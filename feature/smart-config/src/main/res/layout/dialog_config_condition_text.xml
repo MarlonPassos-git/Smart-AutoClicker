@@ -61,13 +61,24 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <include layout="@layout/include_field_text_input"
-                        android:id="@+id/field_text_to_search"
+                    <LinearLayout
+                        android:id="@+id/text_values_container"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginHorizontal="@dimen/margin_horizontal_default"
                         android:layout_marginTop="@dimen/margin_vertical_small"
-                        android:layout_marginBottom="@dimen/margin_vertical_extra_large"/>
+                        android:orientation="vertical" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/button_add_text"
+                        style="@style/Widget.Material3.Button.TextButton.Icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end"
+                        android:layout_marginHorizontal="@dimen/margin_horizontal_default"
+                        android:layout_marginBottom="@dimen/margin_vertical_default"
+                        android:text="@string/button_add_text_to_detect"
+                        app:icon="@drawable/ic_add" />
 
                     <include layout="@layout/include_field_selector"
                         android:id="@+id/field_alphabet"

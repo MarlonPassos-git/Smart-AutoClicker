@@ -86,10 +86,10 @@ interface ImageDetector : AutoCloseable {
     ): DetectionResult
 
     /**
-     * Detect if a text is visible the provided area.
+     * Detect if any of the provided texts is visible in the provided area.
      * [setScreenBitmap] must have been called first with the content of the screen.
      *
-     * @param conditionText the text to detect.
+     * @param conditionTexts the text alternatives to detect.
      * @param recognitionModelId the identifier of the model to use, as specified during [loadTextDetectionModels] call.
      * @param detectionArea the area to search for the text.
      * @param threshold the allowed error threshold allowed for the condition.
@@ -97,7 +97,7 @@ interface ImageDetector : AutoCloseable {
      * @return the results of the detection.
      */
     fun detectText(
-        conditionText: String,
+        conditionTexts: List<String>,
         recognitionModelId: String,
         detectionArea: Rect,
         threshold: Int,

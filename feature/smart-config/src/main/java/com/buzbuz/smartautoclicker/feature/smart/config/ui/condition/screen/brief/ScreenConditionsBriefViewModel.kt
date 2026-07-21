@@ -259,7 +259,7 @@ private fun ScreenCondition.Image.toImageItemDescription(screenArea: Point, bitm
 
 private fun ScreenCondition.Text.toTextItemDescription(): TextConditionDescription =
     TextConditionDescription(
-        conditionText = text,
+        conditionText = texts.joinToString(),
         conditionDetectionArea = detectionArea,
     )
 

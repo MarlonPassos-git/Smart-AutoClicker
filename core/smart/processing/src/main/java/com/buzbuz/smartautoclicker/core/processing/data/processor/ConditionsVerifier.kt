@@ -244,7 +244,7 @@ internal class ConditionsVerifier(
             ?: return condition.toInvalidConditionResult()
 
         val detectionResult = imageDetector.detectText(
-            conditionText = condition.text,
+            conditionTexts = condition.texts,
             recognitionModelId = condition.alphabet.name,
             detectionArea = conditionScalingInfo.detectionArea,
             threshold = condition.threshold,

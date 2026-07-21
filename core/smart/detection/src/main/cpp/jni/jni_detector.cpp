@@ -32,7 +32,7 @@ extern "C" {
     JNIEXPORT void JNICALL Java_com_buzbuz_smartautoclicker_core_detection_NativeDetector_setScreenImage(JNIEnv *env, jobject self, jobject screenBitmap, jstring metricsTag);
     JNIEXPORT jdoubleArray JNICALL Java_com_buzbuz_smartautoclicker_core_detection_NativeDetector_detectImageNative(JNIEnv *env, jobject self, jobject conditionBitmap, jint conditionWidth, jint conditionHeight, jint x, jint y, jint width, jint height, jint threshold);
     JNIEXPORT jdoubleArray JNICALL Java_com_buzbuz_smartautoclicker_core_detection_NativeDetector_detectColorNative(JNIEnv *env, jobject self, jint conditionColor, jint x, jint y, jint width, jint height, jint threshold);
-    JNIEXPORT jdoubleArray JNICALL Java_com_buzbuz_smartautoclicker_core_detection_NativeDetector_detectTextNative(JNIEnv *env, jobject self, jstring conditionText, jstring recognitionModelId, jint x, jint y, jint width, jint height, jint threshold);
+    JNIEXPORT jdoubleArray JNICALL Java_com_buzbuz_smartautoclicker_core_detection_NativeDetector_detectTextNative(JNIEnv *env, jobject self, jobjectArray conditionTexts, jstring recognitionModelId, jint x, jint y, jint width, jint height, jint threshold);
     JNIEXPORT jdoubleArray JNICALL Java_com_buzbuz_smartautoclicker_core_detection_NativeDetector_detectNumberNative(JNIEnv *env, jobject self, jint x, jint y, jint width, jint height, jint threshold, jint numberFormat);
     JNIEXPORT void JNICALL Java_com_buzbuz_smartautoclicker_core_detection_NativeDetector_releaseScreenImage(JNIEnv *env, jobject self, jobject screenBitmap);
 }
@@ -44,7 +44,7 @@ static const JNINativeMethod methods[] = {
         {"setScreenImage", "(Landroid/graphics/Bitmap;Ljava/lang/String;)V", (void*)Java_com_buzbuz_smartautoclicker_core_detection_NativeDetector_setScreenImage},
         {"detectImageNative", "(Landroid/graphics/Bitmap;IIIIIII)[D", (void*)Java_com_buzbuz_smartautoclicker_core_detection_NativeDetector_detectImageNative},
         {"detectColorNative", "(IIIIII)[D", (void*)Java_com_buzbuz_smartautoclicker_core_detection_NativeDetector_detectColorNative},
-        {"detectTextNative", "(Ljava/lang/String;Ljava/lang/String;IIIII)[D", (void*)Java_com_buzbuz_smartautoclicker_core_detection_NativeDetector_detectTextNative},
+        {"detectTextNative", "([Ljava/lang/String;Ljava/lang/String;IIIII)[D", (void*)Java_com_buzbuz_smartautoclicker_core_detection_NativeDetector_detectTextNative},
         {"detectNumberNative", "(IIIIII)[D", (void*)Java_com_buzbuz_smartautoclicker_core_detection_NativeDetector_detectNumberNative},
         {"releaseScreenImage", "(Landroid/graphics/Bitmap;)V", (void*)Java_com_buzbuz_smartautoclicker_core_detection_NativeDetector_releaseScreenImage}
 };

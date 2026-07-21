@@ -112,6 +112,11 @@ namespace smartautoclicker {
          */
         float bestSubstringSimilarity(const std::string& recognized, const std::string& target, float minSimilarity = 0.80f);
 
+        /** Returns the best similarity between recognized text and any configured alternative. */
+        float bestConditionSimilarity(
+                const std::string& recognized,
+                const std::vector<std::string>& targets);
+
         /**
          * Normalizes a character for comparison (e.g., case folding).
          * @param c The character to normalize.
@@ -142,14 +147,14 @@ namespace smartautoclicker {
          * Results are stored internally and can be retrieved with getMatchingResults().
          *
          * @param screenImage The source screen capture.
-         * @param conditionText The text to look for.
+         * @param conditionTexts The text alternatives to look for.
          * @param recognitionModelId The identifier of the recognition model provided with [init].
          * @param detectionArea The region of the screen to search in.
          * @param threshold Confidence threshold for the detection/recognition.
          */
         TextMatchingResult* matchText(
                 const ScreenImage& screenImage,
-                const std::string& conditionText,
+                const std::vector<std::string>& conditionTexts,
                 const std::string& recognitionModelId,
                 const cv::Rect& detectionArea,
                 int threshold);

@@ -23,6 +23,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 
 import com.buzbuz.smartautoclicker.core.domain.model.condition.ScreenCondition
+import com.buzbuz.smartautoclicker.core.domain.model.condition.TEXT_CONDITION_VALUES_LIMIT
 import com.buzbuz.smartautoclicker.core.common.tutorial.domain.model.monitoring.MonitoredViewType
 import com.buzbuz.smartautoclicker.core.common.tutorial.domain.MonitoredViewsManager
 import com.buzbuz.smartautoclicker.feature.smart.config.domain.EditionRepository
@@ -79,8 +80,27 @@ class TextConditionViewModel @Inject constructor(
         updateEditedCondition { it.copy(name = name) }
     }
 
-    fun setTextToDetect(text: String) {
-        updateEditedCondition { it.copy(text = text) }
+    fun updateTextToDetect(index: Int, text: String) {
+        updateEditedCondition { condition ->
+            if (index !in condition.texts.indices || condition.texts[index] == text) return@updateEditedCondition null
+
+            val updatedTexts = condition.texts.toMutableList().apply { set(index, text) }
+            condition.copy(texts = updatedTexts)
+        }
+    }
+
+    fun addTextToDetect() {
+        updateEditedCondition { condition ->
+            if (condition.texts.size >= TEXT_CONDITION_VALUES_LIMIT) return@updateEditedCondition null
+            condition.copy(texts = condition.texts + "")
+        }
+    }
+
+    fun removeTextToDetect(index: Int) {
+        updateEditedCondition { condition ->
+            if (condition.texts.size == 1 || index !in condition.texts.indices) return@updateEditedCondition null
+            condition.copy(texts = condition.texts.filterIndexed { itemIndex, _ -> itemIndex != index })
+        }
     }
 
     fun toggleShouldBeDetected() {
@@ -132,7 +152,8 @@ class TextConditionViewModel @Inject constructor(
             canBeSaved = isComplete(),
             name = name,
             nameError = name.isEmpty(),
-            textToSearch = text,
+            textsToSearch = texts,
+            canAddTextToSearch = texts.size < TEXT_CONDITION_VALUES_LIMIT,
             shouldBeDetectedChecked = shouldBeDetected,
             detectionAreaDescription = detectionArea.toAreaDisplayText(context),
             detectionAreaError = detectionArea.isEmpty,

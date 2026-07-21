@@ -117,7 +117,7 @@ class EventCardViewHolder(
                     conditionImage.visibility = View.GONE
                     conditionText.visibility = View.VISIBLE
 
-                    conditionText.text = condition.text
+                    conditionText.text = condition.texts.joinToString()
                 }
             }
         }

@@ -62,7 +62,7 @@ namespace smartautoclicker {
                 int threshold);
 
         TextMatchingResult* detectText(
-                const char* textCondition,
+                const std::vector<std::string>& textConditions,
                 const char* recognitionModelId,
                 const cv::Rect &roi,
                 int threshold);

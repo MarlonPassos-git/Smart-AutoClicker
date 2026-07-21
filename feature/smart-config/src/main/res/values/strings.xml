@@ -256,6 +256,9 @@
     <!-- Dialog Condition Text ==================================================================================== -->
 
     <string name="field_text_to_detect_label">Text to detect</string>
+    <string name="field_text_to_detect_indexed_label">Text to detect %1$d</string>
+    <string name="button_add_text_to_detect">Add text</string>
+    <string name="accessibility_remove_text_to_detect">Remove text %1$d</string>
     <string name="field_text_detection_alphabet_title">Alphabet</string>
 
 

@@ -23,11 +23,27 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <string>
 #include <map>
+#include <vector>
 
 #include "jni/jni.hpp"
 #include "detector/detector.hpp"
 
 using namespace smartautoclicker;
+
+std::vector<std::string> toNativeStrings(JNIEnv *env, jobjectArray javaStrings) {
+    std::vector<std::string> nativeStrings;
+    const jsize length = env->GetArrayLength(javaStrings);
+    nativeStrings.reserve(length);
+
+    for (jsize index = 0; index < length; index++) {
+        auto javaString = static_cast<jstring>(env->GetObjectArrayElement(javaStrings, index));
+        const char* nativeString = env->GetStringUTFChars(javaString, nullptr);
+        if (nativeString != nullptr) nativeStrings.emplace_back(nativeString);
+        if (nativeString != nullptr) env->ReleaseStringUTFChars(javaString, nativeString);
+        env->DeleteLocalRef(javaString);
+    }
+    return nativeStrings;
+}
 
 extern "C" {
 
@@ -158,7 +174,7 @@ extern "C" {
     JNIEXPORT jdoubleArray JNICALL Java_com_buzbuz_smartautoclicker_core_detection_NativeDetector_detectTextNative(
             JNIEnv *env,
             jobject self,
-            jstring conditionText,
+            jobjectArray conditionTexts,
             jstring recognitionModelId,
             jint x,
             jint y,
@@ -169,14 +185,16 @@ extern "C" {
         auto detector = getDetectorFromJavaRef(env, self);
         if (!detector) return nullptr;
 
-        const char* nativeConditionText = env->GetStringUTFChars(conditionText, nullptr);
+        std::vector<std::string> nativeConditionTexts = toNativeStrings(env, conditionTexts);
+        if (nativeConditionTexts.empty()) return nullptr;
+
         const char* nativeRecognitionModelId = env->GetStringUTFChars(recognitionModelId, nullptr);
-        if (nativeConditionText == nullptr || nativeRecognitionModelId == nullptr) return nullptr;
+        if (nativeRecognitionModelId == nullptr) return nullptr;
 
         jdoubleArray result = nullptr;
         try {
             result = toJniResult(env, detector->detectText(
-                    nativeConditionText,
+                    nativeConditionTexts,
                     nativeRecognitionModelId,
                     cv::Rect(x, y, width, height),
                     threshold));
@@ -184,7 +202,6 @@ extern "C" {
             throwRuntimeException(env, "Invalid detection arguments for text detection");
         }
 
-        env->ReleaseStringUTFChars(conditionText, nativeConditionText);
         env->ReleaseStringUTFChars(recognitionModelId, nativeRecognitionModelId);
         return result;
     }

@@ -44,6 +44,7 @@ import com.buzbuz.smartautoclicker.core.ui.bindings.fields.setValueLabelState
 import com.buzbuz.smartautoclicker.core.ui.bindings.fields.setupDescriptions
 import com.buzbuz.smartautoclicker.feature.smart.config.R
 import com.buzbuz.smartautoclicker.feature.smart.config.databinding.DialogConfigConditionTextBinding
+import com.buzbuz.smartautoclicker.feature.smart.config.databinding.ItemTextConditionValueBinding
 import com.buzbuz.smartautoclicker.feature.smart.config.di.ScenarioConfigViewModelsEntryPoint
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.dialogs.showCloseWithoutSavingDialog
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.dialogs.showDeleteConditionsWithAssociatedActionsDialog
@@ -72,6 +73,8 @@ class TextConditionDialog(
 
     /** ViewBinding containing the views for this dialog. */
     private lateinit var viewBinding: DialogConfigConditionTextBinding
+    private val textValueBindings = mutableListOf<ItemTextConditionValueBinding>()
+    private var monitoredTextField: View? = null
 
     override fun onCreateView(): ViewGroup {
         viewBinding = DialogConfigConditionTextBinding.inflate(LayoutInflater.from(context)).apply {
@@ -101,14 +104,7 @@ class TextConditionDialog(
             }
             hideSoftInputOnFocusLoss(fieldEditName.textField)
 
-            fieldTextToSearch.apply {
-                setLabel(R.string.field_text_to_detect_label)
-                textField.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(
-                    context.resources.getInteger(R.integer.text_condition_max_length)
-                ))
-                setOnTextChangedListener { viewModel.setTextToDetect(it.toString()) }
-            }
-            hideSoftInputOnFocusLoss(fieldEditName.textField)
+            buttonAddText.setOnClickListener { viewModel.addTextToDetect() }
 
             fieldAlphabet.apply {
                 setTitle(context.getString(R.string.field_text_detection_alphabet_title))
@@ -160,12 +156,13 @@ class TextConditionDialog(
         super.onStart()
         viewModel.monitorSaveButtonView(viewBinding.layoutTopBar.buttonSave)
         viewModel.monitorDetectionAreaSelectorView(viewBinding.fieldSelectArea.root)
-        viewModel.monitorTextToDetectField(viewBinding.fieldTextToSearch.textField)
+        monitorFirstTextValueField()
     }
 
     override fun onStop() {
         super.onStop()
         viewModel.stopViewMonitoring()
+        monitoredTextField = null
     }
 
     override fun back() {
@@ -189,7 +186,7 @@ class TextConditionDialog(
             if (fieldEditName.textField.text.isNullOrEmpty()) fieldEditName.setText(uiState.name)
             fieldEditName.setError(uiState.nameError)
 
-            if (fieldTextToSearch.textField.text.isNullOrEmpty()) fieldTextToSearch.setText(uiState.textToSearch)
+            updateTextValueFields(uiState)
 
             fieldAlphabet.setDescription(uiState.alphabetDesc)
             fieldSelectArea.setDescription(uiState.detectionAreaDescription)
@@ -198,6 +195,71 @@ class TextConditionDialog(
             fieldShouldAppear.setDescription(if (uiState.shouldBeDetectedChecked) 1 else 0)
             fieldSliderThreshold.setSliderValue(uiState.detectionThreshold.toFloat())
         }
+    }
+
+    private fun updateTextValueFields(uiState: TextConditionUiState) {
+        while (textValueBindings.size < uiState.textsToSearch.size) addTextValueField()
+        while (textValueBindings.size > uiState.textsToSearch.size) removeLastTextValueField()
+
+        uiState.textsToSearch.forEachIndexed { index, text ->
+            bindTextValueField(index, text, uiState.textsToSearch.size > 1)
+        }
+        viewBinding.buttonAddText.isEnabled = uiState.canAddTextToSearch
+        monitorFirstTextValueField()
+    }
+
+    private fun monitorFirstTextValueField() {
+        val textField = textValueBindings.firstOrNull()?.fieldTextToSearch?.textField ?: return
+        if (monitoredTextField === textField) return
+
+        viewModel.monitorTextToDetectField(textField)
+        monitoredTextField = textField
+    }
+
+    private fun addTextValueField() {
+        val valueBinding = ItemTextConditionValueBinding.inflate(
+            LayoutInflater.from(context),
+            viewBinding.textValuesContainer,
+            false,
+        )
+        configureTextValueInput(valueBinding)
+        textValueBindings.add(valueBinding)
+        viewBinding.textValuesContainer.addView(valueBinding.root)
+    }
+
+    private fun configureTextValueInput(valueBinding: ItemTextConditionValueBinding) {
+        valueBinding.fieldTextToSearch.textField.filters = arrayOf(
+            InputFilter.LengthFilter(context.resources.getInteger(R.integer.text_condition_max_length))
+        )
+        valueBinding.fieldTextToSearch.setOnTextChangedListener { text ->
+            textValueBindings.indexOf(valueBinding)
+                .takeIf { it >= 0 }
+                ?.let { viewModel.updateTextToDetect(it, text.toString()) }
+        }
+        valueBinding.buttonRemoveText.setOnClickListener {
+            viewModel.removeTextToDetect(textValueBindings.indexOf(valueBinding))
+        }
+        hideSoftInputOnFocusLoss(valueBinding.fieldTextToSearch.textField)
+    }
+
+    private fun bindTextValueField(index: Int, text: String, canRemove: Boolean) {
+        val valueBinding = textValueBindings[index]
+        valueBinding.fieldTextToSearch.root.hint = if (canRemove) {
+            context.getString(R.string.field_text_to_detect_indexed_label, index + 1)
+        } else context.getString(R.string.field_text_to_detect_label)
+        if (valueBinding.fieldTextToSearch.textField.text.toString() != text) {
+            valueBinding.fieldTextToSearch.setText(text)
+        }
+        valueBinding.buttonRemoveText.visibility = if (canRemove) View.VISIBLE else View.GONE
+        valueBinding.buttonRemoveText.contentDescription = context.getString(
+            R.string.accessibility_remove_text_to_detect,
+            index + 1,
+        )
+    }
+
+    private fun removeLastTextValueField() {
+        val removedBinding = textValueBindings.removeLast()
+        viewBinding.textValuesContainer.removeView(removedBinding.root)
     }
 
     private fun onDeleteClicked() {

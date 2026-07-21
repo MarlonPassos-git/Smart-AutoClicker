@@ -182,7 +182,7 @@ class EditedItemsBuilder internal constructor(
             threshold = defaultValues.conditionThreshold(context),
             shouldBeDetected = defaultValues.conditionShouldBeDetected(),
             priority = 0,
-            text = "",
+            texts = listOf(""),
             detectionArea = Rect(),
             alphabet = OCRAlphabet.LATIN,
         )
@@ -244,7 +244,7 @@ class EditedItemsBuilder internal constructor(
             id = conditionsIdCreator.generateNewIdentifier(),
             eventId = eventId,
             name = "" + condition.name,
-            text = "" + condition.text,
+            texts = condition.texts.toList(),
         )
 
     fun createNewOnBroadcastReceived(context: Context): TriggerCondition.OnBroadcastReceived =

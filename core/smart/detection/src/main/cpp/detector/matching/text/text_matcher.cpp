@@ -44,7 +44,7 @@ void TextMatcher::clearResults() {
 
 TextMatchingResult* TextMatcher::matchText(
         const ScreenImage& screenImage,
-        const std::string& conditionText,
+        const std::vector<std::string>& conditionTexts,
         const std::string& recognitionModelId,
         const cv::Rect& detectionArea,
         int threshold)
@@ -62,7 +62,7 @@ TextMatchingResult* TextMatcher::matchText(
 
     // Parse results and find matching candidate, if any
     for (const auto& recognizerResult: recognizerResults) {
-        float score = bestSubstringSimilarity(recognizerResult.text,conditionText) * 100;
+        float score = bestConditionSimilarity(recognizerResult.text, conditionTexts) * 100;
         LOGD("TextMatcher", "Score=%f; recognized=%s", score, recognizerResult.text.c_str());
 
         if (score < currentMatchingResult.getResultConfidence()) continue;
@@ -75,6 +75,18 @@ TextMatchingResult* TextMatcher::matchText(
     }
 
     return &currentMatchingResult;
+}
+
+float TextMatcher::bestConditionSimilarity(
+        const std::string& recognized,
+        const std::vector<std::string>& targets
+) {
+    float bestScore = 0.f;
+    for (const auto& target : targets) {
+        bestScore = std::max(bestScore, bestSubstringSimilarity(recognized, target));
+        if (bestScore >= 1.f) break;
+    }
+    return bestScore;
 }
 
 TextMatchingResult* TextMatcher::matchNumber(

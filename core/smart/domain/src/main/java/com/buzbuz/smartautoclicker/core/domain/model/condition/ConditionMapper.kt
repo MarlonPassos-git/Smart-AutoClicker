@@ -104,7 +104,8 @@ private fun ScreenCondition.Text.toTextConditionEntity() = ConditionEntity(
     type = ConditionType.ON_TEXT_DETECTED,
     threshold = threshold,
     shouldBeDetected = shouldBeDetected,
-    textToDetect = text,
+    textToDetect = texts.first(),
+    textToDetectAlternatives = texts.encodeTextAlternatives(),
     textAlphabet = alphabet.name,
     detectionAreaLeft = detectionArea.left,
     detectionAreaTop = detectionArea.top,
@@ -214,7 +215,7 @@ private fun ConditionEntity.toDomainTextCondition(cleanIds: Boolean = false): Sc
         threshold = threshold!!,
         shouldBeDetected = shouldBeDetected ?: true,
         detectionArea = getDetectionArea()!!,
-        text = textToDetect!!,
+        texts = listOf(textToDetect!!) + textToDetectAlternatives.decodeTextAlternatives(),
         alphabet = getTextAlphabet(),
     )
 
@@ -276,3 +277,32 @@ private fun ConditionEntity.getTextAlphabet(): OCRAlphabet =
             OCRAlphabet.valueOf(it)
         } catch (_: IllegalArgumentException) { OCRAlphabet.LATIN }
     } ?: OCRAlphabet.LATIN
+
+private fun List<String>.encodeTextAlternatives(): String? {
+    if (size <= 1) return null
+
+    return buildString {
+        append(TEXT_ALTERNATIVES_ENCODING_PREFIX)
+        this@encodeTextAlternatives.drop(1).forEach { append(it.length).append(':').append(it) }
+    }
+}
+
+private fun String?.decodeTextAlternatives(): List<String> {
+    if (this == null || !startsWith(TEXT_ALTERNATIVES_ENCODING_PREFIX)) return emptyList()
+
+    val alternatives = mutableListOf<String>()
+    var offset = TEXT_ALTERNATIVES_ENCODING_PREFIX.length
+    while (offset < length) {
+        val separator = indexOf(':', offset)
+        if (separator == -1) return emptyList()
+        val valueLength = substring(offset, separator).toIntOrNull() ?: return emptyList()
+        val valueStart = separator + 1
+        val valueEnd = valueStart + valueLength
+        if (valueEnd > length) return emptyList()
+        alternatives.add(substring(valueStart, valueEnd))
+        offset = valueEnd
+    }
+    return alternatives
+}
+
+private const val TEXT_ALTERNATIVES_ENCODING_PREFIX = "v1:"

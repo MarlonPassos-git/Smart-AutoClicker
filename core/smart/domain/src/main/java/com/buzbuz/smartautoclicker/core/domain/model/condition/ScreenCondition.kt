@@ -137,18 +137,24 @@ sealed class ScreenCondition : Condition(), Prioritizable {
         override val threshold: Int,
         override val shouldBeDetected: Boolean,
         override var priority: Int,
-        val text: String,
+        val texts: List<String>,
         val detectionArea: Rect,
         val alphabet: OCRAlphabet,
     ): ScreenCondition(), Prioritizable {
 
         /** Tells if this condition is complete and valid to be saved. */
         override fun isComplete(): Boolean =
-            super.isComplete() && text.isNotEmpty() && !detectionArea.isEmpty
+            super.isComplete() && texts.isValidTextConditionValues() && !detectionArea.isEmpty
 
         override fun hashCodeNoIds(): Int =
-            name.hashCode() + text.hashCode() + threshold.hashCode() + shouldBeDetected.hashCode() +
+            name.hashCode() + texts.hashCode() + threshold.hashCode() + shouldBeDetected.hashCode() +
                     detectionArea.hashCode() + priority.hashCode()
 
     }
 }
+
+private fun List<String>.isValidTextConditionValues(): Boolean =
+    size in 1..TEXT_CONDITION_VALUES_LIMIT && all(String::isNotBlank)
+
+/** Maximum number of alternatives supported by a text condition. */
+const val TEXT_CONDITION_VALUES_LIMIT = 10

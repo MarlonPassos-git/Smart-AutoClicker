@@ -137,17 +137,17 @@ class NativeDetector private constructor() : ImageDetector {
     }
 
     override fun detectText(
-        conditionText: String,
+        conditionTexts: List<String>,
         recognitionModelId: String,
         detectionArea: Rect,
         threshold: Int,
     ): DetectionResult {
 
-        if (isClosed) return DetectionResult()
+        if (isClosed || conditionTexts.isEmpty()) return DetectionResult()
 
         return try {
             detectTextNative(
-                conditionText = conditionText,
+                conditionTexts = conditionTexts.toTypedArray(),
                 recognitionModelId = recognitionModelId,
                 x = detectionArea.left,
                 y = detectionArea.top,
@@ -160,7 +160,7 @@ class NativeDetector private constructor() : ImageDetector {
                 keys = mapOf(
                     "screenSize" to "${screenDimensions.x}x${screenDimensions.y}",
                     "recognitionModelId" to recognitionModelId,
-                    "conditionText" to conditionText,
+                    "conditionTexts" to conditionTexts.joinToString(),
                     "detectionArea" to detectionArea.toString(),
                     "threshold" to threshold.toString(),
                 ),
@@ -273,7 +273,7 @@ class NativeDetector private constructor() : ImageDetector {
     /**
      * Native method for detecting if the text is at a specific position in the current screen bitmap.
      *
-     * @param conditionText the condition to detect in the screen.
+     * @param conditionTexts the conditions to detect in the screen.
      * @param recognitionModelId the identifier of the recognition model specified with [init].
      * @param x the horizontal position of the condition.
      * @param y the vertical position of the condition.
@@ -282,7 +282,7 @@ class NativeDetector private constructor() : ImageDetector {
      * @param threshold the allowed error threshold allowed for the condition.
      */
     private external fun detectTextNative(
-        conditionText: String,
+        conditionTexts: Array<String>,
         recognitionModelId: String,
         x: Int,
         y: Int,

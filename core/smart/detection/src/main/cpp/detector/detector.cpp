@@ -89,10 +89,15 @@ ColorMatchingResult* Detector::detectColor(int colorCondition, const cv::Rect& r
     return colorMatcher->getMatchingResults();
 }
 
-TextMatchingResult* Detector::detectText(const char* textCondition, const char* recognitionModelId, const cv::Rect& roi, int threshold) {
+TextMatchingResult* Detector::detectText(
+        const std::vector<std::string>& textConditions,
+        const char* recognitionModelId,
+        const cv::Rect& roi,
+        int threshold
+) {
     return textMatcher->matchText(
             *screenImage,
-            std::string(textCondition),
+            textConditions,
             std::string(recognitionModelId),
             roi,
             threshold);
