@@ -1,0 +1,37 @@
+[tools]
+java = "21"
+
+[env]
+ANDROID_HOME = "{{env.HOME}}/Android/Sdk"
+ANDROID_SDK_ROOT = "{{env.HOME}}/Android/Sdk"
+_.path = [
+    "{{env.HOME}}/Android/Sdk/cmdline-tools/latest/bin",
+    "{{env.HOME}}/Android/Sdk/emulator",
+    "{{env.HOME}}/Android/Sdk/platform-tools",
+]
+
+[tasks.devices]
+description = "Lista celulares e emuladores disponíveis no ADB"
+run = "adb devices -l"
+
+[tasks.test]
+description = "Executa os testes unitários da variante FDroid Debug"
+run = "./gradlew testFDroidDebugUnitTest"
+
+[tasks.build]
+description = "Gera os APKs FDroid Debug"
+run = "./gradlew assembleFDroidDebug"
+
+[tasks.emulator]
+description = "Inicia o emulador medium_phone"
+run = "android --sdk=$ANDROID_SDK_ROOT emulator start medium_phone"
+
+[tasks.install-emulator]
+description = "Instala o APK x86_64 no emulador ativo"
+depends = ["build"]
+run = "adb -e install -r smartautoclicker/build/outputs/apk/fDroid/debug/smartautoclicker-fDroid-x86_64-debug.apk"
+
+[tasks.install-phone]
+description = "Instala o APK universal no celular USB"
+depends = ["build"]
+run = "adb -d install -r smartautoclicker/build/outputs/apk/fDroid/debug/smartautoclicker-fDroid-universal-debug.apk"
