@@ -72,6 +72,25 @@
 
     <string name="item_click_title">Click</string>
     <string name="item_click_desc">Click somewhere on the screen</string>
+    <string name="item_area_click_title">Area clicks</string>
+    <string name="item_area_click_desc">Click several points inside a polygon</string>
+    <string name="item_area_click_details">%1$d clicks · %2$s · %3$d ms interval</string>
+    <string name="default_area_click_name">Area clicks</string>
+    <string name="dialog_title_area_click">Area clicks</string>
+    <string name="field_area_click_count">Click count</string>
+    <string name="field_area_click_interval">Click interval (ms)</string>
+    <string name="field_area_click_distribution">Distribution</string>
+    <string name="field_area_click_random">Random</string>
+    <string name="field_area_click_distributed">Distributed</string>
+    <string name="field_area_click_area">Click area</string>
+    <string name="field_area_click_area_empty">Select and confirm a polygon</string>
+    <string name="field_area_click_area_vertices">%1$d vertices configured</string>
+    <string name="area_click_editor_title">Click area</string>
+    <string name="area_click_add_vertex">Add point</string>
+    <string name="area_click_remove_vertex">Remove point</string>
+    <string name="area_click_preview">New preview</string>
+    <string name="area_click_hide_editor">Hide or show click area</string>
+    <string name="area_click_editor_instructions">Drag a point, an edge, or the area over the target app</string>
     <string name="item_click_details_on_condition">During %1$s on %2$s</string>
     <string name="item_click_details_on_condition_unknown">During %1$s on detected condition</string>
     <string name="item_click_details_at_position">During %1$s</string>

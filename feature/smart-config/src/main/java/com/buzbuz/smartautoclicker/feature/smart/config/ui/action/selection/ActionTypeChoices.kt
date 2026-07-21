@@ -20,6 +20,7 @@ import com.buzbuz.smartautoclicker.core.common.overlays.dialog.implementation.Di
 import com.buzbuz.smartautoclicker.feature.smart.config.R
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.model.action.getChangeCounterIconRes
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.model.action.getClickIconRes
+import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.model.action.getAreaClickIconRes
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.model.action.getIntentIconRes
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.model.action.getNotificationIconRes
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.model.action.getPauseIconRes
@@ -52,6 +53,11 @@ sealed class ActionTypeChoice(
         R.string.item_click_title,
         R.string.item_click_desc,
         getClickIconRes(),
+    )
+    data object AreaClick : ActionTypeChoice(
+        R.string.item_area_click_title,
+        R.string.item_area_click_desc,
+        getAreaClickIconRes(),
     )
     /** Swipe Action choice. */
     data object Swipe : ActionTypeChoice(

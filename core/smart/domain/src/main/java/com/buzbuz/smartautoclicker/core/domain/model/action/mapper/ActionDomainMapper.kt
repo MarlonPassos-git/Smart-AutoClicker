@@ -11,6 +11,8 @@ import com.buzbuz.smartautoclicker.core.database.entity.EventToggleType
 import com.buzbuz.smartautoclicker.core.database.entity.SystemActionType
 import com.buzbuz.smartautoclicker.core.domain.model.counter.CounterOperationValue
 import com.buzbuz.smartautoclicker.core.domain.model.action.Action
+import com.buzbuz.smartautoclicker.core.domain.model.action.AreaClick
+import com.buzbuz.smartautoclicker.core.domain.model.action.AreaClickDistribution
 import com.buzbuz.smartautoclicker.core.domain.model.action.ChangeCounter
 import com.buzbuz.smartautoclicker.core.domain.model.action.Click
 import com.buzbuz.smartautoclicker.core.domain.model.action.Intent
@@ -28,6 +30,7 @@ import com.buzbuz.smartautoclicker.core.domain.model.action.toggleevent.toDomain
 /** Convert an Action entity into a Domain Action. */
 internal fun CompleteActionEntity.toDomain(cleanIds: Boolean = false): Action = when (action.type) {
     ActionType.CLICK -> toDomainClick(cleanIds)
+    ActionType.AREA_CLICK -> toDomainAreaClick(cleanIds)
     ActionType.SWIPE -> toDomainSwipe(cleanIds)
     ActionType.ZOOM -> toDomainZoom(cleanIds)
     ActionType.PAUSE -> toDomainPause(cleanIds)
@@ -38,6 +41,18 @@ internal fun CompleteActionEntity.toDomain(cleanIds: Boolean = false): Action = 
     ActionType.SYSTEM -> toDomainSystem(cleanIds)
     ActionType.TEXT -> toDomainSetText(cleanIds)
 }
+
+private fun CompleteActionEntity.toDomainAreaClick(cleanIds: Boolean = false) = AreaClick(
+    id = Identifier(id = action.id, asTemporary = cleanIds),
+    eventId = Identifier(id = action.eventId, asTemporary = cleanIds),
+    name = action.name,
+    priority = action.priority,
+    vertices = AreaClickVerticesCodec.decode(action.areaClickVertices!!),
+    clickCount = action.areaClickCount!!,
+    distribution = AreaClickDistribution.valueOf(action.areaClickDistribution!!.name),
+    pressDurationMs = action.pressDuration!!,
+    intervalMs = action.areaClickInterval!!,
+)
 
 private fun CompleteActionEntity.toDomainClick(cleanIds: Boolean = false) = Click(
     id = Identifier(id = action.id, asTemporary = cleanIds),

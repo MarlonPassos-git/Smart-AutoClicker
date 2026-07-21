@@ -37,6 +37,8 @@ enum class EventType {
 enum class ActionType {
     /** A single tap on the screen. */
     CLICK,
+    /** A finite sequence of taps generated inside a polygon. */
+    AREA_CLICK,
     /** A swipe on the screen. */
     SWIPE,
     /** A symmetric two-finger zoom gesture. */
@@ -55,6 +57,12 @@ enum class ActionType {
     SYSTEM,
     /** Set the text of a focused view on the screen. */
     TEXT,
+}
+
+/** Spatial sampling strategy for an [ActionType.AREA_CLICK]. */
+enum class AreaClickDistributionEntity {
+    RANDOM,
+    DISTRIBUTED,
 }
 
 

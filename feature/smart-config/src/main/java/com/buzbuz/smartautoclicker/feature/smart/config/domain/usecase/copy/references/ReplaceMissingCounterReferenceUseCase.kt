@@ -19,6 +19,7 @@ package com.buzbuz.smartautoclicker.feature.smart.config.domain.usecase.copy.ref
 import android.util.Log
 
 import com.buzbuz.smartautoclicker.core.domain.model.action.Action
+import com.buzbuz.smartautoclicker.core.domain.model.action.AreaClick
 import com.buzbuz.smartautoclicker.core.domain.model.action.ChangeCounter
 import com.buzbuz.smartautoclicker.core.domain.model.action.Click
 import com.buzbuz.smartautoclicker.core.domain.model.action.Intent
@@ -103,6 +104,7 @@ class ReplaceMissingCounterReferenceUseCase @Inject constructor() {
             is Notification -> replaceCounterReference(oldName, newName)
             is SetText -> replaceCounterReference(oldName, newName)
 
+            is AreaClick,
             is Click,
             is Intent,
             is Pause,

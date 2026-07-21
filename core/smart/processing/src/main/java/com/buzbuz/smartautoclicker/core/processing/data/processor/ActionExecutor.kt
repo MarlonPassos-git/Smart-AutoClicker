@@ -36,6 +36,8 @@ import com.buzbuz.smartautoclicker.core.common.actions.utils.getPauseDurationMs
 import com.buzbuz.smartautoclicker.core.domain.model.counter.CounterOperationValue
 import com.buzbuz.smartautoclicker.core.domain.model.OR
 import com.buzbuz.smartautoclicker.core.domain.model.action.Intent
+import com.buzbuz.smartautoclicker.core.domain.model.action.AreaClick
+import com.buzbuz.smartautoclicker.core.domain.model.action.AreaClickGeometry
 import com.buzbuz.smartautoclicker.core.domain.model.action.Click
 import com.buzbuz.smartautoclicker.core.domain.model.action.Pause
 import com.buzbuz.smartautoclicker.core.domain.model.action.Swipe
@@ -67,6 +69,7 @@ internal class ActionExecutor(
     private val processingState: ProcessingState,
     randomize: Boolean,
     unblockWorkaroundEnabled: Boolean = false,
+    private val areaClickRandom: Random = Random.Default,
 ) {
 
     init { androidExecutor.resetState() }
@@ -93,6 +96,7 @@ internal class ActionExecutor(
     suspend fun executeActions(event: Event, results: ConditionsResults? = null) {
         event.actions.forEach { action ->
             when (action) {
+                is AreaClick -> executeAreaClick(action)
                 is Click -> executeClick(event, action, results)
                 is Swipe -> executeSwipe(action)
                 is Zoom -> executeZoom(action)
@@ -105,6 +109,29 @@ internal class ActionExecutor(
                 is SetText -> executeSetText(action)
             }
         }
+    }
+
+    private suspend fun executeAreaClick(areaClick: AreaClick) {
+        val positions = AreaClickGeometry.sample(
+            vertices = areaClick.vertices,
+            count = areaClick.clickCount,
+            distribution = areaClick.distribution,
+            random = areaClickRandom,
+        )
+        positions.forEachIndexed { index, position ->
+            dispatchAreaClick(position, areaClick.pressDurationMs)
+            if (index != positions.lastIndex) delay(areaClick.intervalMs)
+        }
+    }
+
+    private suspend fun dispatchAreaClick(position: Point, pressDurationMs: Long) {
+        val path = Path().apply { moveTo(position.x.toFloat(), position.y.toFloat()) }
+        val gesture = GestureDescription.Builder().buildSingleStroke(
+            path = path,
+            durationMs = pressDurationMs,
+            random = random,
+        )
+        withContext(Dispatchers.Main) { androidExecutor.dispatchGesture(gesture) }
     }
 
     private suspend fun executeClick(event: Event, click: Click, results: ConditionsResults?) {

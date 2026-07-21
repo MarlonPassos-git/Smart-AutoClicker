@@ -30,6 +30,7 @@ import com.buzbuz.smartautoclicker.core.bitmaps.BitmapRepository
 import com.buzbuz.smartautoclicker.core.common.overlays.menu.implementation.brief.ItemBrief
 import com.buzbuz.smartautoclicker.core.domain.ext.getConditionBitmap
 import com.buzbuz.smartautoclicker.core.domain.model.action.Action
+import com.buzbuz.smartautoclicker.core.domain.model.action.AreaClick
 import com.buzbuz.smartautoclicker.core.domain.model.action.Click
 import com.buzbuz.smartautoclicker.core.domain.model.action.Pause
 import com.buzbuz.smartautoclicker.core.domain.model.action.Swipe
@@ -47,6 +48,7 @@ import com.buzbuz.smartautoclicker.core.common.tutorial.impl.monitoring.ViewPosi
 import com.buzbuz.smartautoclicker.core.ui.utils.createColorIndicatorDrawable
 import com.buzbuz.smartautoclicker.core.ui.views.itembrief.ItemBriefDescription
 import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.ClickDescription
+import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.AreaClickDescription
 import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.DefaultDescription
 import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.PauseDescription
 import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.SwipeDescription
@@ -132,6 +134,7 @@ class SmartActionsBriefViewModel @Inject constructor(
             buildList {
                 if (!legacyEnabled && canCopy) add(ActionTypeChoice.Copy)
                 add(ActionTypeChoice.Click)
+                add(ActionTypeChoice.AreaClick)
                 add(ActionTypeChoice.Swipe)
                 add(ActionTypeChoice.Zoom)
                 add(ActionTypeChoice.Pause)
@@ -176,6 +179,7 @@ class SmartActionsBriefViewModel @Inject constructor(
         actionTypeChoices.value
 
     override fun createAction(context: Context, choice: ActionTypeChoice): Action = when (choice) {
+        ActionTypeChoice.AreaClick -> editionRepository.editedItemsBuilder.createNewAreaClick(context)
         ActionTypeChoice.Click -> editionRepository.editedItemsBuilder.createNewClick(context)
         ActionTypeChoice.Swipe -> editionRepository.editedItemsBuilder.createNewSwipe(context)
         ActionTypeChoice.Zoom -> editionRepository.editedItemsBuilder.createNewZoom(context)
@@ -305,6 +309,10 @@ class SmartActionsBriefViewModel @Inject constructor(
         }
 
     private suspend fun Action.toActionDescription(context: Context): ItemBriefDescription = when (this) {
+        is AreaClick -> AreaClickDescription(
+            vertices = vertices.map { vertex -> vertex.toPointF() },
+        )
+
         is Click -> ClickDescription(
             position = position?.toPointF(),
             pressDurationMs = pressDuration ?: 1,

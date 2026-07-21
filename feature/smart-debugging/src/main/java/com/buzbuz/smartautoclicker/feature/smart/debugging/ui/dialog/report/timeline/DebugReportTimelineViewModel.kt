@@ -25,6 +25,7 @@ import com.buzbuz.smartautoclicker.core.domain.IRepository
 import com.buzbuz.smartautoclicker.core.domain.model.action.Action
 import com.buzbuz.smartautoclicker.core.domain.model.action.ChangeCounter
 import com.buzbuz.smartautoclicker.core.domain.model.action.Click
+import com.buzbuz.smartautoclicker.core.domain.model.action.AreaClick
 import com.buzbuz.smartautoclicker.core.domain.model.action.Intent
 import com.buzbuz.smartautoclicker.core.domain.model.action.Notification
 import com.buzbuz.smartautoclicker.core.domain.model.action.Pause
@@ -182,6 +183,7 @@ class DebugReportTimelineViewModel @Inject constructor(
     @DrawableRes
     private fun Action.getDebugIconRes(): Int =
         when (this) {
+            is AreaClick -> R.drawable.ic_click
             is Click -> R.drawable.ic_click
             is Swipe -> R.drawable.ic_swipe
             is Zoom -> R.drawable.ic_swipe

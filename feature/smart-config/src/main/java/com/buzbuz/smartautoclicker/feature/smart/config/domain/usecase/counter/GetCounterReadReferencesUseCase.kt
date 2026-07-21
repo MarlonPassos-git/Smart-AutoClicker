@@ -18,6 +18,7 @@ package com.buzbuz.smartautoclicker.feature.smart.config.domain.usecase.counter
 
 import com.buzbuz.smartautoclicker.core.common.actions.text.findCounterReferences
 import com.buzbuz.smartautoclicker.core.domain.model.action.Action
+import com.buzbuz.smartautoclicker.core.domain.model.action.AreaClick
 import com.buzbuz.smartautoclicker.core.domain.model.action.ChangeCounter
 import com.buzbuz.smartautoclicker.core.domain.model.action.Click
 import com.buzbuz.smartautoclicker.core.domain.model.action.Intent
@@ -112,6 +113,7 @@ class GetCounterReadReferencesUseCase @Inject constructor(
                         }
                     }
 
+                    is AreaClick,
                     is Click,
                     is Intent,
                     is Pause,

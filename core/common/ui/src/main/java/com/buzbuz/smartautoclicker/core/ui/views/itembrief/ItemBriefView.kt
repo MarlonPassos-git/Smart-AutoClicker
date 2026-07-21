@@ -29,6 +29,8 @@ import com.buzbuz.smartautoclicker.core.display.config.DisplayConfigManager
 import com.buzbuz.smartautoclicker.core.display.di.DisplayEntryPoint
 import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.ClickBriefRenderer
 import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.ClickDescription
+import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.AreaClickBriefRenderer
+import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.AreaClickDescription
 import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.ColorConditionBriefRenderer
 import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.ColorConditionDescription
 import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.DefaultBriefRenderer
@@ -82,6 +84,7 @@ class ItemBriefView @JvmOverloads constructor(
         renderer?.onStop()
         if (!keepRenderer) {
             renderer = when (description) {
+                is AreaClickDescription -> AreaClickBriefRenderer(this, style.areaClickStyle)
                 is ClickDescription -> ClickBriefRenderer(this, style.clickStyle)
                 is SwipeDescription -> SwipeBriefRenderer(this, style.swipeStyle)
                 is ZoomDescription -> ZoomBriefRenderer(this, style.swipeStyle)

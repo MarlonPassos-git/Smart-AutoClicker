@@ -23,6 +23,7 @@ import com.buzbuz.smartautoclicker.feature.smart.config.ui.action.brief.SmartAct
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.action.changecounter.ChangeCounterViewModel
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.action.click.offset.ClickOffsetViewModel
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.action.click.ClickViewModel
+import com.buzbuz.smartautoclicker.feature.smart.config.ui.action.areaclick.AreaClickViewModel
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.action.intent.IntentViewModel
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.action.intent.activities.ActivitySelectionModel
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.action.intent.component.ComponentSelectionModel
@@ -79,6 +80,7 @@ import dagger.hilt.InstallIn
 interface ScenarioConfigViewModelsEntryPoint {
 
     fun actionCopyViewModel(): ActionCopyViewModel
+    fun areaClickViewModel(): AreaClickViewModel
     fun actionTypeSelectionViewModel(): ActionTypeSelectionViewModel
     fun activitySelectionViewModel(): ActivitySelectionModel
     fun alphabetSelectionViewModel(): AlphabetSelectionViewModel

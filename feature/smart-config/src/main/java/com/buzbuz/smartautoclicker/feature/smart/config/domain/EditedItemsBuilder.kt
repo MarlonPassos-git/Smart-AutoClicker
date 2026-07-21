@@ -32,6 +32,7 @@ import com.buzbuz.smartautoclicker.core.bitmaps.CONDITION_FILE_PREFIX
 import com.buzbuz.smartautoclicker.core.domain.IRepository
 import com.buzbuz.smartautoclicker.core.domain.model.counter.CounterOperationValue
 import com.buzbuz.smartautoclicker.core.domain.model.action.Action
+import com.buzbuz.smartautoclicker.core.domain.model.action.AreaClick
 import com.buzbuz.smartautoclicker.core.domain.model.action.ChangeCounter
 import com.buzbuz.smartautoclicker.core.domain.model.action.Click
 import com.buzbuz.smartautoclicker.core.domain.model.action.Click.PositionType
@@ -314,6 +315,19 @@ class EditedItemsBuilder internal constructor(
             priority = 0,
         )
 
+    fun createNewAreaClick(context: Context): AreaClick =
+        AreaClick(
+            id = actionsIdCreator.generateNewIdentifier(),
+            eventId = getEditedEventIdOrThrow(),
+            name = defaultValues.areaClickName(context),
+            clickCount = defaultValues.areaClickCount(context),
+            distribution = defaultValues.areaClickDistribution(context),
+            pressDurationMs = defaultValues.areaClickDuration(context),
+            intervalMs = defaultValues.areaClickInterval(context),
+            vertices = emptyList(),
+            priority = 0,
+        )
+
     fun createNewSwipe(context: Context): Swipe =
         Swipe(
             id = actionsIdCreator.generateNewIdentifier(),
@@ -424,6 +438,10 @@ class EditedItemsBuilder internal constructor(
         )
 
     fun createNewActionFrom(from: Action, eventId: Identifier = getEditedEventIdOrThrow()): Action = when (from) {
+        is AreaClick -> from.copy(
+            id = actionsIdCreator.generateNewIdentifier(), eventId = eventId,
+            name = "" + from.name, vertices = from.vertices.map(::Point),
+        )
         is Click -> createNewClickFrom(from, eventId)
         is Swipe -> createNewSwipeFrom(from, eventId)
         is Zoom -> createNewZoomFrom(from, eventId)

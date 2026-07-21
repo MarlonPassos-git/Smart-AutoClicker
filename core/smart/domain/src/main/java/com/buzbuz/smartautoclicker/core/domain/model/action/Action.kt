@@ -44,6 +44,7 @@ sealed class Action : Identifiable, Completable, Prioritizable {
         priority: Int = this.priority,
     ): Action =
         when (this) {
+            is AreaClick -> copy(id = id, eventId = eventId, name = name, priority = priority)
             is Click -> copy(id = id, eventId = eventId, name = name, priority = priority)
             is ChangeCounter -> copy(id = id, eventId = eventId, name = name, priority = priority)
             is Intent -> copy(id = id, eventId = eventId, name = name, priority = priority)

@@ -20,6 +20,7 @@ import android.content.Context
 import com.buzbuz.smartautoclicker.core.common.overlays.base.BaseOverlay
 import com.buzbuz.smartautoclicker.core.common.permissions.model.PermissionPostNotification
 import com.buzbuz.smartautoclicker.core.domain.model.action.Action
+import com.buzbuz.smartautoclicker.core.domain.model.action.AreaClick
 import com.buzbuz.smartautoclicker.core.domain.model.action.ChangeCounter
 import com.buzbuz.smartautoclicker.core.domain.model.action.Click
 import com.buzbuz.smartautoclicker.core.domain.model.action.Intent
@@ -34,6 +35,7 @@ import com.buzbuz.smartautoclicker.core.domain.model.action.ToggleEvent
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.action.OnActionConfigCompleteListener
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.action.changecounter.ChangeCounterDialog
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.action.click.ClickDialog
+import com.buzbuz.smartautoclicker.feature.smart.config.ui.action.areaclick.AreaClickDialog
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.action.intent.IntentDialog
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.action.notification.NotificationDialog
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.action.pause.PauseDialog
@@ -97,6 +99,7 @@ internal fun BaseOverlay.showActionConfigDialog(configurator: ActionConfigurator
     }
 
     val overlay = when (action) {
+        is AreaClick -> AreaClickDialog(actionConfigDialogListener)
         is Click -> ClickDialog(actionConfigDialogListener)
         is Swipe -> SwipeDialog(actionConfigDialogListener)
         is Zoom -> ZoomDialog(actionConfigDialogListener)

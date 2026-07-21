@@ -124,6 +124,12 @@ data class ActionEntity(
     @ColumnInfo(name = "clickOffsetX") val clickOffsetX: Int? = null,
     @ColumnInfo(name = "clickOffsetY") val clickOffsetY: Int? = null,
 
+    // ActionType.AREA_CLICK
+    @ColumnInfo(name = "areaClickCount") val areaClickCount: Int? = null,
+    @ColumnInfo(name = "areaClickInterval") val areaClickInterval: Long? = null,
+    @ColumnInfo(name = "areaClickDistribution") val areaClickDistribution: AreaClickDistributionEntity? = null,
+    @ColumnInfo(name = "areaClickVertices") val areaClickVertices: String? = null,
+
     // ActionType.SWIPE
     @ColumnInfo(name = "fromX") val fromX: Int? = null,
     @ColumnInfo(name = "fromY") val fromY: Int? = null,

@@ -478,6 +478,7 @@ internal open class CompatDeserializer : Deserializer {
     ): ActionEntity? =
         when (deserializeActionType(jsonAction)) {
             ActionType.CLICK -> deserializeActionClick(jsonAction, eventConditions, conditionsOperator)
+            ActionType.AREA_CLICK -> null
             ActionType.SWIPE -> deserializeActionSwipe(jsonAction)
             ActionType.ZOOM -> deserializeActionZoom(jsonAction)
             ActionType.PAUSE -> deserializeActionPause(jsonAction)

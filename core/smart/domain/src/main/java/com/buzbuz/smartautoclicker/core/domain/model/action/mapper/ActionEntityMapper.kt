@@ -18,9 +18,11 @@ package com.buzbuz.smartautoclicker.core.domain.model.action.mapper
 
 import com.buzbuz.smartautoclicker.core.database.entity.ActionEntity
 import com.buzbuz.smartautoclicker.core.database.entity.ActionType
+import com.buzbuz.smartautoclicker.core.database.entity.AreaClickDistributionEntity
 import com.buzbuz.smartautoclicker.core.database.entity.CounterOperationValueType
 import com.buzbuz.smartautoclicker.core.domain.model.counter.CounterOperationValue
 import com.buzbuz.smartautoclicker.core.domain.model.action.Action
+import com.buzbuz.smartautoclicker.core.domain.model.action.AreaClick
 import com.buzbuz.smartautoclicker.core.domain.model.action.ChangeCounter
 import com.buzbuz.smartautoclicker.core.domain.model.action.Click
 import com.buzbuz.smartautoclicker.core.domain.model.action.Intent
@@ -37,6 +39,7 @@ internal fun Action.toEntity(): ActionEntity {
     if (!isComplete()) throw IllegalStateException("Can't transform to entity, action is incomplete: $this")
 
     return when (this) {
+        is AreaClick -> toAreaClickEntity()
         is Click -> toClickEntity()
         is Swipe -> toSwipeEntity()
         is Zoom -> toZoomEntity()
@@ -49,6 +52,20 @@ internal fun Action.toEntity(): ActionEntity {
         is SetText -> toSetTextEntity()
     }
 }
+
+private fun AreaClick.toAreaClickEntity(): ActionEntity =
+    ActionEntity(
+        id = id.databaseId,
+        eventId = eventId.databaseId,
+        priority = priority,
+        name = name!!,
+        type = ActionType.AREA_CLICK,
+        pressDuration = pressDurationMs,
+        areaClickCount = clickCount,
+        areaClickInterval = intervalMs,
+        areaClickDistribution = AreaClickDistributionEntity.valueOf(distribution.name),
+        areaClickVertices = AreaClickVerticesCodec.encode(vertices),
+    )
 
 private fun Click.toClickEntity(): ActionEntity =
     ActionEntity(

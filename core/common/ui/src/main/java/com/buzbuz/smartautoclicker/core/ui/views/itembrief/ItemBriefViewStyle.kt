@@ -26,6 +26,7 @@ import androidx.core.content.res.use
 
 import com.buzbuz.smartautoclicker.core.ui.R
 import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.ClickBriefRendererStyle
+import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.AreaClickBriefRendererStyle
 import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.ColorConditionBriefRendererStyle
 import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.DefaultBriefRendererStyle
 import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.ImageConditionBriefRendererStyle
@@ -35,6 +36,7 @@ import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.TextConditi
 
 
 internal class ItemBriefViewStyle(
+    val areaClickStyle: AreaClickBriefRendererStyle,
     val clickStyle: ClickBriefRendererStyle,
     val swipeStyle: SwipeBriefRendererStyle,
     val pauseStyle: PauseBriefRendererStyle,
@@ -58,6 +60,12 @@ internal fun Context.getItemBriefStyle(attrs: AttributeSet, defStyleAttr: Int): 
         val colorOutlineSecondary = ta.getColor(R.styleable.ItemBriefView_colorOutlineSecondary, Color.GREEN)
 
         ItemBriefViewStyle(
+            areaClickStyle = AreaClickBriefRendererStyle(
+                fillPaint = newFillPaint(colorOutlinePrimary.withAlpha(56)),
+                outlinePaint = newStrokePaint(colorOutlinePrimary, thickness),
+                vertexPaint = newFillPaint(innerColor),
+                vertexRadiusPx = innerRadius,
+            ),
             clickStyle = ClickBriefRendererStyle(
                 backgroundColor = backgroundColor,
                 outerPaint = newStrokePaint(colorOutlinePrimary, thickness),
@@ -122,3 +130,6 @@ private fun newFillPaint(@ColorInt paintColor: Int, thicknessPx: Float? = null) 
     color = paintColor
     thicknessPx?.let { strokeWidth = it }
 }
+
+private fun Int.withAlpha(alpha: Int): Int =
+    Color.argb(alpha, Color.red(this), Color.green(this), Color.blue(this))

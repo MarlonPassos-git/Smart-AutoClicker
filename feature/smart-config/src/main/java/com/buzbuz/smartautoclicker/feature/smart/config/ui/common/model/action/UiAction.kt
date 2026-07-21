@@ -19,6 +19,7 @@ package com.buzbuz.smartautoclicker.feature.smart.config.ui.common.model.action
 import android.content.Context
 import androidx.annotation.DrawableRes
 import com.buzbuz.smartautoclicker.core.domain.model.action.Action
+import com.buzbuz.smartautoclicker.core.domain.model.action.AreaClick
 import com.buzbuz.smartautoclicker.core.domain.model.action.ChangeCounter
 import com.buzbuz.smartautoclicker.core.domain.model.action.Click
 import com.buzbuz.smartautoclicker.core.domain.model.action.Intent
@@ -51,6 +52,7 @@ internal fun Action.toUiAction(context: Context, parent: Event? = null, inError:
 
 @DrawableRes
 internal fun Action.getIconRes(): Int = when (this) {
+    is AreaClick -> getAreaClickIconRes()
     is Click -> getClickIconRes()
     is Swipe -> getSwipeIconRes()
     is Zoom -> getZoomIconRes()
@@ -64,6 +66,7 @@ internal fun Action.getIconRes(): Int = when (this) {
 }
 
 internal fun Action.getActionDescription(context: Context, parent: Event?, inError: Boolean): String = when (this) {
+    is AreaClick -> getDescription(context, inError)
     is Click -> getDescription(context, parent, inError)
     is Swipe -> getDescription(context, inError)
     is Zoom -> getDescription(context, inError)

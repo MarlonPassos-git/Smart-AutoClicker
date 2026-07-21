@@ -19,6 +19,7 @@ package com.buzbuz.smartautoclicker.core.smart.debugging.domain.usecase
 import com.buzbuz.smartautoclicker.core.domain.model.action.Action
 import com.buzbuz.smartautoclicker.core.domain.model.action.ChangeCounter
 import com.buzbuz.smartautoclicker.core.domain.model.action.Click
+import com.buzbuz.smartautoclicker.core.domain.model.action.AreaClick
 import com.buzbuz.smartautoclicker.core.domain.model.action.Intent
 import com.buzbuz.smartautoclicker.core.domain.model.action.Notification
 import com.buzbuz.smartautoclicker.core.domain.model.action.Pause
@@ -77,6 +78,8 @@ class GetDebugLiveDetectionResultUseCase @Inject constructor(
     private fun List<Action>.getDurationMs(): Long =
         fold(initial = 0) { acc, action ->
             acc + when (action) {
+                is AreaClick -> action.clickCount * action.pressDurationMs +
+                        (action.clickCount - 1) * action.intervalMs
                 is Click -> action.pressDuration ?: 0
                 is Swipe -> action.swipeDuration ?: 0
                 is com.buzbuz.smartautoclicker.core.domain.model.action.Zoom -> action.zoomDurationMs ?: 0
