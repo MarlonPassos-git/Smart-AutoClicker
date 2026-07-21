@@ -33,6 +33,7 @@ import com.buzbuz.smartautoclicker.core.ui.views.itembrief.ItemBriefDescription
 import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.ClickDescription
 import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.PauseDescription
 import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.SwipeDescription
+import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.ZoomDescription
 import com.buzbuz.smartautoclicker.feature.dumb.config.domain.DumbEditionRepository
 import com.buzbuz.smartautoclicker.feature.dumb.config.ui.actions.copy.toDumbActionDetails
 
@@ -147,6 +148,9 @@ class DumbScenarioBriefViewModel @Inject constructor(
     fun createNewDumbPause(context: Context, ): DumbAction.DumbPause =
         dumbEditionRepository.dumbActionBuilder.createNewDumbPause(context)
 
+    fun createNewDumbZoom(context: Context, center: Point, intensityPx: Int): DumbAction.DumbZoom =
+        dumbEditionRepository.dumbActionBuilder.createNewDumbZoom(context, center, intensityPx)
+
     fun createDumbActionCopy(actionToCopy: DumbAction): DumbAction =
         dumbEditionRepository.dumbActionBuilder.createNewDumbActionFrom(actionToCopy)
 
@@ -221,6 +225,13 @@ class DumbScenarioBriefViewModel @Inject constructor(
 
             is DumbAction.DumbPause -> PauseDescription(
                 pauseDurationMs = pauseDurationMs,
+            )
+
+            is DumbAction.DumbZoom -> ZoomDescription(
+                direction = direction,
+                center = center.toPointF(),
+                intensityPx = intensityPx,
+                zoomDurationMs = zoomDurationMs,
             )
         }
 }

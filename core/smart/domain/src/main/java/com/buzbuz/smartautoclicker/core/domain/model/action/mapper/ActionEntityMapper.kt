@@ -30,6 +30,7 @@ import com.buzbuz.smartautoclicker.core.domain.model.action.SetText
 import com.buzbuz.smartautoclicker.core.domain.model.action.Swipe
 import com.buzbuz.smartautoclicker.core.domain.model.action.SystemAction
 import com.buzbuz.smartautoclicker.core.domain.model.action.ToggleEvent
+import com.buzbuz.smartautoclicker.core.domain.model.action.Zoom
 
 
 internal fun Action.toEntity(): ActionEntity {
@@ -38,6 +39,7 @@ internal fun Action.toEntity(): ActionEntity {
     return when (this) {
         is Click -> toClickEntity()
         is Swipe -> toSwipeEntity()
+        is Zoom -> toZoomEntity()
         is Pause -> toPauseEntity()
         is Intent -> toIntentEntity()
         is ToggleEvent -> toToggleEventEntity()
@@ -76,6 +78,20 @@ private fun Swipe.toSwipeEntity(): ActionEntity =
         fromY = from?.y,
         toX = to?.x,
         toY = to?.y,
+    )
+
+private fun Zoom.toZoomEntity(): ActionEntity =
+    ActionEntity(
+        id = id.databaseId,
+        eventId = eventId.databaseId,
+        priority = priority,
+        name = name!!,
+        type = ActionType.ZOOM,
+        zoomDirection = direction.name,
+        zoomIntensity = intensityPx,
+        zoomCenterX = center?.x,
+        zoomCenterY = center?.y,
+        zoomDuration = zoomDurationMs,
     )
 
 private fun Pause.toPauseEntity(): ActionEntity =

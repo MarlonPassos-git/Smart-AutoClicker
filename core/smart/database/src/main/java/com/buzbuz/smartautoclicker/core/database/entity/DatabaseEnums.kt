@@ -39,6 +39,8 @@ enum class ActionType {
     CLICK,
     /** A swipe on the screen. */
     SWIPE,
+    /** A symmetric two-finger zoom gesture. */
+    ZOOM,
     /** A pause, waiting before the next action. */
     PAUSE,
     /** An Android Intent, allowing to interact with other applications. */

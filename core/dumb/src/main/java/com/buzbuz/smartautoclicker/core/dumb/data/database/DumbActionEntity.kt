@@ -65,6 +65,13 @@ data class DumbActionEntity(
     @ColumnInfo(name = "toX") val toX: Int? = null,
     @ColumnInfo(name = "toY") val toY: Int? = null,
 
+    // ActionType.ZOOM
+    @ColumnInfo(name = "zoom_direction") val zoomDirection: String? = null,
+    @ColumnInfo(name = "zoom_intensity") val zoomIntensity: Int? = null,
+    @ColumnInfo(name = "zoom_center_x") val zoomCenterX: Int? = null,
+    @ColumnInfo(name = "zoom_center_y") val zoomCenterY: Int? = null,
+    @ColumnInfo(name = "zoom_duration") val zoomDuration: Long? = null,
+
     // ActionType.PAUSE
     @ColumnInfo(name = "pause_duration") val pauseDuration: Long? = null,
 ) : EntityWithId
@@ -81,6 +88,8 @@ enum class DumbActionType {
     CLICK,
     /** A swipe on the screen. */
     SWIPE,
+    /** A symmetric two-finger zoom gesture. */
+    ZOOM,
     /** A pause, waiting before the next action. */
     PAUSE,
 }

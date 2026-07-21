@@ -20,11 +20,17 @@ import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.GestureDescription
 import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.graphics.Point
 import android.util.AndroidRuntimeException
 import android.util.Log
 
 import com.buzbuz.smartautoclicker.core.common.actions.gesture.GestureExecutor
+import com.buzbuz.smartautoclicker.core.common.actions.gesture.buildZoomGesture
+import com.buzbuz.smartautoclicker.core.common.actions.gesture.calculateZoomStrokeEndpoints
 import com.buzbuz.smartautoclicker.core.common.actions.model.ActionNotificationRequest
+import com.buzbuz.smartautoclicker.core.base.gesture.ZoomDirection
+import com.buzbuz.smartautoclicker.core.base.extensions.nextIntInOffset
+import com.buzbuz.smartautoclicker.core.common.actions.utils.RANDOMIZATION_POSITION_MAX_OFFSET_PX
 import com.buzbuz.smartautoclicker.core.common.actions.notification.NotificationRequestExecutor
 import com.buzbuz.smartautoclicker.core.common.actions.text.TextExecutor
 
@@ -33,6 +39,8 @@ import java.io.PrintWriter
 import java.lang.ref.WeakReference
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.math.roundToInt
+import kotlin.random.Random
 
 
 @Singleton
@@ -78,6 +86,32 @@ internal class AndroidActionExecutorImpl @Inject constructor(
             Log.w(TAG, "System did not execute the gesture properly, delaying processing to avoid spamming slow system")
             delay(500)
         }
+    }
+
+    override suspend fun dispatchZoomGesture(
+        center: Point,
+        intensityPx: Int,
+        durationMs: Long,
+        direction: ZoomDirection,
+        random: Random?,
+    ) {
+        val service = accessibilityService ?: return
+        val metrics = service.resources.displayMetrics
+        val randomizedCenter = random?.let {
+            Point(
+                it.nextIntInOffset(center.x, RANDOMIZATION_POSITION_MAX_OFFSET_PX),
+                it.nextIntInOffset(center.y, RANDOMIZATION_POSITION_MAX_OFFSET_PX),
+            )
+        } ?: center
+        val strokes = calculateZoomStrokeEndpoints(
+            center = randomizedCenter,
+            intensityPx = intensityPx,
+            direction = direction,
+            innerRadiusPx = (ZOOM_INNER_RADIUS_DP * metrics.density).roundToInt(),
+            screenWidthPx = metrics.widthPixels,
+            screenHeightPx = metrics.heightPixels,
+        )
+        dispatchGesture(GestureDescription.Builder().buildZoomGesture(strokes, durationMs, random))
     }
 
     override fun performGlobalAction(globalAction: Int) {
@@ -135,3 +169,4 @@ internal class AndroidActionExecutorImpl @Inject constructor(
 }
 
 private const val TAG = "ServiceActionExecutor"
+private const val ZOOM_INNER_RADIUS_DP = 24

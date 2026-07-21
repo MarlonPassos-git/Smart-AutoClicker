@@ -28,11 +28,13 @@ import com.buzbuz.smartautoclicker.core.common.overlays.menu.implementation.Posi
 import com.buzbuz.smartautoclicker.core.dumb.domain.model.DumbAction
 import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.ClickDescription
 import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.SwipeDescription
+import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.ZoomDescription
 import com.buzbuz.smartautoclicker.feature.dumb.config.R
 import com.buzbuz.smartautoclicker.feature.dumb.config.ui.actions.click.DumbClickDialog
 import com.buzbuz.smartautoclicker.feature.dumb.config.ui.actions.copy.DumbActionCopyDialog
 import com.buzbuz.smartautoclicker.feature.dumb.config.ui.actions.pause.DumbPauseDialog
 import com.buzbuz.smartautoclicker.feature.dumb.config.ui.actions.swipe.DumbSwipeDialog
+import com.buzbuz.smartautoclicker.feature.dumb.config.ui.actions.zoom.DumbZoomDialog
 
 internal fun OverlayManager.startDumbActionCreationUiFlow(
     context: Context,
@@ -52,6 +54,7 @@ internal fun OverlayManager.startDumbActionCreationUiFlow(
                     DumbActionTypeChoice.Copy -> onCopyDumbActionSelected(context, creator, listener)
                     DumbActionTypeChoice.Click -> onDumbClickCreationSelected(context, creator, listener)
                     DumbActionTypeChoice.Swipe -> onDumbSwipeCreationSelected(context, creator, listener)
+                    DumbActionTypeChoice.Zoom -> onDumbZoomCreationSelected(context, creator, listener)
                     DumbActionTypeChoice.Pause -> startDumbPauseEditionFlow(
                         context,
                         creator.createNewDumbPause(),
@@ -74,6 +77,7 @@ internal fun OverlayManager.startDumbActionEditionUiFlow(
     when (dumbAction) {
         is DumbAction.DumbClick -> startDumbClickEditionUiFlow(context, dumbAction, listener)
         is DumbAction.DumbSwipe -> startDumbSwipeEditionFlow(context, dumbAction, listener)
+        is DumbAction.DumbZoom -> startDumbZoomEditionFlow(context, dumbAction, listener)
         is DumbAction.DumbPause -> startDumbPauseEditionFlow(context, dumbAction, listener)
     }
 }
@@ -228,6 +232,47 @@ private fun OverlayManager.startDumbPauseEditionFlow(
     )
 }
 
+private fun OverlayManager.onDumbZoomCreationSelected(
+    context: Context,
+    creator: DumbActionCreator,
+    listener: DumbActionUiFlowListener,
+) {
+    navigateTo(
+        context,
+        PositionSelectorMenu(
+            itemBriefDescription = ZoomDescription(),
+            onConfirm = { description ->
+                val zoom = description as? ZoomDescription ?: return@PositionSelectorMenu
+                val center = zoom.center ?: return@PositionSelectorMenu
+                startDumbZoomEditionFlow(
+                    context,
+                    creator.createNewDumbZoom(center.toPoint(), zoom.intensityPx),
+                    listener,
+                )
+            },
+            onDismiss = listener.onDumbActionCreationCancelled,
+        ),
+        hideCurrent = true,
+    )
+}
+
+private fun OverlayManager.startDumbZoomEditionFlow(
+    context: Context,
+    dumbZoom: DumbAction.DumbZoom,
+    listener: DumbActionUiFlowListener,
+) {
+    navigateTo(
+        context,
+        DumbZoomDialog(
+            dumbZoom = dumbZoom,
+            onConfirmClicked = listener.onDumbActionSaved,
+            onDeleteClicked = listener.onDumbActionDeleted,
+            onDismissClicked = listener.onDumbActionCreationCancelled,
+        ),
+        hideCurrent = true,
+    )
+}
+
 
 
 internal class DumbActionUiFlowListener(
@@ -239,6 +284,7 @@ internal class DumbActionUiFlowListener(
 internal class DumbActionCreator(
     val createNewDumbClick: (position: Point) -> DumbAction.DumbClick,
     val createNewDumbSwipe: (from: Point, to: Point) -> DumbAction.DumbSwipe,
+    val createNewDumbZoom: (center: Point, intensityPx: Int) -> DumbAction.DumbZoom,
     val createNewDumbPause: () -> DumbAction.DumbPause,
     val createDumbActionCopy: ((DumbAction) -> DumbAction)? = null,
 )

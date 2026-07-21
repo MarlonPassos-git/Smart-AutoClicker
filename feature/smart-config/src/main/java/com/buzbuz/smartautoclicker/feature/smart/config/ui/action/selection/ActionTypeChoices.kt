@@ -27,6 +27,7 @@ import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.model.action.g
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.model.action.getSwipeIconRes
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.model.action.getSystemActionIconRes
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.model.action.getToggleEventIconRes
+import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.model.action.getZoomIconRes
 
 
 /** Choices for the action type selection dialog. */
@@ -57,6 +58,12 @@ sealed class ActionTypeChoice(
         R.string.item_swipe_title,
         R.string.item_swipe_desc,
         getSwipeIconRes(),
+    )
+    /** Zoom Action choice. */
+    data object Zoom : ActionTypeChoice(
+        R.string.zoom_title,
+        R.string.zoom_choice_description,
+        getZoomIconRes(),
     )
     /** Pause Action choice. */
     data object Pause : ActionTypeChoice(

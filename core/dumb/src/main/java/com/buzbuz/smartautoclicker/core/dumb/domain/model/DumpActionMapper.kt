@@ -17,6 +17,7 @@
 package com.buzbuz.smartautoclicker.core.dumb.domain.model
 
 import android.graphics.Point
+import com.buzbuz.smartautoclicker.core.base.gesture.ZoomDirection
 
 import com.buzbuz.smartautoclicker.core.base.identifier.DATABASE_ID_INSERTION
 import com.buzbuz.smartautoclicker.core.base.identifier.Identifier
@@ -26,11 +27,13 @@ import com.buzbuz.smartautoclicker.core.dumb.data.database.DumbActionType
 internal fun DumbActionEntity.toDomain(asDomain: Boolean = false): DumbAction = when (type) {
     DumbActionType.CLICK -> toDomainClick(asDomain)
     DumbActionType.SWIPE -> toDomainSwipe(asDomain)
+    DumbActionType.ZOOM -> toDomainZoom(asDomain)
     DumbActionType.PAUSE -> toDomainPause(asDomain)
 }
 internal fun DumbAction.toEntity(scenarioDbId: Long = DATABASE_ID_INSERTION): DumbActionEntity = when (this) {
     is DumbAction.DumbClick -> toClickEntity(scenarioDbId)
     is DumbAction.DumbSwipe -> toSwipeEntity(scenarioDbId)
+    is DumbAction.DumbZoom -> toZoomEntity(scenarioDbId)
     is DumbAction.DumbPause -> toPauseEntity(scenarioDbId)
 }
 
@@ -68,6 +71,18 @@ private fun DumbActionEntity.toDomainPause(asDomain: Boolean): DumbAction.DumbPa
         name = name,
         priority = priority,
         pauseDurationMs = pauseDuration!!,
+    )
+
+private fun DumbActionEntity.toDomainZoom(asDomain: Boolean): DumbAction.DumbZoom =
+    DumbAction.DumbZoom(
+        id = Identifier(id = id, asTemporary = asDomain),
+        scenarioId = Identifier(id = dumbScenarioId, asTemporary = asDomain),
+        name = name,
+        priority = priority,
+        direction = ZoomDirection.valueOf(zoomDirection!!),
+        intensityPx = zoomIntensity!!,
+        center = Point(zoomCenterX!!, zoomCenterY!!),
+        zoomDurationMs = zoomDuration!!,
     )
 
 private fun DumbAction.DumbClick.toClickEntity(scenarioDbId: Long): DumbActionEntity {
@@ -118,5 +133,22 @@ private fun DumbAction.DumbPause.toPauseEntity(scenarioDbId: Long): DumbActionEn
         priority = priority,
         type = DumbActionType.PAUSE,
         pauseDuration = pauseDurationMs,
+    )
+}
+
+private fun DumbAction.DumbZoom.toZoomEntity(scenarioDbId: Long): DumbActionEntity {
+    if (!isValid()) throw IllegalStateException("Can't transform to entity, Zoom is incomplete: $this")
+
+    return DumbActionEntity(
+        id = id.databaseId,
+        dumbScenarioId = if (scenarioDbId != DATABASE_ID_INSERTION) scenarioDbId else scenarioId.databaseId,
+        name = name,
+        priority = priority,
+        type = DumbActionType.ZOOM,
+        zoomDirection = direction.name,
+        zoomIntensity = intensityPx,
+        zoomCenterX = center.x,
+        zoomCenterY = center.y,
+        zoomDuration = zoomDurationMs,
     )
 }

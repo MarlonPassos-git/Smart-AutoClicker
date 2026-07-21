@@ -77,6 +77,16 @@
     <string name="item_click_details_at_position">During %1$s</string>
 
     <string name="item_swipe_title">Swipe</string>
+    <string name="zoom_title">Zoom</string>
+    <string name="zoom_choice_description">Pinch in or out around a selected point</string>
+    <string name="zoom_default_name">Zoom</string>
+    <string name="zoom_direction_in">Zoom in</string>
+    <string name="zoom_direction_out">Zoom out</string>
+    <string name="zoom_intensity">Intensity per finger (px)</string>
+    <string name="zoom_duration">Duration (ms)</string>
+    <string name="zoom_geometry">Center and intensity</string>
+    <string name="zoom_test">Test zoom</string>
+    <string name="zoom_details">%1$s · %2$d px · %3$s</string>
     <string name="item_swipe_desc">Swipe from a position on the screen to another</string>
     <string name="item_swipe_details">During %1$s</string>
 

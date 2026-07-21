@@ -27,6 +27,8 @@ import com.buzbuz.smartautoclicker.core.domain.model.action.Notification
 import com.buzbuz.smartautoclicker.core.domain.model.action.Pause
 import com.buzbuz.smartautoclicker.core.domain.model.action.SetText
 import com.buzbuz.smartautoclicker.core.domain.model.action.Swipe
+import com.buzbuz.smartautoclicker.core.domain.model.action.Zoom
+import com.buzbuz.smartautoclicker.feature.smart.config.ui.action.zoom.ZoomDialog
 import com.buzbuz.smartautoclicker.core.domain.model.action.SystemAction
 import com.buzbuz.smartautoclicker.core.domain.model.action.ToggleEvent
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.action.OnActionConfigCompleteListener
@@ -97,6 +99,7 @@ internal fun BaseOverlay.showActionConfigDialog(configurator: ActionConfigurator
     val overlay = when (action) {
         is Click -> ClickDialog(actionConfigDialogListener)
         is Swipe -> SwipeDialog(actionConfigDialogListener)
+        is Zoom -> ZoomDialog(actionConfigDialogListener)
         is Pause -> PauseDialog(actionConfigDialogListener)
         is Intent -> IntentDialog(actionConfigDialogListener)
         is SystemAction -> SystemActionDialog(actionConfigDialogListener)

@@ -49,6 +49,19 @@ fun SharedPreferences.getSwipeDurationConfig(context: Context) : Long = getLong(
 fun SharedPreferences.Editor.putSwipeDurationConfig(durationMs: Long) : SharedPreferences.Editor =
     putLong(PREF_LAST_SWIPE_DURATION, durationMs)
 
+fun SharedPreferences.getZoomDurationConfig(context: Context): Long = getLong(
+    PREF_LAST_ZOOM_DURATION,
+    context.resources.getInteger(R.integer.default_swipe_duration).toLong(),
+)
+
+fun SharedPreferences.Editor.putZoomDurationConfig(durationMs: Long): SharedPreferences.Editor =
+    putLong(PREF_LAST_ZOOM_DURATION, durationMs)
+
+fun SharedPreferences.getZoomIntensityConfig(): Int = getInt(PREF_LAST_ZOOM_INTENSITY, 150)
+
+fun SharedPreferences.Editor.putZoomIntensityConfig(intensityPx: Int): SharedPreferences.Editor =
+    putInt(PREF_LAST_ZOOM_INTENSITY, intensityPx)
+
 /** @return the default duration for a pause. */
 fun SharedPreferences.getPauseDurationConfig(context: Context) : Long = getLong(
     PREF_LAST_PAUSE_DURATION,
@@ -77,6 +90,8 @@ private const val EVENT_CONFIG_PREFERENCES_NAME = "EventConfigPreferences"
 private const val PREF_LAST_CLICK_PRESS_DURATION = "Last_Click_Press_Duration"
 /** User last swipe press duration key in the SharedPreferences. */
 private const val PREF_LAST_SWIPE_DURATION = "Last_Swipe_Duration"
+private const val PREF_LAST_ZOOM_DURATION = "Last_Zoom_Duration"
+private const val PREF_LAST_ZOOM_INTENSITY = "Last_Zoom_Intensity"
 /** User last pause press duration key in the SharedPreferences. */
 private const val PREF_LAST_PAUSE_DURATION = "Last_Pause_Duration"
 /** User last pause press duration key in the SharedPreferences. */

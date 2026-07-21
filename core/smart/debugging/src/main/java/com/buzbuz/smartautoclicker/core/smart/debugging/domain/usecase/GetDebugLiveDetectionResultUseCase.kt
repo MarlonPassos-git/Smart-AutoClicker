@@ -79,6 +79,7 @@ class GetDebugLiveDetectionResultUseCase @Inject constructor(
             acc + when (action) {
                 is Click -> action.pressDuration ?: 0
                 is Swipe -> action.swipeDuration ?: 0
+                is com.buzbuz.smartautoclicker.core.domain.model.action.Zoom -> action.zoomDurationMs ?: 0
                 is Pause -> action.pauseDuration ?: 0
                 is ChangeCounter,
                 is Intent,

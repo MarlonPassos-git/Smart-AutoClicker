@@ -33,6 +33,7 @@ import com.buzbuz.smartautoclicker.core.domain.model.action.Action
 import com.buzbuz.smartautoclicker.core.domain.model.action.Click
 import com.buzbuz.smartautoclicker.core.domain.model.action.Pause
 import com.buzbuz.smartautoclicker.core.domain.model.action.Swipe
+import com.buzbuz.smartautoclicker.core.domain.model.action.Zoom
 import com.buzbuz.smartautoclicker.core.domain.model.condition.ScreenCondition
 import com.buzbuz.smartautoclicker.core.domain.model.event.Event
 import com.buzbuz.smartautoclicker.core.processing.domain.SmartProcessingRepository
@@ -49,6 +50,7 @@ import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.ClickDescri
 import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.DefaultDescription
 import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.PauseDescription
 import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.SwipeDescription
+import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.ZoomDescription
 import com.buzbuz.smartautoclicker.feature.smart.config.R
 import com.buzbuz.smartautoclicker.feature.smart.config.domain.EditionRepository
 import com.buzbuz.smartautoclicker.feature.smart.config.domain.model.EditedListState
@@ -131,6 +133,7 @@ class SmartActionsBriefViewModel @Inject constructor(
                 if (!legacyEnabled && canCopy) add(ActionTypeChoice.Copy)
                 add(ActionTypeChoice.Click)
                 add(ActionTypeChoice.Swipe)
+                add(ActionTypeChoice.Zoom)
                 add(ActionTypeChoice.Pause)
                 add(ActionTypeChoice.SetText)
                 add(ActionTypeChoice.System)
@@ -175,6 +178,7 @@ class SmartActionsBriefViewModel @Inject constructor(
     override fun createAction(context: Context, choice: ActionTypeChoice): Action = when (choice) {
         ActionTypeChoice.Click -> editionRepository.editedItemsBuilder.createNewClick(context)
         ActionTypeChoice.Swipe -> editionRepository.editedItemsBuilder.createNewSwipe(context)
+        ActionTypeChoice.Zoom -> editionRepository.editedItemsBuilder.createNewZoom(context)
         ActionTypeChoice.Pause -> editionRepository.editedItemsBuilder.createNewPause(context)
         ActionTypeChoice.Intent -> editionRepository.editedItemsBuilder.createNewIntent(context)
         ActionTypeChoice.ToggleEvent -> editionRepository.editedItemsBuilder.createNewToggleEvent(context)
@@ -311,6 +315,13 @@ class SmartActionsBriefViewModel @Inject constructor(
             from = from?.toPointF(),
             to = to?.toPointF(),
             swipeDurationMs = swipeDuration ?: 1,
+        )
+
+        is Zoom -> ZoomDescription(
+            direction = direction,
+            center = center?.toPointF(),
+            intensityPx = intensityPx ?: 1,
+            zoomDurationMs = zoomDurationMs ?: 1,
         )
 
         is Pause -> PauseDescription(

@@ -49,6 +49,7 @@ sealed class Action : Identifiable, Completable, Prioritizable {
             is Intent -> copy(id = id, eventId = eventId, name = name, priority = priority)
             is Pause -> copy(id = id, eventId = eventId, name = name, priority = priority)
             is Swipe -> copy(id = id, eventId = eventId, name = name, priority = priority)
+            is Zoom -> copy(id = id, eventId = eventId, name = name, priority = priority)
             is ToggleEvent -> copy(id = id, eventId = eventId, name = name, priority = priority)
             is Notification -> copy(id = id, eventId = eventId, name = name, priority = priority)
             is SystemAction -> copy(id = id, eventId = eventId, name = name, priority = priority)

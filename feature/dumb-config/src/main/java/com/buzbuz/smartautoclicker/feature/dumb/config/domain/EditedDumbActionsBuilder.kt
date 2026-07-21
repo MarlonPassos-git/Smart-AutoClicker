@@ -22,6 +22,7 @@ import android.graphics.Point
 import com.buzbuz.smartautoclicker.core.base.identifier.Identifier
 import com.buzbuz.smartautoclicker.core.base.identifier.IdentifierCreator
 import com.buzbuz.smartautoclicker.core.dumb.domain.model.DumbAction
+import com.buzbuz.smartautoclicker.core.base.gesture.ZoomDirection
 
 class EditedDumbActionsBuilder {
 
@@ -72,6 +73,17 @@ class EditedDumbActionsBuilder {
             pauseDurationMs = context.getDefaultDumbPauseDurationMs(),
         )
 
+    fun createNewDumbZoom(context: Context, center: Point, intensityPx: Int): DumbAction.DumbZoom =
+        DumbAction.DumbZoom(
+            id = dumbActionsIdCreator.generateNewIdentifier(),
+            scenarioId = getEditedScenarioIdOrThrow(),
+            name = context.getDefaultDumbZoomName(),
+            direction = ZoomDirection.IN,
+            intensityPx = intensityPx,
+            center = center,
+            zoomDurationMs = context.getDefaultDumbZoomDurationMs(),
+        )
+
     fun createNewDumbActionFrom(from: DumbAction): DumbAction =
         when (from) {
             is DumbAction.DumbClick -> from.copy(
@@ -85,6 +97,11 @@ class EditedDumbActionsBuilder {
             is DumbAction.DumbPause -> from.copy(
                 id = dumbActionsIdCreator.generateNewIdentifier(),
                 scenarioId = getEditedScenarioIdOrThrow(),
+            )
+            is DumbAction.DumbZoom -> from.copy(
+                id = dumbActionsIdCreator.generateNewIdentifier(),
+                scenarioId = getEditedScenarioIdOrThrow(),
+                center = Point(from.center),
             )
         }
 

@@ -51,6 +51,16 @@
     <string name="item_title_dumb_click">Click</string>
     <string name="item_title_dumb_pause">Wait</string>
     <string name="item_title_dumb_swipe">Swipe</string>
+    <string name="zoom_title">Zoom</string>
+    <string name="zoom_choice_description">Pinch in or out around a selected point</string>
+    <string name="zoom_default_name">Zoom</string>
+    <string name="zoom_direction_in">Zoom in</string>
+    <string name="zoom_direction_out">Zoom out</string>
+    <string name="zoom_intensity">Intensity per finger (px)</string>
+    <string name="zoom_duration">Duration (ms)</string>
+    <string name="zoom_geometry">Center and intensity</string>
+    <string name="zoom_test">Test zoom</string>
+    <string name="zoom_details">%1$s · %2$d px · %3$s</string>
     <string name="item_title_no_dumb_actions">No Actions</string>
     <string name="item_title_dumb_action_copy">Copy</string>
     <string name="item_desc_dumb_action_copy">Copy an existing Action from any Scenarios</string>

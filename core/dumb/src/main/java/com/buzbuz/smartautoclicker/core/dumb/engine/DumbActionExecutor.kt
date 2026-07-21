@@ -71,6 +71,7 @@ class DumbActionExecutor @Inject constructor(
         when (action) {
             is DumbAction.DumbClick -> executeDumbClick(action)
             is DumbAction.DumbSwipe -> executeDumbSwipe(action)
+            is DumbAction.DumbZoom -> executeDumbZoom(action)
             is DumbAction.DumbPause -> executeDumbPause(action)
         }
     }
@@ -103,6 +104,18 @@ class DumbActionExecutor @Inject constructor(
 
     private suspend fun executeDumbPause(dumbPause: DumbAction.DumbPause) {
         delay(dumbPause.pauseDurationMs.getPauseDurationMs(random))
+    }
+
+    private suspend fun executeDumbZoom(dumbZoom: DumbAction.DumbZoom) {
+        withContext(Dispatchers.Main) {
+            androidExecutor.dispatchZoomGesture(
+                center = dumbZoom.center,
+                intensityPx = dumbZoom.intensityPx,
+                durationMs = dumbZoom.zoomDurationMs,
+                direction = dumbZoom.direction,
+                random = if (randomize) random else null,
+            )
+        }
     }
 
     private suspend fun executeRepeatableGesture(gesture: GestureDescription, repeatable: Repeatable) {

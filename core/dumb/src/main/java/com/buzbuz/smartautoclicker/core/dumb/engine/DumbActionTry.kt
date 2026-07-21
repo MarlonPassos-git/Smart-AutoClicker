@@ -21,6 +21,7 @@ import com.buzbuz.smartautoclicker.core.dumb.domain.model.DumbAction
 import com.buzbuz.smartautoclicker.core.dumb.domain.model.DumbAction.DumbClick
 import com.buzbuz.smartautoclicker.core.dumb.domain.model.DumbAction.DumbPause
 import com.buzbuz.smartautoclicker.core.dumb.domain.model.DumbAction.DumbSwipe
+import com.buzbuz.smartautoclicker.core.dumb.domain.model.DumbAction.DumbZoom
 import com.buzbuz.smartautoclicker.core.dumb.domain.model.DumbScenario
 
 internal fun DumbAction.toDumbScenarioTry(): DumbScenario {
@@ -51,4 +52,5 @@ private fun DumbAction.toFiniteDumbAction(scenarioId: Identifier): DumbAction =
         is DumbPause -> copy(
             scenarioId = scenarioId
         )
+        is DumbZoom -> copy(scenarioId = scenarioId)
     }

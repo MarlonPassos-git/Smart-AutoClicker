@@ -27,6 +27,7 @@ import com.buzbuz.smartautoclicker.core.domain.model.action.Notification
 import com.buzbuz.smartautoclicker.core.domain.model.action.Pause
 import com.buzbuz.smartautoclicker.core.domain.model.action.SetText
 import com.buzbuz.smartautoclicker.core.domain.model.action.Swipe
+import com.buzbuz.smartautoclicker.core.domain.model.action.Zoom
 import com.buzbuz.smartautoclicker.core.domain.model.action.SystemAction
 import com.buzbuz.smartautoclicker.core.domain.model.action.ToggleEvent
 import com.buzbuz.smartautoclicker.core.domain.model.counter.CounterOperationValue
@@ -68,6 +69,7 @@ class GetActionMissingReferencesUseCase @Inject constructor(
             is Intent,
             is Pause,
             is Swipe,
+            is Zoom,
             is SystemAction -> emptyList()
         }
 

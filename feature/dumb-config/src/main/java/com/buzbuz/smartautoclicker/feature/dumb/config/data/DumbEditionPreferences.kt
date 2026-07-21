@@ -60,6 +60,18 @@ internal fun SharedPreferences.getSwipeDurationConfig(default: Long) : Long =
 internal fun SharedPreferences.Editor.putSwipeDurationConfig(durationMs: Long) : SharedPreferences.Editor =
     putLong(PREF_LAST_SWIPE_DURATION, durationMs)
 
+internal fun SharedPreferences.getZoomDurationConfig(default: Long): Long =
+    getLong(PREF_LAST_ZOOM_DURATION, default)
+
+internal fun SharedPreferences.Editor.putZoomDurationConfig(durationMs: Long): SharedPreferences.Editor =
+    putLong(PREF_LAST_ZOOM_DURATION, durationMs)
+
+internal fun SharedPreferences.getZoomIntensityConfig(default: Int): Int =
+    getInt(PREF_LAST_ZOOM_INTENSITY, default)
+
+internal fun SharedPreferences.Editor.putZoomIntensityConfig(intensityPx: Int): SharedPreferences.Editor =
+    putInt(PREF_LAST_ZOOM_INTENSITY, intensityPx)
+
 /** @return the default repeat count for a swipe. */
 internal fun SharedPreferences.getSwipeRepeatCountConfig(default: Int) : Int =
     getInt(PREF_LAST_SWIPE_REPEAT_COUNT, default)
@@ -96,6 +108,8 @@ private const val PREF_LAST_CLICK_REPEAT_COUNT = "Last_Click_Repeat_Count"
 private const val PREF_LAST_CLICK_REPEAT_DELAY = "Last_Click_Repeat_Delay"
 /** User last swipe press duration key in the SharedPreferences. */
 private const val PREF_LAST_SWIPE_DURATION = "Last_Swipe_Duration"
+private const val PREF_LAST_ZOOM_DURATION = "Last_Zoom_Duration"
+private const val PREF_LAST_ZOOM_INTENSITY = "Last_Zoom_Intensity"
 /** User last swipe repeat count key in the SharedPreferences. */
 private const val PREF_LAST_SWIPE_REPEAT_COUNT = "Last_Swipe_Repeat_Count"
 /** User last swipe repeat delay key in the SharedPreferences. */

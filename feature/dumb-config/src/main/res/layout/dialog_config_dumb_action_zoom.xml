@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/AppTheme.Dialog.BackgroundLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+    <include android:id="@+id/layout_top_bar" layout="@layout/include_dialog_navigation_top_bar" />
+    <ScrollView android:layout_width="match_parent" android:layout_height="match_parent">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_margin="@dimen/margin_horizontal_default" android:orientation="vertical">
+            <include android:id="@+id/field_name" layout="@layout/include_field_text_input" />
+            <RadioGroup android:id="@+id/direction_group" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
+                <RadioButton android:id="@+id/direction_in" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/zoom_direction_in" />
+                <RadioButton android:id="@+id/direction_out" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/zoom_direction_out" />
+            </RadioGroup>
+            <include android:id="@+id/field_intensity" layout="@layout/include_field_text_input" />
+            <include android:id="@+id/field_duration" layout="@layout/include_field_text_input" />
+            <include android:id="@+id/field_geometry" layout="@layout/include_field_selector" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/button_test" style="@style/Widget.Material3.Button.OutlinedButton" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/zoom_test" />
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

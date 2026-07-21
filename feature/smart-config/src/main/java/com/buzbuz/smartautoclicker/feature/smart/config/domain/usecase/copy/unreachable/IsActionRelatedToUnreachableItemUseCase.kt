@@ -26,6 +26,7 @@ import com.buzbuz.smartautoclicker.core.domain.model.action.Notification
 import com.buzbuz.smartautoclicker.core.domain.model.action.Pause
 import com.buzbuz.smartautoclicker.core.domain.model.action.SetText
 import com.buzbuz.smartautoclicker.core.domain.model.action.Swipe
+import com.buzbuz.smartautoclicker.core.domain.model.action.Zoom
 import com.buzbuz.smartautoclicker.core.domain.model.action.SystemAction
 import com.buzbuz.smartautoclicker.core.domain.model.action.ToggleEvent
 import com.buzbuz.smartautoclicker.core.domain.model.counter.CounterOperationValue
@@ -55,6 +56,7 @@ class IsActionRelatedToUnreachableItemUseCase @Inject constructor(
             // Nothing is referenced in those actions
             is Pause,
             is Swipe,
+            is Zoom,
             is Intent,
             is SystemAction -> false
         }

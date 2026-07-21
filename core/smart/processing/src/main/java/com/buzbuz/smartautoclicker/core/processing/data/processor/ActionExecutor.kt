@@ -44,6 +44,7 @@ import com.buzbuz.smartautoclicker.core.domain.model.action.ChangeCounter
 import com.buzbuz.smartautoclicker.core.domain.model.action.Notification
 import com.buzbuz.smartautoclicker.core.domain.model.action.SetText
 import com.buzbuz.smartautoclicker.core.domain.model.action.SystemAction
+import com.buzbuz.smartautoclicker.core.domain.model.action.Zoom
 import com.buzbuz.smartautoclicker.core.domain.model.action.intent.putDomainExtra
 import com.buzbuz.smartautoclicker.core.domain.model.event.Event
 import com.buzbuz.smartautoclicker.core.domain.model.event.ScreenEvent
@@ -94,6 +95,7 @@ internal class ActionExecutor(
             when (action) {
                 is Click -> executeClick(event, action, results)
                 is Swipe -> executeSwipe(action)
+                is Zoom -> executeZoom(action)
                 is Pause -> executePause(action)
                 is Intent -> executeIntent(action)
                 is ToggleEvent -> executeToggleEvent(action)
@@ -168,6 +170,19 @@ internal class ActionExecutor(
 
         withContext(Dispatchers.Main) {
             androidExecutor.dispatchGesture(swipeGesture)
+        }
+    }
+
+    private suspend fun executeZoom(zoom: Zoom) {
+        val center = zoom.center ?: return
+        withContext(Dispatchers.Main) {
+            androidExecutor.dispatchZoomGesture(
+                center = center,
+                intensityPx = zoom.intensityPx!!,
+                durationMs = zoom.zoomDurationMs!!,
+                direction = zoom.direction,
+                random = random,
+            )
         }
     }
 

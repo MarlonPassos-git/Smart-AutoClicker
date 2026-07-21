@@ -19,6 +19,7 @@ package com.buzbuz.smartautoclicker.core.dumb.domain.model
 import android.graphics.Point
 import com.buzbuz.smartautoclicker.core.base.interfaces.Identifiable
 import com.buzbuz.smartautoclicker.core.base.identifier.Identifier
+import com.buzbuz.smartautoclicker.core.base.gesture.ZoomDirection
 
 sealed class DumbAction : Identifiable {
 
@@ -36,6 +37,7 @@ sealed class DumbAction : Identifiable {
             is DumbClick -> copy(scenarioId = scenarioId)
             is DumbPause -> copy(scenarioId = scenarioId)
             is DumbSwipe -> copy(scenarioId = scenarioId)
+            is DumbZoom -> copy(scenarioId = scenarioId)
         }
 
     data class DumbClick(
@@ -79,5 +81,20 @@ sealed class DumbAction : Identifiable {
     ) : DumbAction() {
 
         override fun isValid(): Boolean = name.isNotEmpty()
+    }
+
+    data class DumbZoom(
+        override val id: Identifier,
+        override val scenarioId: Identifier,
+        override val name: String,
+        override val priority: Int = 0,
+        val direction: ZoomDirection,
+        val intensityPx: Int,
+        val center: Point,
+        val zoomDurationMs: Long,
+    ) : DumbAction() {
+
+        override fun isValid(): Boolean =
+            name.isNotEmpty() && intensityPx > 0 && zoomDurationMs > 0
     }
 }

@@ -25,6 +25,7 @@ import com.buzbuz.smartautoclicker.core.domain.model.action.Notification
 import com.buzbuz.smartautoclicker.core.domain.model.action.Pause
 import com.buzbuz.smartautoclicker.core.domain.model.action.SetText
 import com.buzbuz.smartautoclicker.core.domain.model.action.Swipe
+import com.buzbuz.smartautoclicker.core.domain.model.action.Zoom
 import com.buzbuz.smartautoclicker.core.domain.model.action.SystemAction
 import com.buzbuz.smartautoclicker.core.domain.model.action.ToggleEvent
 import com.buzbuz.smartautoclicker.core.domain.model.condition.ScreenCondition
@@ -81,6 +82,7 @@ class ReplaceMissingScreenConditionReferenceUseCase @Inject constructor() {
             is Pause,
             is SetText,
             is Swipe,
+            is Zoom,
             is SystemAction,
             is ToggleEvent -> {
                 Log.e(TAG, "Can't replace, action type is not supported.")

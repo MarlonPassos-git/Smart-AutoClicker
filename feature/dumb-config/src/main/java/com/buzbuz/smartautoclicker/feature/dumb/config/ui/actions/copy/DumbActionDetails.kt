@@ -50,6 +50,7 @@ fun DumbAction.toDumbActionDetails(
     when (this) {
         is DumbAction.DumbClick -> toClickDetails(context, withPositions, inError)
         is DumbAction.DumbSwipe -> toSwipeDetails(context, withPositions, inError)
+        is DumbAction.DumbZoom -> toZoomDetails(context, withPositions, inError)
         is DumbAction.DumbPause -> toPauseDetails(context, withPositions, inError)
     }
 
@@ -108,6 +109,17 @@ private fun DumbAction.DumbPause.toPauseDetails(context: Context, withPositions:
                 formatDuration(pauseDurationMs),
             )
         },
+        repeatCountText = null,
+        haveError = inError,
+        action = this,
+    )
+
+private fun DumbAction.DumbZoom.toZoomDetails(context: Context, withPositions: Boolean, inError: Boolean): DumbActionDetails =
+    DumbActionDetails(
+        icon = R.drawable.ic_swipe,
+        name = name,
+        detailsText = if (inError) context.getString(R.string.item_error_action_invalid_generic)
+        else context.getString(R.string.zoom_details, direction.name, intensityPx, formatDuration(zoomDurationMs)),
         repeatCountText = null,
         haveError = inError,
         action = this,

@@ -16,6 +16,8 @@
  */
 package com.buzbuz.smartautoclicker.feature.smart.config.domain
 
+import android.graphics.Point
+
 import android.app.NotificationManager
 import android.content.Context
 import android.graphics.Bitmap
@@ -38,6 +40,8 @@ import com.buzbuz.smartautoclicker.core.domain.model.action.Notification
 import com.buzbuz.smartautoclicker.core.domain.model.action.Pause
 import com.buzbuz.smartautoclicker.core.domain.model.action.SetText
 import com.buzbuz.smartautoclicker.core.domain.model.action.Swipe
+import com.buzbuz.smartautoclicker.core.domain.model.action.Zoom
+import com.buzbuz.smartautoclicker.core.base.gesture.ZoomDirection
 import com.buzbuz.smartautoclicker.core.domain.model.action.SystemAction
 import com.buzbuz.smartautoclicker.core.domain.model.action.ToggleEvent
 import com.buzbuz.smartautoclicker.core.domain.model.action.toggleevent.EventToggle
@@ -319,6 +323,17 @@ class EditedItemsBuilder internal constructor(
             priority = 0,
         )
 
+    fun createNewZoom(context: Context): Zoom =
+        Zoom(
+            id = actionsIdCreator.generateNewIdentifier(),
+            eventId = getEditedEventIdOrThrow(),
+            name = defaultValues.zoomName(context),
+            direction = ZoomDirection.IN,
+            intensityPx = defaultValues.zoomIntensity(context),
+            zoomDurationMs = defaultValues.zoomDuration(context),
+            priority = 0,
+        )
+
     fun createNewPause(context: Context): Pause =
         Pause(
             id = actionsIdCreator.generateNewIdentifier(),
@@ -411,6 +426,7 @@ class EditedItemsBuilder internal constructor(
     fun createNewActionFrom(from: Action, eventId: Identifier = getEditedEventIdOrThrow()): Action = when (from) {
         is Click -> createNewClickFrom(from, eventId)
         is Swipe -> createNewSwipeFrom(from, eventId)
+        is Zoom -> createNewZoomFrom(from, eventId)
         is Pause -> createNewPauseFrom(from, eventId)
         is Intent -> createNewIntentFrom(from, eventId)
         is ToggleEvent -> createNewToggleEventFrom(from, eventId)
@@ -440,6 +456,14 @@ class EditedItemsBuilder internal constructor(
             id = actionsIdCreator.generateNewIdentifier(),
             eventId = eventId,
             name = "" + from.name,
+        )
+
+    private fun createNewZoomFrom(from: Zoom, eventId: Identifier): Zoom =
+        from.copy(
+            id = actionsIdCreator.generateNewIdentifier(),
+            eventId = eventId,
+            name = "" + from.name,
+            center = from.center?.let { Point(it) },
         )
 
     private fun createNewPauseFrom(from: Pause, eventId: Identifier): Pause =

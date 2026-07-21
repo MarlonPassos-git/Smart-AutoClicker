@@ -29,6 +29,10 @@ import com.buzbuz.smartautoclicker.core.ui.utils.AutoHideAnimationController
 import com.buzbuz.smartautoclicker.core.ui.views.itembrief.ItemBriefDescription
 import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.ClickDescription
 import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.SwipeDescription
+import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.ZoomDescription
+import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.ZOOM_PREVIEW_INNER_RADIUS_PX
+import kotlin.math.abs
+import kotlin.math.sqrt
 
 /**
  * [OverlayMenu] implementation for displaying the click area selection menu and its overlay view.
@@ -103,6 +107,7 @@ class PositionSelectorMenu(
         when (description) {
             is ClickDescription -> setClickDescription(description)
             is SwipeDescription -> setSwipeDescription(description)
+            is ZoomDescription -> setZoomCenterDescription(description)
         }
 
         instructionsAnimationController.showOrResetTimer()
@@ -131,6 +136,39 @@ class PositionSelectorMenu(
         } else {
             toSelectSwipeToState(description)
         }
+    }
+
+    private fun setZoomCenterDescription(description: ZoomDescription) {
+        selectorViewBinding.textInstructions.setText(R.string.toast_configure_zoom_center)
+        selectorViewBinding.positionSelector.apply {
+            setDescription(description)
+            onTouchListener = { position ->
+                setZoomCenterDescription(description.copy(center = position))
+            }
+        }
+        setConfirmEnabledState(description.center != null) {
+            setZoomIntensityDescription(description)
+            instructionsAnimationController.showOrResetTimer()
+        }
+        setCancelListener(::dismiss)
+    }
+
+    private fun setZoomIntensityDescription(description: ZoomDescription) {
+        val center = description.center ?: return setZoomCenterDescription(description)
+        selectorViewBinding.textInstructions.setText(R.string.toast_configure_zoom_intensity)
+        selectorViewBinding.positionSelector.apply {
+            setDescription(description)
+            onTouchListener = { position ->
+                val diagonalDistance = abs(position.x - center.x) + abs(position.y - center.y)
+                val radius = diagonalDistance / sqrt(2f)
+                val intensity = (radius - ZOOM_PREVIEW_INNER_RADIUS_PX).toInt().coerceAtLeast(1)
+                setZoomIntensityDescription(description.copy(intensityPx = intensity))
+            }
+        }
+        setConfirmEnabledState(description.intensityPx > 0) {
+            onPositionSelectionCompleted(description)
+        }
+        setCancelListener { setZoomCenterDescription(description) }
     }
 
     private fun toSelectSwipeFromState(description: SwipeDescription) {

@@ -49,6 +49,12 @@ sealed class DumbActionTypeChoice(
         R.string.item_desc_dumb_swipe,
         R.drawable.ic_swipe,
     )
+    /** Zoom Action choice. */
+    data object Zoom : DumbActionTypeChoice(
+        R.string.zoom_title,
+        R.string.zoom_choice_description,
+        R.drawable.ic_swipe,
+    )
     /** Pause Action choice. */
     data object Pause : DumbActionTypeChoice(
         R.string.item_title_dumb_pause,
@@ -61,5 +67,6 @@ fun allDumbActionChoices() = listOf(
     DumbActionTypeChoice.Copy,
     DumbActionTypeChoice.Click,
     DumbActionTypeChoice.Swipe,
+    DumbActionTypeChoice.Zoom,
     DumbActionTypeChoice.Pause,
 )

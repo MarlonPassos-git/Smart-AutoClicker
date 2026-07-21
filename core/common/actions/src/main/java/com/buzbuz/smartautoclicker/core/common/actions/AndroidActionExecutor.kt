@@ -19,8 +19,11 @@ package com.buzbuz.smartautoclicker.core.common.actions
 import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.GestureDescription
 import android.content.Intent
+import android.graphics.Point
 import com.buzbuz.smartautoclicker.core.base.Dumpable
+import com.buzbuz.smartautoclicker.core.base.gesture.ZoomDirection
 import com.buzbuz.smartautoclicker.core.common.actions.model.ActionNotificationRequest
+import kotlin.random.Random
 
 interface AndroidActionExecutor: Dumpable {
 
@@ -60,6 +63,15 @@ interface AndroidActionExecutor: Dumpable {
      * @param gestureDescription The gesture to dispatch
      */
     suspend fun dispatchGesture(gestureDescription: GestureDescription)
+
+    /** Dispatches a symmetric two-finger zoom around [center]. */
+    suspend fun dispatchZoomGesture(
+        center: Point,
+        intensityPx: Int,
+        durationMs: Long,
+        direction: ZoomDirection,
+        random: Random?,
+    )
 
     /**
      * Performs a global action.

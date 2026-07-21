@@ -52,6 +52,7 @@ import com.buzbuz.smartautoclicker.core.database.entity.NumberFormatType
 import com.buzbuz.smartautoclicker.core.database.entity.ScenarioEntity
 import com.buzbuz.smartautoclicker.core.database.entity.SystemActionType
 import com.buzbuz.smartautoclicker.core.database.serialization.Deserializer
+import com.buzbuz.smartautoclicker.core.base.gesture.ZoomDirection
 
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
@@ -478,6 +479,7 @@ internal open class CompatDeserializer : Deserializer {
         when (deserializeActionType(jsonAction)) {
             ActionType.CLICK -> deserializeActionClick(jsonAction, eventConditions, conditionsOperator)
             ActionType.SWIPE -> deserializeActionSwipe(jsonAction)
+            ActionType.ZOOM -> deserializeActionZoom(jsonAction)
             ActionType.PAUSE -> deserializeActionPause(jsonAction)
             ActionType.INTENT -> deserializeActionIntent(jsonAction)
             ActionType.TOGGLE_EVENT -> deserializeActionToggleEvent(jsonAction)
@@ -567,6 +569,30 @@ internal open class CompatDeserializer : Deserializer {
             toX = toX,
             toY = toY,
             swipeDuration = jsonSwipe.getLong("swipeDuration")
+                ?.coerceIn(DURATION_LOWER_BOUND..DURATION_GESTURE_UPPER_BOUND)
+                ?: DEFAULT_SWIPE_DURATION,
+        )
+    }
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
+    open fun deserializeActionZoom(jsonZoom: JsonObject): ActionEntity? {
+        val id = jsonZoom.getLong("id", true) ?: return null
+        val eventId = jsonZoom.getLong("eventId", true) ?: return null
+        val direction = jsonZoom.getString("zoomDirection")
+            ?.let { runCatching { ZoomDirection.valueOf(it) }.getOrNull() }
+            ?: return null
+
+        return ActionEntity(
+            id = id,
+            eventId = eventId,
+            name = jsonZoom.getString("name") ?: "",
+            priority = jsonZoom.getInt("priority")?.coerceAtLeast(0) ?: 0,
+            type = ActionType.ZOOM,
+            zoomDirection = direction.name,
+            zoomIntensity = jsonZoom.getInt("zoomIntensity")?.coerceAtLeast(1) ?: return null,
+            zoomCenterX = jsonZoom.getInt("zoomCenterX", true) ?: return null,
+            zoomCenterY = jsonZoom.getInt("zoomCenterY", true) ?: return null,
+            zoomDuration = jsonZoom.getLong("zoomDuration")
                 ?.coerceIn(DURATION_LOWER_BOUND..DURATION_GESTURE_UPPER_BOUND)
                 ?: DEFAULT_SWIPE_DURATION,
         )

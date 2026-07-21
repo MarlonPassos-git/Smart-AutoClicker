@@ -30,6 +30,8 @@ import com.buzbuz.smartautoclicker.feature.smart.config.utils.getEventConfigPref
 import com.buzbuz.smartautoclicker.feature.smart.config.utils.getIntentIsAdvancedConfig
 import com.buzbuz.smartautoclicker.feature.smart.config.utils.getPauseDurationConfig
 import com.buzbuz.smartautoclicker.feature.smart.config.utils.getSwipeDurationConfig
+import com.buzbuz.smartautoclicker.feature.smart.config.utils.getZoomDurationConfig
+import com.buzbuz.smartautoclicker.feature.smart.config.utils.getZoomIntensityConfig
 
 internal class EditionDefaultValues {
 
@@ -58,6 +60,10 @@ internal class EditionDefaultValues {
         context.getString(R.string.default_swipe_name)
     fun swipeDuration(context: Context): Long =
         context.getEventConfigPreferences().getSwipeDurationConfig(context)
+
+    fun zoomName(context: Context): String = context.getString(R.string.zoom_default_name)
+    fun zoomDuration(context: Context): Long = context.getEventConfigPreferences().getZoomDurationConfig(context)
+    fun zoomIntensity(context: Context): Int = context.getEventConfigPreferences().getZoomIntensityConfig()
 
     fun pauseName(context: Context): String =
         context.getString(R.string.default_pause_name)

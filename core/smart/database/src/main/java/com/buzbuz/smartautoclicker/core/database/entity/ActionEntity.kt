@@ -131,6 +131,13 @@ data class ActionEntity(
     @ColumnInfo(name = "toY") val toY: Int? = null,
     @ColumnInfo(name = "swipeDuration") val swipeDuration: Long? = null,
 
+    // ActionType.ZOOM
+    @ColumnInfo(name = "zoom_direction") val zoomDirection: String? = null,
+    @ColumnInfo(name = "zoom_intensity") val zoomIntensity: Int? = null,
+    @ColumnInfo(name = "zoom_center_x") val zoomCenterX: Int? = null,
+    @ColumnInfo(name = "zoom_center_y") val zoomCenterY: Int? = null,
+    @ColumnInfo(name = "zoom_duration") val zoomDuration: Long? = null,
+
     // ActionType.PAUSE
     @ColumnInfo(name = "pauseDuration") val pauseDuration: Long? = null,
 

@@ -20,6 +20,8 @@ import com.buzbuz.smartautoclicker.core.domain.model.action.SetText
 import com.buzbuz.smartautoclicker.core.domain.model.action.Swipe
 import com.buzbuz.smartautoclicker.core.domain.model.action.SystemAction
 import com.buzbuz.smartautoclicker.core.domain.model.action.ToggleEvent
+import com.buzbuz.smartautoclicker.core.domain.model.action.Zoom
+import com.buzbuz.smartautoclicker.core.base.gesture.ZoomDirection
 import com.buzbuz.smartautoclicker.core.domain.model.action.intent.toDomainIntentExtra
 import com.buzbuz.smartautoclicker.core.domain.model.action.toggleevent.toDomain
 
@@ -27,6 +29,7 @@ import com.buzbuz.smartautoclicker.core.domain.model.action.toggleevent.toDomain
 internal fun CompleteActionEntity.toDomain(cleanIds: Boolean = false): Action = when (action.type) {
     ActionType.CLICK -> toDomainClick(cleanIds)
     ActionType.SWIPE -> toDomainSwipe(cleanIds)
+    ActionType.ZOOM -> toDomainZoom(cleanIds)
     ActionType.PAUSE -> toDomainPause(cleanIds)
     ActionType.INTENT -> toDomainIntent(cleanIds)
     ActionType.TOGGLE_EVENT -> toDomainToggleEvent(cleanIds)
@@ -58,6 +61,17 @@ private fun CompleteActionEntity.toDomainSwipe(cleanIds: Boolean = false) = Swip
     swipeDuration = action.swipeDuration!!,
     from = getPositionIfValid(action.fromX, action.fromY),
     to = getPositionIfValid(action.toX, action.toY),
+)
+
+private fun CompleteActionEntity.toDomainZoom(cleanIds: Boolean = false) = Zoom(
+    id = Identifier(id = action.id, asTemporary = cleanIds),
+    eventId = Identifier(id = action.eventId, asTemporary = cleanIds),
+    name = action.name,
+    priority = action.priority,
+    direction = ZoomDirection.valueOf(action.zoomDirection!!),
+    intensityPx = action.zoomIntensity,
+    center = getPositionIfValid(action.zoomCenterX, action.zoomCenterY),
+    zoomDurationMs = action.zoomDuration,
 )
 
 private fun CompleteActionEntity.toDomainPause(cleanIds: Boolean = false) = Pause(

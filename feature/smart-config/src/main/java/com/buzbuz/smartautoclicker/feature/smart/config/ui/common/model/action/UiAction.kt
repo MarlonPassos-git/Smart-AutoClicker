@@ -28,6 +28,7 @@ import com.buzbuz.smartautoclicker.core.domain.model.action.SetText
 import com.buzbuz.smartautoclicker.core.domain.model.action.Swipe
 import com.buzbuz.smartautoclicker.core.domain.model.action.SystemAction
 import com.buzbuz.smartautoclicker.core.domain.model.action.ToggleEvent
+import com.buzbuz.smartautoclicker.core.domain.model.action.Zoom
 import com.buzbuz.smartautoclicker.core.domain.model.event.Event
 
 
@@ -52,6 +53,7 @@ internal fun Action.toUiAction(context: Context, parent: Event? = null, inError:
 internal fun Action.getIconRes(): Int = when (this) {
     is Click -> getClickIconRes()
     is Swipe -> getSwipeIconRes()
+    is Zoom -> getZoomIconRes()
     is Pause -> getPauseIconRes()
     is Intent -> getIntentIconRes()
     is ToggleEvent -> getToggleEventIconRes()
@@ -64,6 +66,7 @@ internal fun Action.getIconRes(): Int = when (this) {
 internal fun Action.getActionDescription(context: Context, parent: Event?, inError: Boolean): String = when (this) {
     is Click -> getDescription(context, parent, inError)
     is Swipe -> getDescription(context, inError)
+    is Zoom -> getDescription(context, inError)
     is Pause -> getDescription(context, inError)
     is Intent -> getDescription(context, inError)
     is ToggleEvent -> getDescription(context, inError)
