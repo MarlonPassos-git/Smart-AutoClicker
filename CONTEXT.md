@@ -24,11 +24,34 @@ _Avoid_: Pinch Location, Gesture Position
 The distance traveled by each simulated finger during a Zoom Action.
 _Avoid_: Pinch Amount, Zoom Quantity
 
+**Area Click Action**:
+An action that executes a finite sequence of clicks inside a confirmed polygon.
+_Avoid_: Repeated Click, Multi-click
+
+**Click Area**:
+The simple polygon that bounds every generated point of an Area Click Action.
+_Avoid_: Detection Area, Condition-relative Area
+
+**Random Distribution**:
+An Area Click Action distribution where every point is sampled uniformly and independently.
+
+**Distributed Distribution**:
+An Area Click Action distribution that uses best effort to spread sampled points spatially.
+
+**Click Count**:
+The exact number of clicks, from 1 through 50, executed by one Area Click Action trigger.
+
+**Click Interval**:
+The temporal wait after one click is released and before the next click begins.
+
 ## Relationships
 
 - A **Zoom Action** has exactly one **Zoom Center** and one **Zoom Intensity**
 - A **Zoom Action** has exactly one direction: **Zoom In** or **Zoom Out**
 - **Zoom In** and **Zoom Out** name the visual result, not the finger movement
+- An **Area Click Action** has one **Click Area**, one **Click Count**, and one distribution
+- **Random Distribution** and **Distributed Distribution** control spatial placement only
+- **Click Interval** applies only between clicks, never after the final click
 
 ## Example dialogue
 
@@ -38,3 +61,4 @@ _Avoid_: Pinch Amount, Zoom Quantity
 ## Flagged ambiguities
 
 - "pinch in" and "pinch out" can describe either finger motion or visual result — resolved: use **Zoom In** and **Zoom Out** exclusively for the visual result.
+- "distribution" can be confused with timing — resolved: distribution means spatial spacing; **Click Interval** is the temporal wait after release.
