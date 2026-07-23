@@ -32,6 +32,6 @@ depends = ["build"]
 run = "adb -e install -r smartautoclicker/build/outputs/apk/fDroid/debug/smartautoclicker-fDroid-x86_64-debug.apk"
 
 [tasks.install-phone]
-description = "Instala o APK universal no celular USB"
+description = "Instala o APK arm64-v8a no celular USB"
 depends = ["build"]
-run = "adb -d install -r smartautoclicker/build/outputs/apk/fDroid/debug/smartautoclicker-fDroid-universal-debug.apk"
+run = "adb -d install -r smartautoclicker/build/outputs/apk/fDroid/debug/smartautoclicker-fDroid-arm64-v8a-debug.apk"
