@@ -96,3 +96,6 @@ scripts/**/*.pyc
 /*.zip
 /*.bat
 /*.ps1
+
+# Local proprietary app research artifacts (APKs, extracted assets, and caches)
+/.local-research/
