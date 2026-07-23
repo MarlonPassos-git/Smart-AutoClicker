@@ -30,6 +30,9 @@ android {
 dependencies {
     implementation(libs.kotlinx.coroutines.core)
 
+    testImplementation(libs.androidx.test.ext.junit)
+    testImplementation(libs.robolectric)
+
     implementation(libs.androidx.annotation)
     implementation(libs.androidx.appCompat)
     implementation(libs.androidx.core.ktx)

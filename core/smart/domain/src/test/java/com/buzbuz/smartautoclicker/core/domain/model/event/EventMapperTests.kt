@@ -21,6 +21,7 @@ import android.os.Build
 import androidx.test.ext.junit.runners.AndroidJUnit4
 
 import com.buzbuz.smartautoclicker.core.database.entity.CompleteEventEntity
+import com.buzbuz.smartautoclicker.core.database.entity.CompleteConditionEntity
 import com.buzbuz.smartautoclicker.core.domain.model.action.ActionTestsData
 import com.buzbuz.smartautoclicker.core.domain.model.condition.ConditionTestsData
 
@@ -61,7 +62,11 @@ class EventMapperTests {
         val imageEvent = CompleteEventEntity(
             event = EventTestsData.getNewImageEventEntity(scenarioId = EventTestsData.EVENT_SCENARIO_ID, priority = 0),
             actions = listOf(ActionTestsData.getNewPauseEntity(eventId = EventTestsData.EVENT_ID)),
-            conditions = listOf(ConditionTestsData.getNewImageConditionEntity(eventId = EventTestsData.EVENT_ID)),
+            conditions = listOf(
+                CompleteConditionEntity(
+                    ConditionTestsData.getNewImageConditionEntity(eventId = EventTestsData.EVENT_ID),
+                ),
+            ),
         ).toDomainScreenEvent()
 
         assertEquals(
@@ -139,7 +144,11 @@ class EventMapperTests {
         val triggerEvent = CompleteEventEntity(
             event = EventTestsData.getNewTriggerEventEntity(scenarioId = EventTestsData.EVENT_SCENARIO_ID),
             actions = listOf(ActionTestsData.getNewPauseEntity(eventId = EventTestsData.EVENT_ID)),
-            conditions = listOf(ConditionTestsData.getNewTimerReachedConditionEntity(eventId = EventTestsData.EVENT_ID)),
+            conditions = listOf(
+                CompleteConditionEntity(
+                    ConditionTestsData.getNewTimerReachedConditionEntity(eventId = EventTestsData.EVENT_ID),
+                ),
+            ),
         ).toDomainTriggerEvent()
 
         assertEquals(

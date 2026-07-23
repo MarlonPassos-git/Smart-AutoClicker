@@ -26,6 +26,7 @@ import com.buzbuz.smartautoclicker.core.database.dao.ConditionDao
 import com.buzbuz.smartautoclicker.core.database.dao.EventDao
 import com.buzbuz.smartautoclicker.core.database.dao.ScenarioDao
 import com.buzbuz.smartautoclicker.core.database.entity.CompleteEventEntity
+import com.buzbuz.smartautoclicker.core.database.entity.CompleteConditionEntity
 import com.buzbuz.smartautoclicker.core.domain.data.ScenarioDataSource
 import com.buzbuz.smartautoclicker.core.domain.model.action.ActionTestsData
 import com.buzbuz.smartautoclicker.core.domain.model.condition.ConditionTestsData
@@ -118,7 +119,11 @@ class RepositoryTests {
                     CompleteEventEntity(
                         event = EventTestsData.getNewImageEventEntity(id = EventTestsData.EVENT_ID, scenarioId = EventTestsData.EVENT_SCENARIO_ID),
                         actions = listOf(ActionTestsData.getNewPauseEntity(eventId = EventTestsData.EVENT_ID, priority = 0)),
-                        conditions = listOf(ConditionTestsData.getNewImageConditionEntity(eventId = EventTestsData.EVENT_ID))
+                        conditions = listOf(
+                            CompleteConditionEntity(
+                                ConditionTestsData.getNewImageConditionEntity(eventId = EventTestsData.EVENT_ID),
+                            ),
+                        )
                     )
                 ))
             }
@@ -145,7 +150,11 @@ class RepositoryTests {
                     CompleteEventEntity(
                         event = EventTestsData.getNewTriggerEventEntity(id = EventTestsData.EVENT_ID, scenarioId = EventTestsData.EVENT_SCENARIO_ID),
                         actions = listOf(ActionTestsData.getNewPauseEntity(eventId = EventTestsData.EVENT_ID, priority = 0)),
-                        conditions = listOf(ConditionTestsData.getNewTimerReachedConditionEntity(eventId = EventTestsData.EVENT_ID)),
+                        conditions = listOf(
+                            CompleteConditionEntity(
+                                ConditionTestsData.getNewTimerReachedConditionEntity(eventId = EventTestsData.EVENT_ID),
+                            ),
+                        ),
                     )
                 ))
             }

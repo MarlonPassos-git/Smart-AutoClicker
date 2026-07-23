@@ -58,6 +58,7 @@ import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.*
 
 import org.robolectric.annotation.Config
+import org.robolectric.Shadows.shadowOf
 
 /** Test the [ActionExecutor] class. */
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -213,6 +214,23 @@ class ActionExecutorTests {
     }
 
     @Test
+    fun execute_click_usesWinningReferencePosition() = runTest {
+        val condition = getNewDefaultCondition(42L)
+        val action = getNewDefaultClickCondition(1, condition.id.databaseId)
+        val event = getNewDefaultEvent(conditions = listOf(condition), actions = listOf(action))
+        val winnerPosition = Point(73, 91)
+        val results = ConditionsResults().apply {
+            addResult(condition.getDatabaseId(), detectedResult(condition, winnerPosition))
+        }
+
+        actionExecutor.executeActions(event, results)
+
+        val gestureCaptor = argumentCaptor<GestureDescription>()
+        verify(mockAndroidExecutor).dispatchGesture(gestureCaptor.capture())
+        assertGestureStartsAt(gestureCaptor.lastValue, winnerPosition)
+    }
+
+    @Test
     fun execute_oneSwipe() = runTest {
         val swipeAction = getNewDefaultSwipe(1)
 
@@ -257,6 +275,22 @@ class ActionExecutorTests {
         verify(mockAndroidExecutor, times(2)).dispatchGesture(gestureCaptor.capture())
         assertActionGesture(gestureCaptor.firstValue)
         assertActionGesture(gestureCaptor.lastValue)
+    }
+
+    private fun detectedResult(condition: ScreenCondition.Image, position: Point) =
+        ProcessedConditionResult.Screen(
+            isFulfilled = true,
+            haveBeenDetected = true,
+            condition = condition,
+            position = position,
+            size = Point(10, 10),
+            confidenceRate = 100.0,
+        )
+
+    private fun assertGestureStartsAt(gesture: GestureDescription, expected: Point) {
+        val start = shadowOf(gesture.getStroke(0).path).points.first()
+        assertEquals(expected.x.toFloat(), start.x, 0f)
+        assertEquals(expected.y.toFloat(), start.y, 0f)
     }
 
     @Test

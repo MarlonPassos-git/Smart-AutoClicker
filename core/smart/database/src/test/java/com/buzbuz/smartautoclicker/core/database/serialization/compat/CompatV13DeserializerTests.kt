@@ -378,9 +378,9 @@ class CompatV13DeserializerTests {
         assertEquals(1, stopEvent.actions.count())
 
         val stopCondition = stopEvent.conditions.first()
-        assertEquals(ConditionType.ON_COUNTER_REACHED, stopCondition.type)
-        assertEquals(executions, stopCondition.counterValue)
-        assertEquals(CounterComparisonOperation.GREATER_OR_EQUALS, stopCondition.counterComparisonOperation)
+        assertEquals(ConditionType.ON_COUNTER_REACHED, stopCondition.condition.type)
+        assertEquals(executions, stopCondition.condition.counterValue)
+        assertEquals(CounterComparisonOperation.GREATER_OR_EQUALS, stopCondition.condition.counterComparisonOperation)
 
         val stopAction = stopEvent.actions.first()
         assertEquals(ActionType.TOGGLE_EVENT, stopAction.action.type)
@@ -393,6 +393,6 @@ class CompatV13DeserializerTests {
         assertNotNull(counterAction)
         assertEquals(ChangeCounterOperationType.ADD, counterAction!!.action.counterOperation)
         assertEquals(1.0, counterAction.action.counterOperationValue)
-        assertEquals(stopCondition.counterName, counterAction.action.counterName)
+        assertEquals(stopCondition.condition.counterName, counterAction.action.counterName)
     }
 }
