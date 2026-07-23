@@ -1,0 +1,864 @@
+{
+  "version": 25,
+  "screenWidth": 2340,
+  "screenHeight": 1080,
+  "scenario": {
+    "scenario": {
+      "id": 31,
+      "name": "Farm Vila do Construtor",
+      "computeRate": 0,
+      "detectionQuality": 1600,
+      "randomize": true,
+      "keepScreenOn": true
+    },
+    "events": [
+      {
+        "event": {
+          "id": 110,
+          "scenarioId": 31,
+          "name": "10. Fechar carrinho vazio e retomar",
+          "conditionOperator": 1,
+          "priority": 0,
+          "enabledOnStart": true,
+          "type": "IMAGE_EVENT",
+          "keepDetecting": false,
+          "detectionCooldownMs": 3000
+        },
+        "actions": [
+          {
+            "action": {
+              "id": 1091,
+              "eventId": 110,
+              "priority": 0,
+              "name": "1. Fechar no X",
+              "type": "CLICK",
+              "clickPositionType": "USER_SELECTED",
+              "x": 1815,
+              "y": 100,
+              "pressDuration": 175
+            },
+            "intentExtras": [],
+            "eventsToggle": []
+          },
+          {
+            "action": {
+              "id": 1092,
+              "eventId": 110,
+              "priority": 1,
+              "name": "2. Aguardar fechar",
+              "type": "PAUSE",
+              "pauseDuration": 500
+            },
+            "intentExtras": [],
+            "eventsToggle": []
+          },
+          {
+            "action": {
+              "id": 1093,
+              "eventId": 110,
+              "priority": 2,
+              "name": "3. Reativar ataque",
+              "type": "TOGGLE_EVENT",
+              "toggleAll": false
+            },
+            "intentExtras": [],
+            "eventsToggle": [
+              {
+                "id": 9093,
+                "actionId": 1093,
+                "type": "ENABLE",
+                "toggleEventId": 101
+              }
+            ]
+          }
+        ],
+        "conditions": [
+          {
+            "id": 2101,
+            "eventId": 110,
+            "name": "Texto sem nova recompensa",
+            "type": "ON_TEXT_DETECTED",
+            "priority": 0,
+            "shouldBeDetected": true,
+            "textToDetect": "Nenhuma nova recompensa",
+            "threshold": 60,
+            "detectionAreaLeft": 700,
+            "detectionAreaTop": 360,
+            "detectionAreaRight": 1640,
+            "detectionAreaBottom": 680,
+            "textAlphabet": "LATIN"
+          }
+        ]
+      },
+      {
+        "event": {
+          "id": 109,
+          "scenarioId": 31,
+          "name": "9. Coletar carrinho de elixir",
+          "conditionOperator": 1,
+          "priority": 1,
+          "enabledOnStart": true,
+          "type": "IMAGE_EVENT",
+          "keepDetecting": false,
+          "detectionCooldownMs": 2500
+        },
+        "actions": [
+          {
+            "action": {
+              "id": 1081,
+              "eventId": 109,
+              "priority": 0,
+              "name": "Coletar",
+              "type": "CLICK",
+              "clickPositionType": "USER_SELECTED",
+              "x": 1635,
+              "y": 910,
+              "pressDuration": 175
+            },
+            "intentExtras": [],
+            "eventsToggle": []
+          }
+        ],
+        "conditions": [
+          {
+            "id": 2091,
+            "eventId": 109,
+            "name": "Título Carrinho de elixir",
+            "type": "ON_TEXT_DETECTED",
+            "priority": 0,
+            "shouldBeDetected": true,
+            "textToDetect": "Carrinho de elixir",
+            "threshold": 65,
+            "detectionAreaLeft": 750,
+            "detectionAreaTop": 45,
+            "detectionAreaRight": 1590,
+            "detectionAreaBottom": 165,
+            "textAlphabet": "LATIN"
+          }
+        ]
+      },
+      {
+        "event": {
+          "id": 106,
+          "scenarioId": 31,
+          "name": "6. Resultado - Voltar e contar",
+          "conditionOperator": 1,
+          "priority": 2,
+          "enabledOnStart": true,
+          "type": "IMAGE_EVENT",
+          "keepDetecting": false,
+          "detectionCooldownMs": 3000
+        },
+        "actions": [
+          {
+            "action": {
+              "id": 1051,
+              "eventId": 106,
+              "priority": 0,
+              "name": "1. Voltar",
+              "type": "CLICK",
+              "clickPositionType": "USER_SELECTED",
+              "x": 1170,
+              "y": 915,
+              "pressDuration": 175
+            },
+            "intentExtras": [],
+            "eventsToggle": []
+          },
+          {
+            "action": {
+              "id": 1052,
+              "eventId": 106,
+              "priority": 1,
+              "name": "2. Aguardar a vila carregar",
+              "type": "PAUSE",
+              "pauseDuration": 2000
+            },
+            "intentExtras": [],
+            "eventsToggle": []
+          },
+          {
+            "action": {
+              "id": 1053,
+              "eventId": 106,
+              "priority": 2,
+              "name": "3. Somar ataque concluído",
+              "type": "CHANGE_COUNTER",
+              "counterName": "Ataques da Vila do Construtor",
+              "counterOperation": "ADD",
+              "counterOperationValueType": "NUMBER",
+              "counterOperationValue": 1
+            },
+            "intentExtras": [],
+            "eventsToggle": []
+          }
+        ],
+        "conditions": [
+          {
+            "id": 2061,
+            "eventId": 106,
+            "name": "Texto Voltar",
+            "type": "ON_TEXT_DETECTED",
+            "priority": 0,
+            "shouldBeDetected": true,
+            "textToDetect": "Voltar",
+            "threshold": 70,
+            "detectionAreaLeft": 1010,
+            "detectionAreaTop": 835,
+            "detectionAreaRight": 1330,
+            "detectionAreaBottom": 1005,
+            "textAlphabet": "LATIN"
+          }
+        ]
+      },
+      {
+        "event": {
+          "id": 103,
+          "scenarioId": 31,
+          "name": "3. Batalha encontrada - Zoom out",
+          "conditionOperator": 1,
+          "priority": 3,
+          "enabledOnStart": true,
+          "type": "IMAGE_EVENT",
+          "keepDetecting": false,
+          "detectionCooldownMs": 30000
+        },
+        "actions": [
+          {
+            "action": {
+              "id": 1021,
+              "eventId": 103,
+              "priority": 0,
+              "name": "1. Zoom out central",
+              "type": "ZOOM",
+              "zoomDirection": "OUT",
+              "zoomIntensity": 150,
+              "zoomCenterX": 1170,
+              "zoomCenterY": 540,
+              "zoomDuration": 500
+            },
+            "intentExtras": [],
+            "eventsToggle": []
+          },
+          {
+            "action": {
+              "id": 1022,
+              "eventId": 103,
+              "priority": 1,
+              "name": "2. Aguardar o zoom",
+              "type": "PAUSE",
+              "pauseDuration": 300
+            },
+            "intentExtras": [],
+            "eventsToggle": []
+          },
+          {
+            "action": {
+              "id": 1023,
+              "eventId": 103,
+              "priority": 2,
+              "name": "3. Liberar deploy do herói",
+              "type": "TOGGLE_EVENT",
+              "toggleAll": false
+            },
+            "intentExtras": [],
+            "eventsToggle": [
+              {
+                "id": 9023,
+                "actionId": 1023,
+                "type": "ENABLE",
+                "toggleEventId": 104
+              }
+            ]
+          }
+        ],
+        "conditions": [
+          {
+            "id": 2031,
+            "eventId": 103,
+            "name": "Texto Batalha começa em",
+            "type": "ON_TEXT_DETECTED",
+            "priority": 0,
+            "shouldBeDetected": true,
+            "textToDetect": "Batalha comeca em",
+            "threshold": 60,
+            "detectionAreaLeft": 880,
+            "detectionAreaTop": 0,
+            "detectionAreaRight": 1440,
+            "detectionAreaBottom": 150,
+            "textAlphabet": "LATIN"
+          }
+        ]
+      },
+      {
+        "event": {
+          "id": 104,
+          "scenarioId": 31,
+          "name": "4. Deploy - Máquina de Batalha ou Copter",
+          "conditionOperator": 2,
+          "priority": 4,
+          "enabledOnStart": false,
+          "type": "IMAGE_EVENT",
+          "keepDetecting": false,
+          "detectionCooldownMs": 1000
+        },
+        "actions": [
+          {
+            "action": {
+              "id": 1031,
+              "eventId": 104,
+              "priority": 0,
+              "name": "1. Selecionar herói detectado",
+              "type": "CLICK",
+              "clickPositionType": "ON_DETECTED_CONDITION",
+              "pressDuration": 175,
+              "clickOffsetX": 58,
+              "clickOffsetY": 58
+            },
+            "intentExtras": [],
+            "eventsToggle": []
+          },
+          {
+            "action": {
+              "id": 1032,
+              "eventId": 104,
+              "priority": 1,
+              "name": "2. Intervalo",
+              "type": "PAUSE",
+              "pauseDuration": 250
+            },
+            "intentExtras": [],
+            "eventsToggle": []
+          },
+          {
+            "action": {
+              "id": 1033,
+              "eventId": 104,
+              "priority": 2,
+              "name": "3. Dropar no canto inferior esquerdo",
+              "type": "CLICK",
+              "clickPositionType": "USER_SELECTED",
+              "x": 520,
+              "y": 680,
+              "pressDuration": 175
+            },
+            "intentExtras": [],
+            "eventsToggle": []
+          },
+          {
+            "action": {
+              "id": 1034,
+              "eventId": 104,
+              "priority": 3,
+              "name": "4. Confirmar deploy",
+              "type": "PAUSE",
+              "pauseDuration": 250
+            },
+            "intentExtras": [],
+            "eventsToggle": []
+          },
+          {
+            "action": {
+              "id": 1035,
+              "eventId": 104,
+              "priority": 4,
+              "name": "5. Bloquear novo deploy nesta fase",
+              "type": "TOGGLE_EVENT",
+              "toggleAll": false
+            },
+            "intentExtras": [],
+            "eventsToggle": [
+              {
+                "id": 9035,
+                "actionId": 1035,
+                "type": "DISABLE",
+                "toggleEventId": 104
+              }
+            ]
+          }
+        ],
+        "conditions": [
+          {
+            "id": 2041,
+            "eventId": 104,
+            "name": "Máquina de Batalha",
+            "type": "ON_IMAGE_DETECTED",
+            "priority": 0,
+            "shouldBeDetected": true,
+            "path": "Condition_3101.png",
+            "areaLeft": 342,
+            "areaTop": 890,
+            "areaRight": 457,
+            "areaBottom": 1005,
+            "threshold": 20,
+            "detectionType": 3,
+            "detectionAreaLeft": 0,
+            "detectionAreaTop": 864,
+            "detectionAreaRight": 2340,
+            "detectionAreaBottom": 1080
+          },
+          {
+            "id": 2042,
+            "eventId": 104,
+            "name": "Copter de Batalha",
+            "type": "ON_IMAGE_DETECTED",
+            "priority": 1,
+            "shouldBeDetected": true,
+            "path": "Condition_3102.png",
+            "areaLeft": 342,
+            "areaTop": 890,
+            "areaRight": 457,
+            "areaBottom": 1005,
+            "threshold": 20,
+            "detectionType": 3,
+            "detectionAreaLeft": 0,
+            "detectionAreaTop": 864,
+            "detectionAreaRight": 2340,
+            "detectionAreaBottom": 1080
+          }
+        ]
+      },
+      {
+        "event": {
+          "id": 105,
+          "scenarioId": 31,
+          "name": "5. Deploy repetitivo - Bruxa Sombria",
+          "conditionOperator": 2,
+          "priority": 5,
+          "enabledOnStart": true,
+          "type": "IMAGE_EVENT",
+          "keepDetecting": false,
+          "detectionCooldownMs": 100
+        },
+        "actions": [
+          {
+            "action": {
+              "id": 1041,
+              "eventId": 105,
+              "priority": 0,
+              "name": "1. Selecionar próxima bruxa pronta",
+              "type": "CLICK",
+              "clickPositionType": "ON_DETECTED_CONDITION",
+              "pressDuration": 175,
+              "clickOffsetX": 36,
+              "clickOffsetY": 60
+            },
+            "intentExtras": [],
+            "eventsToggle": []
+          },
+          {
+            "action": {
+              "id": 1042,
+              "eventId": 105,
+              "priority": 1,
+              "name": "2. Intervalo antes do deploy",
+              "type": "PAUSE",
+              "pauseDuration": 250
+            },
+            "intentExtras": [],
+            "eventsToggle": []
+          },
+          {
+            "action": {
+              "id": 1043,
+              "eventId": 105,
+              "priority": 2,
+              "name": "3. Dropar no mesmo canto",
+              "type": "CLICK",
+              "clickPositionType": "USER_SELECTED",
+              "x": 520,
+              "y": 680,
+              "pressDuration": 175
+            },
+            "intentExtras": [],
+            "eventsToggle": []
+          },
+          {
+            "action": {
+              "id": 1044,
+              "eventId": 105,
+              "priority": 3,
+              "name": "4. Intervalo antes da habilidade",
+              "type": "PAUSE",
+              "pauseDuration": 250
+            },
+            "intentExtras": [],
+            "eventsToggle": []
+          },
+          {
+            "action": {
+              "id": 1045,
+              "eventId": 105,
+              "priority": 4,
+              "name": "5. Ativar habilidade da bruxa",
+              "type": "CLICK",
+              "clickPositionType": "ON_DETECTED_CONDITION",
+              "pressDuration": 175,
+              "clickOffsetX": 36,
+              "clickOffsetY": 60
+            },
+            "intentExtras": [],
+            "eventsToggle": []
+          },
+          {
+            "action": {
+              "id": 1046,
+              "eventId": 105,
+              "priority": 5,
+              "name": "6. Intervalo para próxima tropa",
+              "type": "PAUSE",
+              "pauseDuration": 250
+            },
+            "intentExtras": [],
+            "eventsToggle": []
+          }
+        ],
+        "conditions": [
+          {
+            "id": 2051,
+            "eventId": 105,
+            "name": "Bruxa pronta - Fase 1",
+            "type": "ON_IMAGE_DETECTED",
+            "priority": 0,
+            "shouldBeDetected": true,
+            "path": "Condition_3103.png",
+            "areaLeft": 560,
+            "areaTop": 930,
+            "areaRight": 632,
+            "areaBottom": 1050,
+            "threshold": 20,
+            "detectionType": 3,
+            "detectionAreaLeft": 0,
+            "detectionAreaTop": 864,
+            "detectionAreaRight": 2340,
+            "detectionAreaBottom": 1080
+          },
+          {
+            "id": 2052,
+            "eventId": 105,
+            "name": "Bruxa pronta - Fase 2",
+            "type": "ON_IMAGE_DETECTED",
+            "priority": 1,
+            "shouldBeDetected": true,
+            "path": "Condition_3104.png",
+            "areaLeft": 1472,
+            "areaTop": 930,
+            "areaRight": 1544,
+            "areaBottom": 1050,
+            "threshold": 20,
+            "detectionType": 3,
+            "detectionAreaLeft": 0,
+            "detectionAreaTop": 864,
+            "detectionAreaRight": 2340,
+            "detectionAreaBottom": 1080
+          }
+        ]
+      },
+      {
+        "event": {
+          "id": 102,
+          "scenarioId": 31,
+          "name": "2. Encontrar oponente",
+          "conditionOperator": 1,
+          "priority": 6,
+          "enabledOnStart": true,
+          "type": "IMAGE_EVENT",
+          "keepDetecting": false,
+          "detectionCooldownMs": 2000
+        },
+        "actions": [
+          {
+            "action": {
+              "id": 1011,
+              "eventId": 102,
+              "priority": 0,
+              "name": "Encontrar agora",
+              "type": "CLICK",
+              "clickPositionType": "USER_SELECTED",
+              "x": 1635,
+              "y": 710,
+              "pressDuration": 175
+            },
+            "intentExtras": [],
+            "eventsToggle": []
+          }
+        ],
+        "conditions": [
+          {
+            "id": 2021,
+            "eventId": 102,
+            "name": "Texto Encontrar agora",
+            "type": "ON_TEXT_DETECTED",
+            "priority": 0,
+            "shouldBeDetected": true,
+            "textToDetect": "Encontrar agora",
+            "threshold": 65,
+            "detectionAreaLeft": 1380,
+            "detectionAreaTop": 600,
+            "detectionAreaRight": 1880,
+            "detectionAreaBottom": 810,
+            "textAlphabet": "LATIN"
+          }
+        ]
+      },
+      {
+        "event": {
+          "id": 108,
+          "scenarioId": 31,
+          "name": "8. Abrir carrinho de elixir",
+          "conditionOperator": 1,
+          "priority": 6,
+          "enabledOnStart": false,
+          "type": "IMAGE_EVENT",
+          "keepDetecting": false,
+          "detectionCooldownMs": 2000
+        },
+        "actions": [
+          {
+            "action": {
+              "id": 1071,
+              "eventId": 108,
+              "priority": 0,
+              "name": "1. Clicar no ícone do carrinho",
+              "type": "CLICK",
+              "clickPositionType": "ON_DETECTED_CONDITION",
+              "pressDuration": 175,
+              "clickOffsetX": 35,
+              "clickOffsetY": 42
+            },
+            "intentExtras": [],
+            "eventsToggle": []
+          },
+          {
+            "action": {
+              "id": 1072,
+              "eventId": 108,
+              "priority": 1,
+              "name": "2. Aguardar abrir",
+              "type": "PAUSE",
+              "pauseDuration": 800
+            },
+            "intentExtras": [],
+            "eventsToggle": []
+          },
+          {
+            "action": {
+              "id": 1073,
+              "eventId": 108,
+              "priority": 2,
+              "name": "3. Bloquear nova abertura",
+              "type": "TOGGLE_EVENT",
+              "toggleAll": false
+            },
+            "intentExtras": [],
+            "eventsToggle": [
+              {
+                "id": 9073,
+                "actionId": 1073,
+                "type": "DISABLE",
+                "toggleEventId": 108
+              }
+            ]
+          }
+        ],
+        "conditions": [
+          {
+            "id": 2081,
+            "eventId": 108,
+            "name": "Ícone do carrinho de elixir",
+            "type": "ON_IMAGE_DETECTED",
+            "priority": 0,
+            "shouldBeDetected": true,
+            "path": "Condition_3105.png",
+            "areaLeft": 1400,
+            "areaTop": 220,
+            "areaRight": 1470,
+            "areaBottom": 305,
+            "threshold": 20,
+            "detectionType": 3,
+            "detectionAreaLeft": 0,
+            "detectionAreaTop": 0,
+            "detectionAreaRight": 2340,
+            "detectionAreaBottom": 1080
+          }
+        ]
+      },
+      {
+        "event": {
+          "id": 101,
+          "scenarioId": 31,
+          "name": "1. Atacar - Vila do Construtor",
+          "conditionOperator": 1,
+          "priority": 7,
+          "enabledOnStart": true,
+          "type": "IMAGE_EVENT",
+          "keepDetecting": false,
+          "detectionCooldownMs": 2000
+        },
+        "actions": [
+          {
+            "action": {
+              "id": 1001,
+              "eventId": 101,
+              "priority": 0,
+              "name": "Atacar",
+              "type": "CLICK",
+              "clickPositionType": "USER_SELECTED",
+              "x": 195,
+              "y": 990,
+              "pressDuration": 175
+            },
+            "intentExtras": [],
+            "eventsToggle": []
+          }
+        ],
+        "conditions": [
+          {
+            "id": 2011,
+            "eventId": 101,
+            "name": "Texto Atacar",
+            "type": "ON_TEXT_DETECTED",
+            "priority": 0,
+            "shouldBeDetected": true,
+            "textToDetect": "Atacar",
+            "threshold": 70,
+            "detectionAreaLeft": 70,
+            "detectionAreaTop": 900,
+            "detectionAreaRight": 340,
+            "detectionAreaBottom": 1080,
+            "textAlphabet": "LATIN"
+          }
+        ]
+      },
+      {
+        "event": {
+          "id": 107,
+          "scenarioId": 31,
+          "name": "7. Após cinco ataques - Preparar coleta",
+          "conditionOperator": 1,
+          "priority": 0,
+          "enabledOnStart": true,
+          "type": "TRIGGER_EVENT"
+        },
+        "actions": [
+          {
+            "action": {
+              "id": 1061,
+              "eventId": 107,
+              "priority": 0,
+              "name": "1. Reiniciar contador",
+              "type": "CHANGE_COUNTER",
+              "counterName": "Ataques da Vila do Construtor",
+              "counterOperation": "SET",
+              "counterOperationValueType": "NUMBER",
+              "counterOperationValue": 0
+            },
+            "intentExtras": [],
+            "eventsToggle": []
+          },
+          {
+            "action": {
+              "id": 1062,
+              "eventId": 107,
+              "priority": 1,
+              "name": "2. Pausar ataque e liberar carrinho",
+              "type": "TOGGLE_EVENT",
+              "toggleAll": false
+            },
+            "intentExtras": [],
+            "eventsToggle": [
+              {
+                "id": 9062,
+                "actionId": 1062,
+                "type": "DISABLE",
+                "toggleEventId": 101
+              },
+              {
+                "id": 9063,
+                "actionId": 1062,
+                "type": "ENABLE",
+                "toggleEventId": 108
+              }
+            ]
+          },
+          {
+            "action": {
+              "id": 1063,
+              "eventId": 107,
+              "priority": 2,
+              "name": "3. Zoom out central",
+              "type": "ZOOM",
+              "zoomDirection": "OUT",
+              "zoomIntensity": 150,
+              "zoomCenterX": 1170,
+              "zoomCenterY": 540,
+              "zoomDuration": 500
+            },
+            "intentExtras": [],
+            "eventsToggle": []
+          },
+          {
+            "action": {
+              "id": 1064,
+              "eventId": 107,
+              "priority": 3,
+              "name": "4. Aguardar o zoom",
+              "type": "PAUSE",
+              "pauseDuration": 500
+            },
+            "intentExtras": [],
+            "eventsToggle": []
+          },
+          {
+            "action": {
+              "id": 1065,
+              "eventId": 107,
+              "priority": 4,
+              "name": "5. Rolar a vila para cima",
+              "type": "SWIPE",
+              "fromX": 1170,
+              "fromY": 700,
+              "toX": 1170,
+              "toY": 300,
+              "swipeDuration": 500
+            },
+            "intentExtras": [],
+            "eventsToggle": []
+          },
+          {
+            "action": {
+              "id": 1066,
+              "eventId": 107,
+              "priority": 5,
+              "name": "6. Aguardar localizar o carrinho",
+              "type": "PAUSE",
+              "pauseDuration": 1500
+            },
+            "intentExtras": [],
+            "eventsToggle": []
+          }
+        ],
+        "conditions": [
+          {
+            "id": 2071,
+            "eventId": 107,
+            "name": "Cinco ataques concluídos",
+            "type": "ON_COUNTER_REACHED",
+            "priority": 0,
+            "counterName": "Ataques da Vila do Construtor",
+            "counterComparisonOperation": "GREATER_OR_EQUALS",
+            "counterOperationValueType": "NUMBER",
+            "counterValue": 5
+          }
+        ]
+      }
+    ],
+    "counters": [
+      {
+        "name": "Ataques da Vila do Construtor",
+        "scenarioId": 31,
+        "startingValue": 0
+      }
+    ]
+  }
+}
