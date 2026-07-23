@@ -44,6 +44,13 @@ The exact number of clicks, from 1 through 50, executed by one Area Click Action
 **Click Interval**:
 The temporal wait after one click is released and before the next click begins.
 
+**Image Condition**:
+A screen condition evaluated against an ordered list of equivalent Reference Images. Presence succeeds when any Reference Image is detected; absence succeeds only when every Reference Image is valid and none is detected.
+
+**Reference Image**:
+One image entry belonging to an Image Condition. It owns its bitmap crop, native size, and Exact Search position while sharing threshold, visibility, and search mode with its Image Condition.
+_Avoid_: Original Image, Main Image, Principal Image, Variation
+
 ## Relationships
 
 - A **Zoom Action** has exactly one **Zoom Center** and one **Zoom Intensity**
@@ -52,6 +59,9 @@ The temporal wait after one click is released and before the next click begins.
 - An **Area Click Action** has one **Click Area**, one **Click Count**, and one distribution
 - **Random Distribution** and **Distributed Distribution** control spatial placement only
 - **Click Interval** applies only between clicks, never after the final click
+- An **Image Condition** has 1 through 20 ordered **Reference Images**
+- **Reference Images** are equivalent candidates; list order controls detection order, not hierarchy
+- Exact Search uses each **Reference Image** position; Whole Screen and In Area searches use the **Image Condition** area
 
 ## Example dialogue
 
