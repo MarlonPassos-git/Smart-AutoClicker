@@ -20,6 +20,7 @@ enum class MonitoredOverlayType {
 
     // Menus
     MAIN_MENU,
+    IMAGE_SOURCE_SELECTION,
     CAPTURE_MENU,
     COLOR_CAPTURE_MENU,
     CONDITION_AREA_SELECTOR_MENU,

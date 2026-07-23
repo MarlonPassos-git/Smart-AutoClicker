@@ -21,7 +21,9 @@ import com.buzbuz.smartautoclicker.code.smart.detectionmodels.text.domain.OCRAlp
 import com.buzbuz.smartautoclicker.core.base.identifier.Identifier
 import com.buzbuz.smartautoclicker.core.database.entity.ConditionEntity
 import com.buzbuz.smartautoclicker.core.database.entity.ConditionType
+import com.buzbuz.smartautoclicker.core.database.entity.CompleteConditionEntity
 import com.buzbuz.smartautoclicker.core.database.entity.CounterOperationValueType
+import com.buzbuz.smartautoclicker.core.database.entity.ImageReferenceEntity
 import com.buzbuz.smartautoclicker.core.database.entity.NumberFormatType as DbNumberFormatType
 import com.buzbuz.smartautoclicker.core.domain.model.counter.CounterOperationValue
 import com.buzbuz.smartautoclicker.core.domain.model.counter.toDomain
@@ -72,6 +74,19 @@ private fun ScreenCondition.Image.toImageConditionEntity() = ConditionEntity(
     detectionAreaRight = detectionArea?.right,
     detectionAreaBottom = detectionArea?.bottom,
 )
+
+internal fun ScreenCondition.Image.toReferenceEntities(conditionId: Long): List<ImageReferenceEntity> =
+    references.mapIndexed { index, reference ->
+        ImageReferenceEntity(
+            conditionId = conditionId,
+            priority = index,
+            path = reference.path,
+            areaLeft = reference.area.left,
+            areaTop = reference.area.top,
+            areaRight = reference.area.right,
+            areaBottom = reference.area.bottom,
+        )
+    }
 
 private fun ScreenCondition.Number.toNumberConditionEntity(): ConditionEntity {
     val isNumberValue = counterValue is CounterOperationValue.Number
@@ -163,6 +178,13 @@ internal fun ConditionEntity.toDomain(cleanIds: Boolean = false): Condition =
         ConditionType.ON_TIMER_REACHED -> toDomainTimerReached(cleanIds)
     }
 
+internal fun CompleteConditionEntity.toDomain(cleanIds: Boolean = false): Condition =
+    if (condition.type == ConditionType.ON_IMAGE_DETECTED) {
+        condition.toDomainImageCondition(cleanIds, imageReferences)
+    } else {
+        condition.toDomain(cleanIds)
+    }
+
 private fun ConditionEntity.toDomainColorCondition(cleanIds: Boolean = false): ScreenCondition.Color =
     ScreenCondition.Color(
         id = Identifier(id = id, asTemporary = cleanIds),
@@ -175,18 +197,40 @@ private fun ConditionEntity.toDomainColorCondition(cleanIds: Boolean = false): S
         color = colorRgba!!,
     )
 
-private fun ConditionEntity.toDomainImageCondition(cleanIds: Boolean = false): ScreenCondition.Image =
+private fun ConditionEntity.toDomainImageCondition(
+    cleanIds: Boolean = false,
+    relatedReferences: List<ImageReferenceEntity> = emptyList(),
+): ScreenCondition.Image =
     ScreenCondition.Image(
         id = Identifier(id = id, asTemporary = cleanIds),
         eventId = Identifier(id = eventId, asTemporary = cleanIds),
         name = name,
         priority = priority,
-        path = path!!,
-        area = Rect(areaLeft!!, areaTop!!, areaRight!!, areaBottom!!),
+        references = relatedReferences
+            .sortedBy { reference -> reference.priority }
+            .map(ImageReferenceEntity::toDomain)
+            .ifEmpty { listOf(getLegacyImageReference()) },
         threshold = threshold!!,
         detectionType = detectionType!!,
         detectionArea = getDetectionArea(),
         shouldBeDetected = shouldBeDetected ?: true,
+    )
+
+private fun ImageReferenceEntity.toDomain(): ImageReference =
+    ImageReference(
+        path = path,
+        area = Rect(areaLeft, areaTop, areaRight, areaBottom),
+    )
+
+private fun ConditionEntity.getLegacyImageReference(): ImageReference =
+    ImageReference(
+        path = requireNotNull(path) { "Invalid legacy image path=$path, expected a non-null path" },
+        area = Rect(
+            requireNotNull(areaLeft) { "Invalid legacy image area left=$areaLeft, expected an integer" },
+            requireNotNull(areaTop) { "Invalid legacy image area top=$areaTop, expected an integer" },
+            requireNotNull(areaRight) { "Invalid legacy image area right=$areaRight, expected an integer" },
+            requireNotNull(areaBottom) { "Invalid legacy image area bottom=$areaBottom, expected an integer" },
+        ),
     )
 
 private fun ConditionEntity.toDomainNumberCondition(cleanIds: Boolean = false): ScreenCondition.Number =

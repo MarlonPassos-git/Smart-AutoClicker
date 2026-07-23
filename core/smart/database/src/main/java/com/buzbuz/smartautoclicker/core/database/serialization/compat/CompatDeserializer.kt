@@ -35,6 +35,7 @@ import com.buzbuz.smartautoclicker.core.database.entity.ActionType
 import com.buzbuz.smartautoclicker.core.database.entity.ChangeCounterOperationType
 import com.buzbuz.smartautoclicker.core.database.entity.ClickPositionType
 import com.buzbuz.smartautoclicker.core.database.entity.CompleteActionEntity
+import com.buzbuz.smartautoclicker.core.database.entity.CompleteConditionEntity
 import com.buzbuz.smartautoclicker.core.database.entity.CompleteEventEntity
 import com.buzbuz.smartautoclicker.core.database.entity.CompleteScenario
 import com.buzbuz.smartautoclicker.core.database.entity.ConditionEntity
@@ -171,7 +172,7 @@ internal open class CompatDeserializer : Deserializer {
             CompleteEventEntity(
                 event = eventEntity,
                 actions = completeActions,
-                conditions = conditions,
+                conditions = conditions.map { condition -> CompleteConditionEntity(condition) },
             )
         }
     }

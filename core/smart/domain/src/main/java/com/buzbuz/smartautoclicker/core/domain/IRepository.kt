@@ -186,6 +186,13 @@ interface IRepository {
     suspend fun migrateLegacyImageConditions(): Boolean
 
     /**
+     * Delete image files only when no persisted reference uses their path.
+     *
+     * Example: `repository.deleteUnusedImageConditionBitmaps(listOf(discardedPath))`.
+     */
+    suspend fun deleteUnusedImageConditionBitmaps(paths: List<String>)
+
+    /**
      * Get the name of a condition by its identifier.
      *
      * @param conditionId the identifier of the condition.

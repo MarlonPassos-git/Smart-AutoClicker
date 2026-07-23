@@ -48,6 +48,7 @@ import com.buzbuz.smartautoclicker.core.domain.model.action.ToggleEvent
 import com.buzbuz.smartautoclicker.core.domain.model.action.toggleevent.EventToggle
 import com.buzbuz.smartautoclicker.core.domain.model.action.intent.IntentExtra
 import com.buzbuz.smartautoclicker.core.domain.model.condition.ScreenCondition
+import com.buzbuz.smartautoclicker.core.domain.model.condition.ImageReference
 import com.buzbuz.smartautoclicker.core.domain.model.condition.TriggerCondition
 import com.buzbuz.smartautoclicker.core.domain.model.counter.ComparisonOperation
 import com.buzbuz.smartautoclicker.core.domain.model.event.ScreenEvent
@@ -191,22 +192,35 @@ class EditedItemsBuilder internal constructor(
 
     suspend fun createNewImageCondition(context: Context, area: Rect, bitmap: Bitmap): ScreenCondition.Image {
         val id = conditionsIdCreator.generateNewIdentifier()
+        val reference = createImageReference(area, bitmap)
+
+        return ScreenCondition.Image(
+            id = id,
+            eventId = getEditedEventIdOrThrow(),
+            name = defaultValues.conditionName(context),
+            references = listOf(reference),
+            threshold = defaultValues.conditionThreshold(context),
+            detectionType = defaultValues.conditionDetectionType(),
+            shouldBeDetected = defaultValues.conditionShouldBeDetected(),
+            priority = 0,
+        )
+    }
+
+    /**
+     * Persist a captured bitmap and track it until the edition is saved or canceled.
+     *
+     * Example: `builder.createImageReference(Rect(0, 0, 100, 100), bitmap)`.
+     */
+    suspend fun createImageReference(area: Rect, bitmap: Bitmap): ImageReference {
         val newPath = bitmapRepository.saveImageConditionBitmap(
             bitmap = bitmap,
             prefix = CONDITION_FILE_PREFIX,
         )
         _newImageConditionsPaths.add(newPath)
 
-        return ScreenCondition.Image(
-            id = id,
-            eventId = getEditedEventIdOrThrow(),
-            name = defaultValues.conditionName(context),
-            area = area,
-            threshold = defaultValues.conditionThreshold(context),
-            detectionType = defaultValues.conditionDetectionType(),
-            shouldBeDetected = defaultValues.conditionShouldBeDetected(),
+        return ImageReference(
             path = newPath,
-            priority = 0,
+            area = Rect(area),
         )
     }
 
@@ -230,7 +244,9 @@ class EditedItemsBuilder internal constructor(
             id = conditionsIdCreator.generateNewIdentifier(),
             eventId = eventId,
             name = "" + condition.name,
-            path = "" + condition.path,
+            references = condition.references.map { reference ->
+                reference.copy(path = "" + reference.path, area = Rect(reference.area))
+            },
         )
 
     private fun createNewNumberConditionFrom(condition: ScreenCondition.Number, eventId: Identifier = getEditedEventIdOrThrow()): ScreenCondition.Number =

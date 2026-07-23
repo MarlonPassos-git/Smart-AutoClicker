@@ -19,6 +19,7 @@ package com.buzbuz.smartautoclicker.core.processing.data.processor
 import android.graphics.Bitmap
 
 import com.buzbuz.smartautoclicker.core.detection.ImageDetector
+import com.buzbuz.smartautoclicker.core.detection.DetectionResult
 import com.buzbuz.smartautoclicker.core.detection.NumberFormatType as DetectionNumberFormatType
 import com.buzbuz.smartautoclicker.core.domain.model.condition.NumberFormatType as DomainNumberFormatType
 import com.buzbuz.smartautoclicker.core.domain.model.AND
@@ -32,6 +33,7 @@ import com.buzbuz.smartautoclicker.core.domain.model.counter.ComparisonOperation
 import com.buzbuz.smartautoclicker.core.processing.data.processor.state.ProcessingState
 import com.buzbuz.smartautoclicker.core.processing.data.scaling.ScalingManager
 import com.buzbuz.smartautoclicker.core.processing.data.scaling.ScreenConditionScalingInfo
+import com.buzbuz.smartautoclicker.core.processing.data.scaling.ImageReferenceScalingInfo
 import com.buzbuz.smartautoclicker.core.processing.domain.SmartProcessingListener
 import com.buzbuz.smartautoclicker.core.processing.domain.model.ProcessedConditionResult
 
@@ -163,34 +165,65 @@ internal class ConditionsVerifier(
             .getScreenConditionScalingInfo(condition) as? ScreenConditionScalingInfo.Image
             ?: return condition.toInvalidConditionResult()
 
-        val bitmap = bitmapSupplier(
-            condition.path,
-            conditionScalingInfo.imageArea.width(),
-            conditionScalingInfo.imageArea.height(),
-        )
-
-        val result = bitmap?.let { conditionBitmap ->
-            val detectionResult = imageDetector.detectImage(
-                conditionBitmap = conditionBitmap,
-                conditionWidth = conditionScalingInfo.imageArea.width(),
-                conditionHeight = conditionScalingInfo.imageArea.height(),
-                detectionArea = conditionScalingInfo.detectionArea,
-                threshold = condition.threshold,
-            )
-
-            ProcessedConditionResult.Screen(
-                isFulfilled = detectionResult.isDetected == condition.shouldBeDetected,
-                haveBeenDetected = detectionResult.isDetected,
-                condition = condition,
-                position = scalingManager.scaleUpDetectionResult(detectionResult.position),
-                confidenceRate = detectionResult.confidenceRate,
-                size = scalingManager.scaleUpDetectionResult(detectionResult.size),
-            )
-        } ?: condition.toInvalidConditionResult()
+        val result = verifyImageReferences(condition, conditionScalingInfo.references)
 
         progressListener?.onScreenConditionProcessingCompleted(result)
         return result
     }
+
+    private suspend fun verifyImageReferences(
+        condition: ScreenCondition.Image,
+        references: List<ImageReferenceScalingInfo>,
+    ): ProcessedConditionResult.Screen {
+        if (references.isEmpty()) return condition.toImageResult(DetectionResult(), isValid = false)
+
+        var bestMiss: DetectionResult? = null
+        var hasMissingBitmap = false
+
+        references.forEach { reference ->
+            val bitmap = loadReferenceBitmap(reference)
+            if (bitmap == null) hasMissingBitmap = true
+            else {
+                val detection = detectImageReference(condition, reference, bitmap)
+                if (detection.isDetected) return condition.toImageResult(detection, isValid = true)
+                if (detection.confidenceRate > (bestMiss?.confidenceRate ?: -1.0)) bestMiss = detection
+            }
+            yield()
+        }
+
+        return condition.toImageResult(bestMiss ?: DetectionResult(), isValid = !hasMissingBitmap)
+    }
+
+    private suspend fun loadReferenceBitmap(reference: ImageReferenceScalingInfo): Bitmap? =
+        bitmapSupplier(
+            reference.reference.path,
+            reference.imageArea.width(),
+            reference.imageArea.height(),
+        )
+
+    private fun detectImageReference(
+        condition: ScreenCondition.Image,
+        reference: ImageReferenceScalingInfo,
+        bitmap: Bitmap,
+    ): DetectionResult = imageDetector.detectImage(
+        conditionBitmap = bitmap,
+        conditionWidth = reference.imageArea.width(),
+        conditionHeight = reference.imageArea.height(),
+        detectionArea = reference.detectionArea,
+        threshold = condition.threshold,
+    )
+
+    private fun ScreenCondition.Image.toImageResult(
+        detection: DetectionResult,
+        isValid: Boolean,
+    ): ProcessedConditionResult.Screen = ProcessedConditionResult.Screen(
+        isFulfilled = isValid && detection.isDetected == shouldBeDetected,
+        haveBeenDetected = detection.isDetected,
+        condition = this,
+        position = scalingManager.scaleUpDetectionResult(detection.position),
+        confidenceRate = detection.confidenceRate,
+        size = scalingManager.scaleUpDetectionResult(detection.size),
+    )
 
     private fun verifyNumberCondition(condition: ScreenCondition.Number): ProcessedConditionResult.Screen {
         progressListener?.onScreenConditionProcessingStarted()

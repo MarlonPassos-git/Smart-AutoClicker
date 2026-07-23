@@ -118,6 +118,16 @@ object ImageConditionsStillTargetTutorial : TutorialItem {
                         MonitoredViewType.SCREEN_CONDITION_TYPE_SELECTION_IMAGE,
                     ),
                 ),
+                // Choose screen capture as the reference source
+                TutorialStep.TutorialOverlay(
+                    contentTextResId = R.string.message_tutorial_choose_screen_capture_source,
+                    stepStartCondition = TutorialStepStartCondition.MonitoredOverlayDisplayed(
+                        MonitoredOverlayType.IMAGE_SOURCE_SELECTION,
+                    ),
+                    stepEndCondition = TutorialStepEndCondition.MonitoredViewClicked(
+                        MonitoredViewType.IMAGE_SOURCE_SELECTION_CAPTURE,
+                    ),
+                ),
                 // Take a screenshot
                 TutorialStep.TutorialOverlay(
                     contentTextResId = R.string.message_tutorial_screen_condition_still_target_step_8,

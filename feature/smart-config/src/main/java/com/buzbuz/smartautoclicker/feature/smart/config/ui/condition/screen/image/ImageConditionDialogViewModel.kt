@@ -24,19 +24,29 @@ import android.view.View
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.buzbuz.smartautoclicker.core.bitmaps.BitmapRepository
+import com.buzbuz.smartautoclicker.core.display.config.DisplayConfigManager
 
-import com.buzbuz.smartautoclicker.core.domain.ext.getConditionBitmap
 import com.buzbuz.smartautoclicker.core.domain.model.DetectionType
 import com.buzbuz.smartautoclicker.core.domain.model.IN_AREA
 import com.buzbuz.smartautoclicker.core.domain.model.condition.ScreenCondition
+import com.buzbuz.smartautoclicker.core.domain.model.condition.IMAGE_REFERENCES_LIMIT
+import com.buzbuz.smartautoclicker.core.domain.model.condition.ImageReference
 import com.buzbuz.smartautoclicker.core.common.tutorial.domain.model.monitoring.MonitoredViewType
 import com.buzbuz.smartautoclicker.core.common.tutorial.domain.MonitoredViewsManager
 import com.buzbuz.smartautoclicker.feature.smart.config.R
 import com.buzbuz.smartautoclicker.feature.smart.config.domain.EditionRepository
+import com.buzbuz.smartautoclicker.feature.smart.config.domain.ImageReferenceEditor
+import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.RecoverableOverlayResultQueue
+import com.buzbuz.smartautoclicker.feature.smart.config.ui.condition.screen.image.importer.ImageImportCoordinator
+import com.buzbuz.smartautoclicker.feature.smart.config.ui.condition.screen.image.importer.ImageImportResult
 import dagger.hilt.android.qualifiers.ApplicationContext
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.Flow
@@ -47,17 +57,19 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.take
 import javax.inject.Inject
-import kotlin.math.max
 
-@OptIn(FlowPreview::class)
+@OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 class ImageConditionViewModel @Inject constructor(
     @ApplicationContext context: Context,
     private val bitmapRepository: BitmapRepository,
     private val editionRepository: EditionRepository,
     private val monitoredViewsManager: MonitoredViewsManager,
+    private val displayConfigManager: DisplayConfigManager,
+    private val imageImportCoordinator: ImageImportCoordinator,
 ) : ViewModel() {
 
     /** The condition being configured by the user. */
@@ -93,10 +105,27 @@ class ImageConditionViewModel @Inject constructor(
 
     /** The condition threshold value currently edited by the user. */
     val threshold: Flow<Int> = configuredCondition.mapNotNull { it.threshold }
-    /** The bitmap for the configured condition. */
-    val conditionBitmap: Flow<Bitmap?> = configuredCondition.map { condition ->
-        bitmapRepository.getConditionBitmap(condition)
+    val imageReferences: Flow<ImageReferencesState> = configuredCondition.mapLatest { condition ->
+        ImageReferencesState(
+            items = condition.references.mapIndexed { index, reference ->
+                ImageReferenceItem(
+                    index = index,
+                    reference = reference,
+                    bitmap = bitmapRepository.getImageConditionBitmap(
+                        reference.path,
+                        reference.area.width(),
+                        reference.area.height(),
+                    ),
+                )
+            },
+            canAdd = condition.references.size < IMAGE_REFERENCES_LIMIT,
+        )
     }.flowOn(Dispatchers.IO)
+
+    private val imageImportResultQueue = RecoverableOverlayResultQueue<PendingImageImport>()
+    val imageImportResults: Flow<PendingImageImport> = imageImportResultQueue.results
+    private val referenceSaveFailureQueue = RecoverableOverlayResultQueue<PendingReferenceSave>()
+    val referenceSaveFailures: Flow<PendingReferenceSave> = referenceSaveFailureQueue.results
     /** Tells if the configured condition is valid and can be saved. */
     val conditionCanBeSaved: Flow<Boolean> = editionRepository.editionState.editedScreenConditionState.map { condition ->
         condition.canBeSaved
@@ -127,14 +156,20 @@ class ImageConditionViewModel @Inject constructor(
                 if (oldCondition.detectionArea == null && newType == IN_AREA) oldCondition.area
                 else oldCondition.detectionArea
 
-            oldCondition.copy(detectionType = newType, detectionArea = detectionArea)
+            ImageReferenceEditor.expandDetectionArea(
+                oldCondition.copy(detectionType = newType, detectionArea = detectionArea),
+                displayConfigManager.displayConfig.sizePx,
+            )
         }
     }
 
     /** Set the area to detect in. */
     fun setDetectionArea(area: Rect) {
         updateEditedCondition { oldCondition ->
-            oldCondition.copy(detectionArea = sanitizeAreaForCondition(area, oldCondition.area))
+            ImageReferenceEditor.expandDetectionArea(
+                oldCondition.copy(detectionArea = Rect(area)),
+                displayConfigManager.displayConfig.sizePx,
+            )
         }
     }
 
@@ -150,6 +185,45 @@ class ImageConditionViewModel @Inject constructor(
 
     fun isConditionRelatedToClick(): Boolean =
         editionRepository.editionState.isEditedConditionReferencedByClick()
+
+    fun saveReference(area: Rect, bitmap: Bitmap, replacementIndex: Int?) {
+        val pendingSave = PendingReferenceSave(Rect(area), bitmap, replacementIndex)
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val reference = editionRepository.editedItemsBuilder.createImageReference(area, bitmap)
+                withContext(Dispatchers.Main) { applyReference(reference, replacementIndex) }
+            } catch (exception: CancellationException) {
+                throw exception
+            } catch (_: Exception) {
+                referenceSaveFailureQueue.enqueue(pendingSave)
+            }
+        }
+    }
+
+    fun removeReference(index: Int) {
+        updateEditedCondition { condition -> ImageReferenceEditor.remove(condition, index) }
+    }
+
+    fun moveReference(from: Int, to: Int) {
+        updateEditedCondition { condition -> ImageReferenceEditor.move(condition, from, to) }
+    }
+
+    fun reorderReferences(references: List<ImageReference>) {
+        updateEditedCondition { condition -> ImageReferenceEditor.reorder(condition, references) }
+    }
+
+    fun requestImageImport(context: Context, replacementIndex: Int?) {
+        viewModelScope.launch {
+            val result = imageImportCoordinator.requestImage(context)
+            imageImportResultQueue.enqueue(PendingImageImport(replacementIndex, result))
+        }
+    }
+
+    fun centerImageArea(bitmap: Bitmap): Rect =
+        ImageReferenceEditor.centerArea(bitmap.width, bitmap.height, displayConfigManager.displayConfig.sizePx)
+
+    fun fixImagePosition(position: Rect, imageArea: Rect): Rect =
+        ImageReferenceEditor.positionWithFixedSize(position, imageArea, displayConfigManager.displayConfig.sizePx)
 
 
     fun monitorSaveButtonView(view: View) {
@@ -175,18 +249,14 @@ class ImageConditionViewModel @Inject constructor(
         monitoredViewsManager.detach(MonitoredViewType.SCREEN_CONDITION_DIALOG_FIELD_VISIBILITY)
     }
 
-    private fun sanitizeAreaForCondition(area: Rect, conditionArea: Rect): Rect {
-        val left = max(area.left, 0)
-        val top = max(area.top, 0)
-        val width = max(area.right - left, conditionArea.width())
-        val height = max(area.bottom - top, conditionArea.height())
-
-        return Rect(
-            left,
-            top,
-            left + width,
-            top + height,
-        )
+    private fun applyReference(reference: ImageReference, replacementIndex: Int?) {
+        updateEditedCondition { condition ->
+            if (replacementIndex == null) {
+                ImageReferenceEditor.add(condition, reference, displayConfigManager.displayConfig.sizePx)
+            } else {
+                ImageReferenceEditor.replace(condition, replacementIndex, reference, displayConfigManager.displayConfig.sizePx)
+            }
+        }
     }
 
     private fun updateEditedCondition(closure: (oldValue: ScreenCondition.Image) -> ScreenCondition.Image?) {
@@ -206,6 +276,28 @@ class ImageConditionViewModel @Inject constructor(
 data class DetectionTypeState(
     @param:DetectionType val type: Int,
     val areaText: String,
+)
+
+data class ImageReferenceItem(
+    val index: Int,
+    val reference: ImageReference,
+    val bitmap: Bitmap?,
+)
+
+data class ImageReferencesState(
+    val items: List<ImageReferenceItem>,
+    val canAdd: Boolean,
+)
+
+data class PendingImageImport(
+    val replacementIndex: Int?,
+    val result: ImageImportResult,
+)
+
+data class PendingReferenceSave(
+    val area: Rect,
+    val bitmap: Bitmap,
+    val replacementIndex: Int?,
 )
 
 /** The maximum threshold value selectable by the user. */

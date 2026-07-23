@@ -101,21 +101,29 @@ class ScalingManager @Inject constructor(
     }
 
     private fun ScreenCondition.Image.toImageScalingInfo(scaledScreenSize: Point): ScreenConditionScalingInfo.Image {
-        val scaledImageArea = area.scaleDown()
         val bounds = scaledScreenSize.toArea()
 
         return ScreenConditionScalingInfo.Image(
             screenCondition = this,
-            imageArea = scaledImageArea,
-            detectionArea = when (detectionType) {
-                EXACT -> scaledImageArea.grow(bounds)
-                WHOLE_SCREEN -> bounds
-                IN_AREA -> detectionArea?.scaleDown()?.grow(bounds)
-                    ?: throw IllegalArgumentException("Invalid IN_AREA condition, no area defined")
-                else -> throw IllegalArgumentException("Unexpected detection type")
+            references = references.map { reference ->
+                val scaledImageArea = reference.area.scaleDown()
+                ImageReferenceScalingInfo(
+                    reference = reference,
+                    imageArea = scaledImageArea,
+                    detectionArea = getImageDetectionArea(scaledImageArea, bounds),
+                )
             },
         )
     }
+
+    private fun ScreenCondition.Image.getImageDetectionArea(scaledImageArea: Rect, bounds: Rect): Rect =
+        when (detectionType) {
+            EXACT -> scaledImageArea.grow(bounds)
+            WHOLE_SCREEN -> bounds
+            IN_AREA -> detectionArea?.scaleDown()?.grow(bounds)
+                ?: throw IllegalArgumentException("Invalid IN_AREA condition id=$id, expected a detection area")
+            else -> throw IllegalArgumentException("Unexpected image detection type=$detectionType, expected EXACT, WHOLE_SCREEN or IN_AREA")
+        }
 
     private fun ScreenCondition.Color.toColorScalingInfo(scaledScreenSize: Point): ScreenConditionScalingInfo.Color =
         ScreenConditionScalingInfo.Color(

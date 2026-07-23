@@ -41,6 +41,7 @@ import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.dialogs.intent
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.condition.screen.image.CaptureViewModel
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.condition.screen.areaselector.ConditionAreaSelectorViewModel
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.condition.screen.image.ImageConditionViewModel
+import com.buzbuz.smartautoclicker.feature.smart.config.ui.condition.screen.image.ImageSourceSelectionViewModel
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.condition.screen.brief.ScreenConditionsBriefViewModel
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.condition.screen.color.ColorConditionViewModel
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.condition.screen.color.capture.ColorCaptureViewModel
@@ -108,6 +109,7 @@ interface ScenarioConfigViewModelsEntryPoint {
     fun imageConditionAreaSelectorViewModel(): ConditionAreaSelectorViewModel
     fun screenConditionsBriefViewModel(): ScreenConditionsBriefViewModel
     fun imageConditionViewModel(): ImageConditionViewModel
+    fun imageSourceSelectionViewModel(): ImageSourceSelectionViewModel
     fun imageEventListViewModel(): ImageEventListViewModel
     fun intentActionsSelectionViewModel(): IntentActionsSelectionViewModel
     fun intentViewModel(): IntentViewModel

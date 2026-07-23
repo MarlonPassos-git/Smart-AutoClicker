@@ -113,6 +113,7 @@ class EditionRepository @Inject constructor(
         // In case of error, do not stop the edition
         if (!updateResult) return false
 
+        repository.deleteUnusedImageConditionBitmaps(editedItemsBuilder.newImageConditionsPaths)
         scenarioEditor.stopEdition()
         editedItemsBuilder.resetBuilder()
 
@@ -123,7 +124,7 @@ class EditionRepository @Inject constructor(
     suspend fun stopEdition() {
         Log.d(TAG, "Stop edition")
         scenarioEditor.stopEdition()
-        bitmapRepository.deleteImageConditionBitmaps(editedItemsBuilder.newImageConditionsPaths)
+        repository.deleteUnusedImageConditionBitmaps(editedItemsBuilder.newImageConditionsPaths)
         editedItemsBuilder.resetBuilder()
     }
 

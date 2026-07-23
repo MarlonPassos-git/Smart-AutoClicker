@@ -26,6 +26,7 @@ import com.buzbuz.smartautoclicker.core.base.interfaces.areComplete
 import com.buzbuz.smartautoclicker.core.database.ClickDatabase
 import com.buzbuz.smartautoclicker.core.database.entity.ActionEntity
 import com.buzbuz.smartautoclicker.core.database.entity.CompleteActionEntity
+import com.buzbuz.smartautoclicker.core.database.entity.CompleteConditionEntity
 import com.buzbuz.smartautoclicker.core.database.entity.CompleteEventEntity
 import com.buzbuz.smartautoclicker.core.database.entity.CompleteScenario
 import com.buzbuz.smartautoclicker.core.database.entity.ConditionEntity
@@ -46,6 +47,7 @@ import com.buzbuz.smartautoclicker.core.domain.model.action.toggleevent.toEntity
 import com.buzbuz.smartautoclicker.core.domain.model.condition.Condition
 import com.buzbuz.smartautoclicker.core.domain.model.condition.ScreenCondition
 import com.buzbuz.smartautoclicker.core.domain.model.condition.toEntity
+import com.buzbuz.smartautoclicker.core.domain.model.condition.toReferenceEntities
 import com.buzbuz.smartautoclicker.core.domain.model.counter.Counter
 import com.buzbuz.smartautoclicker.core.domain.model.counter.toEntity
 import com.buzbuz.smartautoclicker.core.domain.model.event.toEntity
@@ -116,8 +118,8 @@ internal class ScenarioDataSource @Inject constructor(
     fun getTriggerEventsFlow(scenarioId: Long): Flow<List<CompleteEventEntity>> =
         database.eventDao().getCompleteTriggerEventsFlow(scenarioId)
 
-    fun getAllConditions(): Flow<List<ConditionEntity>> =
-        database.conditionDao().getAllConditions()
+    fun getAllConditions(): Flow<List<CompleteConditionEntity>> =
+        database.conditionDao().getAllCompleteConditions()
 
     fun getAllActions(): Flow<List<CompleteActionEntity>> =
         database.actionDao().getAllActions()
@@ -262,7 +264,10 @@ internal class ScenarioDataSource @Inject constructor(
     }
 
     suspend fun updateLegacyImageCondition(condition: ConditionEntity, newPath: String) {
-        database.conditionDao().updateCondition(condition.copy(path = newPath))
+        database.withTransaction {
+            database.conditionDao().updateCondition(condition.copy(path = newPath))
+            database.conditionDao().updateFirstImageReferencePath(condition.id, newPath)
+        }
     }
 
     private suspend fun updateEvents(
@@ -272,10 +277,14 @@ internal class ScenarioDataSource @Inject constructor(
     ) {
         scenarioUpdateState.initUpdateState()
         val updater = DatabaseListUpdater<Event, EventEntity>()
+        val currentEvents = database.eventDao().getEvents(scenarioDbId)
+        val previousPathsByEvent = currentEvents.associate { event ->
+            event.id to database.conditionDao().getConditionsPaths(event.id)
+        }
 
         Log.d(TAG, "Updating events in the database for scenario $scenarioDbId")
         updater.refreshUpdateValues(
-            currentEntities = database.eventDao().getEvents(scenarioDbId),
+            currentEntities = currentEvents,
             newItems = events,
             mappingClosure = { event ->
                 event.toEntity().apply {
@@ -303,7 +312,8 @@ internal class ScenarioDataSource @Inject constructor(
                         onImageConditionsRemoved = onImageConditionsRemoved,
                     )
 
-                    if (removed.isNotEmpty()) onImageConditionsRemoved(events.getRemovedConditionsPath(removed))
+                    val removedPaths = removed.flatMap { event -> previousPathsByEvent[event.id].orEmpty() }
+                    if (removedPaths.isNotEmpty()) onImageConditionsRemoved(removedPaths)
                 }
             )
         }
@@ -337,10 +347,12 @@ internal class ScenarioDataSource @Inject constructor(
         onImageConditionsRemoved: suspend (List<String>) -> Unit,
     ) {
         val updater = DatabaseListUpdater<Condition, ConditionEntity>()
+        val currentConditions = database.conditionDao().getCompleteConditions(eventDbId)
+        val previousPaths = currentConditions.flatMap(CompleteConditionEntity::imageReferences).map { it.path }
 
         Log.d(TAG, "Updating conditions in the database for event $eventDbId")
         updater.refreshUpdateValues(
-            currentEntities = database.conditionDao().getConditions(eventDbId),
+            currentEntities = currentConditions.map { completeCondition -> completeCondition.condition },
             newItems = newConditions,
             mappingClosure = { condition ->
                 condition.copyWithNewId(evtId = Identifier(databaseId = eventDbId)).toEntity()
@@ -353,14 +365,28 @@ internal class ScenarioDataSource @Inject constructor(
                 addList = conditionDao::addConditions,
                 updateList = conditionDao::updateConditions,
                 removeList = conditionDao::deleteConditions,
-                onSuccess = { addedMapping, _, _, removed ->
+                onSuccess = { addedMapping, _, _, _ ->
                     addedMapping.forEach { (domainId, dbId) ->
                         scenarioUpdateState.addConditionIdMapping(domainId, dbId)
                     }
 
-                    if (removed.isNotEmpty()) onImageConditionsRemoved(removed.mapNotNull { it.path })
+                    persistImageReferences(newConditions)
+                    val currentPaths = newConditions
+                        .filterIsInstance<ScreenCondition.Image>()
+                        .flatMap { condition -> condition.references.map { reference -> reference.path } }
+                        .toSet()
+                    val removedPaths = previousPaths.filterNot(currentPaths::contains).distinct()
+                    if (removedPaths.isNotEmpty()) onImageConditionsRemoved(removedPaths)
                 }
             )
+        }
+    }
+
+    private suspend fun persistImageReferences(conditions: List<Condition>) {
+        conditions.filterIsInstance<ScreenCondition.Image>().forEach { condition ->
+            val conditionId = scenarioUpdateState.getConditionDbId(condition.id)
+            database.conditionDao().deleteImageReferences(conditionId)
+            database.conditionDao().addImageReferences(condition.toReferenceEntities(conditionId))
         }
     }
 
@@ -492,19 +518,6 @@ internal class ScenarioDataSource @Inject constructor(
         }
     }
 
-    private fun List<Event>.getRemovedConditionsPath(removedEntities: List<EventEntity>): List<String> =
-        buildList {
-            removedEntities.forEach { removedEntity ->
-                // Find the deleted domain event, get its image conditions list and map to their path
-                val removedEvent = this@getRemovedConditionsPath
-                    .find { event -> event is ScreenEvent && event.id.databaseId == removedEntity.id }
-                    ?.conditions?.filterIsInstance<ScreenCondition.Image>()
-                    ?.map { condition -> condition.path }
-                    ?: return@forEach
-
-                addAll(removedEvent)
-            }
-        }
 }
 
 /** Tag for logs. */

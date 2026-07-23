@@ -63,20 +63,32 @@
                     android:layout_marginVertical="@dimen/margin_vertical_large"
                     android:orientation="vertical">
 
-                    <ImageView
-                        android:id="@+id/image_condition"
-                        android:layout_width="wrap_content"
+                    <com.google.android.material.textview.MaterialTextView
+                        style="@style/AppTheme.TextAppearance.ListItemTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/image_references_title" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/list_image_references"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/margin_vertical_small"
+                        android:nestedScrollingEnabled="false"
+                        android:orientation="vertical"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                        tools:itemCount="2"
+                        tools:listitem="@layout/item_image_reference" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/button_add_image_reference"
+                        style="@style/AppTheme.Widget.TextButtonOutlined"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/margin_vertical_default"
                         android:layout_marginBottom="@dimen/margin_vertical_large"
-                        android:maxWidth="@dimen/dialog_condition_max_width"
-                        android:maxHeight="@dimen/dialog_condition_max_height"
-                        android:minWidth="50dp"
-                        android:minHeight="100dp"
-                        android:layout_gravity="center_horizontal"
-                        android:scaleType="fitCenter"
-                        android:contentDescription="@string/content_desc_image_condition"
-                        tools:src="@drawable/ic_click"/>
+                        android:text="@string/image_reference_add"
+                        app:icon="@drawable/ic_add" />
 
                     <com.google.android.material.divider.MaterialDivider
                         style="@style/AppTheme.Widget.Divider.Horizontal"

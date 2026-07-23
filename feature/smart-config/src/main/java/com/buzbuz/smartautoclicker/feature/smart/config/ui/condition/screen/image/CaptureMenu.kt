@@ -17,6 +17,9 @@
 package com.buzbuz.smartautoclicker.feature.smart.config.ui.condition.screen.image
 
 import android.util.Log
+import android.graphics.Bitmap
+import android.graphics.Rect
+import android.widget.Toast
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -25,7 +28,6 @@ import androidx.annotation.IntDef
 
 import com.buzbuz.smartautoclicker.core.common.overlays.base.viewModels
 import com.buzbuz.smartautoclicker.core.common.overlays.menu.OverlayMenu
-import com.buzbuz.smartautoclicker.core.domain.model.condition.ScreenCondition
 import com.buzbuz.smartautoclicker.core.ui.views.imageselector.ImageSelectorView
 import com.buzbuz.smartautoclicker.feature.smart.config.R
 import com.buzbuz.smartautoclicker.feature.smart.config.databinding.OverlayValidationMenuBinding
@@ -36,10 +38,12 @@ import com.buzbuz.smartautoclicker.core.common.tutorial.domain.model.monitoring.
  * [OverlayMenu] implementation for displaying the area selection menu and the area to be captured in order
  * to create a new event condition.
  *
- * @param onConditionSelected listener upon confirmation of the area to be capture to create the event condition.
+ * @param importedBitmap optional file image to crop instead of taking a screenshot.
+ * @param onImageSelected listener upon confirmation of the selected bitmap and area.
  */
 class CaptureMenu(
-    private val onConditionSelected: (ScreenCondition.Image) -> Unit
+    private val importedBitmap: Bitmap? = null,
+    private val onImageSelected: (Rect, Bitmap) -> Unit,
 ) : OverlayMenu() {
 
     override fun tutorialMonitoringTag(): String = MonitoredOverlayType.CAPTURE_MENU.name
@@ -116,7 +120,12 @@ class CaptureMenu(
 
     override fun onStart() {
         super.onStart()
-        state = SELECTION
+        val bitmap = importedBitmap
+        if (bitmap == null) state = SELECTION
+        else {
+            selectorView.showCapture(bitmap)
+            state = ADJUST
+        }
     }
 
     override fun onMenuItemClicked(viewId: Int) {
@@ -145,6 +154,11 @@ class CaptureMenu(
             SELECTION -> {
                 state = CAPTURE
                 viewModel.takeScreenshot { screenshot ->
+                    if (screenshot == null) {
+                        Toast.makeText(context, R.string.image_capture_failed_error, Toast.LENGTH_SHORT).show()
+                        state = SELECTION
+                        return@takeScreenshot
+                    }
                     selectorView.showCapture(screenshot)
                     state = ADJUST
                 }
@@ -154,10 +168,8 @@ class CaptureMenu(
                 state = SAVE
                 try {
                     val selection = selectorView.getSelection()
-                    viewModel.createImageCondition(context, selection.first, selection.second) { imageCondition ->
-                        back()
-                        onConditionSelected(imageCondition)
-                    }
+                    back()
+                    onImageSelected(selection.first, selection.second)
                 } catch (ex: IllegalStateException) {
                     Log.e(TAG, "Condition selection failed", ex)
                     state = ADJUST
@@ -173,7 +185,7 @@ class CaptureMenu(
     private fun onCancel() {
         when (state) {
             SELECTION -> back()
-            ADJUST -> state = SELECTION
+            ADJUST -> if (importedBitmap == null) state = SELECTION else back()
         }
     }
 }

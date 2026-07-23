@@ -124,6 +124,19 @@
                 android:scaleType="fitCenter"
                 tools:src="@drawable/ic_detect_exact"/>
 
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/reference_count_badge"
+                style="@style/TextAppearance.Material3.LabelSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/background_reference_count_badge"
+                android:textColor="?attr/colorOnPrimaryContainer"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="@id/item_icon"
+                app:layout_constraintEnd_toEndOf="@id/item_icon"
+                tools:text="+2"
+                tools:visibility="visible" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </com.google.android.material.card.MaterialCardView>

@@ -95,6 +95,10 @@ class ClickOffsetViewModel @Inject constructor(
             }
         }
 
+    val multipleReferencesInfoVisible: Flow<Boolean> = conditionToShow.map { condition ->
+        (condition as? ScreenCondition.Image)?.references?.size?.let { it > 1 } == true
+    }
+
     fun getOffsetMaxBoundsX(): IntRange =
         displayConfigManager.displayConfig.let { displayConfig ->
             IntRange(-displayConfig.sizePx.x / 2, displayConfig.sizePx.x / 2)

@@ -88,9 +88,9 @@ internal open class CompatV20Deserializer : CompatDeserializer() {
                     }
 
                     conditions.forEach { conditionItem ->
-                        putIfValidCounter(event.scenarioId, conditionItem.counterName)
-                        putIfValidCounter(event.scenarioId, conditionItem.counterOperationCounterName)
-                        putIfValidCounter(event.scenarioId, conditionItem.numberCounterOperationCounterName)
+                        putIfValidCounter(event.scenarioId, conditionItem.condition.counterName)
+                        putIfValidCounter(event.scenarioId, conditionItem.condition.counterOperationCounterName)
+                        putIfValidCounter(event.scenarioId, conditionItem.condition.numberCounterOperationCounterName)
                     }
                 }
             }.values.toList()

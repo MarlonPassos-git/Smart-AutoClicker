@@ -29,6 +29,7 @@ import com.buzbuz.smartautoclicker.core.display.config.DisplayConfigManager
 import com.buzbuz.smartautoclicker.core.ui.R
 import com.buzbuz.smartautoclicker.core.ui.views.viewcomponents.SelectorComponent
 import com.buzbuz.smartautoclicker.core.ui.views.viewcomponents.base.ComponentsView
+import com.buzbuz.smartautoclicker.core.ui.views.viewcomponents.base.MoveSelector
 import com.buzbuz.smartautoclicker.core.ui.views.viewcomponents.base.ViewComponent
 import com.buzbuz.smartautoclicker.core.ui.views.viewcomponents.hints.HintsComponent
 
@@ -47,6 +48,8 @@ class AreaSelectorView(
 
     /** Tells if the view have ignored a touch event due to a animation running or being hidden. */
     private var haveTouchEventIgnored = false
+    /** Tells if only translation gestures are accepted for the selection. */
+    private var selectionSizeLocked = false
 
     /** Get the attributes from the style file and initialize all components. */
     init {
@@ -83,11 +86,22 @@ class AreaSelectorView(
 
     fun setSelection(area: Rect, minimalArea: Rect) {
         if (selector.setDefaultSelectionArea(area, minimalArea)) {
-            hintsIcons.showAll()
+            if (selectionSizeLocked) hintsIcons.show(MoveSelector) else hintsIcons.showAll()
             animations.startShowSelectorAnimation(
                 onAnimationCompleted = { animations.startHideHintsAnimation() }
             )
         }
+    }
+
+    /**
+     * Restricts the selector to translation while preserving its current size.
+     *
+     * Example: `selector.setSelectionSizeLocked(true)` before positioning a fixed-size image.
+     */
+    fun setSelectionSizeLocked(locked: Boolean) {
+        selectionSizeLocked = locked
+        selector.resizeEnabled = !locked
+        invalidate()
     }
 
     fun getSelection(): Rect =

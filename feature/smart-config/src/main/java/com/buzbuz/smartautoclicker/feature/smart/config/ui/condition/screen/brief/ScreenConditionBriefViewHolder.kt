@@ -65,6 +65,9 @@ class ScreenConditionBriefViewHolder(
             )
 
             threshold.text = details.thresholdText
+            referenceCount.text = details.additionalReferencesText
+            referenceCount.contentDescription = details.additionalReferencesContentDescription
+            referenceCount.visibility = if (details.additionalReferencesText == null) View.GONE else View.VISIBLE
 
             errorBadge.visibility = if (details.haveError) View.VISIBLE else View.GONE
 
@@ -127,6 +130,7 @@ class ScreenConditionBriefBinding private constructor(
     val shouldBeDetectedText: TextView,
     val shouldBeDetectedIcon: ImageView,
     val threshold: TextView,
+    val referenceCount: TextView,
     val errorBadge: ImageView,
 ) : ViewBinding {
 
@@ -146,6 +150,7 @@ class ScreenConditionBriefBinding private constructor(
         shouldBeDetectedText = binding.textShouldBeDetected,
         shouldBeDetectedIcon = binding.iconShouldBeDetected,
         threshold = binding.textThreshold,
+        referenceCount = binding.referenceCountBadge,
         errorBadge = binding.errorBadge,
     )
 
@@ -157,6 +162,7 @@ class ScreenConditionBriefBinding private constructor(
         shouldBeDetectedText = binding.textShouldBeDetected,
         shouldBeDetectedIcon = binding.iconShouldBeDetected,
         threshold = binding.textThreshold,
+        referenceCount = binding.referenceCountBadge,
         errorBadge = binding.errorBadge,
     )
 

@@ -36,6 +36,8 @@ data class UiScreenCondition(
     @field:DrawableRes val detectionTypeIconRes: Int,
     @field:DrawableRes override val iconRes: Int,
     val thresholdText: String,
+    val additionalReferencesText: String?,
+    val additionalReferencesContentDescription: String?,
 ) : UiCondition()
 
 fun ScreenCondition.toUiScreenCondition(context: Context, shortThreshold: Boolean, inError: Boolean) = UiScreenCondition(
@@ -47,7 +49,23 @@ fun ScreenCondition.toUiScreenCondition(context: Context, shortThreshold: Boolea
     thresholdText = if (shortThreshold) getShortThresholdText(context) else getThresholdText(context),
     iconRes = getIconRes(),
     haveError = inError,
+    additionalReferencesText = getAdditionalReferencesText(context),
+    additionalReferencesContentDescription = getAdditionalReferencesContentDescription(context),
 )
+
+private fun ScreenCondition.getAdditionalReferencesText(context: Context): String? {
+    val referenceCount = (this as? ScreenCondition.Image)?.references?.size ?: return null
+    if (referenceCount < 2) return null
+
+    return context.getString(R.string.image_reference_more_count, referenceCount - 1)
+}
+
+private fun ScreenCondition.getAdditionalReferencesContentDescription(context: Context): String? {
+    val referenceCount = (this as? ScreenCondition.Image)?.references?.size ?: return null
+    if (referenceCount < 2) return null
+
+    return context.getString(R.string.content_desc_image_reference_count, referenceCount)
+}
 
 @DrawableRes
 private fun ScreenCondition.getShouldBeDetectedIconRes(): Int =

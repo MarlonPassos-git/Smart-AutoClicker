@@ -123,6 +123,8 @@ internal class SelectorComponent(
 
     /** Listener upon the position of the selector. */
     var onSelectorPositionChanged: ((Rect) -> Unit)? = null
+    /** Allows selector border gestures to change its size. */
+    var resizeEnabled: Boolean = true
 
     /** Transparency of the background. */
     var backgroundAlpha: Int = selectorBackgroundAlpha
@@ -232,13 +234,17 @@ internal class SelectorComponent(
 
     private fun onNewDownEvent(eventX: Float, eventY: Float): Boolean {
         currentGesture = when {
-            ResizeLeft.getGestureArea(selectedArea, handleSize, innerHandleSize).contains(eventX, eventY) ->
+            resizeEnabled && ResizeLeft.getGestureArea(selectedArea, handleSize, innerHandleSize)
+                .contains(eventX, eventY) ->
                 ResizeLeft
-            ResizeTop.getGestureArea(selectedArea, handleSize, innerHandleSize).contains(eventX, eventY) ->
+            resizeEnabled && ResizeTop.getGestureArea(selectedArea, handleSize, innerHandleSize)
+                .contains(eventX, eventY) ->
                 ResizeTop
-            ResizeRight.getGestureArea(selectedArea, handleSize, innerHandleSize).contains(eventX, eventY) ->
+            resizeEnabled && ResizeRight.getGestureArea(selectedArea, handleSize, innerHandleSize)
+                .contains(eventX, eventY) ->
                 ResizeRight
-            ResizeBottom.getGestureArea(selectedArea, handleSize, innerHandleSize).contains(eventX, eventY) ->
+            resizeEnabled && ResizeBottom.getGestureArea(selectedArea, handleSize, innerHandleSize)
+                .contains(eventX, eventY) ->
                 ResizeBottom
             MoveSelector.getGestureArea(selectedArea, handleSize, innerHandleSize).contains(eventX, eventY) ->
                 MoveSelector

@@ -34,6 +34,17 @@
         android:scaleType="centerInside"
         tools:src="@drawable/ic_image_condition_big"/>
 
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/text_reference_offset_info"
+        style="@style/AppTheme.TextAppearance.ListItemSubText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/margin_horizontal_default"
+        android:layout_marginBottom="@dimen/margin_vertical_default"
+        android:text="@string/field_click_offset_reference_info"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
     <com.google.android.material.divider.MaterialDivider
         style="@style/AppTheme.Widget.Divider.Horizontal"
         android:layout_width="match_parent"

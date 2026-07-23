@@ -78,8 +78,7 @@ sealed class ScreenCondition : Condition(), Prioritizable {
      * @param id the unique identifier for the condition.
      * @param eventId the identifier of the event for this condition.
      * @param name the name of the condition.
-     * @param path the path to the bitmap that should be matched for detection.
-     * @param area the area of the screen to detect.
+     * @param references ordered images that can equivalently satisfy this condition.
      * @param threshold the accepted difference between the conditions and the screen content, in percent (0-100%).
      * @param detectionType the type of detection for this condition. Must be one of [DetectionType].
      * @param detectionArea the area to detect the condition in if [detectionType] is IN_AREA.
@@ -91,18 +90,49 @@ sealed class ScreenCondition : Condition(), Prioritizable {
         override val threshold: Int,
         override val shouldBeDetected: Boolean,
         override var priority: Int,
-        val path: String,
-        val area: Rect,
+        val references: List<ImageReference>,
         @param:DetectionType val detectionType: Int,
         val detectionArea: Rect? = null,
     ): ScreenCondition(), Prioritizable {
 
+        /** Path mirrored by legacy persistence and previews from the first reference. */
+        val path: String
+            get() = references.firstOrNull()?.path.orEmpty()
+
+        /** Area used by legacy persistence and previews from the first reference. */
+        val area: Rect
+            get() = references.firstOrNull()?.area ?: Rect()
+
+        constructor(
+            id: Identifier,
+            eventId: Identifier,
+            name: String,
+            threshold: Int,
+            shouldBeDetected: Boolean,
+            priority: Int,
+            path: String,
+            area: Rect,
+            @DetectionType detectionType: Int,
+            detectionArea: Rect? = null,
+        ) : this(
+            id = id,
+            eventId = eventId,
+            name = name,
+            threshold = threshold,
+            shouldBeDetected = shouldBeDetected,
+            priority = priority,
+            references = listOf(ImageReference(path, area)),
+            detectionType = detectionType,
+            detectionArea = detectionArea,
+        )
+
         /** Tells if this condition is complete and valid to be saved. */
         override fun isComplete(): Boolean =
-            super.isComplete() && (detectionType == IN_AREA && detectionArea != null || detectionType != IN_AREA)
+            super.isComplete() && references.isValidImageReferences() &&
+                    (detectionType == IN_AREA && detectionArea != null || detectionType != IN_AREA)
 
         override fun hashCodeNoIds(): Int =
-            name.hashCode() + path.hashCode() + area.hashCode() + threshold.hashCode() + detectionType.hashCode() +
+            name.hashCode() + references.hashCode() + threshold.hashCode() + detectionType.hashCode() +
                     shouldBeDetected.hashCode() + detectionArea.hashCode() + priority.hashCode()
     }
 
@@ -155,6 +185,20 @@ sealed class ScreenCondition : Condition(), Prioritizable {
 
 private fun List<String>.isValidTextConditionValues(): Boolean =
     size in 1..TEXT_CONDITION_VALUES_LIMIT && all(String::isNotBlank)
+
+private fun List<ImageReference>.isValidImageReferences(): Boolean =
+    size in 1..IMAGE_REFERENCES_LIMIT && all { reference ->
+        reference.path.isNotBlank() && !reference.area.isEmpty
+    }
+
+/** One image that can satisfy an [ScreenCondition.Image], with its own native size and exact position. */
+data class ImageReference(
+    val path: String,
+    val area: Rect,
+)
+
+/** Maximum number of equivalent images supported by an image condition. */
+const val IMAGE_REFERENCES_LIMIT = 20
 
 /** Maximum number of alternatives supported by a text condition. */
 const val TEXT_CONDITION_VALUES_LIMIT = 10

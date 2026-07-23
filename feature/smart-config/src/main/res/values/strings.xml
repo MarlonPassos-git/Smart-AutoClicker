@@ -258,6 +258,23 @@
     <!-- Dialog Condition Image ==================================================================================== -->
 
     <string name="dialog_title_condition_config">Condition</string>
+    <string name="image_source_dialog_title">Add reference image</string>
+    <string name="image_source_capture_title">Capture screen</string>
+    <string name="image_source_capture_description">Take a screenshot and select the image on screen.</string>
+    <string name="image_source_file_title">Choose file</string>
+    <string name="image_source_file_description">Import an image from this device.</string>
+    <string name="imported_image_usage_dialog_title">Use imported image</string>
+    <string name="imported_image_whole_title">Use whole image</string>
+    <string name="imported_image_whole_description">Keep the image at its native size.</string>
+    <string name="imported_image_crop_title">Crop image</string>
+    <string name="imported_image_crop_description">Select the part to use as the reference.</string>
+    <string name="image_import_empty_error">Selected file is empty. Choose another image.</string>
+    <string name="image_import_invalid_error">Selected file is not a valid image. Choose another file.</string>
+    <string name="image_import_too_large_error">Selected image is larger than the screen.</string>
+    <string name="image_import_picker_unavailable_error">No compatible image picker is available. Try again after installing or enabling a file picker.</string>
+    <string name="image_reference_save_error">Image couldn’t be saved. Check available storage and try again.</string>
+    <string name="image_capture_failed_error">Could not capture the screen. Try again.</string>
+    <string name="generic_retry">Retry</string>
 
     <string name="field_condition_visibility_title">Visibility</string>
     <string name="field_condition_visibility_desc_present">The condition must be detected</string>
@@ -384,6 +401,7 @@
     <string name="field_click_offset_desc" translatable="false">X=%1$d Y=%2$d</string>
     <string name="field_click_offset_x" translatable="false">X</string>
     <string name="field_click_offset_y" translatable="false">Y</string>
+    <string name="field_click_offset_reference_info">This preview uses the first reference image. The offset applies to whichever reference image is detected.</string>
 
 
     <!-- Dialog Action Swipe ======================================================================================= -->
@@ -592,6 +610,16 @@
     <string name="content_desc_conditions_count">The number of conditions in this event</string>
     <string name="content_desc_actions_count">The number of actions in this event</string>
     <string name="content_desc_image_condition">The image to be detected</string>
+    <string name="image_references_title">Reference images</string>
+    <string name="image_reference_number">Reference image %1$d</string>
+    <string name="image_reference_replace">Replace</string>
+    <string name="image_reference_remove">Remove</string>
+    <string name="image_reference_add">Add image</string>
+    <string name="image_reference_add_count">Add image (%1$d/%2$d)</string>
+    <string name="image_reference_more_count">+%1$d</string>
+    <string name="content_desc_image_reference">Reference image thumbnail</string>
+    <string name="content_desc_move_image_reference">Reorder reference image</string>
+    <string name="content_desc_image_reference_count">Total reference images: %1$d</string>
     <string name="content_desc_open_event_list">Open the event list</string>
     <string name="content_desc_application_icon">The icon of the application to start.</string>
 

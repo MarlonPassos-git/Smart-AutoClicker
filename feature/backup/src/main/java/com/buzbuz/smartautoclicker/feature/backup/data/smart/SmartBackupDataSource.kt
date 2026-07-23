@@ -21,6 +21,7 @@ import android.util.Log
 
 import com.buzbuz.smartautoclicker.core.database.DATABASE_VERSION
 import com.buzbuz.smartautoclicker.core.database.entity.CompleteScenario
+import com.buzbuz.smartautoclicker.core.database.entity.CompleteConditionEntity
 import com.buzbuz.smartautoclicker.core.database.entity.ConditionEntity
 import com.buzbuz.smartautoclicker.core.database.entity.ConditionType
 import com.buzbuz.smartautoclicker.core.database.entity.EventType
@@ -61,7 +62,7 @@ internal class SmartBackupDataSource(
             scenario.events.forEach { completeEvent ->
                 if (completeEvent.event.type == EventType.IMAGE_EVENT) {
                     completeEvent.conditions.forEach { condition ->
-                        if (condition.type == ConditionType.ON_IMAGE_DETECTED) add(condition.path!!)
+                        addAll(condition.getImageReferencePaths())
                     }
                 }
             }
@@ -96,23 +97,26 @@ internal class SmartBackupDataSource(
             }
 
             if (event.event.type == EventType.IMAGE_EVENT) {
-                if (event.conditions.find { condition -> !condition.isScreenCondition() } != null) {
+                if (event.conditions.find { condition -> !condition.condition.isScreenCondition() } != null) {
                     Log.w(TAG, "Invalid scenario, condition list is invalid.")
                     return null
                 }
             }
 
             if (event.event.type == EventType.TRIGGER_EVENT) {
-                if (event.conditions.find { condition -> !condition.isTriggerCondition() } != null) {
+                if (event.conditions.find { condition -> !condition.condition.isTriggerCondition() } != null) {
                     Log.w(TAG, "Invalid scenario, condition list is invalid.")
                     return null
                 }
             }
 
             event.conditions.forEach { condition ->
-                if (condition.type == ConditionType.ON_IMAGE_DETECTED && (
-                            condition.path == null || !File(appDataDir, condition.path!!).exists())) {
-                    Log.w(TAG, "Invalid screen condition, ${condition.path} file does not exist.")
+                if (condition.condition.type != ConditionType.ON_IMAGE_DETECTED) return@forEach
+
+                val paths = condition.getImageReferencePaths()
+                val missingPath = paths.firstOrNull { path -> !File(appDataDir, path).exists() }
+                if (paths.isEmpty() || missingPath != null) {
+                    Log.w(TAG, "Invalid screen condition, path=$missingPath references=${paths.size}.")
                     return null
                 }
             }
@@ -159,6 +163,13 @@ internal class SmartBackupDataSource(
             ConditionType.ON_NUMBER_DETECTED,
             ConditionType.ON_TEXT_DETECTED -> false
         }
+
+    private fun CompleteConditionEntity.getImageReferencePaths(): List<String> {
+        if (condition.type != ConditionType.ON_IMAGE_DETECTED) return emptyList()
+        if (imageReferences.isNotEmpty()) return imageReferences.sortedBy { it.priority }.map { it.path }
+
+        return listOfNotNull(condition.path)
+    }
 }
 
 /** Tag for logs. */

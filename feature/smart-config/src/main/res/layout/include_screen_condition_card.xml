@@ -36,6 +36,20 @@
         android:contentDescription="@string/content_desc_image_condition"
         tools:src="@drawable/ic_condition" />
 
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/condition_reference_count"
+        style="@style/TextAppearance.Material3.LabelMedium"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin_horizontal_small"
+        android:background="@drawable/background_reference_count_badge"
+        android:textColor="?attr/colorOnPrimaryContainer"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@id/condition_image"
+        app:layout_constraintTop_toTopOf="@id/condition_image"
+        tools:text="+2"
+        tools:visibility="visible" />
+
     <TextView
         android:id="@+id/condition_text"
         android:layout_width="match_parent"

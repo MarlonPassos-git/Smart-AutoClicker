@@ -49,7 +49,9 @@ import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.ImageCondit
 import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.ImageConditionDescription
 import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.TextConditionDescription
 import com.buzbuz.smartautoclicker.feature.smart.config.domain.EditionRepository
+import com.buzbuz.smartautoclicker.feature.smart.config.domain.ImageReferenceEditor
 import com.buzbuz.smartautoclicker.feature.smart.config.domain.model.EditedListState
+import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.RecoverableOverlayResultQueue
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.formatters.toEffectDescription
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.formatters.toNaturalDisplayString
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.model.condition.toUiScreenCondition
@@ -57,6 +59,7 @@ import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.model.conditio
 import dagger.hilt.android.qualifiers.ApplicationContext
 
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -71,6 +74,8 @@ import kotlinx.coroutines.withContext
 
 import java.util.Collections
 import javax.inject.Inject
+import com.buzbuz.smartautoclicker.feature.smart.config.ui.condition.screen.image.importer.ImageImportCoordinator
+import com.buzbuz.smartautoclicker.feature.smart.config.ui.condition.screen.image.importer.ImageImportResult
 
 
 class ScreenConditionsBriefViewModel @Inject constructor(
@@ -81,6 +86,7 @@ class ScreenConditionsBriefViewModel @Inject constructor(
     bitmapRepository: BitmapRepository,
     private val editionRepository: EditionRepository,
     private val monitoredViewsManager: MonitoredViewsManager,
+    private val imageImportCoordinator: ImageImportCoordinator,
 ) : ViewModel() {
 
     private val editedConditions: Flow<EditedListState<ScreenCondition>> =
@@ -122,6 +128,11 @@ class ScreenConditionsBriefViewModel @Inject constructor(
 
     val isTutorialModeEnabled: Flow<Boolean> =
         tutorialRepository.tutorialState.map { it is TutorialState.Started }
+
+    private val imageImportResultQueue = RecoverableOverlayResultQueue<ImageImportResult>()
+    val imageImportResults: Flow<ImageImportResult> = imageImportResultQueue.results
+    private val imageConditionSaveFailureQueue = RecoverableOverlayResultQueue<PendingImageConditionSave>()
+    val imageConditionSaveFailures: Flow<PendingImageConditionSave> = imageConditionSaveFailureQueue.results
 
     fun setFocusedItemIndex(index: Int) {
         currentFocusItemIndex.value = index
@@ -205,6 +216,32 @@ class ScreenConditionsBriefViewModel @Inject constructor(
         }
     }
 
+    fun createImageCondition(context: Context, area: Rect, bitmap: Bitmap, completed: (ScreenCondition.Image) -> Unit) {
+        val pendingSave = PendingImageConditionSave(Rect(area), bitmap)
+        viewModelScope.launch(ioDispatcher) {
+            try {
+                val condition = editionRepository.editedItemsBuilder.createNewImageCondition(context, area, bitmap)
+                withContext(Dispatchers.Main) { completed(condition) }
+            } catch (exception: CancellationException) {
+                throw exception
+            } catch (_: Exception) {
+                imageConditionSaveFailureQueue.enqueue(pendingSave)
+            }
+        }
+    }
+
+    fun requestImageImport(context: Context) {
+        viewModelScope.launch {
+            imageImportResultQueue.enqueue(imageImportCoordinator.requestImage(context))
+        }
+    }
+
+    fun centerImageArea(bitmap: Bitmap): Rect =
+        ImageReferenceEditor.centerArea(bitmap.width, bitmap.height, displayConfigManager.displayConfig.sizePx)
+
+    fun fixImagePosition(position: Rect, imageArea: Rect): Rect =
+        ImageReferenceEditor.positionWithFixedSize(position, imageArea, displayConfigManager.displayConfig.sizePx)
+
     fun monitorBriefFirstItemView(briefItemView: View) {
         monitoredViewsManager.attach(
             MonitoredViewType.CONDITIONS_BRIEF_FIRST_ITEM,
@@ -232,6 +269,11 @@ class ScreenConditionsBriefViewModel @Inject constructor(
         }
     }
 }
+
+data class PendingImageConditionSave(
+    val area: Rect,
+    val bitmap: Bitmap,
+)
 
 private fun ScreenCondition.Color.toColorItemDescription(): ColorConditionDescription =
     ColorConditionDescription(

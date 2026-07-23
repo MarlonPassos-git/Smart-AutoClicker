@@ -100,8 +100,9 @@ data class CompleteEventEntity(
     )
     val actions: List<CompleteActionEntity>,
     @Relation(
+        entity = ConditionEntity::class,
         parentColumn = "id",
         entityColumn = "eventId"
     )
-    val conditions: List<ConditionEntity>,
+    val conditions: List<CompleteConditionEntity>,
 )

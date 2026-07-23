@@ -16,6 +16,8 @@
  */
 package com.buzbuz.smartautoclicker.feature.smart.config.ui.condition.screen.brief
 
+import android.graphics.Bitmap
+import android.graphics.Rect
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -43,6 +45,14 @@ import com.buzbuz.smartautoclicker.feature.smart.config.ui.condition.screen.colo
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.condition.screen.color.capture.ColorCaptureMenu
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.condition.screen.image.CaptureMenu
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.condition.screen.image.ImageConditionDialog
+import com.buzbuz.smartautoclicker.feature.smart.config.ui.condition.screen.image.ImageSourceChoice
+import com.buzbuz.smartautoclicker.feature.smart.config.ui.condition.screen.image.ImageSourceSelectionDialog
+import com.buzbuz.smartautoclicker.feature.smart.config.ui.condition.screen.image.ImportedImageUsageChoice
+import com.buzbuz.smartautoclicker.feature.smart.config.ui.condition.screen.image.ImportedImageUsageDialog
+import com.buzbuz.smartautoclicker.feature.smart.config.ui.condition.screen.image.ReferencePositionSelectorMenu
+import com.buzbuz.smartautoclicker.feature.smart.config.ui.condition.screen.image.importer.ImageImportResult
+import com.buzbuz.smartautoclicker.feature.smart.config.ui.condition.screen.image.showImageImportFailure
+import com.buzbuz.smartautoclicker.feature.smart.config.ui.condition.screen.image.showImagePersistenceFailure
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.condition.screen.number.NumberConditionDialog
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.condition.screen.selection.ScreenConditionTypeSelectionDialog
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.condition.screen.text.TextConditionDialog
@@ -78,6 +88,8 @@ class ScreenConditionsBriefMenu(
                 launch { viewModel.conditionBriefList.collect(::updateItemList) }
                 launch { viewModel.conditionVisualization.collect(::updateActionVisualisation) }
                 launch { viewModel.isTutorialModeEnabled.collect(::updateTutorialModeState) }
+                launch { viewModel.imageImportResults.collect(::onImageImportResult) }
+                launch { viewModel.imageConditionSaveFailures.collect(::onImageConditionSaveFailure) }
             }
         }
     }
@@ -198,7 +210,7 @@ class ScreenConditionsBriefMenu(
                 onChoiceSelectedListener = { choice ->
                     when (choice) {
                         ScreenConditionTypeChoice.OnColorDetected -> showNewColorCaptureOverlay()
-                        ScreenConditionTypeChoice.OnImageDetected -> showNewImageCaptureOverlay()
+                        ScreenConditionTypeChoice.OnImageDetected -> showNewImageSourceSelection()
                         ScreenConditionTypeChoice.OnNumberDetected -> viewModel.createNumberCondition(context) { condition ->
                             showScreenConditionConfigDialog(condition)
                         }
@@ -226,14 +238,81 @@ class ScreenConditionsBriefMenu(
         )
     }
 
+    private fun showNewImageSourceSelection() {
+        overlayManager.navigateTo(
+            context = context,
+            newOverlay = ImageSourceSelectionDialog { choice ->
+                when (choice) {
+                    ImageSourceChoice.CaptureScreen -> showNewImageCaptureOverlay()
+                    ImageSourceChoice.ChooseFile -> viewModel.requestImageImport(context)
+                }
+            },
+        )
+    }
+
     private fun showNewImageCaptureOverlay() {
         overlayManager.navigateTo(
             context = context,
-            newOverlay = CaptureMenu { capturedCondition ->
-                showScreenConditionConfigDialog(capturedCondition)
+            newOverlay = CaptureMenu { area, bitmap ->
+                createImageCondition(area, bitmap)
             },
             hideCurrent = true,
         )
+    }
+
+    private fun onImageImportResult(result: ImageImportResult) {
+        when (result) {
+            is ImageImportResult.Success -> showImportedImageUsage(result.bitmap)
+            is ImageImportResult.Failure -> context.showImageImportFailure(result.reason) {
+                viewModel.requestImageImport(context)
+            }
+            ImageImportResult.Cancelled -> Unit
+        }
+    }
+
+    private fun onImageConditionSaveFailure(pendingSave: PendingImageConditionSave) {
+        context.showImagePersistenceFailure {
+            createImageCondition(pendingSave.area, pendingSave.bitmap)
+        }
+    }
+
+    private fun showImportedImageUsage(bitmap: Bitmap) {
+        overlayManager.navigateTo(
+            context = context,
+            newOverlay = ImportedImageUsageDialog { choice ->
+                when (choice) {
+                    ImportedImageUsageChoice.WholeImage -> positionImportedImage(bitmap)
+                    ImportedImageUsageChoice.CropImage -> cropImportedImage(bitmap)
+                }
+            },
+        )
+    }
+
+    private fun cropImportedImage(bitmap: Bitmap) {
+        overlayManager.navigateTo(
+            context = context,
+            newOverlay = CaptureMenu(importedBitmap = bitmap) { _, croppedBitmap ->
+                positionImportedImage(croppedBitmap)
+            },
+            hideCurrent = true,
+        )
+    }
+
+    private fun positionImportedImage(bitmap: Bitmap) {
+        val imageArea = viewModel.centerImageArea(bitmap)
+        overlayManager.navigateTo(
+            context = context,
+            newOverlay = ReferencePositionSelectorMenu(imageArea) { selectedArea ->
+                createImageCondition(viewModel.fixImagePosition(selectedArea, imageArea), bitmap)
+            },
+            hideCurrent = true,
+        )
+    }
+
+    private fun createImageCondition(area: Rect, bitmap: Bitmap) {
+        viewModel.createImageCondition(context, area, bitmap) { condition ->
+            showScreenConditionConfigDialog(condition)
+        }
     }
 
     private fun showScreenConditionConfigDialog(condition: ScreenCondition) {

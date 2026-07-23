@@ -33,6 +33,12 @@
             android:noHistory="true"
             android:exported="false"/>
 
+        <activity
+            android:name=".ui.condition.screen.image.importer.ImageImportActivity"
+            android:theme="@style/AppTheme.TranslucentActivity"
+            android:excludeFromRecents="true"
+            android:exported="false"/>
+
     </application>
 
 </manifest>

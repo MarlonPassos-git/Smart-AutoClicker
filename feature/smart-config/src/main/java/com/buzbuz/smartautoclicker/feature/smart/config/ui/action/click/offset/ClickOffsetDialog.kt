@@ -109,6 +109,7 @@ class ClickOffsetDialog : OverlayDialog(R.style.ScenarioConfigTheme) {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch { viewModel.clickOffset.collect(::updateClickOffset) }
                 launch { viewModel.conditionImage.collect(::updateConditionImage) }
+                launch { viewModel.multipleReferencesInfoVisible.collect(::updateReferenceInfoVisibility) }
             }
         }
     }
@@ -140,6 +141,10 @@ class ClickOffsetDialog : OverlayDialog(R.style.ScenarioConfigTheme) {
                 else -> setImageResource(R.drawable.ic_image_condition_big)
             }
         }
+    }
+
+    private fun updateReferenceInfoVisibility(isVisible: Boolean) {
+        viewBinding.textReferenceOffsetInfo?.visibility = if (isVisible) View.VISIBLE else View.GONE
     }
 }
 

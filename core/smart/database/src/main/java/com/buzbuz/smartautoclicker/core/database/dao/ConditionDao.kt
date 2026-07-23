@@ -21,11 +21,15 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
 import com.buzbuz.smartautoclicker.core.database.CONDITION_TABLE
+import com.buzbuz.smartautoclicker.core.database.IMAGE_REFERENCE_TABLE
 
+import com.buzbuz.smartautoclicker.core.database.entity.CompleteConditionEntity
 import com.buzbuz.smartautoclicker.core.database.entity.ConditionEntity
 import com.buzbuz.smartautoclicker.core.database.entity.ConditionType
+import com.buzbuz.smartautoclicker.core.database.entity.ImageReferenceEntity
 
 import kotlinx.coroutines.flow.Flow
 
@@ -41,6 +45,11 @@ abstract class ConditionDao {
     @Query("SELECT * FROM $CONDITION_TABLE")
     abstract fun getAllConditions(): Flow<List<ConditionEntity>>
 
+    /** @return all conditions with their normalized image references. */
+    @Transaction
+    @Query("SELECT * FROM $CONDITION_TABLE")
+    abstract fun getAllCompleteConditions(): Flow<List<CompleteConditionEntity>>
+
     /**
      * Get the list of conditions for a given event.
      *
@@ -49,6 +58,11 @@ abstract class ConditionDao {
      */
     @Query("SELECT * FROM $CONDITION_TABLE WHERE eventId=:eventId ORDER BY priority")
     abstract suspend fun getConditions(eventId: Long): List<ConditionEntity>
+
+    /** @return event conditions with their normalized image references. */
+    @Transaction
+    @Query("SELECT * FROM $CONDITION_TABLE WHERE eventId=:eventId ORDER BY priority")
+    abstract suspend fun getCompleteConditions(eventId: Long): List<CompleteConditionEntity>
 
     /**
      * Get the list of image conditions that uses the legacy image format
@@ -70,7 +84,7 @@ abstract class ConditionDao {
      * @param eventId the identifier of the event to get the conditions path from.
      * @return the list of path for the event.
      */
-    @Query("SELECT path FROM $CONDITION_TABLE WHERE eventId=:eventId AND type='ON_IMAGE_DETECTED'")
+    @Query("SELECT reference.path FROM $IMAGE_REFERENCE_TABLE AS reference INNER JOIN $CONDITION_TABLE AS condition ON reference.conditionId=condition.id WHERE condition.eventId=:eventId ORDER BY condition.priority, reference.priority")
     abstract suspend fun getConditionsPaths(eventId: Long): List<String>
 
     /**
@@ -79,8 +93,20 @@ abstract class ConditionDao {
      * @param path the value to be searched in the path column.
      * @return the number of conditions using this path.
      */
-    @Query("SELECT COUNT(path) FROM $CONDITION_TABLE WHERE path=:path AND type='ON_IMAGE_DETECTED'")
+    @Query("SELECT COUNT(*) FROM $IMAGE_REFERENCE_TABLE WHERE path=:path")
     abstract suspend fun getValidPathCount(path: String): Int
+
+    /** Replace all normalized references for one condition. */
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    abstract suspend fun addImageReferences(references: List<ImageReferenceEntity>)
+
+    /** Delete normalized references before rewriting their priorities. */
+    @Query("DELETE FROM $IMAGE_REFERENCE_TABLE WHERE conditionId=:conditionId")
+    abstract suspend fun deleteImageReferences(conditionId: Long)
+
+    /** Keep a migrated legacy reference synchronized with its mirrored condition path. */
+    @Query("UPDATE $IMAGE_REFERENCE_TABLE SET path=:newPath WHERE conditionId=:conditionId AND priority=0")
+    abstract suspend fun updateFirstImageReferencePath(conditionId: Long, newPath: String)
 
     /**
      * Get the name of a condition by its identifier.

@@ -22,6 +22,7 @@
     <string name="button_text_tutorial_start_game">Start game</string>
     <string name="button_text_tutorial_next">Next</string>
     <string name="button_text_tutorial_close">Close</string>
+    <string name="message_tutorial_choose_screen_capture_source">Choose <b>Capture screen</b> to continue with this tutorial.</string>
 
     <!-- Completion dialog for all tutorials -->
     <string name="dialog_title_tutorial_completed">Congratulations</string>

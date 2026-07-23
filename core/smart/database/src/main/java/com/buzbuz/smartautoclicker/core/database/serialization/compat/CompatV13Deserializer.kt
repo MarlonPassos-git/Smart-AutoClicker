@@ -25,6 +25,7 @@ import com.buzbuz.smartautoclicker.core.database.entity.ActionEntity
 import com.buzbuz.smartautoclicker.core.database.entity.ActionType
 import com.buzbuz.smartautoclicker.core.database.entity.ChangeCounterOperationType
 import com.buzbuz.smartautoclicker.core.database.entity.CompleteActionEntity
+import com.buzbuz.smartautoclicker.core.database.entity.CompleteConditionEntity
 import com.buzbuz.smartautoclicker.core.database.entity.CompleteEventEntity
 import com.buzbuz.smartautoclicker.core.database.entity.CompleteScenario
 import com.buzbuz.smartautoclicker.core.database.entity.ConditionEntity
@@ -231,7 +232,7 @@ internal open class CompatV13Deserializer : CompatV20Deserializer() {
         val newEventList = buildList {
             add(CompleteEventEntity(
                 event = stopTriggerEvent,
-                conditions = stopTriggerEventConditions,
+                conditions = stopTriggerEventConditions.map { condition -> CompleteConditionEntity(condition) },
                 actions = listOf(CompleteActionEntity(stopScenarioAction, emptyList(), emptyList())),
             ))
 
@@ -283,4 +284,3 @@ internal open class CompatV13Deserializer : CompatV20Deserializer() {
     override fun deserializeActionChangeCounter(jsonChangeCounter: JsonObject): ActionEntity? = null
     override fun deserializeActionNotification(jsonNotification: JsonObject): ActionEntity? = null
 }
-

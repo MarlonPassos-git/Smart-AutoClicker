@@ -143,7 +143,7 @@ internal class Repository @Inject internal constructor(
         dataSource.addScenario(scenario)
 
     override suspend fun deleteScenario(scenarioId: Identifier): Unit =
-        dataSource.deleteScenario(scenarioId, ::clearRemovedConditionsBitmaps)
+        dataSource.deleteScenario(scenarioId, ::deleteUnusedImageConditionBitmaps)
 
     override suspend fun markAsUsed(scenarioId: Identifier) {
         dataSource.markAsUsed(scenarioId.databaseId)
@@ -151,7 +151,7 @@ internal class Repository @Inject internal constructor(
 
     override suspend fun addScenarioCopy(completeScenario: CompleteScenario): Long? {
         val (scenario, events, counters) = completeScenario.toDomain(cleanIds = true)
-        return dataSource.addCompleteScenario(scenario, events, counters, ::clearRemovedConditionsBitmaps)
+        return dataSource.addCompleteScenario(scenario, events, counters, ::deleteUnusedImageConditionBitmaps)
     }
 
     override fun addScenarioCopy(scenarioId: Long, copyName: String, onCopyCompleted: (Boolean) -> Unit) {
@@ -161,13 +161,13 @@ internal class Repository @Inject internal constructor(
                 return@launch
             }
 
-            dataSource.addCompleteScenario(scenario.copy(name = copyName), events, counters, ::clearRemovedConditionsBitmaps)
+            dataSource.addCompleteScenario(scenario.copy(name = copyName), events, counters, ::deleteUnusedImageConditionBitmaps)
             onCopyCompleted(true)
         }
     }
 
     override suspend fun updateScenario(scenario: Scenario, events: List<Event>, counters: List<Counter>): Boolean =
-        dataSource.updateScenario(scenario, events, counters, ::clearRemovedConditionsBitmaps)
+        dataSource.updateScenario(scenario, events, counters, ::deleteUnusedImageConditionBitmaps)
 
     override suspend fun migrateLegacyImageConditions(): Boolean {
         val legacyConditions = dataSource.getLegacyImageConditions()
@@ -208,13 +208,13 @@ internal class Repository @Inject internal constructor(
      * Remove bitmaps from the application data folder.
      * @param removedPath the list of path for the bitmaps to be removed.
      */
-    private suspend fun clearRemovedConditionsBitmaps(removedPath: List<String>) {
-        Log.d(TAG, "Clearing removed conditions bitmaps: $removedPath")
-        val deletedPaths = removedPath.filter { path ->
+    override suspend fun deleteUnusedImageConditionBitmaps(paths: List<String>) {
+        Log.d(TAG, "Clearing removed conditions bitmaps: $paths")
+        val deletedPaths = paths.distinct().filter { path ->
             path.isNotEmpty() && dataSource.getImageConditionPathUsageCount(path) == 0
         }
 
-        Log.d(TAG, "Removed conditions count: ${removedPath.size}; Unused bitmaps after removal: ${deletedPaths.size}")
+        Log.d(TAG, "Removed conditions count: ${paths.size}; Unused bitmaps after removal: ${deletedPaths.size}")
         if (deletedPaths.isNotEmpty()) bitmapRepository.deleteImageConditionBitmaps(deletedPaths)
     }
 }

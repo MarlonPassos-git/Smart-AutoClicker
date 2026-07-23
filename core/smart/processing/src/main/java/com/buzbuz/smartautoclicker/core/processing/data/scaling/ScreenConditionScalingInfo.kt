@@ -17,6 +17,7 @@
 package com.buzbuz.smartautoclicker.core.processing.data.scaling
 
 import android.graphics.Rect
+import com.buzbuz.smartautoclicker.core.domain.model.condition.ImageReference
 import com.buzbuz.smartautoclicker.core.domain.model.condition.ScreenCondition
 
 internal sealed class ScreenConditionScalingInfo {
@@ -30,9 +31,28 @@ internal sealed class ScreenConditionScalingInfo {
 
     data class Image(
         override val screenCondition: ScreenCondition.Image,
-        override val detectionArea: Rect,
-        val imageArea: Rect,
-    ) : ScreenConditionScalingInfo()
+        val references: List<ImageReferenceScalingInfo>,
+    ) : ScreenConditionScalingInfo() {
+        constructor(
+            screenCondition: ScreenCondition.Image,
+            imageArea: Rect,
+            detectionArea: Rect,
+        ) : this(
+            screenCondition = screenCondition,
+            references = listOf(
+                ImageReferenceScalingInfo(
+                    reference = screenCondition.references.first(),
+                    detectionArea = detectionArea,
+                    imageArea = imageArea,
+                ),
+            ),
+        )
+
+        override val detectionArea: Rect
+            get() = references.firstOrNull()?.detectionArea ?: Rect()
+        val imageArea: Rect
+            get() = references.firstOrNull()?.imageArea ?: Rect()
+    }
 
     data class Text(
         override val screenCondition: ScreenCondition.Text,
@@ -44,3 +64,9 @@ internal sealed class ScreenConditionScalingInfo {
         override val detectionArea: Rect,
     ) : ScreenConditionScalingInfo()
 }
+
+internal data class ImageReferenceScalingInfo(
+    val reference: ImageReference,
+    val detectionArea: Rect,
+    val imageArea: Rect,
+)

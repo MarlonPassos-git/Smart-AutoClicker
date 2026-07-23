@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+* Copyright (C) 2026 Kevin Buzeau
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+-->
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:minHeight="@dimen/item_with_button">
+
+    <ImageView
+        android:id="@+id/image_reference_thumbnail"
+        android:layout_width="@dimen/item_selector"
+        android:layout_height="@dimen/item_selector"
+        android:layout_marginVertical="@dimen/margin_vertical_small"
+        android:contentDescription="@string/content_desc_image_reference"
+        android:scaleType="fitCenter"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@drawable/ic_image_condition" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/text_reference_number"
+        style="@style/AppTheme.TextAppearance.ListItemTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_horizontal_default"
+        app:layout_constraintEnd_toStartOf="@id/button_move_reference"
+        app:layout_constraintStart_toEndOf="@id/image_reference_thumbnail"
+        app:layout_constraintTop_toTopOf="@id/image_reference_thumbnail"
+        tools:text="Reference image 1" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/button_replace_reference"
+        style="@style/AppTheme.Widget.TextButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minWidth="0dp"
+        android:text="@string/image_reference_replace"
+        app:layout_constraintBottom_toBottomOf="@id/image_reference_thumbnail"
+        app:layout_constraintStart_toStartOf="@id/text_reference_number" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/button_remove_reference"
+        style="@style/AppTheme.Widget.TextButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minWidth="0dp"
+        android:text="@string/image_reference_remove"
+        app:layout_constraintBottom_toBottomOf="@id/image_reference_thumbnail"
+        app:layout_constraintStart_toEndOf="@id/button_replace_reference" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/button_move_reference"
+        style="@style/AppTheme.Widget.IconButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/content_desc_move_image_reference"
+        app:icon="@drawable/ic_move"
+        app:layout_constraintBottom_toBottomOf="@id/image_reference_thumbnail"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/image_reference_thumbnail" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -45,6 +45,9 @@ fun IncludeScreenConditionCardBinding.bind(
     conditionName.text = uiCondition.name
     conditionShouldBeDetected.setImageResource(uiCondition.shouldBeVisibleIconRes)
     conditionThreshold.text = uiCondition.thresholdText
+    conditionReferenceCount.text = uiCondition.additionalReferencesText
+    conditionReferenceCount.contentDescription = uiCondition.additionalReferencesContentDescription
+    conditionReferenceCount.visibility = if (uiCondition.additionalReferencesText == null) View.GONE else View.VISIBLE
 
     return when (val condition = uiCondition.condition) {
         is ScreenCondition.Color -> {

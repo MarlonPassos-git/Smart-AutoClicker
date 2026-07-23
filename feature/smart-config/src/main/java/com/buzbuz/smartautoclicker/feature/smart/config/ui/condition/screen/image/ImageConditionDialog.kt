@@ -17,23 +17,24 @@
 package com.buzbuz.smartautoclicker.feature.smart.config.ui.condition.screen.image
 
 import android.graphics.Bitmap
-import android.graphics.Color
+import android.graphics.Rect
 import android.text.InputFilter
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.ItemTouchHelper
 
 import com.buzbuz.smartautoclicker.core.common.overlays.base.viewModels
 import com.buzbuz.smartautoclicker.core.common.overlays.dialog.OverlayDialog
 import com.buzbuz.smartautoclicker.core.domain.model.EXACT
 import com.buzbuz.smartautoclicker.core.domain.model.IN_AREA
 import com.buzbuz.smartautoclicker.core.domain.model.WHOLE_SCREEN
+import com.buzbuz.smartautoclicker.core.domain.model.condition.IMAGE_REFERENCES_LIMIT
 import com.buzbuz.smartautoclicker.core.ui.bindings.buttons.MultiStateButtonConfig
 import com.buzbuz.smartautoclicker.core.ui.bindings.dialogs.DialogNavigationButton
 import com.buzbuz.smartautoclicker.core.ui.bindings.dialogs.setButtonEnabledState
@@ -60,6 +61,7 @@ import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.dialogs.showCl
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.dialogs.showDeleteConditionsWithAssociatedActionsDialog
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.condition.OnConditionConfigCompleteListener
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.condition.screen.areaselector.ConditionAreaSelectorMenu
+import com.buzbuz.smartautoclicker.feature.smart.config.ui.condition.screen.image.importer.ImageImportResult
 
 import com.google.android.material.bottomsheet.BottomSheetDialog
 
@@ -81,82 +83,94 @@ class ImageConditionDialog(
 
     /** ViewBinding containing the views for this dialog. */
     private lateinit var viewBinding: DialogConfigConditionImageBinding
+    private lateinit var imageReferenceAdapter: ImageReferenceAdapter
+    private val referenceTouchHelper = ItemTouchHelper(ImageReferenceReorderTouchHelper())
+    private var currentDetectionType = EXACT
 
     override fun onCreateView(): ViewGroup {
-        viewBinding = DialogConfigConditionImageBinding.inflate(LayoutInflater.from(context)).apply {
-            layoutTopBar.apply {
-                dialogTitle.setText(R.string.dialog_title_condition_config)
-
-                buttonDismiss.setDebouncedOnClickListener { back() }
-                buttonSave.apply {
-                    visibility = View.VISIBLE
-                    setDebouncedOnClickListener {
-                        listener.onConfirmClicked()
-                        super.back()
-                    }
-                }
-                buttonDelete.apply {
-                    visibility = View.VISIBLE
-                    setDebouncedOnClickListener { onDeleteClicked() }
-                }
-            }
-
-            fieldEditName.apply {
-                setLabel(R.string.generic_name)
-                setOnTextChangedListener { viewModel.setName(it.toString()) }
-                textField.filters = arrayOf<InputFilter>(
-                    InputFilter.LengthFilter(context.resources.getInteger(R.integer.name_max_length))
-                )
-            }
-            hideSoftInputOnFocusLoss(fieldEditName.textField)
-
-            fieldShouldAppear.apply {
-                setTitle(context.getString(R.string.field_condition_visibility_title))
-                setupDescriptions(
-                    listOf(
-                        context.getString(R.string.field_condition_visibility_desc_absent),
-                        context.getString(R.string.field_condition_visibility_desc_present),
-                    )
-                )
-                setOnClickListener { viewModel.toggleShouldBeDetected() }
-            }
-
-            fieldDetectionType.apply {
-                setTitle(context.getString(R.string.field_detection_type_title))
-                setButtonConfig(
-                    MultiStateButtonConfig(
-                        icons = listOf(
-                            R.drawable.ic_detect_exact,
-                            R.drawable.ic_detect_whole_screen,
-                            R.drawable.ic_detect_in_area,
-                        ),
-                        selectionRequired = true,
-                    )
-                )
-                setupDescriptions(
-                    listOf(
-                        context.getString(R.string.field_detection_type_desc_exact),
-                        context.getString(R.string.field_detection_type_desc_screen),
-                        context.getString(R.string.field_select_detection_area_title),
-                    )
-                )
-                setOnCheckedListener { index -> viewModel.setDetectionType(index.fromIndexToDetectionType())}
-            }
-
-            fieldSelectArea.apply {
-                setTitle(context.getString(R.string.field_select_detection_area_title))
-                setOnClickListener { debounceUserInteraction { showDetectionAreaSelector() } }
-            }
-
-            fieldSliderThreshold.apply {
-                setTitle(context.getString(R.string.generic_condition_threshold_title))
-                setValueLabelState(isEnabled = true, prefix = "%")
-                setSliderRange(0f, MAX_THRESHOLD)
-                setOnValueChangedFromUserListener { value -> viewModel.setThreshold(value.roundToInt()) }
-            }
-        }
+        imageReferenceAdapter = createImageReferenceAdapter()
+        viewBinding = DialogConfigConditionImageBinding.inflate(LayoutInflater.from(context))
+        configureTopBar()
+        configureNameField()
+        configureReferenceList()
+        configureVisibilityField()
+        configureDetectionTypeField()
+        configureDetectionAreaField()
+        configureThresholdField()
 
         return viewBinding.root
+    }
+
+    private fun configureTopBar() = viewBinding.layoutTopBar.apply {
+        dialogTitle.setText(R.string.dialog_title_condition_config)
+        buttonDismiss.setDebouncedOnClickListener { back() }
+        buttonSave.apply {
+            visibility = View.VISIBLE
+            setDebouncedOnClickListener {
+                listener.onConfirmClicked()
+                super.back()
+            }
+        }
+        buttonDelete.apply {
+            visibility = View.VISIBLE
+            setDebouncedOnClickListener { onDeleteClicked() }
+        }
+    }
+
+    private fun configureNameField() = viewBinding.fieldEditName.apply {
+        setLabel(R.string.generic_name)
+        setOnTextChangedListener { viewModel.setName(it.toString()) }
+        textField.filters = arrayOf(
+            InputFilter.LengthFilter(context.resources.getInteger(R.integer.name_max_length)),
+        )
+        hideSoftInputOnFocusLoss(textField)
+    }
+
+    private fun configureReferenceList() = viewBinding.apply {
+        listImageReferences.adapter = imageReferenceAdapter
+        referenceTouchHelper.attachToRecyclerView(listImageReferences)
+        buttonAddImageReference.setOnClickListener {
+            debounceUserInteraction { showImageSourceSelection(replacementIndex = null) }
+        }
+    }
+
+    private fun configureVisibilityField() = viewBinding.fieldShouldAppear.apply {
+        setTitle(context.getString(R.string.field_condition_visibility_title))
+        setupDescriptions(listOf(
+            context.getString(R.string.field_condition_visibility_desc_absent),
+            context.getString(R.string.field_condition_visibility_desc_present),
+        ))
+        setOnClickListener { viewModel.toggleShouldBeDetected() }
+    }
+
+    private fun configureDetectionTypeField() = viewBinding.fieldDetectionType.apply {
+        setTitle(context.getString(R.string.field_detection_type_title))
+        setButtonConfig(MultiStateButtonConfig(
+            icons = listOf(
+                R.drawable.ic_detect_exact,
+                R.drawable.ic_detect_whole_screen,
+                R.drawable.ic_detect_in_area,
+            ),
+            selectionRequired = true,
+        ))
+        setupDescriptions(listOf(
+            context.getString(R.string.field_detection_type_desc_exact),
+            context.getString(R.string.field_detection_type_desc_screen),
+            context.getString(R.string.field_select_detection_area_title),
+        ))
+        setOnCheckedListener { index -> viewModel.setDetectionType(index.fromIndexToDetectionType()) }
+    }
+
+    private fun configureDetectionAreaField() = viewBinding.fieldSelectArea.apply {
+        setTitle(context.getString(R.string.field_select_detection_area_title))
+        setOnClickListener { debounceUserInteraction { showDetectionAreaSelector() } }
+    }
+
+    private fun configureThresholdField() = viewBinding.fieldSliderThreshold.apply {
+        setTitle(context.getString(R.string.generic_condition_threshold_title))
+        setValueLabelState(isEnabled = true, prefix = "%")
+        setSliderRange(0f, MAX_THRESHOLD)
+        setOnValueChangedFromUserListener { value -> viewModel.setThreshold(value.roundToInt()) }
     }
 
     override fun onDialogCreated(dialog: BottomSheetDialog) {
@@ -169,7 +183,9 @@ class ImageConditionDialog(
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch { viewModel.name.collect(::updateConditionName) }
                 launch { viewModel.nameError.collect(viewBinding.fieldEditName::setError) }
-                launch { viewModel.conditionBitmap.collect(::updateConditionBitmap) }
+                launch { viewModel.imageReferences.collect(::updateImageReferences) }
+                launch { viewModel.imageImportResults.collect(::onImageImportResult) }
+                launch { viewModel.referenceSaveFailures.collect(::onReferenceSaveFailure) }
                 launch { viewModel.shouldBeDetected.collect(::updateShouldBeDetected) }
                 launch { viewModel.detectionType.collect(::updateDetectionType) }
                 launch { viewModel.threshold.collect(::updateThreshold) }
@@ -217,14 +233,14 @@ class ImageConditionDialog(
         viewBinding.fieldEditName.setText(newName)
     }
 
-    private fun updateConditionBitmap(newBitmap: Bitmap?) {
-        if (newBitmap != null) {
-            viewBinding.imageCondition.setImageBitmap(newBitmap)
-        } else {
-            viewBinding.imageCondition.setImageDrawable(
-                ContextCompat.getDrawable(context, R.drawable.ic_cancel)?.apply {
-                    setTint(Color.RED)
-                }
+    private fun updateImageReferences(state: ImageReferencesState) {
+        imageReferenceAdapter.submitItems(state.items)
+        viewBinding.buttonAddImageReference.apply {
+            isEnabled = state.canAdd
+            text = context.getString(
+                R.string.image_reference_add_count,
+                state.items.size,
+                IMAGE_REFERENCES_LIMIT,
             )
         }
     }
@@ -237,6 +253,7 @@ class ImageConditionDialog(
     }
 
     private fun updateDetectionType(detectionTypeState: DetectionTypeState) {
+        currentDetectionType = detectionTypeState.type
         val index = when (detectionTypeState.type) {
             EXACT -> 0
             WHOLE_SCREEN -> 1
@@ -269,6 +286,102 @@ class ImageConditionDialog(
             newOverlay = ConditionAreaSelectorMenu(
                 onAreaSelected = viewModel::setDetectionArea,
             ),
+            hideCurrent = true,
+        )
+    }
+
+    private fun createImageReferenceAdapter() = ImageReferenceAdapter(
+        onReplace = { index -> showImageSourceSelection(index) },
+        onRemove = viewModel::removeReference,
+        onOrderChanged = viewModel::reorderReferences,
+        onDragRequested = referenceTouchHelper::startDrag,
+    )
+
+    private fun showImageSourceSelection(replacementIndex: Int?) {
+        overlayManager.navigateTo(
+            context = context,
+            newOverlay = ImageSourceSelectionDialog { choice ->
+                when (choice) {
+                    ImageSourceChoice.CaptureScreen -> showImageCapture(replacementIndex)
+                    ImageSourceChoice.ChooseFile -> viewModel.requestImageImport(context, replacementIndex)
+                }
+            },
+        )
+    }
+
+    private fun showImageCapture(replacementIndex: Int?) {
+        overlayManager.navigateTo(
+            context = context,
+            newOverlay = CaptureMenu { area, bitmap ->
+                saveCapturedReference(area, bitmap, replacementIndex)
+            },
+            hideCurrent = true,
+        )
+    }
+
+    private fun saveCapturedReference(area: Rect, bitmap: Bitmap, replacementIndex: Int?) {
+        val referenceArea = if (currentDetectionType == EXACT) area else viewModel.centerImageArea(bitmap)
+        viewModel.saveReference(referenceArea, bitmap, replacementIndex)
+    }
+
+    private fun onImageImportResult(pendingImport: PendingImageImport) {
+        when (val result = pendingImport.result) {
+            is ImageImportResult.Success -> showImportedImageUsage(result.bitmap, pendingImport.replacementIndex)
+            is ImageImportResult.Failure -> context.showImageImportFailure(result.reason) {
+                viewModel.requestImageImport(context, pendingImport.replacementIndex)
+            }
+            ImageImportResult.Cancelled -> Unit
+        }
+    }
+
+    private fun onReferenceSaveFailure(pendingSave: PendingReferenceSave) {
+        context.showImagePersistenceFailure {
+            viewModel.saveReference(pendingSave.area, pendingSave.bitmap, pendingSave.replacementIndex)
+        }
+    }
+
+    private fun showImportedImageUsage(bitmap: Bitmap, replacementIndex: Int?) {
+        overlayManager.navigateTo(
+            context = context,
+            newOverlay = ImportedImageUsageDialog { choice ->
+                when (choice) {
+                    ImportedImageUsageChoice.WholeImage -> positionImportedImage(bitmap, replacementIndex)
+                    ImportedImageUsageChoice.CropImage -> cropImportedImage(bitmap, replacementIndex)
+                }
+            },
+        )
+    }
+
+    private fun cropImportedImage(bitmap: Bitmap, replacementIndex: Int?) {
+        overlayManager.navigateTo(
+            context = context,
+            newOverlay = CaptureMenu(importedBitmap = bitmap) { _, croppedBitmap ->
+                positionImportedImage(croppedBitmap, replacementIndex)
+            },
+            hideCurrent = true,
+        )
+    }
+
+    private fun positionImportedImage(bitmap: Bitmap, replacementIndex: Int?) {
+        val imageArea = viewModel.centerImageArea(bitmap)
+        if (currentDetectionType != EXACT) {
+            viewModel.saveReference(imageArea, bitmap, replacementIndex)
+            return
+        }
+
+        showReferencePositionSelector(imageArea, bitmap, replacementIndex)
+    }
+
+    private fun showReferencePositionSelector(area: Rect, bitmap: Bitmap, replacementIndex: Int?) {
+        overlayManager.navigateTo(
+            context = context,
+            newOverlay = ReferencePositionSelectorMenu(area) { selectedArea ->
+                viewModel.saveReference(
+                    viewModel.fixImagePosition(selectedArea, area),
+                    bitmap,
+                    replacementIndex,
+                )
+            },
             hideCurrent = true,
         )
     }
