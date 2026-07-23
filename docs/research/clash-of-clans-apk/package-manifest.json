@@ -1,0 +1,69 @@
+{
+  "capturedAt": "2026-07-23",
+  "sourceDevice": {
+    "manufacturer": "Samsung",
+    "model": "SM-S916B",
+    "product": "dm2qxxx",
+    "device": "dm2q",
+    "abi": "arm64-v8a"
+  },
+  "package": {
+    "applicationId": "com.supercell.clashofclans",
+    "label": "Clash of Clans",
+    "versionName": "18.400.9",
+    "versionCode": 180400010,
+    "minSdk": 24,
+    "targetSdk": 35,
+    "launchActivity": "com.supercell.titan.GameApp",
+    "installer": "com.android.vending"
+  },
+  "splits": [
+    {
+      "file": "base.apk",
+      "sizeBytes": 55373830,
+      "zipEntries": 1529,
+      "sha256": "80970e7110c7111d3376556ae7fe38008c423df80bdae82584616238478fd7ff"
+    },
+    {
+      "file": "split_config.arm64_v8a.apk",
+      "sizeBytes": 82470138,
+      "zipEntries": 17,
+      "sha256": "8a784bb0b9d41283d985162d6b319c4462ad6f004f1d4b83c64851e74790e91e"
+    },
+    {
+      "file": "split_config.en.apk",
+      "sizeBytes": 53657,
+      "zipEntries": 6,
+      "sha256": "9024dedafa5d259d8fb3b6095c813dbbf11ae1b78c28540606b54b1645e53488"
+    },
+    {
+      "file": "split_config.pt.apk",
+      "sizeBytes": 49561,
+      "zipEntries": 6,
+      "sha256": "0538141b05f226f08197fe93cc496af416aab899acc09c019c46cb55163f8468"
+    },
+    {
+      "file": "split_config.xxhdpi.apk",
+      "sizeBytes": 129361,
+      "zipEntries": 65,
+      "sha256": "a4842e78211fa3320edfdcafd753f47059342bcb228ec90c9721d35b7b83bfd1"
+    },
+    {
+      "file": "split_install_time_asset_pack.apk",
+      "sizeBytes": 557586297,
+      "zipEntries": 9329,
+      "sha256": "75bd46e809559eaf261800e0c9b1b12e57d9d2ecf042cf77b11eea8cad5a9b0a"
+    }
+  ],
+  "localArtifacts": {
+    "root": ".local-research/clash-of-clans/18.400.9",
+    "apkDirectory": "apks",
+    "rawExtractionDirectory": "extracted",
+    "decodedDirectory": "decoded",
+    "catalogDirectory": "catalog",
+    "rawFileCount": 10952,
+    "decodedCsvCount": 94,
+    "decodedPngCount": 23,
+    "catalogEntryCount": 107
+  }
+}
