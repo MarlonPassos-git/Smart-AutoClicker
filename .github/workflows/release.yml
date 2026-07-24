@@ -1,49 +1,225 @@
-name: Release
+name: Publicar versão Android
 
 on:
+  push:
+    tags:
+      - "*.*.*"
   workflow_dispatch:
-  release:
-    types: [created]
+    inputs:
+      version:
+        description: "Versão exata configurada no app, por exemplo 4.0.0-beta05"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publicar-versao-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
-  build:
-    name: Build application
+  publicar:
+    name: Validar, compilar e publicar
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+      - name: Baixar código-fonte
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-    - name: set up JDK 21
-      uses: actions/setup-java@v4
-      with:
-        distribution: 'zulu'
-        java-version: '21'
+      - name: Identificar versão
+        id: metadata
+        env:
+          REQUESTED_VERSION: ${{ inputs.version }}
+        run: |
+          if [[ "$GITHUB_EVENT_NAME" == "push" ]]; then
+            version="$GITHUB_REF_NAME"
+          else
+            version="$REQUESTED_VERSION"
+          fi
 
-    - name: set NDK
-      shell: bash
-      run: |
-        set -x
-        echo "ANDROID_NDK=$ANDROID_NDK_LATEST_HOME" >> $GITHUB_ENV
-        echo "ANDROID_NDK_HOME=$ANDROID_NDK_LATEST_HOME" >> $GITHUB_ENV
-        echo "ANDROID_NDK_ROOT=$ANDROID_NDK_LATEST_HOME" >> $GITHUB_ENV
+          if [[ -z "$version" ]]; then
+            echo "Versão vazia; esperado valor como 4.0.0-beta05." >&2
+            exit 1
+          fi
 
-    - name: Restore keystore
-      run: |
-        echo "${{ secrets.RELEASE_KEYSTORE }}" > smartautoclicker.jks.asc
-        gpg -d --passphrase "${{ secrets.RELEASE_KEYSTORE_PASSPHRASE }}" --batch smartautoclicker.jks.asc > smartautoclicker/smartautoclicker.jks
+          if [[ "$version" == *-* ]]; then
+            prerelease=true
+          else
+            prerelease=false
+          fi
 
-    - name: Build with Gradle
-      run: |
-        ./gradlew --info \
-          -PsigningStorePassword="${{ secrets.SIGNING_STORE_PASSWORD }}" \
-          -PsigningKeyAlias="${{ secrets.SIGNING_KEY_ALIAS }}" \
-          -PsigningKeyPassword="${{ secrets.SIGNING_KEY_PASSWORD }}" \
-          assembleFDroidRelease
-      env:
-        JAVA_TOOL_OPTIONS: "-Djava.net.preferIPv4Stack=true"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "prerelease=$prerelease" >> "$GITHUB_OUTPUT"
 
-    - name: Upload APK
-      uses: actions/upload-artifact@v4
-      with:
-        name: smartautoclicker-release
-        path: smartautoclicker/build/outputs/
+      - name: Validar versão e preparar notas
+        env:
+          VERSION: ${{ steps.metadata.outputs.version }}
+        run: |
+          bash scripts/prepare-release-notes.sh \
+            "$VERSION" "$RUNNER_TEMP/notas-changelog.md"
+
+      - name: Verificar se a versão já foi publicada
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.metadata.outputs.version }}
+        run: |
+          if gh release view "$VERSION" >/dev/null 2>&1; then
+            echo "Versão '$VERSION' já possui uma Release; esperado uma versão inédita." >&2
+            exit 1
+          fi
+
+      - name: Configurar JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: zulu
+          java-version: "21"
+          cache: gradle
+
+      - name: Configurar Android NDK
+        run: |
+          echo "ANDROID_NDK=$ANDROID_NDK_LATEST_HOME" >> "$GITHUB_ENV"
+          echo "ANDROID_NDK_HOME=$ANDROID_NDK_LATEST_HOME" >> "$GITHUB_ENV"
+          echo "ANDROID_NDK_ROOT=$ANDROID_NDK_LATEST_HOME" >> "$GITHUB_ENV"
+
+      - name: Detectar modo de assinatura
+        id: signing
+        env:
+          PRERELEASE: ${{ steps.metadata.outputs.prerelease }}
+          RELEASE_KEYSTORE: ${{ secrets.RELEASE_KEYSTORE }}
+          RELEASE_KEYSTORE_PASSPHRASE: ${{ secrets.RELEASE_KEYSTORE_PASSPHRASE }}
+          SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
+          SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
+          SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+        run: |
+          missing=()
+          [[ -z "$RELEASE_KEYSTORE" ]] && missing+=("RELEASE_KEYSTORE")
+          [[ -z "$RELEASE_KEYSTORE_PASSPHRASE" ]] && missing+=("RELEASE_KEYSTORE_PASSPHRASE")
+          [[ -z "$SIGNING_STORE_PASSWORD" ]] && missing+=("SIGNING_STORE_PASSWORD")
+          [[ -z "$SIGNING_KEY_ALIAS" ]] && missing+=("SIGNING_KEY_ALIAS")
+          [[ -z "$SIGNING_KEY_PASSWORD" ]] && missing+=("SIGNING_KEY_PASSWORD")
+
+          if (( ${#missing[@]} == 0 )); then
+            echo "variant=release" >> "$GITHUB_OUTPUT"
+            echo "signed=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if [[ "$PRERELEASE" != "true" ]]; then
+            echo "Secrets ausentes: ${missing[*]}; versão estável exige assinatura de release." >&2
+            exit 1
+          fi
+
+          echo "::warning::Secrets ausentes: ${missing[*]}. APKs beta usarão assinatura de desenvolvimento."
+          echo "variant=debug" >> "$GITHUB_OUTPUT"
+          echo "signed=false" >> "$GITHUB_OUTPUT"
+
+      - name: Restaurar chave de assinatura
+        if: steps.signing.outputs.signed == 'true'
+        env:
+          RELEASE_KEYSTORE: ${{ secrets.RELEASE_KEYSTORE }}
+          RELEASE_KEYSTORE_PASSPHRASE: ${{ secrets.RELEASE_KEYSTORE_PASSPHRASE }}
+        run: |
+          printf "%s" "$RELEASE_KEYSTORE" > smartautoclicker.jks.asc
+          gpg --batch --yes --pinentry-mode loopback \
+            --passphrase "$RELEASE_KEYSTORE_PASSPHRASE" \
+            --decrypt smartautoclicker.jks.asc \
+            > smartautoclicker/smartautoclicker.jks
+
+      - name: Executar testes
+        run: ./gradlew testFDroidDebugUnitTest
+        env:
+          JAVA_TOOL_OPTIONS: "-Djava.net.preferIPv4Stack=true"
+
+      - name: Compilar APKs
+        env:
+          VARIANT: ${{ steps.signing.outputs.variant }}
+          SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
+          SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
+          SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+          JAVA_TOOL_OPTIONS: "-Djava.net.preferIPv4Stack=true"
+        run: |
+          if [[ "$VARIANT" == "release" ]]; then
+            ./gradlew \
+              -PsigningStorePassword="$SIGNING_STORE_PASSWORD" \
+              -PsigningKeyAlias="$SIGNING_KEY_ALIAS" \
+              -PsigningKeyPassword="$SIGNING_KEY_PASSWORD" \
+              assembleFDroidRelease
+          else
+            ./gradlew assembleFDroidDebug
+          fi
+
+      - name: Organizar APKs e checksums
+        env:
+          VARIANT: ${{ steps.signing.outputs.variant }}
+          VERSION: ${{ steps.metadata.outputs.version }}
+        run: |
+          source_dir="smartautoclicker/build/outputs/apk/fDroid/$VARIANT"
+          mkdir -p dist
+          mapfile -d "" apk_files < <(
+            find "$source_dir" -maxdepth 1 -type f -name "*.apk" -print0 |
+              sort -z
+          )
+
+          if (( ${#apk_files[@]} == 0 )); then
+            echo "Nenhum APK encontrado em '$source_dir'; esperado ao menos um arquivo .apk." >&2
+            exit 1
+          fi
+
+          for apk_file in "${apk_files[@]}"; do
+            source_name="$(basename "$apk_file")"
+            variant_name="${source_name#smartautoclicker-fDroid-}"
+            cp "$apk_file" "dist/Klickr-$VERSION-$variant_name"
+          done
+
+          (
+            cd dist
+            sha256sum ./*.apk > SHA256SUMS.txt
+          )
+
+      - name: Montar descrição pública
+        env:
+          SIGNED: ${{ steps.signing.outputs.signed }}
+        run: |
+          {
+            echo "### Sobre os APKs"
+            echo
+            if [[ "$SIGNED" == "true" ]]; then
+              echo "APKs assinados para esta linha de distribuição."
+            else
+              echo "> **Versão de desenvolvimento:** APKs assinados com a chave de debug e instalados como \`Klick´r dev\`, separados da versão oficial."
+            fi
+            echo
+            echo "- Use \`arm64-v8a\` na maioria dos celulares atuais."
+            echo "- Use \`universal\` se não souber a arquitetura do aparelho."
+            echo "- Confira \`SHA256SUMS.txt\` para validar a integridade dos arquivos."
+            echo
+            cat "$RUNNER_TEMP/notas-changelog.md"
+          } > "$RUNNER_TEMP/notas-release.md"
+
+      - name: Salvar artefatos da compilação
+        uses: actions/upload-artifact@v4
+        with:
+          name: Klickr-${{ steps.metadata.outputs.version }}
+          path: dist/
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Criar página da versão
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PRERELEASE: ${{ steps.metadata.outputs.prerelease }}
+          VERSION: ${{ steps.metadata.outputs.version }}
+        run: |
+          release_flags=()
+          if [[ "$PRERELEASE" == "true" ]]; then
+            release_flags+=("--prerelease")
+          fi
+
+          gh release create "$VERSION" dist/*.apk dist/SHA256SUMS.txt \
+            --target "$GITHUB_SHA" \
+            --title "Klick'r $VERSION" \
+            --notes-file "$RUNNER_TEMP/notas-release.md" \
+            "${release_flags[@]}"
