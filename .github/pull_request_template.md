@@ -1,10 +1,12 @@
-# 📝 Description of the pull request, what, why and where
+# 📝 O que mudou e por quê
 
-This PR ...
+Descreva a mudança, a motivação e as áreas afetadas.
 
-## ✅ How to test
+## ✅ Como testar
 
-- action one
-- action two
+- Passo de validação
+- Resultado esperado
 
-## 📹 Demo
+## 📹 Demonstração
+
+Inclua capturas de tela ou vídeo quando houver mudança visual.

@@ -24,3 +24,7 @@ Tests use JUnit 4, MockK, and Robolectric where Android behavior is needed. Ever
 ## Commit & Pull Request Guidelines
 
 History uses concise imperative subjects, including Conventional Commit forms such as `feat(android): ...` and issue-prefixed fixes such as `[#975] Fix ...`. Keep each commit scoped to one intent and reference the issue when applicable. Pull requests must explain what changed and why, provide reproducible test steps, link relevant issues, and include screenshots or a demo for visible UI changes. Confirm the FDroid debug build and unit tests pass.
+
+## Public Communication Language
+
+Write public repository content in Brazilian Portuguese. This includes the README, changelog, GitHub Release notes, issue and pull request templates, and visible GitHub Actions labels. Source code, commit messages, and internal development documentation can remain in English.
