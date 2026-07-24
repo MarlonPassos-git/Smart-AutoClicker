@@ -25,7 +25,7 @@ jobs:
 
     steps:
       - name: Baixar código-fonte
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
@@ -72,7 +72,7 @@ jobs:
           fi
 
       - name: Configurar JDK 21
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: zulu
           java-version: "21"
@@ -200,7 +200,7 @@ jobs:
           } > "$RUNNER_TEMP/notas-release.md"
 
       - name: Salvar artefatos da compilação
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: Klickr-${{ steps.metadata.outputs.version }}
           path: dist/
