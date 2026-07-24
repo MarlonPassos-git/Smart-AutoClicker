@@ -13,38 +13,38 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-name: Release OCR Models
+name: Publicar modelos de OCR
 
 on:
   workflow_dispatch:
 
 jobs:
   build:
-    name: Build OCR models
+    name: Compilar modelos de OCR
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Configurar Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.9'
 
-      - name: Install Python dependencies
+      - name: Instalar dependências Python
         run: pip install -r scripts/ocr-models/requirements.txt
 
-      - name: Build language pack models
+      - name: Compilar pacotes de idiomas
         env:
           PYTHONUNBUFFERED: "1"
         run: python scripts/ocr-models/build_models.py --output output --mode language_pack
 
-      - name: Collect release artifacts
+      - name: Organizar arquivos da versão
         run: |
           mkdir -p dist
           find output/rec -maxdepth 1 -name "*.zip" -exec cp {} dist/ \;
 
-      - name: Replace release assets
+      - name: Substituir arquivos da versão
         uses: softprops/action-gh-release@v2
         with:
           files: dist/*

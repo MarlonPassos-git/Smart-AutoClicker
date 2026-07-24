@@ -1,8 +1,8 @@
-name: 'Test Report'
+name: 'Relatório de testes'
 
 on:
   workflow_run:
-    workflows: ['Execute tests']
+    workflows: ['Executar testes']
     types:
       - completed
 
@@ -13,6 +13,6 @@ jobs:
       - uses: dorny/test-reporter@v1
         with:
           artifact: test-results
-          name: Test Results
+          name: Resultados dos testes
           path: '**/TEST-*.xml'
           reporter: java-junit

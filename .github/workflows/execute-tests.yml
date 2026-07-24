@@ -1,4 +1,4 @@
-name: 'Execute tests'
+name: 'Executar testes'
 
 on:
   push:
@@ -9,21 +9,21 @@ on:
 jobs:
 
   tests:
-    name: Run local unit tests
+    name: Executar testes unitários locais
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
-      - name: set up JDK 21
+      - name: Configurar JDK 21
         uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
           java-version: '21'
-      - name: Local unit tests with Gradle
+      - name: Executar testes com Gradle
         run: ./gradlew testFDroidDebugUnitTest
         env:
           JAVA_TOOL_OPTIONS: "-Djava.net.preferIPv4Stack=true"
-      - name: Upload tests results
+      - name: Salvar resultados dos testes
         uses: actions/upload-artifact@v4
         if: success() || failure()
         with:
