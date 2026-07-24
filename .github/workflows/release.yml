@@ -184,17 +184,16 @@ jobs:
           SIGNED: ${{ steps.signing.outputs.signed }}
         run: |
           {
-            echo "### Sobre os APKs"
+            echo "### Installation"
+            echo
+            echo "> [!TIP]"
+            echo "> Para saber qual APK baixar e instalar, consulte [Which APK should I install?](https://github.com/MarlonPassos-git/Smart-AutoClicker/blob/master/docs/WHICH-APK.md)."
             echo
             if [[ "$SIGNED" == "true" ]]; then
               echo "APKs assinados para esta linha de distribuição."
             else
               echo "> **Versão de desenvolvimento:** APKs assinados com a chave de debug e instalados como \`Klick´r dev\`, separados da versão oficial."
             fi
-            echo
-            echo "- Use \`arm64-v8a\` na maioria dos celulares atuais."
-            echo "- Use \`universal\` se não souber a arquitetura do aparelho."
-            echo "- Confira \`SHA256SUMS.txt\` para validar a integridade dos arquivos."
             echo
             cat "$RUNNER_TEMP/notas-changelog.md"
           } > "$RUNNER_TEMP/notas-release.md"
