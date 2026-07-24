@@ -28,7 +28,7 @@ A publicação é interrompida quando:
 
 - a versão não segue o formato semântico esperado;
 - o `versionName` é diferente da tag ou da versão informada;
-- o `versionCode` não aumentou desde a versão anterior;
+- o `versionCode` não aumentou desde a revisão anterior que alterou a versão;
 - não existe uma seção preenchida para a versão no `CHANGELOG.md`;
 - a versão já possui uma Release no GitHub;
 - os testes ou a compilação falham;

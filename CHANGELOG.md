@@ -34,4 +34,4 @@ e as versões seguem o [Versionamento Semântico](https://semver.org/lang/pt-BR/
 - Adicionados testes de regressão para zoom, toque em área, textos alternativos, imagens alternativas, migrações e fluxos de edição.
 
 [Não lançado]: https://github.com/MarlonPassos-git/Smart-AutoClicker/compare/4.0.0-beta05...HEAD
-[4.0.0-beta05]: https://github.com/MarlonPassos-git/Smart-AutoClicker/compare/4.0.0-beta04...4.0.0-beta05
+[4.0.0-beta05]: https://github.com/MarlonPassos-git/Smart-AutoClicker/compare/45545d23...4.0.0-beta05
