@@ -1,12 +1,12 @@
-# 📝 O que mudou e por quê
+# What changed and why
 
 Descreva a mudança, a motivação e as áreas afetadas.
 
-## ✅ Como testar
+## How to test
 
 - Passo de validação
 - Resultado esperado
 
-## 📹 Demonstração
+## Demo
 
 Inclua capturas de tela ou vídeo quando houver mudança visual.

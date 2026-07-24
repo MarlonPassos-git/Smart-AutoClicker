@@ -22,7 +22,7 @@ Este repositório mantém uma versão personalizada do
 Ela preserva os modos de automação por imagem e por sequência de ações, além de
 adicionar recursos desenvolvidos para cenários mais complexos.
 
-## Principais recursos
+## Features
 
 - **Reconhecimento por várias imagens:** uma condição pode aceitar referências visuais alternativas do mesmo alvo.
 - **Textos alternativos:** uma condição de texto pode reconhecer diferentes palavras ou frases.
@@ -35,21 +35,19 @@ adicionar recursos desenvolvidos para cenários mais complexos.
 Consulte o [histórico de mudanças](CHANGELOG.md) para ver detalhes de cada
 versão.
 
-## Instalação
+## Installation
 
 1. Abra a página de [Releases](https://github.com/MarlonPassos-git/Smart-AutoClicker/releases).
-2. Entre na versão desejada e baixe o APK compatível:
-   - `arm64-v8a`: opção indicada para a maioria dos celulares Android atuais;
-   - `armeabi-v7a`: aparelhos ARM de 32 bits;
-   - `x86` ou `x86_64`: principalmente emuladores;
-   - `universal`: opção maior, compatível com todas as arquiteturas incluídas.
-3. Confira o arquivo `SHA256SUMS.txt` se quiser validar a integridade do download.
-4. Autorize a instalação de aplicativos desconhecidos quando o Android solicitar.
+2. Consulte [Which APK should I install?](docs/WHICH-APK.md) para escolher
+   versão, arquitetura e tipo de assinatura.
+3. Entre na versão desejada e baixe o APK indicado pelo guia.
+4. Confira o arquivo `SHA256SUMS.txt` se quiser validar a integridade do download.
+5. Autorize a instalação de aplicativos desconhecidos quando o Android solicitar.
 
 Versões beta podem usar assinatura de desenvolvimento. Nesse caso, o APK é
 instalado como `Klick´r dev`, separado de instalações oficiais do Klick'r.
 
-## Desenvolvimento
+## Development
 
 Requisitos: JDK 21, Android SDK e o Gradle Wrapper incluído no repositório.
 
@@ -65,10 +63,9 @@ conectado:
 mise run install-emulator
 ```
 
-O processo de publicação está documentado em
-[Como publicar uma versão](docs/RELEASES.md).
+O processo de publicação está documentado em [Release process](docs/RELEASES.md).
 
-## Projeto original e licença
+## Upstream project and license
 
 Klick'r é software livre distribuído sob a
 [GNU General Public License v3.0](LICENSE). O desenvolvimento original e as
@@ -78,6 +75,7 @@ versões oficiais para lojas estão em
 ## Links
 
 - [Baixar versões deste repositório](https://github.com/MarlonPassos-git/Smart-AutoClicker/releases)
+- [Descobrir qual APK instalar](docs/WHICH-APK.md)
 - [Relatar um problema](https://github.com/MarlonPassos-git/Smart-AutoClicker/issues/new?template=bug_report.yml)
 - [Consultar mudanças da versão](CHANGELOG.md)
 - [Acessar o projeto original](https://github.com/Nain57/Smart-AutoClicker)

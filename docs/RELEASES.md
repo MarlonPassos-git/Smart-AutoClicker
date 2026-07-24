@@ -1,14 +1,17 @@
-# Como publicar uma versão
+# Release process
 
 O workflow `Publicar versão Android` valida a versão, executa os testes, gera os
 APKs, calcula os hashes SHA-256 e cria a página da versão no GitHub com as notas
 extraídas do `CHANGELOG.md`.
 
-## Preparar a versão
+## Prepare the release
 
 1. Atualize `versionCode` e `versionName` em
    `smartautoclicker/build.gradle.kts`.
-2. Crie a seção correspondente no `CHANGELOG.md`, em português.
+2. Crie a seção correspondente no `CHANGELOG.md`, com headings convencionais
+   em inglês (`Added`, `Changed`, `Fixed`, `Security`) e conteúdo em português.
+   Se houver demonstrações visuais, salve-as em
+   `docs/assets/releases/<versão>/` e adicione uma seção `Screenshots`.
 3. Execute `./gradlew testFDroidDebugUnitTest`.
 4. Envie o commit para o GitHub.
 5. Crie e envie uma tag igual ao `versionName`:
@@ -22,7 +25,7 @@ Também é possível abrir **Actions → Publicar versão Android → Run workfl
 informar a versão. Nesse modo, o workflow cria a tag apontando para o commit
 selecionado.
 
-## Validações automáticas
+## Automated validations
 
 A publicação é interrompida quando:
 
@@ -34,7 +37,7 @@ A publicação é interrompida quando:
 - os testes ou a compilação falham;
 - uma versão estável não possui assinatura de release configurada.
 
-## Assinatura dos APKs
+## APK signing
 
 Para uma versão beta, a ausência dos secrets gera APKs de desenvolvimento,
 assinados pela chave de debug do Android. Eles usam o pacote
