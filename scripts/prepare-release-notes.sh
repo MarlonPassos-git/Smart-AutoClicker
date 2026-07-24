@@ -16,8 +16,9 @@ fail_release_validation() {
 read_gradle_value() {
     local source_file="$1"
     local property_name="$2"
-    sed -nE "s/^[[:space:]]*${property_name} = \"?([^\"[:space:]]+)\"?/\1/p" "$source_file" |
-        head -n 1
+    sed -nE \
+        "s/^[[:space:]]*${property_name} = \"?([^\"[:space:]]+)\"?/\1/p" \
+        "$source_file"
 }
 
 validate_requested_version() {
@@ -45,9 +46,12 @@ validate_gradle_version() {
 
 find_previous_release_tag() {
     local requested_version="$1"
-    git -C "$project_root" tag --list '[0-9]*' --sort=-version:refname |
-        grep -vxF "$requested_version" |
-        head -n 1
+    local release_tag
+    while IFS= read -r release_tag; do
+        [[ "$release_tag" == "$requested_version" ]] && continue
+        echo "$release_tag"
+        return
+    done < <(git -C "$project_root" tag --list '[0-9]*' --sort=-version:refname)
 }
 
 validate_version_code_increment() {
@@ -59,8 +63,7 @@ validate_version_code_increment() {
 
     previous_code="$(git -C "$project_root" show \
         "$previous_tag:smartautoclicker/build.gradle.kts" |
-        sed -nE 's/^[[:space:]]*versionCode = ([0-9]+)/\1/p' |
-        head -n 1)"
+        sed -nE 's/^[[:space:]]*versionCode = ([0-9]+)/\1/p')"
     (( current_code > previous_code )) && return
     fail_release_validation \
         "versionCode '$current_code'; esperado valor maior que '$previous_code' da versão '$previous_tag'."
