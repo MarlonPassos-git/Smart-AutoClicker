@@ -13,6 +13,15 @@ fail_release_validation() {
     exit 1
 }
 
+report_unexpected_error() {
+    local exit_code="$?"
+    local line_number="$1"
+    echo "Erro inesperado na linha '$line_number'; esperado comando com saída zero, recebido '$exit_code'." >&2
+    exit "$exit_code"
+}
+
+trap 'report_unexpected_error "$LINENO"' ERR
+
 read_gradle_value() {
     local source_file="$1"
     local property_name="$2"
@@ -44,29 +53,35 @@ validate_gradle_version() {
         "versionName '$configured_version'; esperado '$requested_version'."
 }
 
-find_previous_release_tag() {
-    local requested_version="$1"
-    local release_tag
-    while IFS= read -r release_tag; do
-        [[ "$release_tag" == "$requested_version" ]] && continue
-        echo "$release_tag"
-        return
-    done < <(git -C "$project_root" tag --list '[0-9]*' --sort=-version:refname)
+find_previous_version_code() {
+    local current_code="$1"
+    local commit_hash previous_code
+    while IFS= read -r commit_hash; do
+        previous_code="$(git -C "$project_root" show \
+            "$commit_hash:smartautoclicker/build.gradle.kts" |
+            sed -nE 's/^[[:space:]]*versionCode = ([0-9]+)/\1/p')"
+        [[ "$previous_code" =~ ^[0-9]+$ ]] || continue
+        [[ "$previous_code" == "$current_code" ]] && continue
+        echo "$previous_code ${commit_hash:0:8}"
+        return 0
+    done < <(git -C "$project_root" log --format='%H' -- \
+        smartautoclicker/build.gradle.kts)
+    return 0
 }
 
 validate_version_code_increment() {
-    local requested_version="$1"
-    local current_code previous_code previous_tag
+    local current_code previous_code previous_revision previous_version
     current_code="$(read_gradle_value "$build_file" "versionCode")"
-    previous_tag="$(find_previous_release_tag "$requested_version")"
-    [[ -n "$previous_tag" ]] || return
+    [[ "$current_code" =~ ^[0-9]+$ ]] ||
+        fail_release_validation \
+            "versionCode '$current_code'; esperado número inteiro positivo."
+    previous_version="$(find_previous_version_code "$current_code")"
+    [[ -n "$previous_version" ]] || return 0
 
-    previous_code="$(git -C "$project_root" show \
-        "$previous_tag:smartautoclicker/build.gradle.kts" |
-        sed -nE 's/^[[:space:]]*versionCode = ([0-9]+)/\1/p')"
+    read -r previous_code previous_revision <<< "$previous_version"
     (( current_code > previous_code )) && return
     fail_release_validation \
-        "versionCode '$current_code'; esperado valor maior que '$previous_code' da versão '$previous_tag'."
+        "versionCode '$current_code'; esperado valor maior que '$previous_code' da revisão '$previous_revision'."
 }
 
 write_changelog_section() {
@@ -99,7 +114,7 @@ main() {
 
     validate_requested_version "$requested_version"
     validate_gradle_version "$requested_version"
-    validate_version_code_increment "$requested_version"
+    validate_version_code_increment
     write_changelog_section "$requested_version" "$output_file"
 }
 
