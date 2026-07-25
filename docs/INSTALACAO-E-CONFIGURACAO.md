@@ -20,18 +20,12 @@ consulte [Qual APK devo instalar?](QUAL-APK-DEVO-INSTALAR.md).
 4. Selecione o navegador usado para baixar o Klick'r.
 5. Ative **Autorizar permissão**.
 
-![Menu de três pontos com a opção Acesso especial](images/instalacao/01-acesso-especial.jpg)
-
-![Lista de aplicativos que podem instalar apps desconhecidos](images/instalacao/02-instalar-apps-desconhecidos.jpg)
-
-![Chrome autorizado a instalar aplicativos](images/instalacao/03-autorizar-navegador.jpg)
+![Passo a passo para autorizar o navegador a instalar aplicativos](images/instalacao/permitir-instalacao-navegador.gif)
 
 ### 3. Desativar o Play Protect quando ele bloquear o app
 
 Esta etapa só é necessária quando aparecer a mensagem **O app foi bloqueado
 para proteger seu dispositivo**.
-
-![Mensagem informando que o Play Protect bloqueou o aplicativo](images/instalacao/04-play-protect-bloqueou.jpg)
 
 1. Abra a **Play Store**.
 2. Toque na foto do perfil e abra **Play Protect**.
@@ -39,14 +33,14 @@ para proteger seu dispositivo**.
 4. Desative **Verificar apps com o Play Protect**.
 5. Toque em **Desativar**.
 
-![Confirmação para desativar a verificação do Play Protect](images/instalacao/05-desativar-play-protect.jpg)
+![Passo a passo para desativar o Play Protect](images/instalacao/desativar-play-protect.gif)
 
 ### 4. Instalar o Klick'r
 
 Abra o arquivo baixado e conclua a instalação. Ao terminar, o Android mostrará
 a mensagem **App instalado**.
 
-![Mensagem confirmando que o Klick'r foi instalado](images/instalacao/06-app-instalado.jpg)
+![Passo a passo para instalar o Klick'r](images/instalacao/instalar-klickr.gif)
 
 ## Depois da instalação
 
@@ -57,8 +51,6 @@ a mensagem **App instalado**.
 3. Toque em **Notificações**.
 4. Ative **Permitir notificações**.
 
-![Atalho de notificações nas informações do Klick'r](images/instalacao/07-permitir-notificacoes.jpg)
-
 ### 6. Permitir sobreposição
 
 Nas informações do Klick'r:
@@ -66,7 +58,10 @@ Nas informações do Klick'r:
 1. toque em **Aparecer sobre outros**;
 2. ative **Autorizar permissão**.
 
-![Permissão para o Klick'r aparecer sobre outros aplicativos](images/instalacao/08-aparecer-sobre-outros.jpg)
+O GIF mostra como abrir as informações do aplicativo e ativar a sobreposição.
+A tela de notificações pode mudar conforme a versão do Android.
+
+![Passo a passo para abrir as permissões do Klick'r e permitir a sobreposição](images/instalacao/configurar-permissoes-aplicativo.gif)
 
 ### 7. Permitir configurações restritas
 
@@ -75,7 +70,7 @@ Nas informações do Klick'r:
 3. Selecione **Permitir configurações restritas**.
 4. Confirme o desbloqueio do celular.
 
-![Opção para permitir configurações restritas](images/instalacao/09-permitir-configuracoes-restritas.jpg)
+![Passo a passo para permitir configurações restritas](images/instalacao/permitir-configuracoes-restritas.gif)
 
 ### 8. Ativar a acessibilidade
 
@@ -84,6 +79,6 @@ Nas informações do Klick'r:
 3. Selecione **Klick'r**.
 4. Ative o serviço e confirme em **Permitir**.
 
-![Serviço de acessibilidade do Klick'r ativado](images/instalacao/10-ativar-acessibilidade.jpg)
+![Passo a passo para ativar o serviço de acessibilidade do Klick'r](images/instalacao/ativar-acessibilidade.gif)
 
 Pronto. Abra o Klick'r e comece a criar seus cenários.
