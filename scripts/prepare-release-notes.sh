@@ -92,7 +92,7 @@ write_changelog_section() {
     awk -v header="$expected_header" '
         index($0, header) == 1 { found = 1; next }
         found && /^## \[/ { exit }
-        found && /^\[Unreleased\]:/ { exit }
+        found && /^\[Não lançado\]:/ { exit }
         found { print }
         END { if (!found) exit 2 }
     ' "$changelog_file" > "$output_file" ||

@@ -180,20 +180,13 @@ jobs:
           )
 
       - name: Montar descrição pública
-        env:
-          SIGNED: ${{ steps.signing.outputs.signed }}
         run: |
           {
-            echo "### Installation"
+            echo "### Instalação"
             echo
             echo "> [!TIP]"
-            echo "> Para saber qual APK baixar e instalar, consulte [Which APK should I install?](https://github.com/MarlonPassos-git/Smart-AutoClicker/blob/master/docs/WHICH-APK.md)."
-            echo
-            if [[ "$SIGNED" == "true" ]]; then
-              echo "APKs assinados para esta linha de distribuição."
-            else
-              echo "> **Versão de desenvolvimento:** APKs assinados com a chave de debug e instalados como \`Klick´r dev\`, separados da versão oficial."
-            fi
+            echo "> Para descobrir e baixar o APK recomendado, acesse [Qual APK devo instalar?](https://marlonpassos-git.github.io/Smart-AutoClicker/baixar-apk.html)."
+            echo "> Para permissões e solução de bloqueios do Android, consulte o [tutorial de instalação e configuração](https://github.com/MarlonPassos-git/Smart-AutoClicker/blob/master/docs/INSTALACAO-E-CONFIGURACAO.md)."
             echo
             cat "$RUNNER_TEMP/notas-changelog.md"
           } > "$RUNNER_TEMP/notas-release.md"
