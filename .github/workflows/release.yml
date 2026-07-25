@@ -174,19 +174,14 @@ jobs:
             cp "$apk_file" "dist/Klickr-$VERSION-$variant_name"
           done
 
-          (
-            cd dist
-            sha256sum ./*.apk > SHA256SUMS.txt
-          )
-
       - name: Montar descrição pública
         run: |
           {
             echo "### Instalação"
             echo
             echo "> [!TIP]"
-            echo "> Para descobrir e baixar o APK recomendado, acesse [Qual APK devo instalar?](https://marlonpassos-git.github.io/Smart-AutoClicker/baixar-apk.html)."
-            echo "> Para permissões e solução de bloqueios do Android, consulte o [tutorial de instalação e configuração](https://github.com/MarlonPassos-git/Smart-AutoClicker/blob/master/docs/INSTALACAO-E-CONFIGURACAO.md)."
+            echo "> Não sabe qual arquivo baixar? Consulte [Qual APK devo instalar?](https://github.com/MarlonPassos-git/Smart-AutoClicker/blob/master/docs/QUAL-APK-DEVO-INSTALAR.md)."
+            echo "> Depois, siga o [guia de instalação](https://github.com/MarlonPassos-git/Smart-AutoClicker/blob/master/docs/INSTALACAO-E-CONFIGURACAO.md)."
             echo
             cat "$RUNNER_TEMP/notas-changelog.md"
           } > "$RUNNER_TEMP/notas-release.md"
@@ -210,7 +205,7 @@ jobs:
             release_flags+=("--prerelease")
           fi
 
-          gh release create "$VERSION" dist/*.apk dist/SHA256SUMS.txt \
+          gh release create "$VERSION" dist/*.apk \
             --target "$GITHUB_SHA" \
             --title "Klick'r $VERSION" \
             --notes-file "$RUNNER_TEMP/notas-release.md" \
