@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <a href="https://marlonpassos-git.github.io/Smart-AutoClicker/baixar-apk.html">
+  <a href="https://github.com/MarlonPassos-git/Smart-AutoClicker/releases">
     <img alt="Baixar APK" src="https://img.shields.io/badge/baixar-APK-2ea44f?style=for-the-badge">
   </a>
   <a href="https://github.com/MarlonPassos-git/Smart-AutoClicker/releases">
@@ -35,10 +35,9 @@ versão.
 
 ## Instalação
 
-Acesse [Qual APK devo instalar?](https://marlonpassos-git.github.io/Smart-AutoClicker/baixar-apk.html)
-para receber uma recomendação e baixar o arquivo. O
-[tutorial de instalação e configuração](docs/INSTALACAO-E-CONFIGURACAO.md)
-explica permissões, bloqueios do Android e importação de cenários.
+[Baixe uma versão compatível com seu celular](https://github.com/MarlonPassos-git/Smart-AutoClicker/releases/tag/4.0.0-beta05).
+Se precisar de ajuda, consulte [Qual APK devo instalar?](docs/QUAL-APK-DEVO-INSTALAR.md)
+e depois siga o [guia de instalação](docs/INSTALACAO-E-CONFIGURACAO.md).
 
 ## Desenvolvimento
 
@@ -68,8 +67,8 @@ versões oficiais para lojas estão em
 
 ## Links
 
-- [Descobrir e baixar o APK recomendado](https://marlonpassos-git.github.io/Smart-AutoClicker/baixar-apk.html)
-- [Escolher o APK manualmente](docs/QUAL-APK-DEVO-INSTALAR.md)
+- [Baixar o aplicativo](https://github.com/MarlonPassos-git/Smart-AutoClicker/releases/tag/4.0.0-beta05)
+- [Escolher o APK compatível](docs/QUAL-APK-DEVO-INSTALAR.md)
 - [Instalar e configurar o aplicativo](docs/INSTALACAO-E-CONFIGURACAO.md)
 - [Relatar um problema](https://github.com/MarlonPassos-git/Smart-AutoClicker/issues/new?template=bug_report.yml)
 - [Consultar mudanças da versão](CHANGELOG.md)

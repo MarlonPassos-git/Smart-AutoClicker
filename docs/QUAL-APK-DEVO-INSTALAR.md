@@ -1,37 +1,24 @@
 # Qual APK devo instalar?
 
-Para a maioria dos celulares e tablets Android atuais, escolha o APK
-`arm64-v8a`. Se você não souber a arquitetura do aparelho, escolha
-`universal`: o arquivo é maior, mas reúne todas as arquiteturas disponíveis.
+[Abrir a página de download](https://github.com/MarlonPassos-git/Smart-AutoClicker/releases/tag/4.0.0-beta05)
 
-## Baixar com recomendação automática
+Escolha o arquivo indicado para seu aparelho:
 
-A página abaixo tenta identificar a arquitetura informada pelo navegador,
-seleciona o APK correspondente na release mais recente e permite alterar a
-opção antes do download:
-
-[Descobrir e baixar o APK recomendado](https://marlonpassos-git.github.io/Smart-AutoClicker/baixar-apk.html)
-
-O navegador não fornece essa informação em todos os aparelhos. Quando a
-detecção não é confiável, a página recomenda o APK `universal`.
-
-## Escolher manualmente
-
-| Nome no arquivo | Indicado para |
+| Nome no arquivo | Dispositivo |
 | --- | --- |
-| `arm64-v8a` | Maioria dos celulares e tablets Android atuais |
-| `armeabi-v7a` | Aparelhos ARM antigos de 32 bits |
-| `x86_64` | Maioria dos emuladores Android em computadores |
-| `x86` | Emuladores ou aparelhos x86 antigos de 32 bits |
-| `universal` | Alternativa quando a arquitetura é desconhecida |
+| `arm64-v8a` | Maioria dos celulares e tablets atuais |
+| `armeabi-v7a` | Celulares Android antigos |
+| `x86_64` | Emuladores Android atuais |
+| `x86` | Emuladores Android antigos |
+| `universal` | Quando você não souber qual escolher |
 
-Um APK de arquitetura incorreta não será instalado. Se isso acontecer, use o
-arquivo `universal`.
+## Descobrir a versão do seu celular
 
-## Instalar e configurar
+1. Abra **Configurações → Sobre o telefone** e copie o nome ou modelo.
+2. Pesquise o modelo no [PhoneDB](https://phonedb.net/?c2_focus=1&m=device&s=query).
+3. Se o processador aparecer como **ARM de 64 bits** ou **ARMv8**, escolha
+   `arm64-v8a`.
+4. Se ainda estiver em dúvida, escolha `universal`.
 
-Depois do download, siga o
-[tutorial completo de instalação e configuração](INSTALACAO-E-CONFIGURACAO.md).
-Ele explica as permissões do Android, os bloqueios mais comuns e a importação
-de cenários.
-
+Depois do download, siga o guia
+[Instalar o Klick'r no Android](INSTALACAO-E-CONFIGURACAO.md).
