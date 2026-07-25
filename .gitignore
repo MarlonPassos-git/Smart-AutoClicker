@@ -99,3 +99,7 @@ scripts/**/*.pyc
 
 # Local proprietary app research artifacts (APKs, extracted assets, and caches)
 /.local-research/
+
+# Local scenario backups and reference images
+/SmartAutoClicker-Backup2/
+/SmartAutoClicker-BuilderBase-v1/
