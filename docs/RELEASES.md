@@ -1,17 +1,17 @@
-# Release process
+# Como publicar uma versão
 
 O workflow `Publicar versão Android` valida a versão, executa os testes, gera os
 APKs, calcula os hashes SHA-256 e cria a página da versão no GitHub com as notas
 extraídas do `CHANGELOG.md`.
 
-## Prepare the release
+## Preparar a versão
 
 1. Atualize `versionCode` e `versionName` em
    `smartautoclicker/build.gradle.kts`.
-2. Crie a seção correspondente no `CHANGELOG.md`, com headings convencionais
-   em inglês (`Added`, `Changed`, `Fixed`, `Security`) e conteúdo em português.
+2. Crie a seção correspondente no `CHANGELOG.md`, com títulos em português
+   (`Adicionado`, `Alterado`, `Corrigido`, `Segurança`).
    Se houver demonstrações visuais, salve-as em
-   `docs/assets/releases/<versão>/` e adicione uma seção `Screenshots`.
+   `docs/assets/releases/<versão>/` e adicione uma seção `Capturas de tela`.
 3. Execute `./gradlew testFDroidDebugUnitTest`.
 4. Envie o commit para o GitHub.
 5. Crie e envie uma tag igual ao `versionName`:
@@ -25,7 +25,7 @@ Também é possível abrir **Actions → Publicar versão Android → Run workfl
 informar a versão. Nesse modo, o workflow cria a tag apontando para o commit
 selecionado.
 
-## Automated validations
+## Validações automáticas
 
 A publicação é interrompida quando:
 
@@ -37,13 +37,12 @@ A publicação é interrompida quando:
 - os testes ou a compilação falham;
 - uma versão estável não possui assinatura de release configurada.
 
-## APK signing
+## Assinatura dos APKs
 
-Para uma versão beta, a ausência dos secrets gera APKs de desenvolvimento,
-assinados pela chave de debug do Android. Eles usam o pacote
-`com.buzbuz.smartautoclicker.debug` e podem coexistir com a versão oficial.
+Para uma versão beta, a ausência dos secrets usa a assinatura de teste do
+Android. Versões estáveis exigem uma assinatura de release configurada.
 
-Versões estáveis exigem estes secrets no repositório:
+Configure estes secrets no repositório:
 
 - `RELEASE_KEYSTORE`: conteúdo ASCII do keystore criptografado;
 - `RELEASE_KEYSTORE_PASSPHRASE`: senha usada na criptografia;

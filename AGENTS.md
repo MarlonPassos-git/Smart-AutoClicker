@@ -27,4 +27,4 @@ History uses concise imperative subjects, including Conventional Commit forms su
 
 ## Public Communication Language
 
-Write public repository content in Brazilian Portuguese. Use conventional English headings in Markdown and GitHub Release notes, including `Features`, `Installation`, `FAQ`, `Added`, `Changed`, `Fixed`, and `Security`; keep their explanatory content in Brazilian Portuguese. This applies to the README, changelog, release notes, installation documentation, and issue and pull request templates. Visible GitHub Actions labels can remain in Brazilian Portuguese. Source code, commit messages, and internal development documentation can remain in English.
+Write all public repository content and headings in Brazilian Portuguese. This applies to the README, changelog, release notes, installation documentation, and issue and pull request templates. Visible GitHub Actions labels can remain in Brazilian Portuguese. Source code, commit messages, and internal development documentation can remain in English.

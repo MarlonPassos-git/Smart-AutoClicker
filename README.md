@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/MarlonPassos-git/Smart-AutoClicker/releases">
+  <a href="https://marlonpassos-git.github.io/Smart-AutoClicker/baixar-apk.html">
     <img alt="Baixar APK" src="https://img.shields.io/badge/baixar-APK-2ea44f?style=for-the-badge">
   </a>
   <a href="https://github.com/MarlonPassos-git/Smart-AutoClicker/releases">
@@ -22,32 +22,25 @@ Este repositório mantém uma versão personalizada do
 Ela preserva os modos de automação por imagem e por sequência de ações, além de
 adicionar recursos desenvolvidos para cenários mais complexos.
 
-## Features
+## Recursos
 
 - **Reconhecimento por várias imagens:** uma condição pode aceitar referências visuais alternativas do mesmo alvo.
 - **Textos alternativos:** uma condição de texto pode reconhecer diferentes palavras ou frases.
 - **Toque em área:** define uma região poligonal e escolhe um ponto válido dentro dela durante a execução.
 - **Zoom configurável:** executa gestos de aproximar ou afastar nos modos inteligente e regular.
 - **Automação avançada:** combina imagens, textos, temporizadores, contadores, intents e controle de fluxo.
-- **Cenários experimentais para Clash of Clans:** inclui backups iniciais para a vila principal e a Base do Construtor.
-- **Aplicativo de desenvolvimento isolado:** compilações de teste usam o nome `Klick´r dev` e podem coexistir com a versão oficial.
 
 Consulte o [histórico de mudanças](CHANGELOG.md) para ver detalhes de cada
 versão.
 
-## Installation
+## Instalação
 
-1. Abra a página de [Releases](https://github.com/MarlonPassos-git/Smart-AutoClicker/releases).
-2. Consulte [Which APK should I install?](docs/WHICH-APK.md) para escolher
-   versão, arquitetura e tipo de assinatura.
-3. Entre na versão desejada e baixe o APK indicado pelo guia.
-4. Confira o arquivo `SHA256SUMS.txt` se quiser validar a integridade do download.
-5. Autorize a instalação de aplicativos desconhecidos quando o Android solicitar.
+Acesse [Qual APK devo instalar?](https://marlonpassos-git.github.io/Smart-AutoClicker/baixar-apk.html)
+para receber uma recomendação e baixar o arquivo. O
+[tutorial de instalação e configuração](docs/INSTALACAO-E-CONFIGURACAO.md)
+explica permissões, bloqueios do Android e importação de cenários.
 
-Versões beta podem usar assinatura de desenvolvimento. Nesse caso, o APK é
-instalado como `Klick´r dev`, separado de instalações oficiais do Klick'r.
-
-## Development
+## Desenvolvimento
 
 Requisitos: JDK 21, Android SDK e o Gradle Wrapper incluído no repositório.
 
@@ -63,9 +56,10 @@ conectado:
 mise run install-emulator
 ```
 
-O processo de publicação está documentado em [Release process](docs/RELEASES.md).
+O processo de publicação está documentado em
+[Como publicar uma versão](docs/RELEASES.md).
 
-## Upstream project and license
+## Projeto original e licença
 
 Klick'r é software livre distribuído sob a
 [GNU General Public License v3.0](LICENSE). O desenvolvimento original e as
@@ -74,8 +68,9 @@ versões oficiais para lojas estão em
 
 ## Links
 
-- [Baixar versões deste repositório](https://github.com/MarlonPassos-git/Smart-AutoClicker/releases)
-- [Descobrir qual APK instalar](docs/WHICH-APK.md)
+- [Descobrir e baixar o APK recomendado](https://marlonpassos-git.github.io/Smart-AutoClicker/baixar-apk.html)
+- [Escolher o APK manualmente](docs/QUAL-APK-DEVO-INSTALAR.md)
+- [Instalar e configurar o aplicativo](docs/INSTALACAO-E-CONFIGURACAO.md)
 - [Relatar um problema](https://github.com/MarlonPassos-git/Smart-AutoClicker/issues/new?template=bug_report.yml)
 - [Consultar mudanças da versão](CHANGELOG.md)
 - [Acessar o projeto original](https://github.com/Nain57/Smart-AutoClicker)
