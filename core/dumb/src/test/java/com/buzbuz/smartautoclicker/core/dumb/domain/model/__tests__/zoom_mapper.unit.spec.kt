@@ -13,6 +13,7 @@ import android.os.Build
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.buzbuz.smartautoclicker.core.base.gesture.ZoomDirection
 import com.buzbuz.smartautoclicker.core.base.identifier.Identifier
+import com.buzbuz.smartautoclicker.core.dumb.data.database.DumbActionWithFingers
 import com.buzbuz.smartautoclicker.core.dumb.domain.model.DumbAction
 import com.buzbuz.smartautoclicker.core.dumb.domain.model.toDomain
 import com.buzbuz.smartautoclicker.core.dumb.domain.model.toEntity
@@ -29,7 +30,7 @@ class ZoomMapperTest {
     fun zoomRoundTripPreservesGestureConfiguration() {
         val zoom = createZoom()
 
-        assertEquals(zoom, zoom.toEntity().toDomain())
+        assertEquals(zoom, DumbActionWithFingers(zoom.toEntity(), emptyList()).toDomain())
     }
 
     private fun createZoom() = DumbAction.DumbZoom(

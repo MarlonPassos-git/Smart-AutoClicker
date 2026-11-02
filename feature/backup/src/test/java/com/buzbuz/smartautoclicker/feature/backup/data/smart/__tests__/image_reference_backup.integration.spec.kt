@@ -69,6 +69,17 @@ class ImageReferenceBackupTest {
     }
 
     @Test
+    fun `published fork schema 27 backup preserves ordered duplicate references`() {
+        val scenario = completeScenario(listOf(referenceEntity(0, "shared.png"), referenceEntity(1, "shared.png")))
+        val output = ByteArrayOutputStream()
+        ScenarioSerializer().serialize(ScenarioBackup(27, 1080, 2400, scenario), output)
+
+        val restored = ScenarioSerializer().deserialize(ByteArrayInputStream(output.toByteArray()))!!
+
+        assertEquals(scenario.events.single().conditions, restored.scenario.events.single().conditions)
+    }
+
+    @Test
     fun `backup includes and validates every related reference file`() {
         val sourceFolder = temporaryFolder.newFolder("source")
         val destinationFolder = temporaryFolder.newFolder("destination")
@@ -207,6 +218,7 @@ class ImageReferenceBackupTest {
             type = ActionType.PAUSE,
             pauseDuration = 10L,
         ),
+        gestureFingers = emptyList(),
         intentExtras = emptyList(),
         eventsToggle = emptyList(),
     )

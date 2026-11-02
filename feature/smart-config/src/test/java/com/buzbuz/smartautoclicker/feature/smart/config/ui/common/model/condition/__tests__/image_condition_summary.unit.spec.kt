@@ -6,7 +6,7 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-package com.buzbuz.smartautoclicker.feature.smart.config.ui.common.model.condition
+package com.buzbuz.smartautoclicker.feature.smart.config.ui.common.uistate.condition
 
 import android.content.Context
 import android.graphics.Rect

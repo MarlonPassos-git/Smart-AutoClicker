@@ -158,7 +158,7 @@ class GestureWaypointConditionMapperTests {
 
     private fun textCondition(text: String) = ScreenCondition.Text(
         id = CONDITION_ID, eventId = EVENT_ID, name = "text", threshold = 0, shouldBeDetected = true, priority = 0,
-        text = text, detectionArea = Rect(0, 0, 10, 10), alphabet = OCRAlphabet.LATIN,
+        texts = listOf(text), detectionArea = Rect(0, 0, 10, 10), alphabet = OCRAlphabet.LATIN,
     )
 
     private fun numberCondition(operation: ComparisonOperation, value: CounterOperationValue) = ScreenCondition.Number(

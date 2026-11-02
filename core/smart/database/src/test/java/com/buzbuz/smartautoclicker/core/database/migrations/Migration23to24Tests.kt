@@ -55,7 +55,7 @@ class Migration23to24Tests {
 
     private companion object {
         private const val OLD_DB_VERSION = 23
-        private const val NEW_DB_VERSION = 24
+        private const val NEW_DB_VERSION = 28
 
         private const val ACTION_ID_COLUMN = "id"
         private const val ACTION_TYPE_COLUMN = "type"
@@ -100,7 +100,7 @@ class Migration23to24Tests {
             close()
         }
 
-        val dbV24 = helper.runMigrationsAndValidate(dbPath, NEW_DB_VERSION, true, Migration23to24)
+        val dbV24 = helper.runMigrationsAndValidate(dbPath, NEW_DB_VERSION, true, MigrationTo28(23))
 
         dbV24.query(getV24GestureFingers()).use { cursor ->
             cursor.assertCountEquals(0)
@@ -120,7 +120,7 @@ class Migration23to24Tests {
             close()
         }
 
-        val dbV24 = helper.runMigrationsAndValidate(dbPath, NEW_DB_VERSION, true, Migration23to24)
+        val dbV24 = helper.runMigrationsAndValidate(dbPath, NEW_DB_VERSION, true, MigrationTo28(23))
 
         dbV24.query(getV24Actions()).use { cursor ->
             cursor.assertCountEquals(2)
@@ -140,7 +140,7 @@ class Migration23to24Tests {
             close()
         }
 
-        val dbV24 = helper.runMigrationsAndValidate(dbPath, NEW_DB_VERSION, true, Migration23to24)
+        val dbV24 = helper.runMigrationsAndValidate(dbPath, NEW_DB_VERSION, true, MigrationTo28(23))
 
         dbV24.query(getV24Actions()).use { cursor ->
             cursor.assertCountEquals(1)
@@ -160,7 +160,7 @@ class Migration23to24Tests {
             close()
         }
 
-        val dbV24 = helper.runMigrationsAndValidate(dbPath, NEW_DB_VERSION, true, Migration23to24)
+        val dbV24 = helper.runMigrationsAndValidate(dbPath, NEW_DB_VERSION, true, MigrationTo28(23))
 
         dbV24.query(getV24GestureFingersForAction(actionId)).use { cursor ->
             cursor.assertCountEquals(1)
@@ -187,7 +187,7 @@ class Migration23to24Tests {
             close()
         }
 
-        val dbV24 = helper.runMigrationsAndValidate(dbPath, NEW_DB_VERSION, true, Migration23to24)
+        val dbV24 = helper.runMigrationsAndValidate(dbPath, NEW_DB_VERSION, true, MigrationTo28(23))
 
         val fingerId = dbV24.query(getV24GestureFingersForAction(actionId)).use { cursor ->
             cursor.moveToFirst()
@@ -240,7 +240,7 @@ class Migration23to24Tests {
             close()
         }
 
-        val dbV24 = helper.runMigrationsAndValidate(dbPath, NEW_DB_VERSION, true, Migration23to24)
+        val dbV24 = helper.runMigrationsAndValidate(dbPath, NEW_DB_VERSION, true, MigrationTo28(23))
 
         dbV24.query(getV24Actions()).use { cursor ->
             cursor.assertCountEquals(3)
@@ -268,7 +268,7 @@ class Migration23to24Tests {
             close()
         }
 
-        val dbV24 = helper.runMigrationsAndValidate(dbPath, NEW_DB_VERSION, true, Migration23to24)
+        val dbV24 = helper.runMigrationsAndValidate(dbPath, NEW_DB_VERSION, true, MigrationTo28(23))
 
         // Verify first swipe
         val finger1Id = dbV24.query(getV24GestureFingersForAction(1L)).use { cursor ->
@@ -322,7 +322,7 @@ class Migration23to24Tests {
             close()
         }
 
-        val dbV24 = helper.runMigrationsAndValidate(dbPath, NEW_DB_VERSION, true, Migration23to24)
+        val dbV24 = helper.runMigrationsAndValidate(dbPath, NEW_DB_VERSION, true, MigrationTo28(23))
 
         dbV24.query(getV24Actions()).use { cursor ->
             cursor.assertCountEquals(1)
@@ -351,7 +351,7 @@ class Migration23to24Tests {
             close()
         }
 
-        val dbV24 = helper.runMigrationsAndValidate(dbPath, NEW_DB_VERSION, true, Migration23to24)
+        val dbV24 = helper.runMigrationsAndValidate(dbPath, NEW_DB_VERSION, true, MigrationTo28(23))
 
         val fingerId = dbV24.query(getV24GestureFingersForAction(actionId)).use { cursor ->
             cursor.assertCountEquals(1)
@@ -409,7 +409,7 @@ class Migration23to24Tests {
             close()
         }
 
-        val dbV24 = helper.runMigrationsAndValidate(dbPath, NEW_DB_VERSION, true, Migration23to24)
+        val dbV24 = helper.runMigrationsAndValidate(dbPath, NEW_DB_VERSION, true, MigrationTo28(23))
 
         val fingerId = dbV24.query(getV24GestureFingersForAction(actionId)).use { cursor ->
             cursor.moveToFirst()
@@ -448,7 +448,7 @@ class Migration23to24Tests {
             close()
         }
 
-        val dbV24 = helper.runMigrationsAndValidate(dbPath, NEW_DB_VERSION, true, Migration23to24)
+        val dbV24 = helper.runMigrationsAndValidate(dbPath, NEW_DB_VERSION, true, MigrationTo28(23))
 
         val fingerId = dbV24.query(getV24GestureFingersForAction(actionId)).use { cursor ->
             cursor.moveToFirst()
@@ -481,7 +481,7 @@ class Migration23to24Tests {
             close()
         }
 
-        val dbV24 = helper.runMigrationsAndValidate(dbPath, NEW_DB_VERSION, true, Migration23to24)
+        val dbV24 = helper.runMigrationsAndValidate(dbPath, NEW_DB_VERSION, true, MigrationTo28(23))
 
         val fingerId = dbV24.query(getV24GestureFingersForAction(actionId)).use { cursor ->
             cursor.moveToFirst()
@@ -512,7 +512,7 @@ class Migration23to24Tests {
             close()
         }
 
-        val dbV24 = helper.runMigrationsAndValidate(dbPath, NEW_DB_VERSION, true, Migration23to24)
+        val dbV24 = helper.runMigrationsAndValidate(dbPath, NEW_DB_VERSION, true, MigrationTo28(23))
 
         val fingerId = dbV24.query(getV24GestureFingersForAction(actionId)).use { cursor ->
             cursor.moveToFirst()
@@ -544,7 +544,7 @@ class Migration23to24Tests {
             close()
         }
 
-        val dbV24 = helper.runMigrationsAndValidate(dbPath, NEW_DB_VERSION, true, Migration23to24)
+        val dbV24 = helper.runMigrationsAndValidate(dbPath, NEW_DB_VERSION, true, MigrationTo28(23))
 
         dbV24.query(getV24GestureFingers()).use { cursor ->
             cursor.assertCountEquals(2)
@@ -568,7 +568,7 @@ class Migration23to24Tests {
             close()
         }
 
-        val dbV24 = helper.runMigrationsAndValidate(dbPath, NEW_DB_VERSION, true, Migration23to24)
+        val dbV24 = helper.runMigrationsAndValidate(dbPath, NEW_DB_VERSION, true, MigrationTo28(23))
 
         dbV24.query(getV24Actions()).use { cursor ->
             cursor.assertCountEquals(3)

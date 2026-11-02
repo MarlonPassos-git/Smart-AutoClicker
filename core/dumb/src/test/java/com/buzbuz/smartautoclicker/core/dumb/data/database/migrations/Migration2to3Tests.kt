@@ -55,7 +55,7 @@ class Migration2to3Tests {
 
     private companion object {
         private const val OLD_DB_VERSION = 2
-        private const val NEW_DB_VERSION = 3
+        private const val NEW_DB_VERSION = 4
 
         private const val SCENARIO_ID = 1L
 
@@ -107,7 +107,7 @@ class Migration2to3Tests {
             close()
         }
 
-        val dbV3 = helper.runMigrationsAndValidate(dbPath, NEW_DB_VERSION, true, Migration2to3)
+        val dbV3 = helper.runMigrationsAndValidate(dbPath, NEW_DB_VERSION, true, MigrationTo4(2))
 
         dbV3.query(getV3GestureFingers()).use { cursor -> cursor.assertCountEquals(0) }
         dbV3.query(getV3GestureFingerMotions()).use { cursor -> cursor.assertCountEquals(0) }
@@ -124,7 +124,7 @@ class Migration2to3Tests {
             close()
         }
 
-        val dbV3 = helper.runMigrationsAndValidate(dbPath, NEW_DB_VERSION, true, Migration2to3)
+        val dbV3 = helper.runMigrationsAndValidate(dbPath, NEW_DB_VERSION, true, MigrationTo4(2))
 
         dbV3.query(getV3Actions()).use { cursor ->
             cursor.assertCountEquals(2)
@@ -157,7 +157,7 @@ class Migration2to3Tests {
             close()
         }
 
-        val dbV3 = helper.runMigrationsAndValidate(dbPath, NEW_DB_VERSION, true, Migration2to3)
+        val dbV3 = helper.runMigrationsAndValidate(dbPath, NEW_DB_VERSION, true, MigrationTo4(2))
 
         dbV3.query(getV3Actions()).use { cursor ->
             cursor.assertColumnMissing(ACTION_SWIPE_DURATION_COLUMN)
@@ -178,7 +178,7 @@ class Migration2to3Tests {
             close()
         }
 
-        val dbV3 = helper.runMigrationsAndValidate(dbPath, NEW_DB_VERSION, true, Migration2to3)
+        val dbV3 = helper.runMigrationsAndValidate(dbPath, NEW_DB_VERSION, true, MigrationTo4(2))
 
         dbV3.query(getV3Actions()).use { cursor ->
             cursor.assertCountEquals(1)
@@ -203,7 +203,7 @@ class Migration2to3Tests {
             close()
         }
 
-        val dbV3 = helper.runMigrationsAndValidate(dbPath, NEW_DB_VERSION, true, Migration2to3)
+        val dbV3 = helper.runMigrationsAndValidate(dbPath, NEW_DB_VERSION, true, MigrationTo4(2))
 
         dbV3.query(getV3GestureFingersForAction(actionId)).use { cursor ->
             cursor.assertCountEquals(1)
@@ -231,7 +231,7 @@ class Migration2to3Tests {
             close()
         }
 
-        val dbV3 = helper.runMigrationsAndValidate(dbPath, NEW_DB_VERSION, true, Migration2to3)
+        val dbV3 = helper.runMigrationsAndValidate(dbPath, NEW_DB_VERSION, true, MigrationTo4(2))
 
         val fingerId = dbV3.query(getV3GestureFingersForAction(actionId)).use { cursor ->
             cursor.moveToFirst()
@@ -279,7 +279,7 @@ class Migration2to3Tests {
             close()
         }
 
-        val dbV3 = helper.runMigrationsAndValidate(dbPath, NEW_DB_VERSION, true, Migration2to3)
+        val dbV3 = helper.runMigrationsAndValidate(dbPath, NEW_DB_VERSION, true, MigrationTo4(2))
 
         dbV3.query(getV3Actions()).use { cursor ->
             cursor.assertCountEquals(3)

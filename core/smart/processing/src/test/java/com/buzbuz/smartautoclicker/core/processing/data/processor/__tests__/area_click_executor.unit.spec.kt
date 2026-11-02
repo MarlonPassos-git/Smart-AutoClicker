@@ -7,9 +7,10 @@ import com.buzbuz.smartautoclicker.core.base.identifier.Identifier
 import com.buzbuz.smartautoclicker.core.common.actions.AndroidActionExecutor
 import com.buzbuz.smartautoclicker.core.domain.model.OR
 import com.buzbuz.smartautoclicker.core.domain.model.action.AreaClick
+import com.buzbuz.smartautoclicker.core.domain.model.action.AreaClickGeometry
 import com.buzbuz.smartautoclicker.core.domain.model.action.AreaClickDistribution
 import com.buzbuz.smartautoclicker.core.domain.model.event.ScreenEvent
-import com.buzbuz.smartautoclicker.core.processing.data.processor.ActionExecutor
+import com.buzbuz.smartautoclicker.core.processing.data.processor.actions.ActionExecutor
 import com.buzbuz.smartautoclicker.core.processing.data.processor.state.ProcessingState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -21,6 +22,10 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
+import org.junit.Assert.assertTrue
+import org.robolectric.Shadows.shadowOf
+import org.mockito.kotlin.argumentCaptor
+import com.buzbuz.smartautoclicker.core.common.actions.model.BuiltGesture
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -46,7 +51,7 @@ class AreaClickExecutorTest {
     fun oneClickHasNoTrailingInterval() = runTest {
         executor().executeActions(event(clickCount = 1, intervalMs = 200))
 
-        verify(androidExecutor).dispatchGesture(any())
+        verify(androidExecutor).dispatchBuiltGesture(any())
         assertEquals(0, currentTime)
     }
 
@@ -54,7 +59,7 @@ class AreaClickExecutorTest {
     fun fiftyClicksHaveExactlyFortyNineIntervals() = runTest {
         executor().executeActions(event(clickCount = 50, intervalMs = 10))
 
-        verify(androidExecutor, times(50)).dispatchGesture(any())
+        verify(androidExecutor, times(50)).dispatchBuiltGesture(any())
         assertEquals(490, currentTime)
     }
 
@@ -64,13 +69,30 @@ class AreaClickExecutorTest {
         testScheduler.advanceTimeBy(250)
         execution.cancelAndJoin()
 
-        verify(androidExecutor, times(3)).dispatchGesture(any())
+        verify(androidExecutor, times(3)).dispatchBuiltGesture(any())
     }
 
-    private fun executor() = ActionExecutor(
+    @Test
+    fun randomizationNeverMovesSampledTapsOutsideThePolygon() = runTest {
+        val original = event(clickCount = 50, intervalMs = 0)
+        val polygon = listOf(Point(100, 100), Point(103, 100), Point(103, 150), Point(100, 150))
+        val action = (original.actions.single() as AreaClick).copy(vertices = polygon)
+
+        executor(randomize = true).executeActions(original.copy(actions = listOf(action)))
+
+        val gestures = argumentCaptor<BuiltGesture>()
+        verify(androidExecutor, times(50)).dispatchBuiltGesture(gestures.capture())
+        gestures.allValues.forEach { gesture ->
+            val point = shadowOf(gesture.chains.first().first().getStroke(0).path).points.first()
+            assertTrue(AreaClickGeometry.containsStrictly(polygon, Point(point.x.toInt(), point.y.toInt())))
+        }
+    }
+
+    private fun executor(randomize: Boolean = false) = ActionExecutor(
         androidExecutor = androidExecutor,
         processingState = processingState,
-        randomize = false,
+        randomize = randomize,
+        currentTimeMs = { 4L },
         areaClickRandom = Random(4),
     )
 

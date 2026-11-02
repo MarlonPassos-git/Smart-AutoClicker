@@ -16,20 +16,14 @@
  */
 package com.buzbuz.smartautoclicker.feature.smart.config.ui.condition.screen.image
 
-import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.Rect
 import android.os.Build
 
 import com.buzbuz.smartautoclicker.core.common.tutorial.domain.MonitoredViewsManager
 import com.buzbuz.smartautoclicker.core.common.tutorial.domain.model.monitoring.MonitoredViewType
 import com.buzbuz.smartautoclicker.core.display.recorder.DisplayRecorder
-import com.buzbuz.smartautoclicker.core.domain.model.condition.ScreenCondition
-import com.buzbuz.smartautoclicker.feature.smart.config.domain.EditedItemsBuilder
-import com.buzbuz.smartautoclicker.feature.smart.config.domain.EditionRepository
 
 import io.mockk.coEvery
-import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 
@@ -62,10 +56,6 @@ class CaptureViewModelTest {
     private val testDispatcher = UnconfinedTestDispatcher()
 
     private val mockDisplayRecorder: DisplayRecorder = mockk()
-    private val mockEditedItemsBuilder: EditedItemsBuilder = mockk()
-    private val mockEditionRepository: EditionRepository = mockk {
-        every { editedItemsBuilder } returns mockEditedItemsBuilder
-    }
     private val mockMonitoredViewsManager: MonitoredViewsManager = mockk(relaxed = true)
 
     private lateinit var viewModel: CaptureViewModel
@@ -73,7 +63,7 @@ class CaptureViewModelTest {
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
-        viewModel = CaptureViewModel(mockDisplayRecorder, mockEditionRepository, mockMonitoredViewsManager)
+        viewModel = CaptureViewModel(mockDisplayRecorder, mockMonitoredViewsManager)
     }
 
     @After
@@ -123,38 +113,4 @@ class CaptureViewModelTest {
         verify { mockMonitoredViewsManager.notifyClick(MonitoredViewType.SCREEN_CONDITION_CAPTURE_MENU_BUTTON_CAPTURE) }
     }
 
-    @Test
-    fun createImageCondition_callsCompletedWithCreatedCondition() {
-        val context = mockk<Context>()
-        val area = mockk<Rect>()
-        val bitmap = mockk<Bitmap>()
-        val condition = mockk<ScreenCondition.Image>()
-        coEvery { mockEditedItemsBuilder.createNewImageCondition(context, area, bitmap) } returns condition
-        val latch = CountDownLatch(1)
-        var capturedCondition: ScreenCondition.Image? = null
-
-        viewModel.createImageCondition(context, area, bitmap) {
-            capturedCondition = it
-            latch.countDown()
-        }
-
-        assertTrue("Completed callback not called within timeout", latch.await(1, TimeUnit.SECONDS))
-        assertEquals(condition, capturedCondition)
-    }
-
-    @Test
-    fun createImageCondition_delegatesToEditionRepository() {
-        val context = mockk<Context>()
-        val area = mockk<Rect>()
-        val bitmap = mockk<Bitmap>()
-        val condition = mockk<ScreenCondition.Image>()
-        coEvery { mockEditedItemsBuilder.createNewImageCondition(context, area, bitmap) } returns condition
-        val latch = CountDownLatch(1)
-
-        viewModel.createImageCondition(context, area, bitmap) { latch.countDown() }
-
-        assertTrue("Completed callback not called within timeout", latch.await(1, TimeUnit.SECONDS))
-        // Verify the builder was called with exact arguments
-        io.mockk.coVerify { mockEditedItemsBuilder.createNewImageCondition(context, area, bitmap) }
-    }
 }

@@ -50,7 +50,7 @@ class Migration24to25Tests {
 
     private companion object {
         private const val OLD_DB_VERSION = 24
-        private const val NEW_DB_VERSION = 25
+        private const val NEW_DB_VERSION = 28
 
         private const val ACTION_TYPE_COLUMN = "type"
         private const val COUNTER_NAME_COLUMN = "counter_name"
@@ -99,7 +99,7 @@ class Migration24to25Tests {
             close()
         }
 
-        val dbV25 = helper.runMigrationsAndValidate(dbPath, NEW_DB_VERSION, true, Migration24to25)
+        val dbV25 = helper.runMigrationsAndValidate(dbPath, NEW_DB_VERSION, true, MigrationTo28(24))
 
         dbV25.query(getV25Actions()).use { cursor ->
             cursor.assertCountEquals(2)
@@ -133,7 +133,7 @@ class Migration24to25Tests {
             close()
         }
 
-        val dbV25 = helper.runMigrationsAndValidate(dbPath, NEW_DB_VERSION, true, Migration24to25)
+        val dbV25 = helper.runMigrationsAndValidate(dbPath, NEW_DB_VERSION, true, MigrationTo28(24))
 
         dbV25.query(getV25Actions()).use { cursor ->
             cursor.assertCountEquals(1)

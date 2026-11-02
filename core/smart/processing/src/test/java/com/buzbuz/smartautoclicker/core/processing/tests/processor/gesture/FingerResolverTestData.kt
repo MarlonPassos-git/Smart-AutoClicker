@@ -133,4 +133,3 @@ internal object FingerResolverTestData {
     fun release(): GestureFingerMotion.Release =
         GestureFingerMotion.Release(ITEM_ID)
 }
-

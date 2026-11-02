@@ -63,7 +63,6 @@ import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.*
 
 import org.robolectric.Shadows.shadowOf
-import android.accessibilityservice.GestureDescription
 import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
 

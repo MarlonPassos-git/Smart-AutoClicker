@@ -325,7 +325,7 @@ class GestureBriefDescriptionMapperTests {
     fun conditionPosition_text_detectionAreaCenter() {
         val condition = ScreenCondition.Text(
             id = CONDITION_1_ID, eventId = EVENT_ID, name = "text", threshold = 0, shouldBeDetected = true,
-            priority = 0, text = "hello", detectionArea = Rect(200, 400, 300, 500), alphabet = OCRAlphabet.LATIN,
+            priority = 0, texts = listOf("hello"), detectionArea = Rect(200, 400, 300, 500), alphabet = OCRAlphabet.LATIN,
         )
 
         assertEquals(PointF(250f, 450f), mapConditionPosition(CONDITION_1_ID, listOf(condition)))
