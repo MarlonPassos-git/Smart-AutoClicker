@@ -23,6 +23,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.marginStart
 import androidx.core.view.marginTop
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -48,6 +49,9 @@ class TimingGameFragment : Fragment() {
     private val viewModel: TimingGameViewModel by viewModels()
     private lateinit var viewBinding: FragmentTimingGameBinding
 
+    /** Dialog shown once the game is won. */
+    private var completionDialog: AlertDialog? = null
+
     @Inject lateinit var overlayManager: OverlayManager
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -63,8 +67,6 @@ class TimingGameFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        lockMenuPosition()
 
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -84,6 +86,7 @@ class TimingGameFragment : Fragment() {
     override fun onStart() {
         super.onStart()
 
+        lockMenuPosition()
         if (viewModel.shouldDisplayFloatingUi.value && overlayManager.isOverlayStackHidden()) {
             overlayManager.restoreVisibility()
         }
@@ -97,6 +100,13 @@ class TimingGameFragment : Fragment() {
             overlayManager.hideAll()
         }
         overlayManager.removeTopOverlay()
+        overlayManager.unlockMenuPosition()
+    }
+
+    override fun onDestroyView() {
+        completionDialog?.dismiss()
+        completionDialog = null
+        super.onDestroyView()
     }
 
     override fun onDestroy() {
@@ -139,7 +149,11 @@ class TimingGameFragment : Fragment() {
     }
 
     private fun showCompletionDialog(show: Boolean) {
-        if (!show) return
+        if (!show) {
+            completionDialog?.dismiss()
+            return
+        }
+        if (completionDialog != null) return
 
         val dialogContext = requireContext().getDynamicColorsContext(R.style.AppTheme)
         val dialogViewBinding = DialogTutorialSuccessBinding.inflate(LayoutInflater.from(dialogContext))
@@ -151,10 +165,12 @@ class TimingGameFragment : Fragment() {
             buttonKeepPlaying.setOnClickListener { dialog.dismiss() }
             buttonClose.setOnClickListener {
                 dialog.dismiss()
-                findNavController().navigateUp()
+                if (isAdded) findNavController().navigateUp()
             }
         }
 
+        dialog.setOnDismissListener { completionDialog = null }
+        completionDialog = dialog
         dialog.show()
     }
 

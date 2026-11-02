@@ -56,10 +56,17 @@
     <string name="item_click_desc">انقر في مكان ما على الشاشة</string>
     <string name="item_click_details_on_condition">خلال %1$s على %2$s</string>
     <string name="item_click_details_at_position">خلال %1$s</string>
+    <string name="item_gesture_title">إيماءة</string>
+    <string name="item_gesture_desc">تنفيذ إيماءة معقدة على الشاشة</string>
+    <plurals name="item_gesture_details">
+        <item quantity="zero">بدون أصابع خلال %2$s</item>
+        <item quantity="one">بإصبع واحد خلال %2$s</item>
+        <item quantity="two">بإصبعين خلال %2$s</item>
+        <item quantity="few">بـ %1$d أصابع خلال %2$s</item>
+        <item quantity="many">بـ %1$d إصبعًا خلال %2$s</item>
+        <item quantity="other">بـ %1$d إصبع خلال %2$s</item>
+    </plurals>
 
-    <string name="item_swipe_title">انتقد</string>
-    <string name="item_swipe_desc">اسحب من موضع على الشاشة إلى آخر</string>
-    <string name="item_swipe_details">خلال %1$s</string>
 
     <string name="item_pause_title">انتظر</string>
     <string name="item_pause_desc">إيقاف تنفيذ الكشف مؤقتًا</string>
@@ -67,7 +74,6 @@
 
     <string name="item_change_counter_title">تغيير العداد</string>
     <string name="item_change_counter_desc">قم بتغيير القيمة للتحقق منها لاحقًا</string>
-    <string name="item_change_counter_details">%1$s %2$s %3$s</string>
     <string name="item_change_counter_details_error">العداد غير صالح</string>
 
     <string name="item_toggle_event_title">تغيير حالة الحدث</string>
@@ -138,6 +144,14 @@
     <string name="item_title_debug_generate_report">إنشاء تقرير</string>
     <string name="item_desc_debug_generate_report">التقط سلوك السيناريو الخاص بك أثناء الكشف لإنشاء تقرير.</string>
 
+    <string name="field_debug_view_settings_title">إعدادات عرض التصحيح</string>
+    <string name="field_debug_view_settings_desc">اختر المعلومات المعروضة في عرض التصحيح.</string>
+
+    <string name="dialog_title_debug_view_settings">عرض التصحيح</string>
+    <string name="field_debug_view_show_event_stats_title">عرض إحصائيات الأحداث</string>
+    <string name="field_debug_view_show_actions_title">عرض إجراءات الحدث</string>
+    <string name="field_debug_view_show_held_finger_title">عرض الإصبع الممسوك</string>
+
     <string name="field_show_debug_report_title">عرض التقرير</string>
     <string name="field_show_debug_report_desc_available">تقرير التصحيح متاح</string>
     <string name="field_show_debug_report_desc_not_available">لا يتوفر تقرير تصحيح</string>
@@ -156,7 +170,7 @@
     <string name="message_empty_trigger_condition_list_title">لا توجد شروط!</string>
     <string name="message_empty_trigger_condition_list_desc">الشرط هو معايير مخصصة لبدء الإجراء.</string>
     <string name="message_empty_action_list_title">لا توجد إجراءات!</string>
-    <string name="message_empty_action_list_desc">الإجراء هو تفاعل (نقر، تمرير…) مع هاتفك يتم تشغيله عند استيفاء الشروط التي تم إنشاؤها.</string>
+    <string name="message_empty_action_list_desc">الإجراء هو تفاعل (نقر، إيماءة…) مع هاتفك يتم تشغيله عند استيفاء الشروط التي تم إنشاؤها.</string>
 
     <string name="menu_item_title_conditions">شروط</string>
     <string name="menu_item_title_actions">الإجراءات</string>
@@ -199,10 +213,12 @@
 
     <string name="generic_condition_threshold_title">الفرق المسموح به</string>
 
+    <string name="toast_capture_failed">فشل التقاط الشاشة، لم يتم إنشاء أي إطارات.</string>
+
 
     <!-- Dialog Condition Counter Reached ========================================================================== -->
 
-    <string name="dialog_title_counter_reached">قيمة العداد</string>
+    <string name="dialog_title_counter_reached">قيمة العداد وصلت</string>
 
     <string name="field_counter_name_label">اسم العداد</string>
 
@@ -240,19 +256,45 @@
     <string name="field_condition_selection_desc_and_operator_not_found">لم يتم تحديد أي شرط</string>
 
     <string name="field_condition_selection_title_or_operator">انقر على أول حالة تم اكتشافها</string>
-    <string name="field_condition_selection_desc_or_operator">تم ضبط الحدث على "شرط واحد"، ولا يمكنك تحديد شرط محدد</string>
+    <string name="field_condition_selection_desc_or_operator">تم ضبط عامل الشرط للحدث على \"OR\"، سيحدث النقر على أول شرط يتم اكتشافه</string>
 
     <string name="field_click_position_desc">انقر على %1$d، %2$d</string>
 
-    <string name="field_click_offset_title">انقر فوق تعويض</string>
+    <string name="field_click_offset_title">الإزاحة</string>
     <string name="field_click_offset_desc_none">لا أحد</string>
+    <string name="item_desc_gesture_press_condition">الضغط على [%1$s]</string>
+    <string name="item_desc_gesture_press_condition_or">الضغط على أول شرط يتم اكتشافه</string>
+    <string name="item_desc_gesture_press_condition_error">لا يوجد شرط للضغط عليه</string>
+    <string name="item_desc_gesture_move_condition">التحريك إلى [%1$s]</string>
+    <string name="item_desc_gesture_move_condition_or">التحريك إلى أول شرط يتم اكتشافه</string>
+    <string name="item_desc_gesture_move_condition_error">لا يوجد شرط للتحريك إليه</string>
+    <string name="message_title_gesture_on_condition_and">النقر على شرط</string>
+    <string name="message_desc_gesture_on_condition_and">%1$s</string>
+    <string name="message_title_gesture_on_condition_or">عامل الشرط OR</string>
+    <string name="message_desc_gesture_on_condition_or">موضع أول شرط يتم اكتشافه</string>
+    <string name="message_title_gesture_on_condition_error">لم يتم تحديد أي شرط</string>
+    <string name="message_desc_gesture_on_condition_error">تحتاج إلى شرط لتنفيذ الإيماءة عليه</string>
+    <string name="button_title_condition_pick">اختيار شرط</string>
+    <string name="button_title_condition_remove">إزالة الشرط</string>
+    <string name="field_gesture_release_when_title">متى</string>
+    <string name="field_gesture_release_when_item_now">الآن</string>
+    <string name="field_gesture_release_when_item_until_actions_end">انتهاء الإجراءات</string>
+    <string name="field_gesture_release_when_item_once_unfulfilled">الحدث غير مستوفى</string>
+    <string name="field_gesture_release_when_item_for_duration">بعد مدة</string>
+    <string name="field_gesture_release_hold_duration_title">مدة الإبقاء (مللي ثانية)</string>
+    <string name="field_gesture_release_desc_now">رفع الإصبع فورًا.</string>
+    <string name="field_gesture_release_desc_until_actions_end">رفع الإصبع بعد تنفيذ جميع إجراءات هذا الحدث. مماثل لـ \"الآن\" إذا كان هذا الإجراء هو الأخير في القائمة.</string>
+    <string name="field_gesture_release_desc_once_unfulfilled">رفع الإصبع عندما لا يعود هذا الحدث مستوفى.</string>
+    <string name="field_gesture_release_desc_for_duration">رفع الإصبع بعد %1$d مللي ثانية.</string>
+    <string name="item_desc_gesture_release_now">الرفع فورًا</string>
+    <string name="item_desc_gesture_release_until_actions_end">الرفع عند انتهاء الإجراءات</string>
+    <string name="item_desc_gesture_release_once_unfulfilled">الرفع عندما يصبح الحدث غير مستوفى</string>
+    <string name="item_desc_gesture_release_for_duration">الرفع بعد %1$d مللي ثانية</string>
+    <string name="field_gesture_release_hold_behaviour">• يمكن إبقاء إصبع واحد فقط مضغوطًا في كل مرة، وبدء إبقاء آخر سيرفع هذا الإصبع.\n• أثناء إبقاء الإصبع مضغوطًا، لن يتم تشغيل الحدث المرتبط به حتى يتم رفع الإصبع.\n• إذا لمست الشاشة بنفسك، فسيتم إيقاف الإبقاء.\n• تعتمد أقصى مدة للإبقاء على نظامك والتطبيق الذي تتم أتمتته. بعض الأنظمة تسمح بمدة غير محدودة، وبعضها لا يسمح.</string>
 
     <!-- Dialog Action Swipe ======================================================================================= -->
 
-    <string name="dialog_title_swipe">انتقد</string>
 
-    <string name="field_swipe_positions_title">انتقاد المواقف</string>
-    <string name="field_swipe_positions_desc">اسحب من %1$d، %2$d إلى %3$d، %4$d</string>
 
 
     <!-- Dialog Action Pause ======================================================================================= -->
@@ -284,6 +326,24 @@
     <string name="dialog_title_change_counter">تغيير العداد</string>
 
     <string name="field_counter_operation_value_label">قيمة</string>
+    <string name="field_counter_operation_condition_selection_desc">في حال اكتشافه، سيتم استخدام موضعه على الشاشة كقيمة</string>
+    <string name="field_counter_operation_condition_selection_title_empty">لم يتم تحديد أي شرط</string>
+    <string name="field_counter_operation_condition_selection_desc_empty">انقر هنا لتحديد شرط</string>
+    <string name="field_counter_operation_condition_selection_title_none">لا يوجد شرط متاح</string>
+    <string name="field_counter_operation_condition_selection_desc_none">أنشئ شرط شاشة يجب اكتشافه في هذا الحدث لاستخدام موضعه</string>
+    <string name="dropdown_condition_position_type_label">الموضع</string>
+    <string name="dropdown_condition_position_type_item_left">يسار</string>
+    <string name="dropdown_condition_position_type_item_left_desc">الإحداثي X للحافة اليسرى</string>
+    <string name="dropdown_condition_position_type_item_center_x">مركز X</string>
+    <string name="dropdown_condition_position_type_item_center_x_desc">الإحداثي X للمركز</string>
+    <string name="dropdown_condition_position_type_item_right">يمين</string>
+    <string name="dropdown_condition_position_type_item_right_desc">الإحداثي X للحافة اليمنى</string>
+    <string name="dropdown_condition_position_type_item_top">أعلى</string>
+    <string name="dropdown_condition_position_type_item_top_desc">الإحداثي Y للحافة العلوية</string>
+    <string name="dropdown_condition_position_type_item_center_y">مركز Y</string>
+    <string name="dropdown_condition_position_type_item_center_y_desc">الإحداثي Y للمركز</string>
+    <string name="dropdown_condition_position_type_item_bottom">أسفل</string>
+    <string name="dropdown_condition_position_type_item_bottom_desc">الإحداثي Y للحافة السفلية</string>
 
     <string name="dropdown_counter_operation_label">عملية</string>
 

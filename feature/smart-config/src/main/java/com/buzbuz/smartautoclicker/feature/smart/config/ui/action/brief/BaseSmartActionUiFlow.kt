@@ -23,26 +23,27 @@ import com.buzbuz.smartautoclicker.core.domain.model.action.Action
 import com.buzbuz.smartautoclicker.core.domain.model.action.AreaClick
 import com.buzbuz.smartautoclicker.core.domain.model.action.ChangeCounter
 import com.buzbuz.smartautoclicker.core.domain.model.action.Click
+import com.buzbuz.smartautoclicker.core.domain.model.action.Gesture
 import com.buzbuz.smartautoclicker.core.domain.model.action.Intent
 import com.buzbuz.smartautoclicker.core.domain.model.action.Notification
 import com.buzbuz.smartautoclicker.core.domain.model.action.Pause
 import com.buzbuz.smartautoclicker.core.domain.model.action.SetText
-import com.buzbuz.smartautoclicker.core.domain.model.action.Swipe
 import com.buzbuz.smartautoclicker.core.domain.model.action.Zoom
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.action.zoom.ZoomDialog
 import com.buzbuz.smartautoclicker.core.domain.model.action.SystemAction
 import com.buzbuz.smartautoclicker.core.domain.model.action.ToggleEvent
+import com.buzbuz.smartautoclicker.feature.smart.config.domain.EditionRepository
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.action.OnActionConfigCompleteListener
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.action.changecounter.ChangeCounterDialog
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.action.click.ClickDialog
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.action.areaclick.AreaClickDialog
+import com.buzbuz.smartautoclicker.feature.smart.config.ui.action.gesture.GestureDialog
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.action.intent.IntentDialog
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.action.notification.NotificationDialog
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.action.pause.PauseDialog
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.action.selection.ActionTypeChoice
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.action.selection.ActionTypeSelectionDialog
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.action.settext.SetTextDialog
-import com.buzbuz.smartautoclicker.feature.smart.config.ui.action.swipe.SwipeDialog
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.action.system.SystemActionDialog
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.action.toggleevent.ToggleEventDialog
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.starters.newNotificationPermissionStarterOverlay
@@ -56,6 +57,21 @@ internal interface ActionConfigurator {
     fun upsertEditedAction()
     fun removeEditedAction()
     fun dismissEditedAction()
+}
+
+internal fun EditionRepository.createNewAction(context: Context, choice: ActionTypeChoice): Action = when (choice) {
+    ActionTypeChoice.AreaClick -> editedItemsBuilder.createNewAreaClick(context)
+    ActionTypeChoice.Zoom -> editedItemsBuilder.createNewZoom(context)
+    ActionTypeChoice.Click -> editedItemsBuilder.createNewClick(context)
+    ActionTypeChoice.Gesture -> editedItemsBuilder.createNewGesture(context)
+    ActionTypeChoice.Pause -> editedItemsBuilder.createNewPause(context)
+    ActionTypeChoice.Intent -> editedItemsBuilder.createNewIntent(context)
+    ActionTypeChoice.ToggleEvent -> editedItemsBuilder.createNewToggleEvent(context)
+    ActionTypeChoice.ChangeCounter -> editedItemsBuilder.createNewChangeCounter(context)
+    ActionTypeChoice.Notification -> editedItemsBuilder.createNewNotification(context)
+    ActionTypeChoice.System -> editedItemsBuilder.createNewSystemAction(context)
+    ActionTypeChoice.SetText -> editedItemsBuilder.createNewSetText(context)
+    ActionTypeChoice.Copy -> throw IllegalArgumentException("Unsupported action type for creation $choice")
 }
 
 internal fun BaseOverlay.showActionTypeSelectionDialog(configurator: ActionConfigurator) {
@@ -101,8 +117,8 @@ internal fun BaseOverlay.showActionConfigDialog(configurator: ActionConfigurator
     val overlay = when (action) {
         is AreaClick -> AreaClickDialog(actionConfigDialogListener)
         is Click -> ClickDialog(actionConfigDialogListener)
-        is Swipe -> SwipeDialog(actionConfigDialogListener)
         is Zoom -> ZoomDialog(actionConfigDialogListener)
+        is Gesture -> GestureDialog(actionConfigDialogListener)
         is Pause -> PauseDialog(actionConfigDialogListener)
         is Intent -> IntentDialog(actionConfigDialogListener)
         is SystemAction -> SystemActionDialog(actionConfigDialogListener)

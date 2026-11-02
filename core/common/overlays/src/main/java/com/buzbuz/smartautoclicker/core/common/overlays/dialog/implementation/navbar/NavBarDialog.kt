@@ -21,10 +21,15 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
+import android.view.WindowManager
 
 import androidx.annotation.CallSuper
 import androidx.annotation.StyleRes
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.Lifecycle
 
 import com.buzbuz.smartautoclicker.core.common.overlays.databinding.DialogBaseNavBarBinding
@@ -42,6 +47,12 @@ abstract class NavBarDialog(@StyleRes theme: Int) : OverlayDialog(theme) {
     /** Map of navigation bar item id to their content view. */
     private val contentMap: MutableMap<Int, NavBarDialogContent> = mutableMapOf()
 
+    /**
+     * Listener translating the nav bar and FABs behind the keyboard when the soft keyboard is
+     * visible, preventing them from obscuring a focused text field.
+     */
+    private var keyboardAdjustListener: ViewTreeObserver.OnGlobalLayoutListener? = null
+
     private lateinit var baseViewBinding: DialogBaseNavBarBinding
     protected lateinit var navBarView: NavigationBarView
     lateinit var floatingActionButtons: IncludeFloatingActionButtonsBinding
@@ -54,6 +65,9 @@ abstract class NavBarDialog(@StyleRes theme: Int) : OverlayDialog(theme) {
     abstract fun onDialogButtonPressed(buttonType: DialogNavigationButton)
 
     open fun onContentViewChanged(navItemId: Int) = Unit
+
+    /** Dialogs with a single content can hide the navigation bar, as there is nothing to navigate to. */
+    open fun isNavigationBarVisible(): Boolean = true
 
     override fun onCreateView(): ViewGroup {
         baseViewBinding = DialogBaseNavBarBinding.inflate(LayoutInflater.from(context)).apply {
@@ -88,11 +102,22 @@ abstract class NavBarDialog(@StyleRes theme: Int) : OverlayDialog(theme) {
             }
         }
 
+        if (!isNavigationBarVisible()) {
+            navBarView.visibility = View.GONE
+            baseViewBinding.dialogContent.updateLayoutParams<ViewGroup.MarginLayoutParams> { bottomMargin = 0 }
+        }
+
         return baseViewBinding.root
     }
 
     @CallSuper
     override fun onDialogCreated(dialog: BottomSheetDialog) {
+        // Switch to ADJUST_PAN so the window scrolls (rather than resizes) when the keyboard opens.
+        dialog.window?.setSoftInputMode(
+            WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN or
+            WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN
+        )
+
         // Setup dialog views. We need to do it here as it is the first place where the dialog is created and where we
         // can access its views.
         if (displayConfigManager.displayConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
@@ -116,6 +141,10 @@ abstract class NavBarDialog(@StyleRes theme: Int) : OverlayDialog(theme) {
     }
 
     override fun onDestroy() {
+        keyboardAdjustListener?.let { listener ->
+            dialogCoordinatorLayout?.viewTreeObserver?.removeOnGlobalLayoutListener(listener)
+            keyboardAdjustListener = null
+        }
         contentMap.values.forEach { content ->
             content.destroy()
         }
@@ -150,6 +179,14 @@ abstract class NavBarDialog(@StyleRes theme: Int) : OverlayDialog(theme) {
                     gravity = Gravity.BOTTOM or Gravity.END
                 }
             )
+
+            keyboardAdjustListener = ViewTreeObserver.OnGlobalLayoutListener {
+                val imeHeight = ViewCompat.getRootWindowInsets(this)
+                    ?.getInsets(WindowInsetsCompat.Type.ime())?.bottom ?: 0
+                navBarView.translationY = imeHeight.toFloat()
+                floatingActionButtons.root.translationY = imeHeight.toFloat()
+            }
+            viewTreeObserver.addOnGlobalLayoutListener(keyboardAdjustListener)
         }
     }
 

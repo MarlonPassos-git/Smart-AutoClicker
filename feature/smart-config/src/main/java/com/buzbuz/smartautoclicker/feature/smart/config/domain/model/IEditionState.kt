@@ -73,6 +73,7 @@ interface IEditionState {
     fun getEditedEvent(): Event?
     fun <T : Action> getEditedEventActions(): List<T>?
     fun <T : Condition> getEditedEventConditions(): List<T>?
+    fun getEditedEventScreenConditions(): List<ScreenCondition>?
     fun <T : Condition> getEditedCondition(): T?
     fun <T : Action> getEditedAction(): T?
     fun getEditedIntentExtra(): IntentExtra<out Any>?
@@ -86,8 +87,8 @@ interface IEditionState {
     fun isEditedEventReferencedByAction(): Boolean
 
     /**
-     * Check if the edited Condition is referenced by a Click Action in the edited event.
-     * If the edited event is set to OR, do not consider the reference as true.
+     * Check if the edited Condition is referenced by an Action in the edited event that will be deleted with it.
+     * Click references are ignored if the edited event is set to OR, ChangeCounter references are always considered.
      */
-    fun isEditedConditionReferencedByClick(): Boolean
+    fun isEditedConditionReferencedByAction(): Boolean
 }

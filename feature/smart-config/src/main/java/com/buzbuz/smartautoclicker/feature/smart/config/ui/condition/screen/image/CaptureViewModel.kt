@@ -30,6 +30,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
 
 class CaptureViewModel @Inject constructor(
     private val displayRecorder: DisplayRecorder,
@@ -38,7 +39,7 @@ class CaptureViewModel @Inject constructor(
 
     fun takeScreenshot(resultCallback: (Bitmap?) -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
-            delay(200L)
+            delay(200L.milliseconds)
             val screenshot = displayRecorder.takeScreenshot()
 
             withContext(Dispatchers.Main) {

@@ -18,16 +18,21 @@ package com.buzbuz.smartautoclicker.core.processing.data.processor
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.util.Log
 import androidx.annotation.VisibleForTesting
 
 import com.buzbuz.smartautoclicker.core.common.actions.AndroidActionExecutor
 import com.buzbuz.smartautoclicker.core.detection.ImageDetector
+import com.buzbuz.smartautoclicker.core.domain.model.action.gesture.GestureFingerMotion.Release.Hold
 import com.buzbuz.smartautoclicker.core.domain.model.counter.Counter
+import com.buzbuz.smartautoclicker.core.domain.model.event.Event
 import com.buzbuz.smartautoclicker.core.domain.model.event.ScreenEvent
 import com.buzbuz.smartautoclicker.core.domain.model.event.TriggerEvent
+import com.buzbuz.smartautoclicker.core.processing.data.processor.actions.ActionExecutor
 import com.buzbuz.smartautoclicker.core.processing.data.processor.state.ProcessingState
 import com.buzbuz.smartautoclicker.core.processing.data.scaling.ScalingManager
 import com.buzbuz.smartautoclicker.core.processing.domain.EventType
+import com.buzbuz.smartautoclicker.core.processing.domain.HoldReleaseReason
 import com.buzbuz.smartautoclicker.core.processing.domain.SmartProcessingListener
 
 import kotlinx.coroutines.yield
@@ -40,8 +45,12 @@ import kotlinx.coroutines.yield
  * @param screenEvents the list of scenario events to be detected.
  * @param bitmapSupplier provides the conditions bitmaps.
  * @param androidExecutor execute the actions requiring an interaction with Android.
+ * @param currentTimeMs provides the current time in milliseconds, used to time the gestures holds.
  * @param onStopRequested called when an end condition of the scenario have been reached or all events are disabled.
  * @param progressListener the object to notify for detection progress. Can be null if not required.
+ * @param processingState handle the processing state of the scenario.
+ * @param conditionsVerifier check conditions and tell if they are fulfilled.
+ * @param actionExecutor execute the detected event actions.
  */
 internal class ScenarioProcessor(
     private val processingTag: String,
@@ -51,41 +60,47 @@ internal class ScenarioProcessor(
     screenEvents: List<ScreenEvent>,
     triggerEvents: List<TriggerEvent>,
     counters: List<Counter>,
-    private val bitmapSupplier: suspend (String, Int, Int) -> Bitmap?,
     androidExecutor: AndroidActionExecutor,
     unblockWorkaroundEnabled: Boolean = false,
+    currentTimeMs: () -> Long = System::currentTimeMillis,
+    private val bitmapSupplier: suspend (String, Int, Int) -> Bitmap?,
     private val onStopRequested: () -> Unit,
     private val progressListener: SmartProcessingListener?,
-) {
-
-    /** Handle the processing state of the scenario. */
-    @VisibleForTesting internal val processingState: ProcessingState = ProcessingState(
+    @get:VisibleForTesting internal val processingState: ProcessingState = ProcessingState(
         screenEvents = screenEvents,
         triggerEvents = triggerEvents,
         counters = counters,
         progressListener = progressListener,
-    )
-    /** Check conditions and tell if they are fulfilled. */
-    private val conditionsVerifier = ConditionsVerifier(
+    ),
+    private val conditionsVerifier: ConditionsVerifier = ConditionsVerifier(
         state = processingState,
         imageDetector = imageDetector,
         scalingManager = scalingManager,
         bitmapSupplier = bitmapSupplier,
         progressListener = progressListener,
-    )
-    /** Execute the detected event actions. */
-    private val actionExecutor = ActionExecutor(
+    ),
+    private val actionExecutor: ActionExecutor = ActionExecutor(
         androidExecutor = androidExecutor,
         processingState = processingState,
         randomize = randomize,
         unblockWorkaroundEnabled = unblockWorkaroundEnabled,
-    )
+        currentTimeMs = currentTimeMs,
+    ),
+) {
+
+    /** The last held event notified to the [progressListener]. */
+    private var notifiedHeldEvent: Event? = null
 
     fun onScenarioStart(context: Context) {
         processingState.onProcessingStarted(context)
     }
 
-    fun onScenarioEnd() {
+    suspend fun onScreenRotation() {
+        releaseHeldEvent(HoldReleaseReason.ScreenRotation)
+    }
+
+    suspend fun onScenarioEnd() {
+        releaseHeldEvent(HoldReleaseReason.ScenarioStopped)
         processingState.onProcessingStopped()
     }
 
@@ -102,6 +117,22 @@ internal class ScenarioProcessor(
             onStopRequested()
             return
         }
+
+        // If there is a held event that has been disabled, release the held finger. Otherwise, verify the user didn't
+        // lift it by touching the screen: the system already released it, only its cooldown remains to be started.
+        // Finally, release it if it was held for a duration that has elapsed.
+        val heldEvent = actionExecutor.getHeldEvent()
+        if (heldEvent != null) {
+            if (!processingState.isEventEnabled(heldEvent.id.databaseId)) {
+                Log.d(TAG, "Held event ${heldEvent.name} is disabled, releasing it")
+                releaseHeldEvent(HoldReleaseReason.EventDisabled, cooldown = false)
+            } else if (!actionExecutor.checkHeldFinger()) {
+                onHeldEventInterrupted(heldEvent)
+            } else {
+                releaseHeldEventIfDurationElapsed()
+            }
+        }
+        notifyHeldEventChangeIfNeeded(actionExecutor.getHeldEvent(), HoldReleaseReason.Interrupted)
 
         // Handle all trigger events enabled during previous processing
         if (!processingState.areAllTriggerEventsDisabled()) {
@@ -128,23 +159,24 @@ internal class ScenarioProcessor(
     }
 
     private suspend fun processTriggerEvents() {
+        // First, if there is a trigger event that keep a gesture held, verify it
+        (actionExecutor.getHeldEvent() as? TriggerEvent)?.let { heldEvent ->
+            releaseHeldEventIfUnfulfilled(heldEvent)
+        }
+
         for (triggerEvent in processingState.getTriggerEvents()) {
             // Enabled state of the event might have changed during the loop
             if (!processingState.isEventEnabled(triggerEvent.id.databaseId)) continue
-
             // No conditions ? This should not happen, skip this event
             if (triggerEvent.conditions.isEmpty()) continue
+            // Event has a gesture currently held, skip interpretation
+            if (actionExecutor.isEventHeld(triggerEvent)) continue
+            // Event hold has just been interrupted, skip it
+            if (processingState.isCooldownRunning(triggerEvent)) continue
 
-            progressListener?.onEventProcessingStarted(triggerEvent)
-            val results = conditionsVerifier.verifyConditions(
-                operator = triggerEvent.conditionOperator,
-                conditions = triggerEvent.conditions,
-            )
-
-            progressListener?.onEventProcessingCompleted(triggerEvent, results.fulfilled == true, results.getAllTriggerConditionsResults())
+            val results = verifyConditions(triggerEvent)
             if (results.fulfilled  == true) {
-                actionExecutor.executeActions(triggerEvent, results)
-                progressListener?.onEventActionsExecuted(triggerEvent, results.getAllTriggerConditionsResults())
+                executeEventActions(triggerEvent, results)
             }
         }
     }
@@ -154,29 +186,25 @@ internal class ScenarioProcessor(
         imageDetector.setScreenBitmap(screenFrame, processingTag)
 
         try {
+            // First, if there is a screen event that keep a gesture held, verify it
+            (actionExecutor.getHeldEvent() as? ScreenEvent)?.let { heldEvent ->
+                releaseHeldEventIfUnfulfilled(heldEvent)
+            }
+
             // Check all events
             for (screenEvent in processingState.getScreenEvents()) {
-                // Enabled state of the event might have changed during the loop
-                if (!processingState.isEventEnabled(screenEvent.id.databaseId)) continue
-
                 // No conditions ? This should not happen, skip this event
                 if (screenEvent.conditions.isEmpty()) continue
-
+                // Enabled state of the event might have changed during the loop
+                if (!processingState.isEventEnabled(screenEvent.id.databaseId)) continue
+                // Event has a gesture currently held, skip interpretation
+                if (actionExecutor.isEventHeld(screenEvent)) continue
                 // Event is under cooldown, skip it
                 if (processingState.isCooldownRunning(screenEvent)) continue
 
-                progressListener?.onEventProcessingStarted(screenEvent)
-                val results = conditionsVerifier.verifyConditions(
-                    operator = screenEvent.conditionOperator,
-                    conditions = screenEvent.conditions,
-                )
-
-                progressListener?.onEventProcessingCompleted(screenEvent, results.fulfilled == true, results.getAllScreenConditionsResults())
+                val results = verifyConditions(screenEvent)
                 if (results.fulfilled == true) {
-                    actionExecutor.executeActions(screenEvent, results)
-                    progressListener?.onEventActionsExecuted(screenEvent, results.getAllScreenConditionsResults())
-
-                    processingState.startCooldownIfNeeded(screenEvent)
+                    executeEventActions(screenEvent, results)
                     if (!screenEvent.keepDetecting) break
                 }
 
@@ -188,4 +216,169 @@ internal class ScenarioProcessor(
             imageDetector.releaseScreenBitmap(screenFrame)
         }
     }
+
+    private suspend fun verifyConditions(event: Event): ConditionsResults {
+        progressListener?.onEventProcessingStarted(event)
+        val results = conditionsVerifier.verifyConditions(
+            operator = event.conditionOperator,
+            conditions = event.conditions,
+        )
+        progressListener?.onEventProcessingCompleted(
+            event = event,
+            fulfilled = results.fulfilled == true,
+            results = when (event) {
+                is ScreenEvent -> results.getAllScreenConditionsResults()
+                is TriggerEvent -> results.getAllTriggerConditionsResults()
+            }
+        )
+
+        return results
+    }
+
+    /**
+     * Execute the actions of a fulfilled event.
+     *
+     * A gesture of the event holding a finger takes the hold over from the previously held event, if any. For an event
+     * left holding a finger, cooldown starts only once the finger is released.
+     *
+     * A finger held until the end of the actions is released once they are all executed, and a finger held for a
+     * duration is released as soon as it has elapsed, even in the middle of the actions.
+     */
+    private suspend fun executeEventActions(event: Event, results: ConditionsResults) {
+        // The user may have touched the screen while this frame was detected
+        actionExecutor.getHeldEvent()?.let { heldEvent ->
+            if (!actionExecutor.checkHeldFinger()) onHeldEventInterrupted(heldEvent)
+        }
+
+        val previousHeldEvent = actionExecutor.getHeldEvent()
+        var isPreviousHoldReleased = false
+        val executionStartTimeMs = System.currentTimeMillis()
+
+        // The system may have dropped the held pointer since the last notification: notify it before this event
+        // holds again, or a new hold by the same event would be seen as the continuation of the lost one.
+        notifyHeldEventChangeIfNeeded(previousHeldEvent, HoldReleaseReason.Interrupted)
+
+        actionExecutor.executeActions(
+            event = event,
+            results = results,
+            onHoldDurationElapsed = {
+                // Released while still held: its cooldown is started by the release, not by the loss of its hold
+                if (previousHeldEvent != null && actionExecutor.isEventHeld(previousHeldEvent)) {
+                    isPreviousHoldReleased = true
+                }
+                releaseHeldEventIfDurationElapsed()
+            },
+        )
+        progressListener?.onEventActionsExecuted(
+            event = event,
+            results = when (event) {
+                is ScreenEvent -> results.getAllScreenConditionsResults()
+                is TriggerEvent -> results.getAllTriggerConditionsResults()
+            },
+        )
+
+        // The previously held event lost its hold to this one, its cooldown started with the execution
+        val heldEvent = actionExecutor.getHeldEvent()
+        if (previousHeldEvent != null && !isPreviousHoldReleased && heldEvent?.id != previousHeldEvent.id) {
+            startHeldEventCooldown(previousHeldEvent, executionStartTimeMs)
+        }
+
+        // New held pointer, delay cooldown to release time (no cooldown on trigger)
+        notifyHeldEventChangeIfNeeded(heldEvent, HoldReleaseReason.OtherEvent)
+
+        if (actionExecutor.getHeldGesture()?.hold == Hold.UntilActionsEnd) {
+            Log.d(TAG, "Held event ${heldEvent?.name} actions are completed, releasing it")
+            releaseHeldEvent(HoldReleaseReason.ActionsCompleted)
+        }
+
+        if (event !is ScreenEvent || (heldEvent?.id != previousHeldEvent?.id && heldEvent?.id == event.id)) return
+        startHeldEventCooldown(event)
+    }
+
+    /** Release the held event if it is held for a duration that has elapsed. */
+    private suspend fun releaseHeldEventIfDurationElapsed() {
+        if (!actionExecutor.isHeldDurationElapsed()) return
+
+        // The hold may have started during the actions being executed, and not have been notified yet
+        val heldEvent = actionExecutor.getHeldEvent()
+        notifyHeldEventChangeIfNeeded(heldEvent, HoldReleaseReason.OtherEvent)
+
+        Log.d(TAG, "Held event ${heldEvent?.name} hold duration has elapsed, releasing it")
+        releaseHeldEvent(HoldReleaseReason.DurationElapsed)
+    }
+
+    /** Release the held event if it is held until unfulfilled, and its conditions are no longer fulfilled. */
+    private suspend fun releaseHeldEventIfUnfulfilled(heldEvent: Event) {
+        if (actionExecutor.getHeldGesture()?.hold != Hold.UntilUnfulfilled) return
+
+        progressListener?.onEventProcessingStarted(heldEvent)
+        val results = conditionsVerifier.verifyConditions(
+            operator = heldEvent.conditionOperator,
+            conditions = heldEvent.conditions,
+        )
+        progressListener?.onEventProcessingCompleted(
+            event = heldEvent,
+            fulfilled = results.fulfilled == true,
+            results = when (heldEvent) {
+                is ScreenEvent -> results.getAllScreenConditionsResults()
+                is TriggerEvent -> results.getAllTriggerConditionsResults()
+            },
+            isHeld = true,
+        )
+
+        if (results.fulfilled != true) {
+            Log.d(TAG, "Held event ${heldEvent.name} is unfulfilled, releasing it; results=$results")
+            releaseHeldEvent(HoldReleaseReason.Unfulfilled)
+        }
+    }
+
+    private suspend fun releaseHeldEvent(reason: HoldReleaseReason, cooldown: Boolean = true) {
+        val heldEvent = actionExecutor.getHeldEvent() ?: return
+        if (!actionExecutor.releaseHeldFinger()) {
+            if (cooldown) onHeldEventInterrupted(heldEvent)
+            notifyHeldEventChangeIfNeeded(null, HoldReleaseReason.Interrupted)
+            return
+        }
+
+        if (cooldown) startHeldEventCooldown(heldEvent)
+        notifyHeldEventChangeIfNeeded(null, reason)
+    }
+
+    /** Cooldown of an event holding a finger starts once it is released. */
+    private fun startHeldEventCooldown(heldEvent: Event, startTimeMs: Long = System.currentTimeMillis()) {
+        if (heldEvent is ScreenEvent) processingState.startCooldownIfNeeded(heldEvent, startTimeMs)
+    }
+
+    /**
+     * The finger of the held event has been lifted by a user touch. The system is still processing that release, and
+     * a gesture dispatched right away can be ignored: the event is put under a minimum cooldown, even a trigger one.
+     */
+    private fun onHeldEventInterrupted(heldEvent: Event) {
+        Log.d(TAG, "Held event ${heldEvent.name} finger has been lifted by the user")
+        processingState.startCooldownIfNeeded(
+            event = heldEvent,
+            startTimeMs = System.currentTimeMillis(),
+            minDurationMs = INTERRUPTED_HOLD_COOLDOWN_MS,
+        )
+    }
+
+    /**
+     * Notify the held event to the [progressListener] if it has changed since the last notification.
+     * @param releaseReason the reason of the release of the previously notified held event, if any.
+     */
+    private fun notifyHeldEventChangeIfNeeded(heldEvent: Event?, releaseReason: HoldReleaseReason) {
+        if (heldEvent?.id == notifiedHeldEvent?.id) return
+
+        notifiedHeldEvent?.let { previousHeldEvent ->
+            progressListener?.onHeldEventReleased(previousHeldEvent, releaseReason)
+        }
+        notifiedHeldEvent = heldEvent
+        progressListener?.onHeldEventChanged(heldEvent)
+    }
 }
+
+/** Minimum cooldown of an event whose held finger has been lifted by the user. */
+@VisibleForTesting
+internal const val INTERRUPTED_HOLD_COOLDOWN_MS = 1_000L
+
+private const val TAG = "ScenarioProcessor"

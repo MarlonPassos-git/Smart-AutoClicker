@@ -184,7 +184,7 @@ class ImageConditionViewModel @Inject constructor(
     }
 
     fun isConditionRelatedToClick(): Boolean =
-        editionRepository.editionState.isEditedConditionReferencedByClick()
+        editionRepository.editionState.isEditedConditionReferencedByAction()
 
     fun saveReference(area: Rect, bitmap: Bitmap, replacementIndex: Int?) {
         val pendingSave = PendingReferenceSave(Rect(area), bitmap, replacementIndex)

@@ -24,6 +24,11 @@ import com.buzbuz.smartautoclicker.feature.tutorial.data.items.root.basics.scree
 import com.buzbuz.smartautoclicker.feature.tutorial.data.items.root.basics.screenconditions.text.TextConditionsStillTextTutorial
 import com.buzbuz.smartautoclicker.feature.tutorial.data.items.root.basics.triggerconditions.TimerReachedConditionTutorial
 import com.buzbuz.smartautoclicker.feature.tutorial.data.items.root.combineconditions.CombineConditionsNotVisibleTargetTutorial
+import com.buzbuz.smartautoclicker.feature.tutorial.data.items.root.combineconditions.CombineConditionsOperatorAndTutorial
+import com.buzbuz.smartautoclicker.feature.tutorial.data.items.root.combineconditions.CombineConditionsOperatorOrTutorial
+import com.buzbuz.smartautoclicker.feature.tutorial.data.items.root.combineevents.priority.EventsPriorityTutorial
+import com.buzbuz.smartautoclicker.feature.tutorial.data.items.root.combineevents.state.EventsStateTutorial
+import com.buzbuz.smartautoclicker.feature.tutorial.data.items.root.counters.CountersBasicsTutorial
 import com.buzbuz.smartautoclicker.feature.tutorial.domain.model.TutorialItem
 import com.buzbuz.smartautoclicker.feature.tutorial.domain.model.TutorialItem.Type.*
 
@@ -33,6 +38,13 @@ internal fun TutorialItem.Type.toTutorialItem(): TutorialItem =
         COLOR_CONDITION -> ColorConditionsTutorial
 
         COMBINE_CONDITIONS_NOT_VISIBLE -> CombineConditionsNotVisibleTargetTutorial
+        COMBINE_CONDITIONS_OPERATOR_AND -> CombineConditionsOperatorAndTutorial
+        COMBINE_CONDITIONS_OPERATOR_OR -> CombineConditionsOperatorOrTutorial
+
+        COUNTERS_BASICS -> CountersBasicsTutorial
+
+        EVENTS_PRIORITY -> EventsPriorityTutorial
+        EVENTS_STATE -> EventsStateTutorial
 
         IMAGE_DETECTION_MOVING_TARGET -> ImageConditionsMovingTargetTutorial
         IMAGE_DETECTION_STILL_TARGET -> ImageConditionsStillTargetTutorial

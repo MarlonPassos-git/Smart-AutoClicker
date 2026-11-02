@@ -31,9 +31,9 @@ import com.buzbuz.smartautoclicker.core.base.extensions.getListOf
 import com.buzbuz.smartautoclicker.core.base.extensions.getRect
 import com.buzbuz.smartautoclicker.core.base.interfaces.containsId
 import com.buzbuz.smartautoclicker.core.database.entity.ActionEntity
+import com.buzbuz.smartautoclicker.core.database.entity.AreaClickDistributionEntity
 import com.buzbuz.smartautoclicker.core.database.entity.ActionType
 import com.buzbuz.smartautoclicker.core.database.entity.ChangeCounterOperationType
-import com.buzbuz.smartautoclicker.core.database.entity.ClickPositionType
 import com.buzbuz.smartautoclicker.core.database.entity.CompleteActionEntity
 import com.buzbuz.smartautoclicker.core.database.entity.CompleteConditionEntity
 import com.buzbuz.smartautoclicker.core.database.entity.CompleteEventEntity
@@ -41,12 +41,19 @@ import com.buzbuz.smartautoclicker.core.database.entity.CompleteScenario
 import com.buzbuz.smartautoclicker.core.database.entity.ConditionEntity
 import com.buzbuz.smartautoclicker.core.database.entity.ConditionType
 import com.buzbuz.smartautoclicker.core.database.entity.CounterComparisonOperation
+import com.buzbuz.smartautoclicker.core.database.entity.CounterOperationConditionPositionType
 import com.buzbuz.smartautoclicker.core.database.entity.CounterOperationValueType
 import com.buzbuz.smartautoclicker.core.database.entity.CountersEntity
 import com.buzbuz.smartautoclicker.core.database.entity.EventEntity
 import com.buzbuz.smartautoclicker.core.database.entity.EventToggleEntity
 import com.buzbuz.smartautoclicker.core.database.entity.EventToggleType
 import com.buzbuz.smartautoclicker.core.database.entity.EventType
+import com.buzbuz.smartautoclicker.core.database.entity.CoordinatesType
+import com.buzbuz.smartautoclicker.core.database.entity.GestureFingerEntity
+import com.buzbuz.smartautoclicker.core.database.entity.GestureFingerMotionEntity
+import com.buzbuz.smartautoclicker.core.database.entity.GestureFingerMotionType
+import com.buzbuz.smartautoclicker.core.database.entity.GestureReleaseHoldType
+import com.buzbuz.smartautoclicker.core.database.entity.GestureFingerWithMotions
 import com.buzbuz.smartautoclicker.core.database.entity.IntentExtraEntity
 import com.buzbuz.smartautoclicker.core.database.entity.IntentExtraType
 import com.buzbuz.smartautoclicker.core.database.entity.NumberFormatType
@@ -55,11 +62,15 @@ import com.buzbuz.smartautoclicker.core.database.entity.SystemActionType
 import com.buzbuz.smartautoclicker.core.database.serialization.Deserializer
 import com.buzbuz.smartautoclicker.core.base.gesture.ZoomDirection
 
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonObject
 
-internal open class CompatDeserializer : Deserializer {
+internal open class CompatDeserializer(
+    private val preserveConditionFields: Boolean = false,
+) : Deserializer() {
 
     protected companion object {
         /** Scenario detection quality lower bound on compat deserialization. */
@@ -96,8 +107,6 @@ internal open class CompatDeserializer : Deserializer {
         const val DURATION_GESTURE_UPPER_BOUND = 59_999L
         /** Default click duration in ms on compat deserialization. */
         const val DEFAULT_CLICK_DURATION = 1L
-        /** Default swipe duration in ms on compat deserialization. */
-        const val DEFAULT_SWIPE_DURATION = 250L
         /** Default pause duration in ms on compat deserialization. */
         const val DEFAULT_PAUSE_DURATION = 50L
 
@@ -105,7 +114,7 @@ internal open class CompatDeserializer : Deserializer {
         private const val TAG = "DeserializerCompat"
     }
 
-    override fun deserializeCompleteScenario(jsonCompleteScenario: JsonObject): CompleteScenario {
+    override fun deserialize(jsonCompleteScenario: JsonObject): CompleteScenario {
         val scenarioEntity = jsonCompleteScenario.getJsonObject("scenario")?.let(::deserializeScenario)
             ?: throw IllegalArgumentException("Json CompleteScenario doesn't contains a valid Scenario")
 
@@ -149,8 +158,15 @@ internal open class CompatDeserializer : Deserializer {
         }
 
         return eventMap.mapNotNull { (jsonCompleteEvent, eventEntity) ->
-            val conditions = jsonCompleteEvent.getJsonArray("conditions")
-                ?.getListOf(::deserializeCondition)
+            val completeConditions = jsonCompleteEvent.getJsonArray("conditions")
+                ?.getListOf { jsonCondition ->
+                    if (jsonCondition.getJsonObject("condition") != null) {
+                        Json.decodeFromJsonElement<CompleteConditionEntity>(jsonCondition)
+                    } else if (preserveConditionFields) {
+                        CompleteConditionEntity(Json.decodeFromJsonElement<ConditionEntity>(jsonCondition))
+                    } else deserializeCondition(jsonCondition)?.let(::CompleteConditionEntity)
+                }
+            val conditions = completeConditions?.map { it.condition }
             if (conditions.isNullOrEmpty()) {
                 Log.w(TAG, "There is no conditions in this event")
                 return@mapNotNull null
@@ -172,7 +188,7 @@ internal open class CompatDeserializer : Deserializer {
             CompleteEventEntity(
                 event = eventEntity,
                 actions = completeActions,
-                conditions = conditions.map { condition -> CompleteConditionEntity(condition) },
+                conditions = completeConditions.orEmpty(),
             )
         }
     }
@@ -183,6 +199,16 @@ internal open class CompatDeserializer : Deserializer {
         eventConditions: List<ConditionEntity>,
         conditionsOperator: Int,
     ): CompleteActionEntity? {
+        // Fork schemas 24–27 predate upstream's gesture format. Their numbers alone cannot select a decoder.
+        val jsonAction = jsonCompleteAction.getJsonObject("action")
+        if (this !is CompatV24Deserializer && jsonCompleteAction.getJsonArray("gestureFingers") == null &&
+            (jsonAction?.getString("type") == "SWIPE" ||
+                (jsonAction?.getString("type") == "CLICK" && "clickPositionType" in jsonAction))) {
+            return CompatV24Deserializer().deserializeCompleteAction(
+                jsonCompleteAction, scenarioEvents, eventConditions, conditionsOperator,
+            )
+        }
+
         val actionEntity = jsonCompleteAction.getJsonObject("action")?.let { jsonAction ->
             deserializeAction(jsonAction, eventConditions, conditionsOperator)
         } ?: return null
@@ -195,10 +221,15 @@ internal open class CompatDeserializer : Deserializer {
             ?.getListOf { jsonEventToggle -> deserializeEventToggle(jsonEventToggle, scenarioEvents)}
             ?: emptyList()
 
+        val gestureFingerList = jsonCompleteAction.getJsonArray("gestureFingers")
+            ?.getListOf { jsonGestureFinger -> deserializeGestureFinger(jsonGestureFinger)}
+            ?: emptyList()
+
         return CompleteActionEntity(
             action = actionEntity,
             intentExtras = extraEntityList,
             eventsToggle = eventToggleList,
+            gestureFingers = gestureFingerList,
         )
     }
 
@@ -434,6 +465,7 @@ internal open class CompatDeserializer : Deserializer {
             type = ConditionType.ON_TEXT_DETECTED,
             shouldBeDetected = jsonCondition.getBoolean("shouldBeDetected") ?: true,
             textToDetect = textToDetect,
+            textToDetectAlternatives = jsonCondition.getString("textToDetectAlternatives"),
             threshold = jsonCondition.getInt("threshold")
                 ?.coerceIn(CONDITION_THRESHOLD_LOWER_BOUND, CONDITION_THRESHOLD_UPPER_BOUND)
                 ?: CONDITION_THRESHOLD_DEFAULT_VALUE,
@@ -479,9 +511,9 @@ internal open class CompatDeserializer : Deserializer {
     ): ActionEntity? =
         when (deserializeActionType(jsonAction)) {
             ActionType.CLICK -> deserializeActionClick(jsonAction, eventConditions, conditionsOperator)
-            ActionType.AREA_CLICK -> null
-            ActionType.SWIPE -> deserializeActionSwipe(jsonAction)
+            ActionType.AREA_CLICK -> deserializeActionAreaClick(jsonAction)
             ActionType.ZOOM -> deserializeActionZoom(jsonAction)
+            ActionType.GESTURE -> deserializeActionGesture(jsonAction)
             ActionType.PAUSE -> deserializeActionPause(jsonAction)
             ActionType.INTENT -> deserializeActionIntent(jsonAction)
             ActionType.TOGGLE_EVENT -> deserializeActionToggleEvent(jsonAction)
@@ -492,6 +524,7 @@ internal open class CompatDeserializer : Deserializer {
             null -> null
         }
 
+    /** The position and press duration of a click are contained in its gesture fingers. */
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
     open fun deserializeActionClick(
         jsonClick: JsonObject,
@@ -501,78 +534,41 @@ internal open class CompatDeserializer : Deserializer {
         val id = jsonClick.getLong("id", true) ?: return null
         val eventId = jsonClick.getLong("eventId", true) ?: return null
 
-        val x: Int?
-        val y: Int?
-        val clickOnConditionId: Long?
-        val clickPositionType = jsonClick.getEnum<ClickPositionType>("clickPositionType", true)
-            ?: return null
-        val clickOffsetX: Int?
-        val clickOffsetY: Int?
-
-        val isAndConditionsOperator = conditionsOperator == 1
-
-        when (clickPositionType) {
-            ClickPositionType.ON_DETECTED_CONDITION -> {
-                x = null
-                y = null
-                clickOnConditionId = jsonClick.getLong("clickOnConditionId", isAndConditionsOperator)
-                if (isAndConditionsOperator && (clickOnConditionId == null || !eventConditions.containsId(clickOnConditionId))) {
-                    Log.w(TAG, "Can't deserialize action, clickOnConditionId is not valid.")
-                    return null
-                }
-                clickOffsetX = jsonClick.getInt("clickOffsetX")
-                clickOffsetY = jsonClick.getInt("clickOffsetY")
-            }
-
-            ClickPositionType.USER_SELECTED -> {
-                x = jsonClick.getInt("x", true) ?: return null
-                y = jsonClick.getInt("y", true) ?: return null
-                clickOnConditionId = null
-                clickOffsetX = null
-                clickOffsetY = null
-            }
-        }
-
         return ActionEntity(
             id = id,
             eventId = eventId,
             name = jsonClick.getString("name") ?: "",
             priority = jsonClick.getInt("priority")?.coerceAtLeast(0) ?: 0,
             type = ActionType.CLICK,
-            clickPositionType = clickPositionType,
-            clickOnConditionId = clickOnConditionId,
-            x = x,
-            y = y,
-            pressDuration = jsonClick.getLong("pressDuration")
-                ?.coerceIn(DURATION_LOWER_BOUND..DURATION_GESTURE_UPPER_BOUND)
-                ?: DEFAULT_CLICK_DURATION,
-            clickOffsetX = clickOffsetX,
-            clickOffsetY = clickOffsetY,
         )
     }
 
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
-    open fun deserializeActionSwipe(jsonSwipe: JsonObject): ActionEntity? {
+    open fun deserializeActionGesture(jsonSwipe: JsonObject): ActionEntity? {
         val id = jsonSwipe.getLong("id", true) ?: return null
         val eventId = jsonSwipe.getLong("eventId", true) ?: return null
-        val fromX = jsonSwipe.getInt("fromX", true) ?: return null
-        val fromY = jsonSwipe.getInt("fromY", true) ?: return null
-        val toX = jsonSwipe.getInt("toX", true) ?: return null
-        val toY = jsonSwipe.getInt("toY", true) ?: return null
 
         return ActionEntity(
             id = id,
             eventId = eventId,
             name = jsonSwipe.getString("name") ?: "",
             priority = jsonSwipe.getInt("priority")?.coerceAtLeast(0) ?: 0,
-            type = ActionType.SWIPE,
-            fromX = fromX,
-            fromY = fromY,
-            toX = toX,
-            toY = toY,
-            swipeDuration = jsonSwipe.getLong("swipeDuration")
-                ?.coerceIn(DURATION_LOWER_BOUND..DURATION_GESTURE_UPPER_BOUND)
-                ?: DEFAULT_SWIPE_DURATION,
+            type = ActionType.GESTURE,
+        )
+    }
+
+    private fun deserializeActionAreaClick(json: JsonObject): ActionEntity? {
+        return ActionEntity(
+        id = json.getLong("id", true) ?: return null,
+        eventId = json.getLong("eventId", true) ?: return null,
+        name = json.getString("name") ?: "",
+        priority = json.getInt("priority")?.coerceAtLeast(0) ?: 0,
+        type = ActionType.AREA_CLICK,
+        pressDuration = json.getLong("pressDuration", true) ?: return null,
+        areaClickCount = json.getInt("areaClickCount", true) ?: return null,
+        areaClickInterval = json.getLong("areaClickInterval", true) ?: return null,
+        areaClickDistribution = json.getEnum<AreaClickDistributionEntity>("areaClickDistribution", true) ?: return null,
+        areaClickVertices = json.getString("areaClickVertices", true) ?: return null,
         )
     }
 
@@ -596,7 +592,7 @@ internal open class CompatDeserializer : Deserializer {
             zoomCenterY = jsonZoom.getInt("zoomCenterY", true) ?: return null,
             zoomDuration = jsonZoom.getLong("zoomDuration")
                 ?.coerceIn(DURATION_LOWER_BOUND..DURATION_GESTURE_UPPER_BOUND)
-                ?: DEFAULT_SWIPE_DURATION,
+                ?: 250L,
         )
     }
 
@@ -659,9 +655,19 @@ internal open class CompatDeserializer : Deserializer {
         val counterName = jsonChangeCounter.getString("counterName") ?: return null
         val counterOperation = jsonChangeCounter.getEnum<ChangeCounterOperationType>("counterOperation") ?: return null
 
-        val counterOperationValueType = jsonChangeCounter.getEnum<CounterOperationValueType>("counterOperationValueType")
-            ?: CounterOperationValueType.NUMBER
         val counterOperationCounterName = jsonChangeCounter.getString("counterOperationCounterName") ?: ""
+        val counterOperationConditionId = jsonChangeCounter.getLong("counterOperationConditionId")
+        val counterOperationConditionPositionType = jsonChangeCounter
+            .getEnum<CounterOperationConditionPositionType>("counterOperationConditionPositionType")
+
+        // A condition value without its condition can't be used, fallback to the default number value
+        val counterOperationValueType = jsonChangeCounter.getEnum<CounterOperationValueType>("counterOperationValueType")
+            ?.takeIf { type ->
+                type != CounterOperationValueType.CONDITION ||
+                        (counterOperationConditionId != null && counterOperationConditionPositionType != null)
+            }
+            ?: CounterOperationValueType.NUMBER
+        val isConditionValue = counterOperationValueType == CounterOperationValueType.CONDITION
 
         return ActionEntity(
             id = id,
@@ -674,6 +680,9 @@ internal open class CompatDeserializer : Deserializer {
             counterOperationValueType = counterOperationValueType,
             counterOperationValue = deserializeCounterActionValue(jsonChangeCounter),
             counterOperationCounterName = counterOperationCounterName,
+            counterOperationConditionId = if (isConditionValue) counterOperationConditionId else null,
+            counterOperationConditionPositionType =
+                if (isConditionValue) counterOperationConditionPositionType else null,
         )
     }
 
@@ -764,6 +773,54 @@ internal open class CompatDeserializer : Deserializer {
 
         return EventToggleEntity(id, actionId, type, toggleEventId)
     }
+
+
+    // ======================= GESTURES
+
+    /** @return the deserialized gesture finger with its motions. */
+    @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
+    open fun deserializeGestureFinger(jsonGestureFingerWithMotions: JsonObject): GestureFingerWithMotions? {
+        val jsonFinger = jsonGestureFingerWithMotions.getJsonObject("finger", true) ?: return null
+
+        val finger = GestureFingerEntity(
+            id = jsonFinger.getLong("id", true) ?: return null,
+            actionId = jsonFinger.getLong("actionId", true) ?: return null,
+            index = jsonFinger.getInt("index", true) ?: return null,
+            startTimeMs = jsonFinger.getLong("startTimeMs") ?: 0L,
+        )
+
+        val motions = jsonGestureFingerWithMotions.getJsonArray("motions")
+            ?.getListOf(::deserializeGestureFingerMotion)
+            ?: emptyList()
+
+        return GestureFingerWithMotions(finger = finger, motions = motions)
+    }
+
+    /** @return the deserialized gesture finger motion. */
+    @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
+    open fun deserializeGestureFingerMotion(jsonMotion: JsonObject): GestureFingerMotionEntity? =
+        GestureFingerMotionEntity(
+            id = jsonMotion.getLong("id", true) ?: return null,
+            fingerId = jsonMotion.getLong("fingerId", true) ?: return null,
+            index = jsonMotion.getInt("index", true) ?: return null,
+            motionType = jsonMotion.getEnum<GestureFingerMotionType>("motionType", true) ?: return null,
+            durationMs = jsonMotion.getLong("durationMs"),
+            xCoordinateType = jsonMotion.getEnum<CoordinatesType>("xCoordinateType"),
+            yCoordinateType = jsonMotion.getEnum<CoordinatesType>("yCoordinateType"),
+            conditionId = jsonMotion.getLong("conditionId"),
+            xLiteral = jsonMotion.getInt("xLiteral"),
+            xCounter = jsonMotion.getString("xCounter"),
+            yLiteral = jsonMotion.getInt("yLiteral"),
+            yCounter = jsonMotion.getString("yCounter"),
+            xOffsetCoordinateType = jsonMotion.getEnum<CoordinatesType>("xOffsetCoordinateType"),
+            yOffsetCoordinateType = jsonMotion.getEnum<CoordinatesType>("yOffsetCoordinateType"),
+            xOffsetLiteral = jsonMotion.getInt("xOffsetLiteral"),
+            xOffsetCounter = jsonMotion.getString("xOffsetCounter"),
+            yOffsetLiteral = jsonMotion.getInt("yOffsetLiteral"),
+            yOffsetCounter = jsonMotion.getString("yOffsetCounter"),
+            releaseHoldType = jsonMotion.getEnum<GestureReleaseHoldType>("releaseHoldType"),
+            holdDurationMs = jsonMotion.getLong("holdDurationMs"),
+        )
 
     // ======================= COMPAT METHODS
 

@@ -46,13 +46,37 @@ class ActionTypeSelectionDialog(
 
     override fun onStop() {
         super.onStop()
-        viewModel.stopViewMonitoring()
+        viewModel.stopViewCreateClickMonitoring()
+        viewModel.stopViewToggleEventMonitoring()
+        viewModel.stopViewCounterMonitoring()
     }
 
     override fun onChoiceViewBound(choice: ActionTypeChoice, view: View?) {
+        when (choice) {
+            ActionTypeChoice.Click ->
+                if (view != null) viewModel.monitorCreateClickView(view)
+                else viewModel.stopViewCreateClickMonitoring()
+
+            ActionTypeChoice.ToggleEvent ->
+                if (view != null) viewModel.monitorCreateToggleEventView(view)
+                else viewModel.stopViewToggleEventMonitoring()
+
+            ActionTypeChoice.ChangeCounter ->
+                if (view != null) viewModel.monitorCreateCounterView(view)
+                else viewModel.stopViewCounterMonitoring()
+
+            ActionTypeChoice.AreaClick,
+            ActionTypeChoice.Zoom,
+            ActionTypeChoice.Copy,
+            ActionTypeChoice.Intent,
+            ActionTypeChoice.Notification,
+            ActionTypeChoice.Pause,
+            ActionTypeChoice.SetText,
+            ActionTypeChoice.Gesture,
+            ActionTypeChoice.System -> Unit
+        }
         if (choice !is ActionTypeChoice.Click) return
 
-        if (view != null) viewModel.monitorCreateClickView(view)
-        else viewModel.stopViewMonitoring()
+
     }
 }

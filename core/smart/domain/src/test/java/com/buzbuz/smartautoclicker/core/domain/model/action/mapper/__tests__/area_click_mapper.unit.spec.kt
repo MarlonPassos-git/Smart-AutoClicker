@@ -25,7 +25,7 @@ class AreaClickMapperTest {
     @Test
     fun roundTripPreservesCompleteConfiguration() {
         val areaClick = createAreaClick()
-        val restored = CompleteActionEntity(areaClick.toEntity(), emptyList(), emptyList()).toDomain()
+        val restored = CompleteActionEntity(areaClick.toEntity(), emptyList(), emptyList(), emptyList()).toDomain()
 
         assertEquals(areaClick, restored)
     }

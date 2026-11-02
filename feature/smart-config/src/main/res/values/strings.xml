@@ -95,7 +95,6 @@
     <string name="item_click_details_on_condition_unknown">During %1$s on detected condition</string>
     <string name="item_click_details_at_position">During %1$s</string>
 
-    <string name="item_swipe_title">Swipe</string>
     <string name="zoom_title">Zoom</string>
     <string name="zoom_choice_description">Pinch in or out around a selected point</string>
     <string name="zoom_default_name">Zoom</string>
@@ -106,8 +105,12 @@
     <string name="zoom_geometry">Center and intensity</string>
     <string name="zoom_test">Test zoom</string>
     <string name="zoom_details">%1$s · %2$d px · %3$s</string>
-    <string name="item_swipe_desc">Swipe from a position on the screen to another</string>
-    <string name="item_swipe_details">During %1$s</string>
+    <string name="item_gesture_title">Gesture</string>
+    <string name="item_gesture_desc">Execute a complex gesture on the screen</string>
+    <plurals name="item_gesture_details">
+        <item quantity="one">With %1$d finger during %2$s</item>
+        <item quantity="other">With %1$d fingers during %2$s</item>
+    </plurals>
 
     <string name="item_pause_title">Wait</string>
     <string name="item_pause_desc">Pause the detection execution</string>
@@ -115,7 +118,6 @@
 
     <string name="item_change_counter_title">Change counter</string>
     <string name="item_change_counter_desc">Change a value to verify it later</string>
-    <string name="item_change_counter_details">%1$s %2$s %3$s</string>
     <string name="item_change_counter_details_error">Counter is invalid</string>
 
     <string name="item_toggle_event_title">Change event state</string>
@@ -201,6 +203,14 @@
     <string name="item_title_debug_generate_report">Generate a report</string>
     <string name="item_desc_debug_generate_report">Capture your scenario behaviour while detecting to create a report.</string>
 
+    <string name="field_debug_view_settings_title">Debug view settings</string>
+    <string name="field_debug_view_settings_desc">Choose the information displayed in the debug view.</string>
+
+    <string name="dialog_title_debug_view_settings">Debug View</string>
+    <string name="field_debug_view_show_event_stats_title">Show event statistics</string>
+    <string name="field_debug_view_show_actions_title">Show event actions</string>
+    <string name="field_debug_view_show_held_finger_title">Show held finger</string>
+
     <string name="field_show_debug_report_title">Show report</string>
     <string name="field_show_debug_report_desc_available">Debug report is available</string>
     <string name="field_show_debug_report_desc_not_available">No debug report available</string>
@@ -220,7 +230,7 @@
     <string name="message_empty_trigger_condition_list_title">No conditions !</string>
     <string name="message_empty_trigger_condition_list_desc">A condition is a custom criteria for starting an action.</string>
     <string name="message_empty_action_list_title">No actions !</string>
-    <string name="message_empty_action_list_desc">An action is an interaction (click, swipe…) with your phone triggered when the created conditions are fulfilled.</string>
+    <string name="message_empty_action_list_desc">An action is an interaction (click, gesture…) with your phone triggered when the created conditions are fulfilled.</string>
 
     <string name="menu_item_title_conditions">Conditions</string>
     <string name="menu_item_title_actions">Actions</string>
@@ -288,6 +298,8 @@
     <string name="field_select_detection_area_title">Detection Area</string>
     <string name="field_select_detection_area_desc">In [%1$d, %2$d, %3$d, %4$d]</string>
 
+    <string name="toast_capture_failed">Screenshot failed, no frames were generated.</string>
+
 
     <!-- Dialog Condition Text ==================================================================================== -->
 
@@ -353,7 +365,7 @@
 
     <!-- Dialog Condition Counter Reached ========================================================================== -->
 
-    <string name="dialog_title_counter_reached">Counter value</string>
+    <string name="dialog_title_counter_reached">Counter value reached</string>
 
     <string name="field_counter_name_label">Counter name</string>
     <string name="field_counter_comparison_value_label">Value</string>
@@ -392,24 +404,54 @@
     <string name="field_condition_selection_desc_and_operator_not_found">No condition selected</string>
 
     <string name="field_condition_selection_title_or_operator">Click on the first detected condition</string>
-    <string name="field_condition_selection_desc_or_operator">Event is set to "One Condition", you can\'t select a specific one</string>
+    <string name="field_condition_selection_desc_or_operator">Event\'s condition operator is set to \"OR\", click will happen on the first detected condition</string>
 
     <string name="field_click_position_desc">Click on %1$d, %2$d</string>
 
-    <string name="field_click_offset_title">Click offset</string>
+    <string name="field_click_offset_title">Offset</string>
     <string name="field_click_offset_desc_none">None</string>
-    <string name="field_click_offset_desc" translatable="false">X=%1$d Y=%2$d</string>
+    <string name="field_click_offset_desc" translatable="false">X=%1$s Y=%2$s</string>
     <string name="field_click_offset_x" translatable="false">X</string>
     <string name="field_click_offset_y" translatable="false">Y</string>
     <string name="field_click_offset_reference_info">This preview uses the first reference image. The offset applies to whichever reference image is detected.</string>
 
 
-    <!-- Dialog Action Swipe ======================================================================================= -->
+    <!-- Dialog Action Gesture ======================================================================================= -->
+    <!-- Smart specific keys for gesture. Base keys are shared with dumb, in core:ui module -->
 
-    <string name="dialog_title_swipe">Swipe</string>
+    <string name="item_desc_gesture_press_condition">Press on [%1$s]</string>
+    <string name="item_desc_gesture_press_condition_or">Press on first detected condition</string>
+    <string name="item_desc_gesture_press_condition_error">No condition to press on</string>
 
-    <string name="field_swipe_positions_title">Swipe positions</string>
-    <string name="field_swipe_positions_desc">Swipe from %1$d, %2$d to %3$d, %4$d</string>
+    <string name="item_desc_gesture_move_condition">Move on [%1$s]</string>
+    <string name="item_desc_gesture_move_condition_or">Move on first detected condition</string>
+    <string name="item_desc_gesture_move_condition_error">No condition to move on</string>
+
+    <string name="message_title_gesture_on_condition_and">Click on a condition</string>
+    <string name="message_desc_gesture_on_condition_and">%1$s</string>
+    <string name="message_title_gesture_on_condition_or">OR condition operator</string>
+    <string name="message_desc_gesture_on_condition_or">First detected condition position</string>
+    <string name="message_title_gesture_on_condition_error">No condition selected</string>
+    <string name="message_desc_gesture_on_condition_error">You need a condition to execute the gesture on</string>
+
+    <string name="button_title_condition_pick">Pick condition</string>
+    <string name="button_title_condition_remove">Remove condition</string>
+
+    <string name="field_gesture_release_when_title">When</string>
+    <string name="field_gesture_release_when_item_now">Now</string>
+    <string name="field_gesture_release_when_item_until_actions_end">Actions end</string>
+    <string name="field_gesture_release_when_item_once_unfulfilled">Event is unfulfilled</string>
+    <string name="field_gesture_release_when_item_for_duration">After a duration</string>
+    <string name="field_gesture_release_hold_duration_title">Hold duration (ms)</string>
+    <string name="field_gesture_release_desc_now">Release the finger immediately.</string>
+    <string name="field_gesture_release_desc_until_actions_end">Release the finger once all actions in this event have been executed. Same as \"Now\" if this action is the last in the list.</string>
+    <string name="field_gesture_release_desc_once_unfulfilled">Release the finger once this event is no longer fulfilled.</string>
+    <string name="field_gesture_release_desc_for_duration">Release the finger after %1$d ms.</string>
+    <string name="item_desc_gesture_release_now">Release immediately</string>
+    <string name="item_desc_gesture_release_until_actions_end">Release once actions end</string>
+    <string name="item_desc_gesture_release_once_unfulfilled">Release once event is unfulfilled</string>
+    <string name="item_desc_gesture_release_for_duration">Release after %1$d ms</string>
+    <string name="field_gesture_release_hold_behaviour">• Only one hold at a time is supported, starting another hold will release this one.\n• While a finger is holding, the related event will no longer be triggered until the held finger is released.\n• If you manually press the screen, the hold will be interrupted.\n• Maximum hold duration depends on your system and the current application being automated. Some systems allow infinite durations, some don\'t.</string>
 
 
     <!-- Dialog Action Pause ======================================================================================= -->
@@ -478,6 +520,27 @@
     <string name="field_change_counter_effect_title">Action effect</string>
     <string name="field_change_counter_effect_desc_set">%1$s = %2$s</string> <!-- Toto = Tata -->
     <string name="field_change_counter_effect_desc_operation">%1$s = %1$s %2$s %3$s</string> <!-- Toto = Toto + Tata -->
+
+    <string name="field_counter_operation_condition_value" translatable="false">%1$s (%2$s)</string> <!-- MyCondition (Left) -->
+    <string name="field_counter_operation_condition_selection_title_empty">No condition selected</string>
+    <string name="field_counter_operation_condition_selection_desc_empty">Click here to select a condition</string>
+    <string name="field_counter_operation_condition_selection_desc">If detected, its position on screen will be used as value</string>
+    <string name="field_counter_operation_condition_selection_title_none">No condition available</string>
+    <string name="field_counter_operation_condition_selection_desc_none">Create a screen condition that should be detected in this event to use its position</string>
+
+    <string name="dropdown_condition_position_type_label">Position</string>
+    <string name="dropdown_condition_position_type_item_left">Left</string>
+    <string name="dropdown_condition_position_type_item_left_desc">X coordinate of the left edge</string>
+    <string name="dropdown_condition_position_type_item_center_x">Center X</string>
+    <string name="dropdown_condition_position_type_item_center_x_desc">X coordinate of the center</string>
+    <string name="dropdown_condition_position_type_item_right">Right</string>
+    <string name="dropdown_condition_position_type_item_right_desc">X coordinate of the right edge</string>
+    <string name="dropdown_condition_position_type_item_top">Top</string>
+    <string name="dropdown_condition_position_type_item_top_desc">Y coordinate of the top edge</string>
+    <string name="dropdown_condition_position_type_item_center_y">Center Y</string>
+    <string name="dropdown_condition_position_type_item_center_y_desc">Y coordinate of the center</string>
+    <string name="dropdown_condition_position_type_item_bottom">Bottom</string>
+    <string name="dropdown_condition_position_type_item_bottom_desc">Y coordinate of the bottom edge</string>
 
 
     <!-- Dialogs Action ToggleEvent ================================================================================ -->

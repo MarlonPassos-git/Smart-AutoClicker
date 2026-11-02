@@ -25,7 +25,8 @@ import android.os.Build
 // A workaround is to inject a multi tap to unblock to InputDispatcher
 
 fun isImpactedByInputBlock(): Boolean =
-    Build.VERSION.SDK_INT == Build.VERSION_CODES.VANILLA_ICE_CREAM
+    Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM
+            && Build.VERSION.SDK_INT <= Build.VERSION_CODES.BAKLAVA
             && Build.BRAND == GOOGLE_DEVICE_BRAND
             && Build.MODEL.lowercase().contains(GOGGLE_MODE_PIXEL)
 
@@ -43,23 +44,5 @@ private fun createUnblockClickStroke(posX: Float, posY: Float): GestureDescripti
         1L,
     )
 
-
-class UnblockGestureScheduler {
-
-    private var lastUnblockTimeMs = System.currentTimeMillis()
-
-    fun shouldTrigger(): Boolean {
-        val currentTime = System.currentTimeMillis()
-        if (currentTime >= (lastUnblockTimeMs + UNBLOCK_GESTURE_DELAY_MS)) {
-            lastUnblockTimeMs = currentTime
-            return true
-        }
-
-        return false
-    }
-}
-
 private const val GOOGLE_DEVICE_BRAND = "google"
 private const val GOGGLE_MODE_PIXEL = "pixel"
-
-private const val UNBLOCK_GESTURE_DELAY_MS = 10000L

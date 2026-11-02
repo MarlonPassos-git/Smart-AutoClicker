@@ -21,14 +21,17 @@ import com.buzbuz.smartautoclicker.core.domain.model.action.Action
 import com.buzbuz.smartautoclicker.core.domain.model.action.AreaClick
 import com.buzbuz.smartautoclicker.core.domain.model.action.ChangeCounter
 import com.buzbuz.smartautoclicker.core.domain.model.action.Click
+import com.buzbuz.smartautoclicker.core.domain.model.action.Gesture
 import com.buzbuz.smartautoclicker.core.domain.model.action.Intent
 import com.buzbuz.smartautoclicker.core.domain.model.action.Notification
 import com.buzbuz.smartautoclicker.core.domain.model.action.Pause
 import com.buzbuz.smartautoclicker.core.domain.model.action.SetText
-import com.buzbuz.smartautoclicker.core.domain.model.action.Swipe
 import com.buzbuz.smartautoclicker.core.domain.model.action.Zoom
 import com.buzbuz.smartautoclicker.core.domain.model.action.SystemAction
 import com.buzbuz.smartautoclicker.core.domain.model.action.ToggleEvent
+import com.buzbuz.smartautoclicker.core.domain.model.action.gesture.GestureFingerMotion
+import com.buzbuz.smartautoclicker.core.domain.model.action.position.CoordinatesValue
+import com.buzbuz.smartautoclicker.core.domain.model.action.position.Position
 import com.buzbuz.smartautoclicker.core.domain.model.condition.Condition
 import com.buzbuz.smartautoclicker.core.domain.model.condition.ScreenCondition
 import com.buzbuz.smartautoclicker.core.domain.model.condition.TriggerCondition
@@ -53,7 +56,8 @@ class ReplaceCounterUseCase @Inject constructor(
     private fun Condition.replaceCounter(from: Counter, to: Counter) {
         when (this) {
             is ScreenCondition.Number -> {
-                if (counterValue is CounterOperationValue.Counter && counterValue.value == from.counterName) {
+                val counterOperation = (counterValue as? CounterOperationValue.Counter)
+                if (counterOperation != null && counterOperation.counterName == from.counterName) {
                     editionRepository.startConditionEdition(this)
                     editionRepository.updateEditedCondition(
                         this.copy(counterValue = CounterOperationValue.Counter(to.counterName))
@@ -67,7 +71,9 @@ class ReplaceCounterUseCase @Inject constructor(
                 if (counterName == from.counterName) {
                     newCondition = newCondition.copy(counterName = to.counterName)
                 }
-                if (counterValue is CounterOperationValue.Counter && counterValue.value == from.counterName) {
+
+                val counterOperation = (counterValue as? CounterOperationValue.Counter)
+                if (counterOperation != null && counterOperation.counterName == from.counterName) {
                     newCondition = newCondition.copy(counterValue = CounterOperationValue.Counter(to.counterName))
                 }
 
@@ -93,7 +99,9 @@ class ReplaceCounterUseCase @Inject constructor(
                 if (counterName == from.counterName) {
                     newAction = newAction.copy(counterName = to.counterName)
                 }
-                if (operationValue is CounterOperationValue.Counter && operationValue.value == from.counterName) {
+
+                val counterOperation = (operationValue as? CounterOperationValue.Counter)
+                if (counterOperation != null && counterOperation.counterName == from.counterName) {
                     newAction = newAction.copy(operationValue = CounterOperationValue.Counter(to.counterName))
                 }
 
@@ -124,14 +132,69 @@ class ReplaceCounterUseCase @Inject constructor(
                 }
             }
 
+            is Click -> {
+                val newClick = copy(
+                    position = position?.replaceCounter(from, to),
+                    offset = offset?.replaceCounter(from, to),
+                )
+
+                if (newClick != this) {
+                    editionRepository.startActionEdition(this)
+                    editionRepository.updateEditedAction(newClick)
+                    editionRepository.upsertEditedAction()
+                }
+            }
+
+            is Gesture -> {
+                val newGesture = copy(fingers = fingers.map { finger ->
+                    finger.copy(motions = finger.motions.map { motion ->
+                        when (motion) {
+                            is GestureFingerMotion.Press -> motion.copy(
+                                position = motion.position.replaceCounter(from, to),
+                                offset = motion.offset.replaceCounter(from, to),
+                            )
+                            is GestureFingerMotion.Move -> motion.copy(
+                                position = motion.position.replaceCounter(from, to),
+                                offset = motion.offset.replaceCounter(from, to),
+                            )
+                            is GestureFingerMotion.Wait,
+                            is GestureFingerMotion.Release -> motion
+                        }
+                    })
+                })
+
+                if (newGesture != this) {
+                    editionRepository.startActionEdition(this)
+                    editionRepository.updateEditedAction(newGesture)
+                    editionRepository.upsertEditedAction()
+                }
+            }
+
             is AreaClick,
-            is Click,
+            is Zoom,
             is Intent,
             is Pause,
             is SystemAction,
-            is Swipe,
-            is Zoom,
             is ToggleEvent -> Unit
         }
     }
+
+    private fun Position.replaceCounter(from: Counter, to: Counter): Position =
+        when (this) {
+            is Position.Condition -> this
+            is Position.Coordinates -> replaceCounter(from, to)
+        }
+
+    private fun Position.Coordinates.replaceCounter(from: Counter, to: Counter): Position.Coordinates =
+        copy(
+            x = x.replaceCounter(from, to),
+            y = y.replaceCounter(from, to),
+        )
+
+    private fun CoordinatesValue.replaceCounter(from: Counter, to: Counter): CoordinatesValue =
+        when (this) {
+            is CoordinatesValue.Literal -> this
+            is CoordinatesValue.Counter ->
+                if (counterName == from.counterName) CoordinatesValue.Counter(to.counterName) else this
+        }
 }

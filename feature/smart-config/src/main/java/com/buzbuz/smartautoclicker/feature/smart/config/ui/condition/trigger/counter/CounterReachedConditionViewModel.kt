@@ -17,19 +17,22 @@
 package com.buzbuz.smartautoclicker.feature.smart.config.ui.condition.trigger.counter
 
 import android.content.Context
+import android.view.View
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.buzbuz.smartautoclicker.core.common.tutorial.domain.MonitoredViewsManager
+import com.buzbuz.smartautoclicker.core.common.tutorial.domain.model.monitoring.MonitoredViewType
 
 import com.buzbuz.smartautoclicker.core.domain.model.condition.TriggerCondition
 import com.buzbuz.smartautoclicker.core.domain.model.counter.CounterOperationValue
 import com.buzbuz.smartautoclicker.feature.smart.config.domain.EditionRepository
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.formatters.toEffectDescription
-import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.model.counter.UiCounterOperatorDropdownItem
-import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.model.counter.UiOperandType
-import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.model.counter.UiStaticOrCounterSelection
-import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.model.counter.toComparisonOperation
-import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.model.counter.toCounterOperatorDropdownItem
-import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.model.counter.toDisplayValue
+import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.uistate.counter.UiCounterOperatorDropdownItem
+import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.uistate.counter.UiOperandType
+import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.uistate.counter.UiStaticOrCounterSelection
+import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.uistate.counter.toComparisonOperation
+import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.uistate.counter.toCounterOperatorDropdownItem
+import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.uistate.counter.toDisplayValue
 
 import dagger.hilt.android.qualifiers.ApplicationContext
 
@@ -51,6 +54,7 @@ import javax.inject.Inject
 class CounterReachedConditionViewModel @Inject constructor(
     @ApplicationContext context: Context,
     private val editionRepository: EditionRepository,
+    private val monitoredViewsManager: MonitoredViewsManager,
 ) : ViewModel() {
 
     /** The condition being configured by the user. */
@@ -97,6 +101,7 @@ class CounterReachedConditionViewModel @Inject constructor(
             when (type) {
                 UiOperandType.STATIC -> CounterOperationValue.Number(0.0)
                 UiOperandType.COUNTER -> CounterOperationValue.Counter("")
+                UiOperandType.CONDITION -> return
             }
         )
     }
@@ -105,6 +110,19 @@ class CounterReachedConditionViewModel @Inject constructor(
         updateEditedCondition { old ->
             old.copy(counterValue = value)
         }
+    }
+
+    fun monitorSelectCounterView(view: View) {
+        monitoredViewsManager.attach(MonitoredViewType.COUNTER_REACHED_DIALOG_FIELD_COUNTER_SELECTION, view)
+    }
+
+    fun monitorSaveButtonView(view: View) {
+        monitoredViewsManager.attach(MonitoredViewType.COUNTER_REACHED_DIALOG_BUTTON_SAVE, view)
+    }
+
+    fun detachMonitoredViews() {
+        monitoredViewsManager.detach(MonitoredViewType.COUNTER_REACHED_DIALOG_FIELD_COUNTER_SELECTION)
+        monitoredViewsManager.detach(MonitoredViewType.COUNTER_REACHED_DIALOG_BUTTON_SAVE)
     }
 
     private fun updateEditedCondition(
@@ -133,7 +151,7 @@ class CounterReachedConditionViewModel @Inject constructor(
             conditionEffectText = comparisonOperation.toEffectDescription(
                 context = context,
                 counterName = counterName,
-                operand = operand.toDisplayValue(),
+                operand = operand.toDisplayValue(context),
             )
         )
     }
@@ -141,9 +159,12 @@ class CounterReachedConditionViewModel @Inject constructor(
     private fun CounterOperationValue.toUiStaticOrCounterSelection(): UiStaticOrCounterSelection =
         when (this) {
             is CounterOperationValue.Counter ->
-                UiStaticOrCounterSelection.CounterValue(editionRepository.editionState.getCounter(value))
+                UiStaticOrCounterSelection.CounterValue(editionRepository.editionState.getCounter(counterName))
 
             is CounterOperationValue.Number ->
                 UiStaticOrCounterSelection.StaticValue(value)
+
+            is CounterOperationValue.Condition ->
+                UiStaticOrCounterSelection.StaticValue(0.0)
         }
 }

@@ -17,13 +17,15 @@
 package com.buzbuz.smartautoclicker.core.common.actions
 
 import android.accessibilityservice.AccessibilityService
-import android.accessibilityservice.GestureDescription
 import android.content.Intent
 import android.graphics.Point
+
 import com.buzbuz.smartautoclicker.core.base.Dumpable
 import com.buzbuz.smartautoclicker.core.base.gesture.ZoomDirection
 import com.buzbuz.smartautoclicker.core.common.actions.model.ActionNotificationRequest
 import kotlin.random.Random
+import com.buzbuz.smartautoclicker.core.common.actions.model.BuiltGesture
+import com.buzbuz.smartautoclicker.core.common.actions.model.HeldPointer
 
 interface AndroidActionExecutor: Dumpable {
 
@@ -48,23 +50,54 @@ interface AndroidActionExecutor: Dumpable {
     fun clear()
 
     /**
-     * Dispatch a gesture to the touch screen.
+     * The pointer a gesture holding its first finger left down on the screen, or null when nothing is held.
      *
-     * Any gestures currently in progress, whether from the user, this service, or another service, will be cancelled.
-     * Method will return only once the gesture is dispatched.
-     *
-     * The gesture will be dispatched as if it were performed directly on the screen by a user, so the events may be
-     * affected by features such as magnification and explore by touch.
-     *
-     * <strong>Note:</strong> In order to dispatch gestures, your service must declare the capability by setting the
-     * android.R.styleable.AccessibilityService_canPerformGestures property in its meta-data. For more information,
-     * see SERVICE_META_DATA.
-     *
-     * @param gestureDescription The gesture to dispatch
+     * It must be given to AndroidGestureBuilder.build for every gesture dispatched while it is held: the system only
+     * honours a continuation when the first step of the dispatched gesture holds exactly one stroke for each pointer
+     * currently down, so a gesture built without it would have the hold cancelled.
      */
-    suspend fun dispatchGesture(gestureDescription: GestureDescription)
+    fun getHeldPointer(): HeldPointer?
 
-    /** Dispatches a symmetric two-finger zoom around [center]. */
+    /**
+     * Dispatch a gesture built by an AndroidGestureBuilder, and keep track of the pointer it leaves down.
+     *
+     * Method will return only once the whole gesture is dispatched.
+     *
+     * @param gesture the gesture to dispatch.
+     */
+    suspend fun dispatchBuiltGesture(gesture: BuiltGesture)
+
+    /**
+     * Verify the pointer left down on the screen by a gesture holding its first finger, if any, is still held.
+     *
+     * The system lifts it without notice when the user touches the screen. Once lost, [getHeldPointer] returns null.
+     * Nothing is dispatched to the system, the user touches being watched while a pointer is held, so it can be called
+     * on every frame from any thread.
+     *
+     * @return true if a pointer is still held, false if it has been lost or if nothing was held.
+     */
+    fun checkHeldPointer(): Boolean
+
+    /**
+     * Lift the pointer left down on the screen by a gesture holding its first finger, if any.
+     *
+     * Method will return only once the pointer is lifted.
+     */
+    suspend fun releaseHeldPointer()
+
+    /**
+     * Some pixel devices have an OS issue on Android 15 & 16.
+     * Injecting a double tap somewhere seems to fix the problem most of the time. This method will take care of
+     * injecting this gesture, it will avoid spamming it by skipping unblock requests to close to the previous one.
+     *
+     * @see [com.buzbuz.smartautoclicker.core.base.workarounds.isImpactedByInputBlock]
+     */
+    suspend fun dispatchPixelWorkaroundGestureIfNeeded()
+
+    /**
+     * Dispatches a symmetric two-finger zoom around [center], continuing any held pointer.
+     * Example: `executor.dispatchZoomGesture(Point(500, 500), 150, 300, ZoomDirection.IN, null)`.
+     */
     suspend fun dispatchZoomGesture(
         center: Point,
         intensityPx: Int,

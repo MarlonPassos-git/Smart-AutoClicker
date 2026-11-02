@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <!--
 * Copyright (C) 2026 Kevin Buzeau
 *
@@ -77,10 +77,24 @@
         de conditions et les opérateurs vous permet de gérer des scénarios complexes.\n\n Apprenez ici à combiner
         efficacement les conditions.</string>
 
-    <string name="tutorial_category_event_state_name">État des événements</string>
-    <string name="tutorial_category_event_state_desc_short">Activez ou désactivez des Événements dynamiquement</string>
-    <string name="tutorial_category_event_state_desc_long">Les Événements peuvent être activés ou désactivés en cours
-        d\'exécution via l\'Action ToggleEvent. Cela permet de créer des flux d\'automatisation en plusieurs étapes où
+    <string name="tutorial_category_combine_event_name">Combiner des Événements</string>
+    <string name="tutorial_category_combine_event_desc_short">Coordonnez plusieurs Événements pour un contrôle avancé</string>
+    <string name="tutorial_category_combine_event_desc_long">Klick\'r vous permet de coordonner plusieurs Événements pour
+        créer des flux d\'automatisation avancés. En contrôlant l\'ordre d\'évaluation et en activant ou désactivant des
+        Événements à l\'exécution, vous pouvez créer des Scénarios complexes en plusieurs étapes.\n\n Apprenez ici à
+        combiner les Événements efficacement pour un contrôle total de votre automatisation.</string>
+
+    <string name="tutorial_category_events_priority_name">Priorité des événements</string>
+    <string name="tutorial_category_events_priority_desc_short">Contrôlez l\'importance de vos événements</string>
+    <string name="tutorial_category_events_priority_desc_long">Les Événements Écran sont évalués par ordre de priorité à
+        chaque cycle de détection. Un Événement plus haut dans la liste est vérifié avant les Événements plus bas, ce
+        qui permet de définir quel Événement a la priorité lorsque plusieurs peuvent se déclencher en même temps.\n\n
+        Apprenez ici à définir les priorités d\'Événement pour affiner l\'ordre d\'exécution de votre Scénario.</string>
+
+    <string name="tutorial_category_events_state_name">État des Événements</string>
+    <string name="tutorial_category_events_state_desc_short">Activez ou désactivez des Événements dynamiquement</string>
+    <string name="tutorial_category_events_state_desc_long">Les Événements peuvent être activés ou désactivés en cours
+        d\'exécution via l\'Action État d\'évènement. Cela permet de créer des flux d\'automatisation en plusieurs étapes où
         certains événements n\'interviennent que sous des conditions spécifiques.\n\n Apprenez ici à contrôler l\'état
         des Événements pour créer des Scénarios avancés.</string>
 
@@ -94,7 +108,65 @@
     <string name="tutorial_category_action_name">Actions</string>
     <string name="tutorial_category_action_desc_short">Exécutez quelque chose une fois vos conditions remplies</string>
     <string name="tutorial_category_action_desc_long">Une Action est exécutée lorsque les Conditions d\'un Événement
-        sont remplies. Les Actions vont des gestes (Click, Swipe) au contrôle de flux (ToggleEvent, ChangeCounter,
-        Pause) et aux interactions système (Intent, Notification, SystemAction, SetText).\n\n Apprenez ici à utiliser
+        sont remplies. Les Actions vont des gestes (Click, Gesture) au contrôle de flux (ToggleEvent, ChangeCounter,
+        Wait) et aux interactions système (Intent, Notification, SystemAction, SetText).\n\n Apprenez ici à utiliser
         chaque type d\'Action pour créer vos scripts d\'automatisation.</string>
+
+    <string name="tutorial_category_click_action_name">Clic</string>
+    <string name="tutorial_category_click_action_desc_short">Appuyez à une position fixe ou sur une condition détectée</string>
+    <string name="tutorial_category_click_action_desc_long">Une Action Clic simule un appui à une coordonnée fixe ou au
+        centre d\'une Condition d\'image détectée. Vous pouvez configurer la durée de pression pour simuler des appuis
+        longs.\n\n Apprenez ici à l\'utiliser pour interagir avec votre écran.</string>
+
+    <string name="tutorial_category_gesture_action_name">Geste</string>
+    <string name="tutorial_category_gesture_action_desc_short">Effectuez un geste complexe sur l\'écran</string>
+    <string name="tutorial_category_gesture_action_desc_long">Une Action Geste simule les mouvements d\'un ou plusieurs doigts sur l\'écran. Vous pouvez configurer jusqu\'à cinq doigts agissant en même temps.\n\n Apprenez ici à l\'utiliser pour interagir avec votre écran.</string>
+
+    <string name="tutorial_category_pause_action_name">Pause</string>
+    <string name="tutorial_category_pause_action_desc_short">Attendre une durée avant d\'exécuter l\'action suivante</string>
+    <string name="tutorial_category_pause_action_desc_long">Une Action Pause retarde l\'exécution pendant une durée
+        configurée. Elle est utile pour laisser le temps à l\'application de réagir avant la prochaine détection.
+        \n\n Apprenez ici à l\'utiliser pour cadencer vos scripts d\'automatisation.</string>
+
+    <string name="tutorial_category_intent_action_name">Intention</string>
+    <string name="tutorial_category_intent_action_desc_short">Envoyer une Intention Android à une autre application</string>
+    <string name="tutorial_category_intent_action_desc_long">Une Action Intention envoie une Intention Android, soit en
+        broadcast, soit pour démarrer une Activité ou un Service. Vous pouvez y joindre des paires clé-valeur pour
+        transmettre des données.\n\n Apprenez ici à l\'utiliser pour déclencher des actions dans d\'autres
+        applications.</string>
+
+    <string name="tutorial_category_change_counter_action_name">Modifier le compteur</string>
+    <string name="tutorial_category_change_counter_action_desc_short">Définir, ajouter ou soustraire une valeur d\'un Compteur</string>
+    <string name="tutorial_category_change_counter_action_desc_long">Une Action Modifier le Compteur modifie une variable
+        Compteur en la définissant à une valeur fixe, en y ajoutant ou en soustrayant une valeur. Les Compteurs peuvent
+        ensuite être lus par des Conditions ou d\'autres Actions.\n\n Apprenez ici à l\'utiliser pour gérer l\'état de
+        votre Scénario.</string>
+
+    <string name="tutorial_category_change_event_state_action_name">Modifier l\'état d\'un événement</string>
+    <string name="tutorial_category_change_event_state_action_desc_short">Activer, désactiver ou basculer un ou plusieurs Événements</string>
+    <string name="tutorial_category_change_event_state_action_desc_long">Une Action Modifier l\'état d\'un événement
+        active, désactive ou bascule un ou plusieurs Événements en cours d\'exécution. Cela permet de créer des flux en
+        plusieurs étapes où les premières étapes conditionnent les suivantes.\n\n Apprenez ici à l\'utiliser pour
+        contrôler le flux de votre Scénario.</string>
+
+    <string name="tutorial_category_notification_action_name">Notification</string>
+    <string name="tutorial_category_notification_action_desc_short">Publier une notification système</string>
+    <string name="tutorial_category_notification_action_desc_long">Une Action Notification publie une notification système
+        Android avec un titre et un message personnalisés. Elle est utile pour alerter l\'utilisateur lorsqu\'une
+        condition spécifique est détectée.\n\n Apprenez ici à l\'utiliser pour afficher des informations pendant que
+        votre Scénario s\'exécute en arrière-plan.</string>
+
+    <string name="tutorial_category_system_action_name">Action système</string>
+    <string name="tutorial_category_system_action_desc_short">Invoquer une action de navigation Android globale</string>
+    <string name="tutorial_category_system_action_desc_long">Une Action système invoque une action de navigation Android
+        globale, comme appuyer sur Retour, Accueil ou Récents. Ces actions n\'ont pas besoin de coordonnées et
+        agissent au niveau du système.\n\n Apprenez ici à l\'utiliser pour naviguer sur l\'appareil pendant
+        l\'automatisation.</string>
+
+    <string name="tutorial_category_write_text_action_name">Écrire du texte</string>
+    <string name="tutorial_category_write_text_action_desc_short">Coller du texte dans le champ de saisie actif</string>
+    <string name="tutorial_category_write_text_action_desc_long">Une Action Écrire du texte colle une chaîne configurée
+        dans le champ de saisie actuellement actif via le service d\'accessibilité. Elle est utile pour remplir des
+        formulaires ou des champs de recherche sans simuler des frappes individuelles.\n\n Apprenez ici à saisir du
+        texte pendant l\'automatisation.</string>
 </resources>

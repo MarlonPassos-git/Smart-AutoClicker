@@ -55,10 +55,14 @@
     <string name="item_click_desc">Clique em algum lugar da tela</string>
     <string name="item_click_details_on_condition">Durante %1$s no %2$s</string>
     <string name="item_click_details_at_position">Durante %1$s</string>
+    <string name="item_gesture_title">Gesto</string>
+    <string name="item_gesture_desc">Executar um gesto complexo na tela</string>
+    <plurals name="item_gesture_details">
+        <item quantity="one">Com %1$d dedo durante %2$s</item>
+        <item quantity="many">Com %1$d dedos durante %2$s</item>
+        <item quantity="other">Com %1$d dedos durante %2$s</item>
+    </plurals>
 
-    <string name="item_swipe_title">Swipe</string>
-    <string name="item_swipe_desc">Swipe de uma posição na tela para outra</string>
-    <string name="item_swipe_details">Durante %1$s</string>
 
     <string name="item_pause_title">Aguardar</string>
     <string name="item_pause_desc">Pausar a execução da detecção</string>
@@ -66,7 +70,6 @@
 
     <string name="item_change_counter_title">Alterar contador</string>
     <string name="item_change_counter_desc">Alterar um valor para verificar mais tarde</string>
-    <string name="item_change_counter_details">%1$s %2$s %3$s</string>
     <string name="item_change_counter_details_error">Contador inválido</string>
 
     <string name="item_toggle_event_title">Alterar estado do evento</string>
@@ -137,6 +140,14 @@
     <string name="item_title_debug_generate_report">Gerar relatório</string>
     <string name="item_desc_debug_generate_report">Registre o comportamento do seu cenário durante a detecção para criar um relatório.</string>
 
+    <string name="field_debug_view_settings_title">Configurações da visualização de depuração</string>
+    <string name="field_debug_view_settings_desc">Escolha as informações exibidas na visualização de depuração.</string>
+
+    <string name="dialog_title_debug_view_settings">Visualização de depuração</string>
+    <string name="field_debug_view_show_event_stats_title">Mostrar estatísticas dos eventos</string>
+    <string name="field_debug_view_show_actions_title">Mostrar ações do evento</string>
+    <string name="field_debug_view_show_held_finger_title">Mostrar dedo pressionado</string>
+
     <string name="field_show_debug_report_title">Mostrar relatório</string>
     <string name="field_show_debug_report_desc_available">Relatório de depuração disponível</string>
     <string name="field_show_debug_report_desc_not_available">Nenhum relatório de depuração disponível</string>
@@ -154,7 +165,7 @@
     <string name="message_empty_trigger_condition_list_title">Sem condições !</string>
     <string name="message_empty_trigger_condition_list_desc">Uma condição é um critério personalizado para iniciar uma ação.</string>
     <string name="message_empty_action_list_title">Sem ações !</string>
-    <string name="message_empty_action_list_desc">Uma ação é uma interação (clicar, swipe…) com seu telefone ativada quando as condições criadas são atendidas.</string>
+    <string name="message_empty_action_list_desc">Uma ação é uma interação (clicar, gesto…) com seu telefone ativada quando as condições criadas são atendidas.</string>
 
     <string name="menu_item_title_conditions">Condições</string>
     <string name="menu_item_title_actions">Ações</string>
@@ -197,10 +208,12 @@
 
     <string name="generic_condition_threshold_title">Diferença tolerada</string>
 
+    <string name="toast_capture_failed">Falha na captura de tela, nenhum quadro foi gerado.</string>
+
 
     <!-- Dialog Condition Counter Reached ========================================================================== -->
 
-    <string name="dialog_title_counter_reached">Valor do contador</string>
+    <string name="dialog_title_counter_reached">Valor do contador alcançado</string>
 
     <string name="field_counter_name_label">Nome do contador</string>
 
@@ -239,20 +252,46 @@
     <string name="field_condition_selection_desc_and_operator_not_found">Nenhuma condição selecionada</string>
 
     <string name="field_condition_selection_title_or_operator">Clique na primeira condição detectada</string>
-    <string name="field_condition_selection_desc_or_operator">Evento está definido como "Uma Condição", você não pode selecionar uma específica</string>
+    <string name="field_condition_selection_desc_or_operator">O operador de condição do evento está definido como \"OR\", o clique ocorrerá na primeira condição detectada</string>
 
     <string name="field_click_position_desc">Clique em %1$d, %2$d</string>
 
-    <string name="field_click_offset_title">Clique deslocamento</string>
+    <string name="field_click_offset_title">Deslocamento</string>
     <string name="field_click_offset_desc_none">Nenhum</string>
+    <string name="item_desc_gesture_press_condition">Pressionar em [%1$s]</string>
+    <string name="item_desc_gesture_press_condition_or">Pressionar na primeira condição detectada</string>
+    <string name="item_desc_gesture_press_condition_error">Nenhuma condição para pressionar</string>
+    <string name="item_desc_gesture_move_condition">Mover para [%1$s]</string>
+    <string name="item_desc_gesture_move_condition_or">Mover para a primeira condição detectada</string>
+    <string name="item_desc_gesture_move_condition_error">Nenhuma condição para onde mover</string>
+    <string name="message_title_gesture_on_condition_and">Clicar em uma condição</string>
+    <string name="message_desc_gesture_on_condition_and">%1$s</string>
+    <string name="message_title_gesture_on_condition_or">Operador de condição OR</string>
+    <string name="message_desc_gesture_on_condition_or">Posição da primeira condição detectada</string>
+    <string name="message_title_gesture_on_condition_error">Nenhuma condição selecionada</string>
+    <string name="message_desc_gesture_on_condition_error">Você precisa de uma condição para executar o gesto</string>
+    <string name="button_title_condition_pick">Escolher condição</string>
+    <string name="button_title_condition_remove">Remover condição</string>
+    <string name="field_gesture_release_when_title">Quando</string>
+    <string name="field_gesture_release_when_item_now">Agora</string>
+    <string name="field_gesture_release_when_item_until_actions_end">Fim das ações</string>
+    <string name="field_gesture_release_when_item_once_unfulfilled">Evento não atendido</string>
+    <string name="field_gesture_release_when_item_for_duration">Após um tempo</string>
+    <string name="field_gesture_release_hold_duration_title">Tempo pressionado (ms)</string>
+    <string name="field_gesture_release_desc_now">Soltar o dedo imediatamente.</string>
+    <string name="field_gesture_release_desc_until_actions_end">Soltar o dedo quando todas as ações deste evento forem executadas. O mesmo que \"Agora\" se esta ação for a última da lista.</string>
+    <string name="field_gesture_release_desc_once_unfulfilled">Soltar o dedo quando este evento deixar de ser atendido.</string>
+    <string name="field_gesture_release_desc_for_duration">Soltar o dedo após %1$d ms.</string>
+    <string name="item_desc_gesture_release_now">Soltar imediatamente</string>
+    <string name="item_desc_gesture_release_until_actions_end">Soltar ao fim das ações</string>
+    <string name="item_desc_gesture_release_once_unfulfilled">Soltar quando o evento não for mais atendido</string>
+    <string name="item_desc_gesture_release_for_duration">Soltar após %1$d ms</string>
+    <string name="field_gesture_release_hold_behaviour">• Só é possível manter um dedo pressionado por vez: iniciar outro soltará este.\n• Enquanto um dedo estiver pressionado, o evento relacionado não será mais acionado até que o dedo seja solto.\n• Se você tocar na tela manualmente, o dedo pressionado será solto.\n• O tempo máximo depende do seu sistema e do aplicativo que está sendo automatizado. Alguns sistemas permitem tempo ilimitado, outros não.</string>
 
 
     <!-- Dialog Action Swipe ======================================================================================= -->
 
-    <string name="dialog_title_swipe">Swipe</string>
 
-    <string name="field_swipe_positions_title">Posições de swipe</string>
-    <string name="field_swipe_positions_desc">Swipe de %1$d, %2$d para %3$d, %4$d</string>
 
 
     <!-- Dialog Action Pause ======================================================================================= -->
@@ -284,6 +323,24 @@
     <string name="dialog_title_change_counter">Alterar contador</string>
 
     <string name="field_counter_operation_value_label">Valor</string>
+    <string name="field_counter_operation_condition_selection_desc">Se detectada, sua posição na tela será usada como valor</string>
+    <string name="field_counter_operation_condition_selection_title_empty">Nenhuma condição selecionada</string>
+    <string name="field_counter_operation_condition_selection_desc_empty">Clique aqui para selecionar uma condição</string>
+    <string name="field_counter_operation_condition_selection_title_none">Nenhuma condição disponível</string>
+    <string name="field_counter_operation_condition_selection_desc_none">Crie uma condição de tela que deve ser detectada neste evento para usar sua posição</string>
+    <string name="dropdown_condition_position_type_label">Posição</string>
+    <string name="dropdown_condition_position_type_item_left">Esquerda</string>
+    <string name="dropdown_condition_position_type_item_left_desc">Coordenada X da borda esquerda</string>
+    <string name="dropdown_condition_position_type_item_center_x">Centro X</string>
+    <string name="dropdown_condition_position_type_item_center_x_desc">Coordenada X do centro</string>
+    <string name="dropdown_condition_position_type_item_right">Direita</string>
+    <string name="dropdown_condition_position_type_item_right_desc">Coordenada X da borda direita</string>
+    <string name="dropdown_condition_position_type_item_top">Superior</string>
+    <string name="dropdown_condition_position_type_item_top_desc">Coordenada Y da borda superior</string>
+    <string name="dropdown_condition_position_type_item_center_y">Centro Y</string>
+    <string name="dropdown_condition_position_type_item_center_y_desc">Coordenada Y do centro</string>
+    <string name="dropdown_condition_position_type_item_bottom">Inferior</string>
+    <string name="dropdown_condition_position_type_item_bottom_desc">Coordenada Y da borda inferior</string>
 
     <string name="dropdown_counter_operation_label">Operação</string>
 

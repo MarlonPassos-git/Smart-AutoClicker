@@ -28,9 +28,10 @@ internal fun getRootCategory() =
         longDescriptionRes = R.string.tutorial_category_root_desc_long,
         iconRes = R.drawable.ic_tutorials,
         content = listOf(
+            TutorialCategory.Content.Divider,
             TutorialCategory.Content.Category(TutorialCategory.Type.BASICS),
             TutorialCategory.Content.Category(TutorialCategory.Type.COMBINE_CONDITIONS),
-            TutorialCategory.Content.Category(TutorialCategory.Type.EVENT_STATE),
+            TutorialCategory.Content.Category(TutorialCategory.Type.COMBINE_EVENTS),
             TutorialCategory.Content.Category(TutorialCategory.Type.COUNTERS),
         ),
     )

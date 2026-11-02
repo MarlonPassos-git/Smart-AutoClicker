@@ -69,6 +69,10 @@ internal class OverlayMenuAnimations : Dumpable {
             showAnimationIsRunning = false
             showOverlayMenuAnimation.cancel()
             showOverlayViewAnimation.cancel()
+
+            view.alpha = 1f
+            if (overlayView is ViewGroup && overlayView.childCount == 1) overlayView.children.first().alpha = 1f
+
             onAnimationEnded()
         }
         view.postDelayed(timeoutCallback, 1_000)
@@ -89,10 +93,15 @@ internal class OverlayMenuAnimations : Dumpable {
             hideAnimationIsRunning = false
         }
 
+        // A previous hide timeout may have left the views fully transparent, and AlphaAnimation is relative to it
+        view.alpha = 1f
         view.measure(MeasureSpec.EXACTLY, MeasureSpec.EXACTLY)
         view.startAnimation(showOverlayMenuAnimation)
         if (overlayView is ViewGroup && overlayView.childCount == 1) {
-            overlayView.children.first().startAnimation(showOverlayViewAnimation)
+            overlayView.children.first().apply {
+                alpha = 1f
+                startAnimation(showOverlayViewAnimation)
+            }
         }
     }
 
@@ -107,6 +116,10 @@ internal class OverlayMenuAnimations : Dumpable {
             hideAnimationIsRunning = false
             hideOverlayMenuAnimation.cancel()
             hideOverlayViewAnimation.cancel()
+
+            view.alpha = 0f
+            if (overlayView is ViewGroup && overlayView.childCount == 1) overlayView.children.first().alpha = 0f
+
             onAnimationEnded()
         }
 

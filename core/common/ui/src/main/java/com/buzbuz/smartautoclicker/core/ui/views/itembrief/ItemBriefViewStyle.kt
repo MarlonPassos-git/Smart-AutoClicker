@@ -25,20 +25,25 @@ import androidx.annotation.ColorInt
 import androidx.core.content.res.use
 
 import com.buzbuz.smartautoclicker.core.ui.R
+import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.ZoomBriefRendererStyle
 import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.ClickBriefRendererStyle
 import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.AreaClickBriefRendererStyle
 import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.ColorConditionBriefRendererStyle
 import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.DefaultBriefRendererStyle
+import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.GestureBriefRendererStyle
 import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.ImageConditionBriefRendererStyle
 import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.PauseBriefRendererStyle
-import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.SwipeBriefRendererStyle
 import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.TextConditionBriefRendererStyle
+import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.getGestureConditionLabelStyle
+import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.getGestureFingerColors
+import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.getGestureHeldColor
 
 
 internal class ItemBriefViewStyle(
     val areaClickStyle: AreaClickBriefRendererStyle,
     val clickStyle: ClickBriefRendererStyle,
-    val swipeStyle: SwipeBriefRendererStyle,
+    val gestureStyle: GestureBriefRendererStyle,
+    val zoomStyle: ZoomBriefRendererStyle,
     val pauseStyle: PauseBriefRendererStyle,
     val imageConditionStyle: ImageConditionBriefRendererStyle,
     val colorConditionStyle: ColorConditionBriefRendererStyle,
@@ -57,7 +62,6 @@ internal fun Context.getItemBriefStyle(attrs: AttributeSet, defStyleAttr: Int): 
         val innerColor = ta.getColor(R.styleable.ItemBriefView_colorInner, Color.WHITE)
         val backgroundColor = ta.getColor(R.styleable.ItemBriefView_colorBackground, Color.TRANSPARENT)
         val colorOutlinePrimary = ta.getColor(R.styleable.ItemBriefView_colorOutlinePrimary, Color.RED)
-        val colorOutlineSecondary = ta.getColor(R.styleable.ItemBriefView_colorOutlineSecondary, Color.GREEN)
 
         ItemBriefViewStyle(
             areaClickStyle = AreaClickBriefRendererStyle(
@@ -73,15 +77,22 @@ internal fun Context.getItemBriefStyle(attrs: AttributeSet, defStyleAttr: Int): 
                 outerRadiusPx = outerRadius,
                 innerRadiusPx = innerRadius,
             ),
-            swipeStyle = SwipeBriefRendererStyle(
-                backgroundColor = backgroundColor,
+            zoomStyle = ZoomBriefRendererStyle(
                 linePaint = newFillPaint(innerColor, innerRadius / 2f),
                 outerFromPaint = newStrokePaint(colorOutlinePrimary, thickness),
-                innerFromPaint = newFillPaint(innerColor),
-                outerToPaint = newStrokePaint(colorOutlineSecondary, thickness),
-                innerToPaint = newFillPaint(innerColor),
+                outerToPaint = newStrokePaint(ta.getColor(R.styleable.ItemBriefView_colorOutlineSecondary, Color.GREEN), thickness),
+                outerRadiusPx = outerRadius,
+            ),
+            gestureStyle = GestureBriefRendererStyle(
+                backgroundColor = backgroundColor,
+                outerPaint = newStrokePaint(colorOutlinePrimary, thickness),
+                innerPaint = newFillPaint(innerColor),
+                linePaint = newFillPaint(innerColor, innerRadius / 2f),
                 outerRadiusPx = outerRadius,
                 innerRadiusPx = innerRadius,
+                fingerColors = getGestureFingerColors(),
+                heldColor = getGestureHeldColor(),
+                conditionLabelStyle = getGestureConditionLabelStyle(),
             ),
             pauseStyle = PauseBriefRendererStyle(
                 backgroundColor = backgroundColor,

@@ -27,13 +27,12 @@ import com.buzbuz.smartautoclicker.core.common.overlays.manager.OverlayManager
 import com.buzbuz.smartautoclicker.core.common.overlays.menu.implementation.PositionSelectorMenu
 import com.buzbuz.smartautoclicker.core.dumb.domain.model.DumbAction
 import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.ClickDescription
-import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.SwipeDescription
 import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.ZoomDescription
 import com.buzbuz.smartautoclicker.feature.dumb.config.R
 import com.buzbuz.smartautoclicker.feature.dumb.config.ui.actions.click.DumbClickDialog
 import com.buzbuz.smartautoclicker.feature.dumb.config.ui.actions.copy.DumbActionCopyDialog
+import com.buzbuz.smartautoclicker.feature.dumb.config.ui.actions.gesture.DumbGestureDialog
 import com.buzbuz.smartautoclicker.feature.dumb.config.ui.actions.pause.DumbPauseDialog
-import com.buzbuz.smartautoclicker.feature.dumb.config.ui.actions.swipe.DumbSwipeDialog
 import com.buzbuz.smartautoclicker.feature.dumb.config.ui.actions.zoom.DumbZoomDialog
 
 internal fun OverlayManager.startDumbActionCreationUiFlow(
@@ -53,8 +52,12 @@ internal fun OverlayManager.startDumbActionCreationUiFlow(
                 when (choice) {
                     DumbActionTypeChoice.Copy -> onCopyDumbActionSelected(context, creator, listener)
                     DumbActionTypeChoice.Click -> onDumbClickCreationSelected(context, creator, listener)
-                    DumbActionTypeChoice.Swipe -> onDumbSwipeCreationSelected(context, creator, listener)
                     DumbActionTypeChoice.Zoom -> onDumbZoomCreationSelected(context, creator, listener)
+                    DumbActionTypeChoice.Gesture -> startDumbGestureEditionUiFlow(
+                        context,
+                        creator.createNewDumbGesture(),
+                        listener,
+                    )
                     DumbActionTypeChoice.Pause -> startDumbPauseEditionFlow(
                         context,
                         creator.createNewDumbPause(),
@@ -76,10 +79,29 @@ internal fun OverlayManager.startDumbActionEditionUiFlow(
 
     when (dumbAction) {
         is DumbAction.DumbClick -> startDumbClickEditionUiFlow(context, dumbAction, listener)
-        is DumbAction.DumbSwipe -> startDumbSwipeEditionFlow(context, dumbAction, listener)
         is DumbAction.DumbZoom -> startDumbZoomEditionFlow(context, dumbAction, listener)
         is DumbAction.DumbPause -> startDumbPauseEditionFlow(context, dumbAction, listener)
+        is DumbAction.DumbGesture -> startDumbGestureEditionUiFlow(context, dumbAction, listener)
     }
+}
+
+private fun OverlayManager.startDumbGestureEditionUiFlow(
+    context: Context,
+    dumbGesture: DumbAction.DumbGesture,
+    listener: DumbActionUiFlowListener,
+) {
+    Log.d(TAG, "Starting dumb gesture edition ui flow: $dumbGesture")
+
+    navigateTo(
+        context = context,
+        newOverlay = DumbGestureDialog(
+            dumbGesture = dumbGesture,
+            onConfirmClicked = listener.onDumbActionSaved,
+            onDeleteClicked = listener.onDumbActionDeleted,
+            onDismissClicked = listener.onDumbActionCreationCancelled,
+        ),
+        hideCurrent = true,
+    )
 }
 
 private fun OverlayManager.startDumbClickEditionUiFlow(
@@ -87,11 +109,6 @@ private fun OverlayManager.startDumbClickEditionUiFlow(
     dumbClick: DumbAction.DumbClick,
     listener: DumbActionUiFlowListener,
 ) {
-    if (!dumbClick.isValid()) {
-        Log.e(TAG, "Can't start dumb click edition ui flow, click is invalid: $dumbClick")
-        listener.onDumbActionCreationCancelled()
-        return
-    }
     Log.d(TAG, "Starting dumb click edition ui flow: $dumbClick")
 
     navigateTo(
@@ -148,64 +165,6 @@ private fun OverlayManager.onDumbClickCreationSelected(
                         listener = listener,
                     )
                 } ?: listener.onDumbActionCreationCancelled()
-            },
-            onDismiss = listener.onDumbActionCreationCancelled,
-        ),
-        hideCurrent = true,
-    )
-}
-
-private fun OverlayManager.startDumbSwipeEditionFlow(
-    context: Context,
-    dumbSwipe: DumbAction.DumbSwipe,
-    listener: DumbActionUiFlowListener,
-) {
-    if (!dumbSwipe.isValid()) {
-        Log.e(TAG, "Can't start dumb swipe edition ui flow, swipe is invalid: $dumbSwipe")
-        listener.onDumbActionCreationCancelled()
-        return
-    }
-    Log.d(TAG, "Starting dumb swipe edition ui flow: $dumbSwipe")
-
-    navigateTo(
-        context = context,
-        newOverlay = DumbSwipeDialog(
-            dumbSwipe = dumbSwipe,
-            onConfirmClicked = listener.onDumbActionSaved,
-            onDeleteClicked = listener.onDumbActionDeleted,
-            onDismissClicked = listener.onDumbActionCreationCancelled,
-        ),
-        hideCurrent = true,
-    )
-}
-
-private fun OverlayManager.onDumbSwipeCreationSelected(
-    context: Context,
-    creator: DumbActionCreator,
-    listener: DumbActionUiFlowListener,
-) {
-    Log.d(TAG, "Dumb swipe creation selected, opening position selection menu")
-
-    navigateTo(
-        context = context,
-        newOverlay = PositionSelectorMenu(
-            itemBriefDescription = SwipeDescription(),
-            onConfirm = { description ->
-                (description as? SwipeDescription)?.let { swipeDesc ->
-                    if (swipeDesc.from == null || swipeDesc.to == null) {
-                        listener.onDumbActionCreationCancelled()
-                        return@let
-                    }
-
-                    startDumbSwipeEditionFlow(
-                        context = context,
-                        dumbSwipe = creator.createNewDumbSwipe(
-                            swipeDesc.from?.toPoint()!!,
-                            swipeDesc.to?.toPoint()!!,
-                        ),
-                        listener = listener,
-                    )
-                }
             },
             onDismiss = listener.onDumbActionCreationCancelled,
         ),
@@ -283,11 +242,10 @@ internal class DumbActionUiFlowListener(
 
 internal class DumbActionCreator(
     val createNewDumbClick: (position: Point) -> DumbAction.DumbClick,
-    val createNewDumbSwipe: (from: Point, to: Point) -> DumbAction.DumbSwipe,
     val createNewDumbZoom: (center: Point, intensityPx: Int) -> DumbAction.DumbZoom,
     val createNewDumbPause: () -> DumbAction.DumbPause,
+    val createNewDumbGesture: () -> DumbAction.DumbGesture,
     val createDumbActionCopy: ((DumbAction) -> DumbAction)? = null,
 )
-
 
 private const val TAG = "DumbActionUiFlow"

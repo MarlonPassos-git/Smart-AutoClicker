@@ -10,7 +10,20 @@ import com.buzbuz.smartautoclicker.core.common.tutorial.domain.TutorialRepositor
 import com.buzbuz.smartautoclicker.core.domain.model.action.Action
 import com.buzbuz.smartautoclicker.core.domain.model.action.AreaClick
 import com.buzbuz.smartautoclicker.core.processing.domain.SmartProcessingRepository
-import com.buzbuz.smartautoclicker.core.settings.domain.SettingsRepository
+import com.buzbuz.smartautoclicker.core.display.config.DisplayConfigManager
+import com.buzbuz.smartautoclicker.core.processing.domain.model.DetectionState
+import com.buzbuz.smartautoclicker.core.common.tutorial.domain.model.state.TutorialState
+import com.buzbuz.smartautoclicker.core.domain.model.event.Event
+import com.buzbuz.smartautoclicker.feature.smart.config.domain.model.EditedElementState
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.setMain
+import kotlinx.coroutines.test.resetMain
+import org.junit.Before
+import org.junit.After
 import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.AreaClickDescription
 import com.buzbuz.smartautoclicker.feature.smart.config.domain.EditionRepository
 import com.buzbuz.smartautoclicker.feature.smart.config.domain.model.EditedListState
@@ -20,7 +33,6 @@ import com.buzbuz.smartautoclicker.feature.smart.config.ui.action.brief.SmartAct
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -29,16 +41,20 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.Q])
 class AreaClickBriefPreviewUnitSpec {
+    @Before fun setUp() = Dispatchers.setMain(UnconfinedTestDispatcher())
+    @After fun tearDown() = Dispatchers.resetMain()
+
 
     @Test
     fun `focused area click exposes its configured polygon`() = runTest {
         val vertices = listOf(Point(40, 60), Point(320, 80), Point(260, 280), Point(70, 240))
         val viewModel = createViewModel(areaClick(vertices))
 
-        val description = viewModel.actionVisualization.first() as AreaClickDescription
+        val description = viewModel.uiState.filterNotNull().first().focusedActionDescription as AreaClickDescription
 
         assertEquals(vertices.map { point -> point.x.toFloat() to point.y.toFloat() }, description.vertices.map { it.x to it.y })
     }
@@ -47,16 +63,18 @@ class AreaClickBriefPreviewUnitSpec {
         val editionState = mockk<IEditionState>()
         val editionRepository = mockk<EditionRepository>()
         val copyAvailability = mockk<IsActionCopyAvailableUseCase>()
-        val settingsRepository = mockk<SettingsRepository>()
+        val processingRepository = mockk<SmartProcessingRepository>()
+        val tutorialRepository = mockk<TutorialRepository>()
+        every { processingRepository.detectionState } returns MutableStateFlow(DetectionState.INACTIVE)
+        every { tutorialRepository.tutorialState } returns MutableStateFlow(TutorialState.Stopped)
         every { editionRepository.editionState } returns editionState
         every { editionState.editedEventActionsState } returns flowOf(actionListState(areaClick))
-        every { editionState.editedEventState } returns emptyFlow()
+        every { editionState.editedEventState } returns flowOf(EditedElementState(mockk<Event>(relaxed = true), false, true))
         every { copyAvailability() } returns flowOf(false)
-        every { settingsRepository.isLegacyActionUiEnabledFlow } returns flowOf(false)
         return SmartActionsBriefViewModel(
             mockk<Context>(relaxed = true), copyAvailability, mockk<BitmapRepository>(), editionRepository,
-            mockk<SmartProcessingRepository>(relaxed = true), mockk<MonitoredViewsManager>(relaxed = true),
-            mockk<TutorialRepository>(relaxed = true), settingsRepository,
+            mockk<DisplayConfigManager>(relaxed = true), processingRepository,
+            mockk<MonitoredViewsManager>(relaxed = true), tutorialRepository,
         )
     }
 

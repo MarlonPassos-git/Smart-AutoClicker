@@ -35,12 +35,12 @@ import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.ColorCondit
 import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.ColorConditionDescription
 import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.DefaultBriefRenderer
 import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.DefaultDescription
+import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.GestureBriefRenderer
+import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.GestureDescription
 import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.ImageConditionBriefRenderer
 import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.ImageConditionDescription
 import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.PauseBriefRenderer
 import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.PauseDescription
-import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.SwipeBriefRenderer
-import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.SwipeDescription
 import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.TextConditionBriefRenderer
 import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.TextConditionDescription
 import com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers.ZoomBriefRenderer
@@ -86,8 +86,8 @@ class ItemBriefView @JvmOverloads constructor(
             renderer = when (description) {
                 is AreaClickDescription -> AreaClickBriefRenderer(this, style.areaClickStyle)
                 is ClickDescription -> ClickBriefRenderer(this, style.clickStyle)
-                is SwipeDescription -> SwipeBriefRenderer(this, style.swipeStyle)
-                is ZoomDescription -> ZoomBriefRenderer(this, style.swipeStyle)
+                is ZoomDescription -> ZoomBriefRenderer(this, style.zoomStyle)
+                is GestureDescription -> GestureBriefRenderer(this, style.gestureStyle)
                 is PauseDescription -> PauseBriefRenderer(this, style.pauseStyle)
                 is ImageConditionDescription -> ImageConditionBriefRenderer(
                     this, style.imageConditionStyle, displayConfigManager,

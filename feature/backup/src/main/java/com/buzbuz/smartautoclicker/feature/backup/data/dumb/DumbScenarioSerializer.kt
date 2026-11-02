@@ -19,7 +19,6 @@ package com.buzbuz.smartautoclicker.feature.backup.data.dumb
 import android.util.Log
 
 import com.buzbuz.smartautoclicker.core.base.extensions.getBoolean
-import com.buzbuz.smartautoclicker.core.base.extensions.getEnum
 import com.buzbuz.smartautoclicker.core.base.extensions.getInt
 import com.buzbuz.smartautoclicker.core.base.extensions.getJsonArray
 import com.buzbuz.smartautoclicker.core.base.extensions.getJsonObject
@@ -29,6 +28,11 @@ import com.buzbuz.smartautoclicker.core.base.identifier.DATABASE_ID_INSERTION
 import com.buzbuz.smartautoclicker.core.dumb.data.database.DUMB_DATABASE_VERSION
 import com.buzbuz.smartautoclicker.core.dumb.data.database.DumbActionEntity
 import com.buzbuz.smartautoclicker.core.dumb.data.database.DumbActionType
+import com.buzbuz.smartautoclicker.core.dumb.data.database.DumbActionWithFingers
+import com.buzbuz.smartautoclicker.core.dumb.data.database.DumbGestureFingerEntity
+import com.buzbuz.smartautoclicker.core.dumb.data.database.DumbGestureFingerMotionEntity
+import com.buzbuz.smartautoclicker.core.dumb.data.database.DumbGestureFingerMotionType
+import com.buzbuz.smartautoclicker.core.dumb.data.database.DumbGestureFingerWithMotions
 import com.buzbuz.smartautoclicker.core.dumb.data.database.DumbScenarioEntity
 import com.buzbuz.smartautoclicker.core.dumb.data.database.DumbScenarioStatsEntity
 import com.buzbuz.smartautoclicker.core.dumb.data.database.DumbScenarioWithActions
@@ -148,13 +152,19 @@ internal class DumbScenarioSerializer : ScenarioBackupSerializer<DumbScenarioBac
         )
     }
 
-    private fun JsonArray.deserializeDumbActionsCompat(): List<DumbActionEntity> =
+    private fun JsonArray.deserializeDumbActionsCompat(): List<DumbActionWithFingers> =
         mapNotNull { jsonElement ->
             jsonElement.getJsonObject()?.let { jsonDumbAction ->
-                when (jsonDumbAction.getEnum<DumbActionType>("type", true)) {
-                    DumbActionType.CLICK -> jsonDumbAction.deserializeDumbClickCompat()
-                    DumbActionType.SWIPE -> jsonDumbAction.deserializeDumbSwipeCompat()
-                    DumbActionType.PAUSE -> jsonDumbAction.deserializeDumbPauseCompat()
+                // Upstream schema 3 wraps the action and its fingers; fork schema 3 still stores flat actions.
+                if (jsonDumbAction.getJsonObject("action") != null) {
+                    return@mapNotNull Json.decodeFromJsonElement<DumbActionWithFingers>(jsonDumbAction)
+                }
+                when (jsonDumbAction.getString("type", true)) {
+                    DumbActionType.ZOOM.name -> Json.decodeFromJsonElement<DumbActionEntity>(jsonDumbAction).withoutFingers()
+                    DumbActionType.CLICK.name -> jsonDumbAction.deserializeDumbClickCompat()?.withoutFingers()
+                    DumbActionType.PAUSE.name -> jsonDumbAction.deserializeDumbPauseCompat()?.withoutFingers()
+                    // Swipes only exist in legacy backups, they are imported as single finger gestures
+                    LEGACY_ACTION_TYPE_SWIPE -> jsonDumbAction.deserializeDumbSwipeCompat()
                     else -> null
                 }
             }
@@ -162,7 +172,7 @@ internal class DumbScenarioSerializer : ScenarioBackupSerializer<DumbScenarioBac
 
     private fun JsonObject.deserializeDumbClickCompat(): DumbActionEntity? {
         val id = getLong("id", true) ?: return null
-        val scenarioId = getLong("dumb_scenario_id", true) ?: return null
+        val scenarioId = getLong("dumbScenarioId") ?: getLong("dumb_scenario_id", true) ?: return null
 
         val name = getString("name", true)
         if (name.isNullOrEmpty()) return null
@@ -191,9 +201,9 @@ internal class DumbScenarioSerializer : ScenarioBackupSerializer<DumbScenarioBac
         )
     }
 
-    private fun JsonObject.deserializeDumbSwipeCompat(): DumbActionEntity? {
+    private fun JsonObject.deserializeDumbSwipeCompat(): DumbActionWithFingers? {
         val id = getLong("id", true) ?: return null
-        val scenarioId = getLong("dumb_scenario_id", true) ?: return null
+        val scenarioId = getLong("dumbScenarioId") ?: getLong("dumb_scenario_id", true) ?: return null
 
         val name = getString("name", true)
         if (name.isNullOrEmpty()) return null
@@ -202,20 +212,16 @@ internal class DumbScenarioSerializer : ScenarioBackupSerializer<DumbScenarioBac
         val fromY = getInt("fromY", true) ?: return null
         val toX = getInt("toX", true) ?: return null
         val toY = getInt("toY", true) ?: return null
+        val swipeDuration = getLong("swipeDuration")
+            ?.coerceIn(DURATION_LOWER_BOUND..DURATION_GESTURE_UPPER_BOUND)
+            ?: DEFAULT_DUMB_SWIPE_DURATION
 
-        return DumbActionEntity(
+        val action = DumbActionEntity(
             id = id,
             dumbScenarioId = scenarioId,
             name = name,
             priority = getInt("priority")?.coerceAtLeast(0) ?: 0,
-            type = DumbActionType.SWIPE,
-            fromX = fromX,
-            fromY = fromY,
-            toX = toX,
-            toY = toY,
-            swipeDuration = getLong("swipeDuration")
-                ?.coerceIn(DURATION_LOWER_BOUND..DURATION_GESTURE_UPPER_BOUND)
-                ?: DEFAULT_DUMB_SWIPE_DURATION,
+            type = DumbActionType.GESTURE,
             repeatCount = getInt("repeatCount")
                 ?.coerceIn(REPEAT_COUNT_MIN_VALUE..REPEAT_COUNT_MAX_VALUE)
                 ?: DEFAULT_DUMB_REPEAT_COUNT,
@@ -224,11 +230,52 @@ internal class DumbScenarioSerializer : ScenarioBackupSerializer<DumbScenarioBac
                 ?.coerceIn(REPEAT_DELAY_MIN_MS.. REPEAT_DELAY_MAX_MS)
                 ?: DEFAULT_DUMB_REPEAT_DELAY_MS,
         )
+
+        val finger = DumbGestureFingerEntity(
+            id = DATABASE_ID_INSERTION,
+            dumbActionId = id,
+            index = 0,
+            startTimeMs = 0,
+        )
+
+        return DumbActionWithFingers(
+            action = action,
+            gestureFingers = listOf(
+                DumbGestureFingerWithMotions(
+                    finger = finger,
+                    motions = listOf(
+                        DumbGestureFingerMotionEntity(
+                            id = DATABASE_ID_INSERTION,
+                            fingerId = finger.id,
+                            index = 0,
+                            motionType = DumbGestureFingerMotionType.PRESS,
+                            x = fromX,
+                            y = fromY,
+                        ),
+                        DumbGestureFingerMotionEntity(
+                            id = DATABASE_ID_INSERTION,
+                            fingerId = finger.id,
+                            index = 1,
+                            motionType = DumbGestureFingerMotionType.MOVE,
+                            durationMs = swipeDuration,
+                            x = toX,
+                            y = toY,
+                        ),
+                        DumbGestureFingerMotionEntity(
+                            id = DATABASE_ID_INSERTION,
+                            fingerId = finger.id,
+                            index = 2,
+                            motionType = DumbGestureFingerMotionType.RELEASE,
+                        ),
+                    ),
+                )
+            ),
+        )
     }
 
     private fun JsonObject.deserializeDumbPauseCompat(): DumbActionEntity? {
         val id = getLong("id", true) ?: return null
-        val scenarioId = getLong("dumb_scenario_id", true) ?: return null
+        val scenarioId = getLong("dumbScenarioId") ?: getLong("dumb_scenario_id", true) ?: return null
 
         val name = getString("name", true)
         if (name.isNullOrEmpty()) return null
@@ -244,7 +291,13 @@ internal class DumbScenarioSerializer : ScenarioBackupSerializer<DumbScenarioBac
                 ?: DEFAULT_DUMB_PAUSE_DURATION,
         )
     }
+
+    private fun DumbActionEntity.withoutFingers(): DumbActionWithFingers =
+        DumbActionWithFingers(action = this, gestureFingers = emptyList())
 }
+
+/** Type name of the swipe actions in legacy backups, replaced by gestures. */
+private const val LEGACY_ACTION_TYPE_SWIPE = "SWIPE"
 
 /** The minimum value for all durations. */
 private const val DURATION_LOWER_BOUND = 1L

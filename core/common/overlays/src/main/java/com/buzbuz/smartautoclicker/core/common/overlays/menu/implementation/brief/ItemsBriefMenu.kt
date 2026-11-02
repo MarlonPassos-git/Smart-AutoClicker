@@ -32,9 +32,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.buzbuz.smartautoclicker.core.common.overlays.R
 import com.buzbuz.smartautoclicker.core.common.overlays.menu.OverlayMenu
 import com.buzbuz.smartautoclicker.core.ui.utils.AutoHideAnimationController
-import com.buzbuz.smartautoclicker.core.ui.views.itembrief.ItemBriefDescription
-import com.buzbuz.smartautoclicker.core.ui.views.gesturerecord.toActionDescription
-import androidx.core.view.isVisible
+import com.buzbuz.smartautoclicker.core.ui.views.gesture.record.RecordedGesture
+import com.buzbuz.smartautoclicker.core.ui.views.gesture.record.toActionDescription
 
 abstract class ItemBriefMenu(
     @StyleRes theme: Int? = null,
@@ -57,6 +56,9 @@ abstract class ItemBriefMenu(
 
     private lateinit var blinkingAnimator: Animator
 
+    /** While capturing, the brief panel must stay hidden as it would block touches on the recorder. */
+    private var isCapturingGesture: Boolean = false
+
     protected open fun onOverlayViewCreated(binding: ItemsBriefOverlayViewBinding): Unit = Unit
 
     protected abstract fun onCreateBriefItemViewHolder(parent: ViewGroup, orientation: Int): ItemBriefViewHolder<*>
@@ -67,8 +69,13 @@ abstract class ItemBriefMenu(
     protected open fun onMoveItemClicked(from: Int, to: Int) = Unit
     protected abstract fun onPlayItemClicked(index: Int)
     protected abstract fun onDeleteItemClicked(index: Int)
+    /** Called when the capture is aborted by the menu itself, without any user action. */
+    protected open fun onGestureCaptureCancelled(): Unit = Unit
 
     override fun onCreateOverlayView(): View {
+        // The overlay view is recreated on rotation, a gesture recorded in the previous orientation is meaningless.
+        if (isCapturingGesture) cancelGestureCapture()
+
         briefPanelAnimationController = AutoHideAnimationController()
         instructionsAnimationController = AutoHideAnimationController()
 
@@ -105,7 +112,7 @@ abstract class ItemBriefMenu(
             itemListSnapHelper.apply {
                 onSnapPositionChangeListener = { snapIndex ->
                     onFocusedItemChanged(snapIndex)
-                    briefPanelAnimationController.showOrResetTimer()
+                    showBriefPanel()
                 }
                 attachToRecyclerView(listActions)
                 initialItemIndex = this@ItemBriefMenu.initialItemIndex
@@ -120,22 +127,22 @@ abstract class ItemBriefMenu(
             emptyScenarioText.setText(noItemText)
 
             root.setOnClickListener {
-                briefPanelAnimationController.showOrResetTimer()
+                showBriefPanel()
             }
             buttonPlay.setDebouncedOnClickListener {
                 onPlayItemClicked(itemListSnapHelper.snapPosition)
             }
             buttonDelete.setDebouncedOnClickListener {
-                briefPanelAnimationController.showOrResetTimer()
+                showBriefPanel()
                 onDeleteItemClicked(itemListSnapHelper.snapPosition)
             }
 
             buttonMovePrevious.setDebouncedOnClickListener {
-                briefPanelAnimationController.showOrResetTimer()
+                showBriefPanel()
                 onMoveItemClicked(itemListSnapHelper.snapPosition, itemListSnapHelper.snapPosition - 1)
             }
             buttonMoveNext.setDebouncedOnClickListener {
-                briefPanelAnimationController.showOrResetTimer()
+                showBriefPanel()
                 onMoveItemClicked(itemListSnapHelper.snapPosition, itemListSnapHelper.snapPosition + 1)
             }
 
@@ -151,7 +158,7 @@ abstract class ItemBriefMenu(
 
     override fun onResume() {
         super.onResume()
-        briefPanelAnimationController.showOrResetTimer()
+        showBriefPanel()
     }
 
     override fun onDestroy() {
@@ -161,7 +168,7 @@ abstract class ItemBriefMenu(
     }
 
     override fun onScreenOverlayVisibilityChanged(isVisible: Boolean) {
-        if (isVisible) briefPanelAnimationController.showOrResetTimer()
+        if (isVisible) showBriefPanel()
     }
 
     @CallSuper
@@ -202,8 +209,9 @@ abstract class ItemBriefMenu(
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    protected fun startGestureCapture(onNewAction: (gesture: ItemBriefDescription?, isFinished: Boolean) -> Unit) {
-        briefPanelAnimationController.hide()
+    protected fun startGestureCapture(onNewAction: (gesture: RecordedGesture?, isFinished: Boolean) -> Unit) {
+        isCapturingGesture = true
+        briefPanelAnimationController.hide(immediately = true)
 
         blinkingAnimator.setTarget(briefViewBinding.recordingIcon)
         blinkingAnimator.start()
@@ -216,7 +224,7 @@ abstract class ItemBriefMenu(
 
             var isCaptureStarted = false
             gestureCaptureListener = { gesture, isFinished ->
-                if (gesture != null && !isCaptureStarted){
+                if (gesture != null && !isCaptureStarted) {
                     isCaptureStarted = true
                     instructionsAnimationController.hide()
                 }
@@ -227,22 +235,39 @@ abstract class ItemBriefMenu(
 
                 if (isFinished) {
                     stopGestureCapture()
-                    onNewAction(gesture?.toActionDescription(), true)
+                    onNewAction(gesture, true)
                 }
             }
         }
     }
 
     protected fun stopGestureCapture() {
+        isCapturingGesture = false
         blinkingAnimator.end()
 
         briefViewBinding.viewRecorder.clearAndHide()
-        briefPanelAnimationController.showOrResetTimer()
+        showBriefPanel()
         instructionsAnimationController.hide()
     }
 
+    private fun cancelGestureCapture() {
+        isCapturingGesture = false
+        blinkingAnimator.end()
+        briefViewBinding.viewRecorder.apply {
+            gestureCaptureListener = null
+            clearAndHide()
+        }
+
+        onGestureCaptureCancelled()
+    }
+
     protected fun isGestureCaptureStarted(): Boolean =
-        briefViewBinding.viewRecorder.isVisible
+        isCapturingGesture
+
+    private fun showBriefPanel() {
+        if (isCapturingGesture) return
+        briefPanelAnimationController.showOrResetTimer()
+    }
 
     private fun updateBriefButtons(itemCount: Int) {
         briefViewBinding.apply {

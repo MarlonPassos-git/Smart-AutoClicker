@@ -23,6 +23,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.core.view.doOnLayout
 import androidx.core.view.marginStart
 import androidx.core.view.marginTop
@@ -34,8 +35,8 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 
 import com.buzbuz.smartautoclicker.core.common.overlays.manager.OverlayManager
-import com.buzbuz.smartautoclicker.core.common.tutorial.domain.model.data.subject.quickclickgame.QuickClickGameTargetState
-import com.buzbuz.smartautoclicker.core.common.tutorial.domain.model.data.subject.quickclickgame.QuickClickGameTargetType
+import com.buzbuz.smartautoclicker.core.common.tutorial.domain.model.tutorial.subject.quickclickgame.QuickClickGameTargetState
+import com.buzbuz.smartautoclicker.core.common.tutorial.domain.model.tutorial.subject.quickclickgame.QuickClickGameTargetType
 import com.buzbuz.smartautoclicker.core.ui.utils.getDynamicColorsContext
 import com.buzbuz.smartautoclicker.feature.tutorial.R
 import com.buzbuz.smartautoclicker.feature.tutorial.databinding.DialogTutorialSuccessBinding
@@ -56,6 +57,9 @@ class ClickCountGameFragment : Fragment() {
     private lateinit var viewBinding: FragmentClickCountGameBinding
     /** Tells if the time blinking animation is started or not. */
     private var isTimeAnimationStarted: Boolean = false
+
+    /** Dialog shown once the game is won.*/
+    private var completionDialog: AlertDialog? = null
 
     @Inject lateinit var overlayManager: OverlayManager
 
@@ -78,7 +82,6 @@ class ClickCountGameFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         viewBinding.gameArea.forceLayout()
-        lockMenuPosition()
 
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -98,6 +101,7 @@ class ClickCountGameFragment : Fragment() {
     override fun onStart() {
         super.onStart()
 
+        lockMenuPosition()
         if (viewModel.shouldDisplayFloatingUi.value && overlayManager.isOverlayStackHidden()) {
             overlayManager.restoreVisibility()
         }
@@ -111,6 +115,13 @@ class ClickCountGameFragment : Fragment() {
             overlayManager.hideAll()
         }
         overlayManager.removeTopOverlay()
+        overlayManager.unlockMenuPosition()
+    }
+
+    override fun onDestroyView() {
+        completionDialog?.dismiss()
+        completionDialog = null
+        super.onDestroyView()
     }
 
     override fun onDestroy() {
@@ -171,7 +182,11 @@ class ClickCountGameFragment : Fragment() {
     }
 
     private fun showCompletionDialog(show: Boolean) {
-        if (!show) return
+        if (!show) {
+            completionDialog?.dismiss()
+            return
+        }
+        if (completionDialog != null) return
 
         val dialogContext = requireContext().getDynamicColorsContext(R.style.AppTheme)
         val dialogViewBinding = DialogTutorialSuccessBinding.inflate(LayoutInflater.from(dialogContext))
@@ -183,10 +198,12 @@ class ClickCountGameFragment : Fragment() {
             buttonKeepPlaying.setOnClickListener { dialog.dismiss() }
             buttonClose.setOnClickListener {
                 dialog.dismiss()
-                findNavController().navigateUp()
+                if (isAdded) findNavController().navigateUp()
             }
         }
 
+        dialog.setOnDismissListener { completionDialog = null }
+        completionDialog = dialog
         dialog.show()
     }
 
@@ -232,6 +249,8 @@ class ClickCountGameFragment : Fragment() {
         when (type) {
             QuickClickGameTargetType.IMAGE_BLUE -> blueTarget
             QuickClickGameTargetType.IMAGE_RED -> redTarget
+            QuickClickGameTargetType.IMAGE_GREEN -> greenTarget
+            QuickClickGameTargetType.IMAGE_YELLOW -> yellowTarget
             QuickClickGameTargetType.TEXT_DAY -> dayTarget
             QuickClickGameTargetType.TEXT_GOODBYE -> goodbyeTarget
             QuickClickGameTargetType.TEXT_HELLO -> helloTarget

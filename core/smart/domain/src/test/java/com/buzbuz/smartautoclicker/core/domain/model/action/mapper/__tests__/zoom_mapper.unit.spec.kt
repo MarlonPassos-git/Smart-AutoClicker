@@ -29,7 +29,7 @@ class ZoomMapperTest {
     @Test
     fun zoomRoundTripPreservesGestureConfiguration() {
         val zoom = createZoom()
-        val completeEntity = CompleteActionEntity(zoom.toEntity(), emptyList(), emptyList())
+        val completeEntity = CompleteActionEntity(zoom.toEntity(), emptyList(), emptyList(), emptyList())
 
         assertEquals(zoom, completeEntity.toDomain())
     }

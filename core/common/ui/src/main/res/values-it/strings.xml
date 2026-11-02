@@ -34,7 +34,6 @@
       -  * Error have the same space as desc
       -->
     <string name="field_click_position_title">Fare clic sulla posizione</string>
-    <string name="field_swipe_positions_title">Posizioni di scorrimento</string>
     <string name="item_title_try_element">Testate il vostro %1$s</string>
     <string name="item_error_action_invalid_generic">Questa azione non è valida</string>
 
@@ -68,7 +67,6 @@
     <string name="input_field_label_name">Nome</string>
     <string name="input_field_label_pause_duration">Durata attesa</string>
     <string name="input_field_label_scenario_name">Nome scenario</string>
-    <string name="input_field_label_swipe_duration">Durata scorrimento (ms)</string>
     <string name="input_field_error_required">Richiesto</string>
 
     <!--
@@ -83,7 +81,7 @@
     <!-- Dropdown field for selecting anti bot state -->
     <string name="dropdown_item_title_anti_detection_enabled">Abilitato</string>
     <string name="dropdown_item_title_anti_detection_disabled">Disabilitato</string>
-    <string name="dropdown_helper_text_anti_detection_enabled">Rendi la durata e posizione dei clic e scorrimenti casuali rispetto ad un piccolo intervallo</string>
+    <string name="dropdown_helper_text_anti_detection_enabled">Rendi la durata e posizione dei clic, dei gesti e delle attese casuali rispetto ad un piccolo intervallo</string>
     <string name="dropdown_helper_text_anti_detection_disabled">Esegui tutte le azioni come dichiarate</string>
 
     <string name="dropdown_label_time_unit_ms">ms</string>
@@ -98,8 +96,24 @@
       -->
     <string name="toast_denied_screen_sharing_permission">L\'utente ha rifiutato l\'autorizzazione di condivisione schermo</string>
     <string name="toast_configure_single_click">Tocca la posizione da cliccare</string>
-    <string name="toast_configure_swipe_from">Tocca la posizione da cui iniziare lo scorrimento</string>
-    <string name="toast_configure_swipe_to">Tocca la posizione in cui finire lo scorrimento</string>
+    <string name="dialog_title_gesture">Gesto</string>
+    <string name="item_header_finger_title">Dito n. %1$d</string>
+    <string name="item_header_finger_desc">%1$dms / %2$dms</string>
+    <string name="item_header_button_capture">Cattura</string>
+    <string name="item_header_finger_start_at">Inizio a (ms)</string>
+    <string name="item_title_gesture_press">Pressione</string>
+    <string name="item_desc_gesture_press_value">Premi in [%1$s, %2$s]</string>
+    <string name="item_title_gesture_move">Spostamento</string>
+    <string name="item_desc_gesture_move_value">Sposta in [%1$s, %2$s]</string>
+    <string name="item_title_gesture_wait">Attendi</string>
+    <string name="item_desc_gesture_wait">Attendi %1$d ms</string>
+    <string name="item_title_gesture_release">Rilascio</string>
+    <string name="item_desc_gesture_release">Solleva il dito dallo schermo</string>
+    <string name="item_title_gesture_add">Aggiungi</string>
+    <string name="field_title_position_x">X</string>
+    <string name="field_title_position_y">Y</string>
+    <string name="field_title_duration_ms">Durata (ms)</string>
+    <string name="button_title_position">Scegli posizione</string>
 
     <!--
       - Content description texts.

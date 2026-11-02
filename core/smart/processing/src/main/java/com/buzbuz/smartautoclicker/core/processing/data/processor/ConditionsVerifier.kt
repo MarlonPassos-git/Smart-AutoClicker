@@ -108,8 +108,10 @@ internal class ConditionsVerifier(
         state.getCounterValue(condition.counterName)?.let { counterValue ->
 
             val operandValue = when (val operationValue = condition.counterValue) {
-                is CounterOperationValue.Counter -> state.getCounterValue(operationValue.value) ?: 0.0
+                is CounterOperationValue.Counter -> state.getCounterValue(operationValue.counterName) ?: 0.0
                 is CounterOperationValue.Number -> operationValue.value
+                // Only supported by the ChangeCounter action
+                is CounterOperationValue.Condition -> return@let false
             }
 
             when (condition.comparisonOperation) {
@@ -243,8 +245,14 @@ internal class ConditionsVerifier(
             if (!detectionResult.isDetected || numberDetected == null) condition.toInvalidConditionResult()
             else {
                 val operandValue = when (val operationValue = condition.counterValue) {
-                    is CounterOperationValue.Counter -> state.getCounterValue(operationValue.value) ?: 0.0
+                    is CounterOperationValue.Counter -> state.getCounterValue(operationValue.counterName) ?: 0.0
                     is CounterOperationValue.Number -> operationValue.value
+                    // Only supported by the ChangeCounter action
+                    is CounterOperationValue.Condition -> {
+                        val invalidResult = condition.toInvalidConditionResult()
+                        progressListener?.onScreenConditionProcessingCompleted(invalidResult)
+                        return invalidResult
+                    }
                 }
 
                 val comparisonResult = when (condition.comparisonOperation) {

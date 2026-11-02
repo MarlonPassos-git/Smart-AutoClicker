@@ -146,6 +146,7 @@
         provided, but keep in mind that broadcast conditions are more for developers, as mastering them requires Android
         development knowledge.</string>
 
+
     <!-- Counter Reached slideshow -->
     <string name="tutorial_slideshow_counter_reached_title">On Counter Reached</string>
     <string name="tutorial_slideshow_counter_reached_desc">React to your scenario\'s counter values</string>
@@ -156,5 +157,291 @@
         operators are available to customize the verification. \n\nCounters can be used in various ways and using a single
         counter-related condition or action is often not enough to use them correctly. Interactive tutorials covering the
         Counter feature are available in their dedicated section.</string>
+
+
+    <!-- Click Action Offset slideshow -->
+    <string name="tutorial_slideshow_click_action_offset_title">Click offset</string>
+    <string name="tutorial_slideshow_click_action_offset_desc">Learn how to fine-tune the click position on a detected condition</string>
+
+    <string name="tutorial_slideshow_click_action_offset_step_1_text">When clicking on a detected condition, the click
+        is applied at the center of the matched area by default. \n\nThe click offset lets you shift that position by a
+        fixed number of pixels along the X and Y axes, relative to the condition\'s center. This is useful when the
+        element you want to tap is close to — but not exactly at — the center of the detected area.</string>
+
+
+    <!-- Click Action Target slideshow -->
+    <string name="tutorial_slideshow_click_action_target_title">Click target</string>
+    <string name="tutorial_slideshow_click_action_target_desc">Learn how to configure where the click will be applied</string>
+
+    <string name="tutorial_slideshow_click_action_target_step_1_text">A Click Action can target two types of positions:
+        a static position that is always the same, or the position of a detected condition.\n\nChoose your targeting
+        method in the click target selector of the action configuration dialog.</string>
+
+    <string name="tutorial_slideshow_click_action_target_step_2_text">When using a static position, the click will
+        always occur at the exact same coordinates, regardless of what is currently on screen.\n\nKeep in mind that
+        those coordinates are screen-rotation-sensitive: if the device rotates, the click may end up at an unexpected
+        position or even outside the screen boundaries.</string>
+
+    <string name="tutorial_slideshow_click_action_target_step_3_text">When using a condition position, the click is
+        applied at the center of a detected Image Condition. This makes the click follow the target wherever it
+        appears on screen.\n\nWhen the event\'s operator is AND, all conditions must be fulfilled, so every Image
+        Condition has a detected position available. You can freely pick any of them as your click target, and
+        optionally refine it with a click offset.</string>
+
+    <string name="tutorial_slideshow_click_action_target_step_4_text">When the event\'s operator is OR, only one
+        condition will be fulfilled, and the next ones will be skipped. Because of this, Klick\'r cannot know
+        in advance which condition will be detected.\n\nAs a consequence, when using the OR operator, you cannot
+        choose a specific condition as the click target: the click will always be applied on the first detected
+        condition, whichever that turns out to be at runtime.</string>
+
+
+    <!-- Gesture Action slideshow -->
+    <string name="tutorial_slideshow_gesture_action_title">Gesture action</string>
+    <string name="tutorial_slideshow_gesture_action_desc">Learn how the gesture is performed</string>
+
+    <string name="tutorial_slideshow_gesture_action_step_1_text">A Gesture Action performs a path you recorded or
+        manually configured for up to five fingers at the same time. \n\nA gesture path always starts with a press and
+        finishes with a release, with moves and waits between them. The maximum total gesture duration is 60 seconds. \n\n
+        With this, you can recreate swipes, pinch to zoom and other complex gestures easily. Try the record button on the
+        action list to capture one directly on the screen! \n\nNote: Wait in a gesture is only available on Android 8 and above.</string>
+
+    <string name="tutorial_slideshow_gesture_action_step_2_text">You can keep the first finger held at the end of a
+        gesture and continue the scenario execution while holding it. Expand the Release step of the gesture and
+        choose when the finger should be released: immediately, once all actions of the event have been executed,
+        once the event is no longer fulfilled, or after a duration.\n\nKeep in mind that:\n• Only one hold at a time
+        is supported, starting another hold will release the previous one.\n• While a finger is holding, the related
+        event will no longer be triggered until the held finger is released.\n• If you manually press the screen, the
+        hold will be interrupted.\n• Maximum hold duration depends on your system and the current application being
+        automated. Some systems allow infinite durations, some don\'t.</string>
+
+
+    <!-- Pause Action slideshow -->
+    <string name="tutorial_slideshow_pause_action_title">Wait action</string>
+    <string name="tutorial_slideshow_pause_action_desc">Learn how the wait affects action execution and detection</string>
+
+    <string name="tutorial_slideshow_pause_action_step_1_text">A Wait Action suspends the entire scenario for a
+        configured duration: during that time, no action runs and no screen detection occurs.\n\nA very common use
+        case is to add a Wait at the end of your action list. When you click somewhere, the app you clicked on
+        needs time to process the click and display the result, and you usually want to wait during that moment
+        before Klick\'r starts looking at the screen again.\n\nA Wait between two actions is also valid, but
+        adding one at the end of the list is often the more common use case.</string>
+
+
+    <!-- Write Text Action slideshow -->
+    <string name="tutorial_slideshow_write_text_action_title">Write text action</string>
+    <string name="tutorial_slideshow_write_text_action_desc">Learn how to set text into a focused input field</string>
+
+    <string name="tutorial_slideshow_write_text_action_step_1_text">Before the Write Text action runs, the target
+        input field must already be focused, just as you would tap it to bring up the keyboard. \n\nTo achieve this,
+        add a Click action on that field before the Write Text action to focus it. If a transition animation plays
+        after the click, a Wait action between the two can help ensure the field is ready. \n\nThe action also has a
+        Validate option: when enabled, it will automatically press Enter after the text is set, confirming or submitting
+        the input.</string>
+
+    <string name="tutorial_slideshow_write_text_action_step_2_text">You can insert the value of a counter into
+        the text to write. Press the Append Counter button in the action configuration to pick a counter: it will
+        insert the placeholder <b>{counterName}</b> at the current cursor position in the text field.\n\nAt
+        runtime, every <b>{counterName}</b> placeholder is replaced by the counter\'s current value before the text
+        is pasted into the field. For example, if a counter named <i>apples</i> has the value 18, the text
+        \"I have {apples} apples\" becomes \"I have 18 apples\".</string>
+
+
+    <!-- System Action slideshow -->
+    <string name="tutorial_slideshow_system_action_title">System action</string>
+    <string name="tutorial_slideshow_system_action_desc">Learn how to trigger Android navigation actions</string>
+
+    <string name="tutorial_slideshow_system_action_step_1_text">A System Action executes one of Android\'s built-in
+        navigation actions: Back, Home, or Recents.\n\nThese are the same actions as the navigation buttons at the
+        bottom of your screen. They require no coordinates and work at the system level, regardless of which app is
+        currently open.</string>
+
+
+    <!-- Change Counter Action slideshow -->
+    <string name="tutorial_slideshow_change_counter_action_title">Change counter action</string>
+    <string name="tutorial_slideshow_change_counter_action_desc">Learn how to modify a counter value</string>
+
+    <string name="tutorial_slideshow_change_counter_action_step_1_text">A Change Counter action applies an operation
+        to a counter using a predefined static value. Three operations are available: add the value to the counter
+        (+), subtract it from the counter (−), or set the counter to that exact value (=).\n\nThis is the most
+        common way to update a counter. For example, adding 1 each time a condition is detected, or resetting it
+        to 0 when a goal is reached.</string>
+
+    <string name="tutorial_slideshow_change_counter_action_step_2_text">Instead of a static value, you can use the
+        current value of another counter as the operand. \n\nThe same three operations (+, −, =) apply, but the amount
+        is read from the selected counter at runtime rather than being fixed at configuration time.\n\nThis lets
+        you build dynamic scenarios where counters interact with each other.</string>
+
+
+    <!-- Notification Action slideshow -->
+    <string name="tutorial_slideshow_notification_action_title">Notification action</string>
+    <string name="tutorial_slideshow_notification_action_desc">Learn how to display a notification during your scenario</string>
+
+    <string name="tutorial_slideshow_notification_action_step_1_text">A Notification action displays an Android
+        notification with a title and a message of your choice.\n\nYou can insert the current value of a counter
+        into the notification text using the Append Counter button, or by typing the <b>{counterName}</b>
+        placeholder directly. At runtime it is replaced by the counter\'s value — for example,
+        \"I have {apples} apples\" becomes \"I have 18 apples\".</string>
+
+    <string name="tutorial_slideshow_notification_action_step_2_text">The notification importance level controls
+        how intrusively the notification is presented. Higher importance levels may show a heads-up banner and play
+        a sound, while lower ones are delivered silently to the notification drawer.\n\nThe exact behaviour depends
+        on the device and can be further customized in the Android notification settings for Klick\'r.</string>
+
+
+    <!-- Toggle Event Action slideshow -->
+    <string name="tutorial_slideshow_toggle_event_action_title">Change event state action</string>
+    <string name="tutorial_slideshow_toggle_event_action_desc">Learn how to enable and disable events at runtime</string>
+
+    <string name="tutorial_slideshow_toggle_event_action_step_1_text">A disabled event is completely skipped during
+        the scenario loop; its conditions are never checked and its actions never run. This means it consumes no
+        processing time at all.\n\nDisabling events you are not currently using is a great way to improve
+        performance. For example, in a scenario that alternates between a menu phase and a game phase, disabling
+        all menu events while you are in the game phase (and vice versa) keeps only the relevant events active at
+        any given time.</string>
+
+    <string name="tutorial_slideshow_toggle_event_action_step_2_text">When configuring the action, you can choose
+        to change the state of all events in the scenario at once, or define a new state for each event
+        individually. \n\nThree state changes are available for each event: enable it, disable it, or toggle it
+        from its current value; so an enabled event becomes disabled and a disabled one becomes enabled.</string>
+
+    <string name="tutorial_slideshow_toggle_event_action_step_3_text">If every event in the scenario ends up
+        disabled at the same time, the scenario stops itself automatically, since there is nothing left to
+        execute.\n\nThis can be used intentionally as a clean way to terminate a scenario once a goal is reached:
+        a final Change Event State action that disables all events will bring the scenario to a halt.</string>
+
+
+    <!-- Intent Action slideshow -->
+    <string name="tutorial_slideshow_intent_action_title">Intent action</string>
+    <string name="tutorial_slideshow_intent_action_desc">Learn how to communicate with other applications</string>
+
+    <string name="tutorial_slideshow_intent_action_step_1_text">Intents are the way applications communicate with
+        each other on Android. The Intent action lets you tap into this system directly from your scenario.\n\nA
+        set of predefined templates is available to make this easy. The most common one is Start Application,
+        which launches another app on your device exactly as if you had tapped its icon from the launcher.</string>
+
+    <string name="tutorial_slideshow_intent_action_step_2_text">The Advanced tab lets you define a raw Intent
+        manually, giving you full control over the action, category, data, and extras. This is not recommended for
+        regular users; it is aimed at Android developers who already know how Intents work.\n\nMore ready-to-use
+        templates will be added in future updates to make common use cases easier to set up without going into the
+        advanced options.</string>
+
+
+    <!-- Actions List slideshow -->
+    <string name="tutorial_slideshow_actions_list_title">Action list</string>
+    <string name="tutorial_slideshow_actions_list_desc">Learn how the action list is executed</string>
+
+    <string name="tutorial_slideshow_actions_list_step_1_text">Actions are executed in order, one after the other.
+        You can visualize the next/previous action by swiping left/right anywhere on your screen.\n\nYou can change
+        the order of an action using the &lt;&lt; and &gt;&gt; buttons, or by tapping directly on the index box.</string>
+    <string name="tutorial_slideshow_actions_list_step_2_text">Try to keep your action lists short.
+        A regular autoclicker taps one place per event; that\'s the model to follow. If you find yourself adding many actions to a single event, it is usually a
+        sign that the work should be split across several events, each reacting to what is actually on the screen.
+        This is the see-and-act philosophy of Klick\'r: detect first, then act.</string>
+
+
+    <!-- Conditions List slideshow -->
+    <string name="tutorial_slideshow_conditions_list_title">Condition list</string>
+    <string name="tutorial_slideshow_conditions_list_desc">Learn how the condition list is executed</string>
+
+    <string name="tutorial_slideshow_conditions_list_step_1_text">
+        You can visualize the next/previous condition by swiping left/right anywhere on your screen.\n\nYou can change
+        the order of a condition using the &lt;&lt; and &gt;&gt; buttons, or by tapping directly on the index box.</string>
+    <string name="tutorial_slideshow_conditions_list_step_2_text">In highly optimized scenarios, the condition order in
+        the list will matter. Moving the smaller conditions such as Color Conditions first will ensure the following heavier
+        ones won\'t be evaluated if the small one is not fulfilled.\n\nNote that this logic is inverted if you are
+        using the OR operator, as the next ones won\'t be evaluated if the first is fulfilled.</string>
+
+
+    <!-- Combine Conditions Ordering slideshow -->
+    <string name="tutorial_slideshow_combine_conditions_ordering_title">Condition order and speed</string>
+    <string name="tutorial_slideshow_combine_conditions_ordering_desc">How the order of your conditions affects how fast
+        your event is checked</string>
+
+    <string name="tutorial_slideshow_combine_conditions_ordering_step_1_text">The order of conditions in the list
+        affects how fast your event is checked.\n\nWith the AND operator, the check stops as soon as the first
+        condition that is NOT met is found. Putting the least likely conditions first lets the app skip the rest
+        sooner, making your event faster.</string>
+
+    <string name="tutorial_slideshow_combine_conditions_ordering_step_2_text">With the OR operator, the check stops as
+        soon as the first condition that IS met is found. Putting the most likely conditions first lets the app
+        finish sooner, without checking the rest.\n\nIn both cases, putting the most important condition at the top
+        of the list is an easy way to keep your scenario running fast.</string>
+
+
+    <!-- Events State Basics slideshow -->
+    <string name="tutorial_slideshow_events_state_basics_title">Event state</string>
+    <string name="tutorial_slideshow_events_state_basics_desc">Learn how to enable and disable events while a
+        scenario is running</string>
+
+    <string name="tutorial_slideshow_events_state_basics_step_1_text">Every event in your scenario (Screen Events and
+        Trigger Events) has a state: it is either <b>enabled</b> or <b>disabled</b>.\n\nWhen enabled, the event runs
+        normally and checks its conditions as usual. When disabled, it is completely skipped, as if it did not
+        exist.\n\nBy default, every event starts enabled. You can change this with the <b>Initial State</b> field in
+        the event settings.</string>
+
+    <string name="tutorial_slideshow_events_state_basics_step_2_text">While a scenario is running, you can change the
+        state of any event using the <b>Change Event State</b> action. This action lets you enable, disable, or
+        toggle one or more events in your scenario.\n\nThis opens up many possibilities: events that turn each other
+        on one after another, events that turn themselves off after running once, or groups of events where only one
+        is active at a time.</string>
+
+    <string name="tutorial_slideshow_events_state_basics_step_3_text">When <b>all events in the scenario are
+        disabled</b>, the scenario stops on its own. There is nothing left to do, so Klick\'r stops
+        automatically.\n\nThis is a simple way to end a scenario: have your last event disable all the others once
+        its job is done, and everything stops by itself.</string>
+
+
+    <!-- Events State Priority slideshow -->
+    <string name="tutorial_slideshow_events_priority_title">Event priority</string>
+    <string name="tutorial_slideshow_events_priority_desc">Learn how the order of events in your list affects
+        which events run</string>
+
+    <string name="tutorial_slideshow_events_priority_step_1_text">Every screen frame captured from your display
+        is processed by checking your events <b>one by one, from top to bottom</b>.\n\nThe position of an event in
+        your event list determines when it gets a chance to run. By default, as soon as an event\'s conditions
+        are met and its actions are executed, <b>the frame is considered done</b>. Processing stops for that frame,
+        and the next frame starts over from the first event in the list.\n\nThis means only one event can run per
+        frame by default.</string>
+
+    <string name="tutorial_slideshow_events_priority_step_2_text">You can change this behavior using the
+        <b>Keep executing</b> field in the event settings. When enabled, after that event runs, processing
+        <b>continues to the next event</b> in the list instead of stopping.\n\nThis lets multiple events run on the
+        same frame.\n\n<b>Example:</b> your list contains Event A followed by Event B. If Event A keeps being detected
+        and does not have <b>Keep executing</b> enabled, it will run every frame and Event B will never get a chance
+        to execute.\n\nEnable <b>Keep executing</b> on Event A, and both events will be checked on every frame. \n\nAn
+        interactive tutorial is also available to practice this concept.</string>
+
+
+    <!-- Events reloading slideshow -->
+    <string name="tutorial_slideshow_events_reloading_title">Event reloading</string>
+    <string name="tutorial_slideshow_events_reloading_desc">Learn how the reloading of an Event behaves in your scenario</string>
+
+    <string name="tutorial_slideshow_events_reloading_step_1_text">The event reloading parameter allows you to skip an
+        event for a given amount of time once it is fulfilled. \n\nEven if skipped, an event in reloading state is
+        still considered enabled: reloading and the event state are independent. \n\nIf the Event is disabled while in
+        reloading state, the reloading timer will be cleared, so the cooldown no longer applies when the event is
+        re-enabled.</string>
+
+
+    <!-- Counters in actions slideshow -->
+    <string name="tutorial_slideshow_counters_value_usages_title">Using counter values</string>
+    <string name="tutorial_slideshow_counters_value_usages_desc">Learn the different ways to display and use counter values in your scenario</string>
+
+    <string name="tutorial_slideshow_counters_value_usages_step_1_text">You can show the current value of a counter
+        inside a Notification action. This is useful to monitor progress while your scenario is running, or to
+        display a summary at the end.\n\nTo insert a counter, press the Append Counter button in the action
+        configuration. This adds a placeholder like <b>{counterName}</b> into your text. At runtime, the placeholder
+        is replaced by the counter\'s actual value. \n\nFor example, if a counter named <i>score</i> has the value 42,
+        the text \"Current score: {score}\" becomes \"Current score: 42\".</string>
+
+    <string name="tutorial_slideshow_counters_value_usages_step_2_text">You can also insert a counter\'s value into a
+        Write Text action, so the typed text includes the current value at the moment the action runs.\n\nThe
+        placeholder works the same way as in the Notification action: press the Append Counter button or type
+        <b>{counterName}</b> directly. \n\nFor example, if a counter named <i>score</i> has the value 42, the text
+        \"My score is {score}\" becomes \"My score is 42\".</string>
+
+    <string name="tutorial_slideshow_counters_value_usages_step_3_text">Counter values are tracked in the debug report.
+        If something is not working as expected in your scenario, capturing a debug report will show you exactly how
+        your counters changed over time, making it easier to find the issue.</string>
 
 </resources>

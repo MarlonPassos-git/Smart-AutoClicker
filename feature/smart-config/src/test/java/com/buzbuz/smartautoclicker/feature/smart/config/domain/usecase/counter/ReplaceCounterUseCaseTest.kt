@@ -22,8 +22,14 @@ import android.os.Build
 import com.buzbuz.smartautoclicker.core.base.identifier.Identifier
 import com.buzbuz.smartautoclicker.core.domain.model.action.Action
 import com.buzbuz.smartautoclicker.core.domain.model.action.ChangeCounter
+import com.buzbuz.smartautoclicker.core.domain.model.action.Click
+import com.buzbuz.smartautoclicker.core.domain.model.action.Gesture
 import com.buzbuz.smartautoclicker.core.domain.model.action.Notification
 import com.buzbuz.smartautoclicker.core.domain.model.action.SetText
+import com.buzbuz.smartautoclicker.core.domain.model.action.position.CoordinatesValue
+import com.buzbuz.smartautoclicker.core.domain.model.action.gesture.GestureFinger
+import com.buzbuz.smartautoclicker.core.domain.model.action.gesture.GestureFingerMotion
+import com.buzbuz.smartautoclicker.core.domain.model.action.position.Position
 import com.buzbuz.smartautoclicker.core.domain.model.condition.Condition
 import com.buzbuz.smartautoclicker.core.domain.model.condition.ScreenCondition
 import com.buzbuz.smartautoclicker.core.domain.model.condition.TriggerCondition
@@ -237,6 +243,189 @@ class ReplaceCounterUseCaseTest {
     }
 
     @Test
+    fun `Gesture with matching Counter coordinate is updated`() {
+        val pressPos = Position.Coordinates(
+            CoordinatesValue.Counter(FROM_COUNTER_NAME), CoordinatesValue.Literal(0),
+        )
+        val action = gestureAction(pressPos)
+        every { mockEditionState.getAllEditedEvents() } returns listOf(event(actions = listOf(action)))
+
+        useCase(FROM_COUNTER, TO_COUNTER)
+
+        val updatedPos = Position.Coordinates(
+            CoordinatesValue.Counter(TO_COUNTER_NAME), CoordinatesValue.Literal(0),
+        )
+        verifyOrder {
+            mockEditionRepository.startActionEdition(action)
+            mockEditionRepository.updateEditedAction(gestureAction(updatedPos))
+            mockEditionRepository.upsertEditedAction()
+        }
+    }
+
+    @Test
+    fun `Gesture with no matching counter coordinate is not updated`() {
+        val action = gestureAction(Position.Coordinates(
+            CoordinatesValue.Literal(100), CoordinatesValue.Literal(200),
+        ))
+        every { mockEditionState.getAllEditedEvents() } returns listOf(event(actions = listOf(action)))
+
+        useCase(FROM_COUNTER, TO_COUNTER)
+
+        verify(exactly = 0) { mockEditionRepository.startActionEdition(any()) }
+    }
+
+    @Test
+    fun `Gesture with other counter or condition position is not updated`() {
+        val action = gestureAction(
+            pressPosition = Position.Condition(Identifier(databaseId = 100L)),
+            pressOffset = Position.Coordinates(
+                CoordinatesValue.Counter("otherCounter"), CoordinatesValue.Literal(0),
+            ),
+        )
+        every { mockEditionState.getAllEditedEvents() } returns listOf(event(actions = listOf(action)))
+
+        useCase(FROM_COUNTER, TO_COUNTER)
+
+        verify(exactly = 0) { mockEditionRepository.startActionEdition(any()) }
+    }
+
+    @Test
+    fun `Gesture with matching Counter in press offset is updated`() {
+        val action = gestureAction(
+            pressPosition = literalPosition(),
+            pressOffset = Position.Coordinates(
+                CoordinatesValue.Literal(0), CoordinatesValue.Counter(FROM_COUNTER_NAME),
+            ),
+        )
+        every { mockEditionState.getAllEditedEvents() } returns listOf(event(actions = listOf(action)))
+
+        useCase(FROM_COUNTER, TO_COUNTER)
+
+        val expected = gestureAction(
+            pressPosition = literalPosition(),
+            pressOffset = Position.Coordinates(
+                CoordinatesValue.Literal(0), CoordinatesValue.Counter(TO_COUNTER_NAME),
+            ),
+        )
+        verifyOrder {
+            mockEditionRepository.startActionEdition(action)
+            mockEditionRepository.updateEditedAction(expected)
+            mockEditionRepository.upsertEditedAction()
+        }
+    }
+
+    @Test
+    fun `Gesture with matching Counter in move position and offset is updated in one call`() {
+        val action = gestureAction(
+            pressPosition = literalPosition(),
+            move = moveMotion(
+                position = Position.Coordinates(CoordinatesValue.Counter(FROM_COUNTER_NAME), CoordinatesValue.Literal(0)),
+                offset = Position.Coordinates(CoordinatesValue.Literal(0), CoordinatesValue.Counter(FROM_COUNTER_NAME)),
+            ),
+        )
+        every { mockEditionState.getAllEditedEvents() } returns listOf(event(actions = listOf(action)))
+
+        useCase(FROM_COUNTER, TO_COUNTER)
+
+        val expected = gestureAction(
+            pressPosition = literalPosition(),
+            move = moveMotion(
+                position = Position.Coordinates(CoordinatesValue.Counter(TO_COUNTER_NAME), CoordinatesValue.Literal(0)),
+                offset = Position.Coordinates(CoordinatesValue.Literal(0), CoordinatesValue.Counter(TO_COUNTER_NAME)),
+            ),
+        )
+        verifyOrder {
+            mockEditionRepository.startActionEdition(action)
+            mockEditionRepository.updateEditedAction(expected)
+            mockEditionRepository.upsertEditedAction()
+        }
+        verify(exactly = 1) { mockEditionRepository.startActionEdition(any()) }
+    }
+
+    @Test
+    fun `Click with matching Counter coordinate is updated`() {
+        val action = clickAction(position = Position.Coordinates(
+            CoordinatesValue.Counter(FROM_COUNTER_NAME), CoordinatesValue.Literal(0),
+        ))
+        every { mockEditionState.getAllEditedEvents() } returns listOf(event(actions = listOf(action)))
+
+        useCase(FROM_COUNTER, TO_COUNTER)
+
+        val expected = clickAction(position = Position.Coordinates(
+            CoordinatesValue.Counter(TO_COUNTER_NAME), CoordinatesValue.Literal(0),
+        ))
+        verifyOrder {
+            mockEditionRepository.startActionEdition(action)
+            mockEditionRepository.updateEditedAction(expected)
+            mockEditionRepository.upsertEditedAction()
+        }
+    }
+
+    @Test
+    fun `Click with matching Counter in both coordinates is updated in one call`() {
+        val action = clickAction(position = Position.Coordinates(
+            CoordinatesValue.Counter(FROM_COUNTER_NAME), CoordinatesValue.Counter(FROM_COUNTER_NAME),
+        ))
+        every { mockEditionState.getAllEditedEvents() } returns listOf(event(actions = listOf(action)))
+
+        useCase(FROM_COUNTER, TO_COUNTER)
+
+        val expected = clickAction(position = Position.Coordinates(
+            CoordinatesValue.Counter(TO_COUNTER_NAME), CoordinatesValue.Counter(TO_COUNTER_NAME),
+        ))
+        verifyOrder {
+            mockEditionRepository.startActionEdition(action)
+            mockEditionRepository.updateEditedAction(expected)
+            mockEditionRepository.upsertEditedAction()
+        }
+        verify(exactly = 1) { mockEditionRepository.startActionEdition(any()) }
+    }
+
+    @Test
+    fun `Click on Condition with matching Counter offset is updated`() {
+        val conditionPosition = Position.Condition(Identifier(databaseId = 100L))
+        val action = clickAction(
+            position = conditionPosition,
+            offset = Position.Coordinates(CoordinatesValue.Counter(FROM_COUNTER_NAME), CoordinatesValue.Literal(0)),
+        )
+        every { mockEditionState.getAllEditedEvents() } returns listOf(event(actions = listOf(action)))
+
+        useCase(FROM_COUNTER, TO_COUNTER)
+
+        val expected = clickAction(
+            position = conditionPosition,
+            offset = Position.Coordinates(CoordinatesValue.Counter(TO_COUNTER_NAME), CoordinatesValue.Literal(0)),
+        )
+        verifyOrder {
+            mockEditionRepository.startActionEdition(action)
+            mockEditionRepository.updateEditedAction(expected)
+            mockEditionRepository.upsertEditedAction()
+        }
+    }
+
+    @Test
+    fun `Click with no matching counter coordinate is not updated`() {
+        val action = clickAction(position = Position.Coordinates(
+            CoordinatesValue.Counter("otherCounter"), CoordinatesValue.Literal(0),
+        ))
+        every { mockEditionState.getAllEditedEvents() } returns listOf(event(actions = listOf(action)))
+
+        useCase(FROM_COUNTER, TO_COUNTER)
+
+        verify(exactly = 0) { mockEditionRepository.startActionEdition(any()) }
+    }
+
+    @Test
+    fun `Click with null position and offset is not updated`() {
+        val action = clickAction(position = null)
+        every { mockEditionState.getAllEditedEvents() } returns listOf(event(actions = listOf(action)))
+
+        useCase(FROM_COUNTER, TO_COUNTER)
+
+        verify(exactly = 0) { mockEditionRepository.startActionEdition(any()) }
+    }
+
+    @Test
     fun `SetText with counter reference in text is updated`() {
         val action = setTextAction(text = "Value: {$FROM_COUNTER_NAME}")
         every { mockEditionState.getAllEditedEvents() } returns listOf(event(actions = listOf(action)))
@@ -253,6 +442,51 @@ class ReplaceCounterUseCaseTest {
     }
 
     // region helpers
+
+    private fun literalPosition() = Position.Coordinates(
+        CoordinatesValue.Literal(100), CoordinatesValue.Literal(200),
+    )
+
+    private fun moveMotion(position: Position, offset: Position) = GestureFingerMotion.Move(
+        id = Identifier(databaseId = 52L),
+        position = position,
+        offset = offset,
+        durationMs = 100L,
+    )
+
+    private fun gestureAction(
+        pressPosition: Position,
+        pressOffset: Position = Position.Coordinates(CoordinatesValue.Literal(0), CoordinatesValue.Literal(0)),
+        move: GestureFingerMotion.Move? = null,
+    ): Gesture = Gesture(
+        id = Identifier(databaseId = 4L),
+        eventId = Identifier(databaseId = 1L),
+        name = "Gesture",
+        priority = 0,
+        fingers = listOf(GestureFinger(
+            id = Identifier(databaseId = 50L),
+            startTimeMs = 0L,
+            motions = listOfNotNull(
+                GestureFingerMotion.Press(
+                    id = Identifier(databaseId = 51L),
+                    position = pressPosition,
+                    offset = pressOffset,
+                ),
+                move,
+                GestureFingerMotion.Release(id = Identifier(databaseId = 54L)),
+            ),
+        )),
+    )
+
+    private fun clickAction(position: Position?, offset: Position? = null): Click = Click(
+        id = Identifier(databaseId = 5L),
+        eventId = Identifier(databaseId = 1L),
+        name = "Click",
+        priority = 0,
+        pressDuration = 100L,
+        position = position,
+        offset = offset,
+    )
 
     private fun event(
         actions: List<Action> = emptyList(),

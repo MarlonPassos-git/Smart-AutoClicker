@@ -24,5 +24,8 @@ import dagger.hilt.components.SingletonComponent
 @InstallIn(SingletonComponent::class)
 interface NavigationEntryPoint {
 
+    fun debuggingNavigator(): DebuggingNavigator
+    fun revenueNavigator(): RevenueNavigator
+    fun reviewNavigator(): ReviewNavigator
     fun tutorialNavigator(): TutorialNavigator
 }

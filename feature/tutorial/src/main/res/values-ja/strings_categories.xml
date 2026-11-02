@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <!--
 * Copyright (C) 2026 Kevin Buzeau
 *
@@ -67,9 +67,21 @@
         ことを要求し、OR は少なくとも1つを要求します。条件の種類と演算子を組み合わせることで、複雑なシナリオに対応できます。\n\n
         ここで条件を効果的に組み合わせる方法を学びましょう。</string>
 
-    <string name="tutorial_category_event_state_name">イベントの状態</string>
-    <string name="tutorial_category_event_state_desc_short">イベントを動的に有効化・無効化する</string>
-    <string name="tutorial_category_event_state_desc_long">イベントはToggleEventアクションを使って実行中に有効化・無効化できます。
+    <string name="tutorial_category_combine_event_name">イベントの組み合わせ</string>
+    <string name="tutorial_category_combine_event_desc_short">複数のイベントを連携して高度な制御を実現する</string>
+    <string name="tutorial_category_combine_event_desc_long">Klick\'rでは複数のイベントを連携させて高度な自動化フローを構築できます。
+        イベントの評価順序を制御したり、実行中にイベントを有効化・無効化したりすることで、複雑な多段階シナリオを作成できます。\n\n
+        ここでイベントを効果的に組み合わせて自動化を完全にコントロールする方法を学びましょう。</string>
+
+    <string name="tutorial_category_events_priority_name">イベントの優先度</string>
+    <string name="tutorial_category_events_priority_desc_short">イベントの重要度をコントロールする</string>
+    <string name="tutorial_category_events_priority_desc_long">スクリーンイベントは各検出サイクルで優先度順に評価されます。
+        リストの上位にあるイベントは下位のイベントより先に確認され、複数のイベントが同時にトリガーされる可能性がある場合に、
+        どのイベントを優先するかを定義できます。\n\n ここでイベントの優先度を設定してシナリオの実行順序を細かく調整する方法を学びましょう。</string>
+
+    <string name="tutorial_category_events_state_name">イベントの状態管理</string>
+    <string name="tutorial_category_events_state_desc_short">イベントを動的に有効化・無効化する</string>
+    <string name="tutorial_category_events_state_desc_long">イベントはイベントの状態を変更するアクションを使って実行中に有効化・無効化できます。
         これにより、特定の条件下でのみ特定のイベントが有効になる多段階の自動化フローを構築できます。\n\n ここでイベントの状態を
         制御して高度なシナリオを作る方法を学びましょう。</string>
 
@@ -82,7 +94,58 @@
     <string name="tutorial_category_action_name">アクション</string>
     <string name="tutorial_category_action_desc_short">条件が満たされたときに何かを実行する</string>
     <string name="tutorial_category_action_desc_long">アクションはイベントの条件が満たされると実行されます。アクションはジェスチャー
-        （Click、Swipe）からフロー制御（ToggleEvent、ChangeCounter、Pause）、システム操作（Intent、Notification、
+        （Click、Gesture）からフロー制御（ToggleEvent、ChangeCounter、Wait）、システム操作（Intent、Notification、
         SystemAction、SetText）まで多岐にわたります。\n\n ここで各アクションタイプを使って自動化スクリプトを作る方法を
         学びましょう。</string>
+
+    <string name="tutorial_category_click_action_name">タップ</string>
+    <string name="tutorial_category_click_action_desc_short">固定位置または検出された条件をタップする</string>
+    <string name="tutorial_category_click_action_desc_long">タップアクションは、固定座標または検出された画像条件の中心をタップする動作を
+        シミュレートします。長押しをシミュレートするために押下時間を設定することもできます。\n\n ここで画面との操作方法を学び
+        ましょう。</string>
+
+    <string name="tutorial_category_gesture_action_name">ジェスチャー</string>
+    <string name="tutorial_category_gesture_action_desc_short">画面上で複雑なジェスチャーを実行する</string>
+    <string name="tutorial_category_gesture_action_desc_long">ジェスチャーアクションは、画面上での 1 本または複数の指の動きをシミュレートします。最大 5 本の指を同時に動かすように設定できます。\n\n ここで画面を操作するための使い方を学びましょう。</string>
+
+    <string name="tutorial_category_pause_action_name">待機</string>
+    <string name="tutorial_category_pause_action_desc_short">次のアクションを実行する前に指定時間待機する</string>
+    <string name="tutorial_category_pause_action_desc_long">待機アクションは、設定した時間だけ実行を遅らせます。次の検出の前に
+        アプリが反応する時間を与えるのに役立ちます。\n\n ここで自動化スクリプトのペースを制御する方法を学びましょう。</string>
+
+    <string name="tutorial_category_intent_action_name">インテント</string>
+    <string name="tutorial_category_intent_action_desc_short">Android インテントを別のアプリに送信する</string>
+    <string name="tutorial_category_intent_action_desc_long">インテントアクションは、ブロードキャストとして、またはアクティビティや
+        サービスを起動するために Android インテントを送信します。データを一緒に渡すためにキーと値のペアを付けることができます。
+        \n\n ここで他のアプリのアクションをトリガーする方法を学びましょう。</string>
+
+    <string name="tutorial_category_change_counter_action_name">カウンターを変更</string>
+    <string name="tutorial_category_change_counter_action_desc_short">カウンターの値を設定、加算、または減算する</string>
+    <string name="tutorial_category_change_counter_action_desc_long">カウンター変更アクションは、カウンター変数を固定値に設定したり、
+        値を加算または減算したりして変更します。カウンターは条件や他のアクションで読み取ることができます。\n\n ここでシナリオの
+        状態を管理する方法を学びましょう。</string>
+
+    <string name="tutorial_category_change_event_state_action_name">イベント状態を変更</string>
+    <string name="tutorial_category_change_event_state_action_desc_short">1つまたは複数のイベントを有効化、無効化、または切り替える</string>
+    <string name="tutorial_category_change_event_state_action_desc_long">イベント状態変更アクションは、実行中に1つまたは複数のイベントを
+        有効化、無効化、または切り替えます。これにより、前のステップが後のステップを制御する多段階フローを作成できます。\n\n ここで
+        シナリオのフローを制御する方法を学びましょう。</string>
+
+    <string name="tutorial_category_notification_action_name">通知</string>
+    <string name="tutorial_category_notification_action_desc_short">システム通知を投稿する</string>
+    <string name="tutorial_category_notification_action_desc_long">通知アクションは、カスタムのタイトルとメッセージを含む Android
+        システム通知を投稿します。特定の条件が検出されたときにユーザーに通知するのに便利です。\n\n ここでシナリオがバックグラウンドで
+        実行中に情報を表示する方法を学びましょう。</string>
+
+    <string name="tutorial_category_system_action_name">システムアクション</string>
+    <string name="tutorial_category_system_action_desc_short">グローバルな Android ナビゲーションアクションを呼び出す</string>
+    <string name="tutorial_category_system_action_desc_long">システムアクションは、戻る、ホーム、最近のアプリなど、グローバルな
+        Android ナビゲーションアクションを呼び出します。これらのアクションは座標を必要とせず、システムレベルで動作します。
+        \n\n ここで自動化中にデバイスをナビゲートする方法を学びましょう。</string>
+
+    <string name="tutorial_category_write_text_action_name">テキストを入力</string>
+    <string name="tutorial_category_write_text_action_desc_short">アクティブな入力フィールドにテキストを貼り付ける</string>
+    <string name="tutorial_category_write_text_action_desc_long">テキスト入力アクションは、アクセシビリティサービスを使って、現在フォーカスされて
+        いる入力フィールドに設定した文字列を貼り付けます。個別のキー入力をシミュレートせずにフォームや検索フィールドを入力するのに
+        便利です。\n\n ここで自動化中にテキストを入力する方法を学びましょう。</string>
 </resources>

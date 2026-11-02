@@ -137,7 +137,10 @@ class ImageReferenceEditorTest {
     fun `create reference stores png path and tracks it for cleanup`() = runTest {
         val bitmapRepository = mock(BitmapRepository::class.java)
         val bitmap = mock(Bitmap::class.java)
-        val builder = EditedItemsBuilder(bitmapRepository, mock(ScenarioEditor::class.java))
+        val builder = EditedItemsBuilder(
+            mock(com.buzbuz.smartautoclicker.core.display.config.DisplayConfigManager::class.java),
+            bitmapRepository, mock(ScenarioEditor::class.java),
+        )
         `when`(bitmapRepository.saveImageConditionBitmap(bitmap, CONDITION_FILE_PREFIX))
             .thenReturn("stored.png")
 

@@ -17,7 +17,6 @@
 package com.buzbuz.smartautoclicker.core.common.actions
 
 import android.accessibilityservice.AccessibilityService
-import android.accessibilityservice.GestureDescription
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.graphics.Point
@@ -25,12 +24,15 @@ import android.util.AndroidRuntimeException
 import android.util.Log
 
 import com.buzbuz.smartautoclicker.core.common.actions.gesture.GestureExecutor
-import com.buzbuz.smartautoclicker.core.common.actions.gesture.buildZoomGesture
+import com.buzbuz.smartautoclicker.core.common.actions.gesture.toNormalizedZoomDuration
+import com.buzbuz.smartautoclicker.core.common.actions.gesture.builder.AndroidGestureBuilder
 import com.buzbuz.smartautoclicker.core.common.actions.gesture.calculateZoomStrokeEndpoints
 import com.buzbuz.smartautoclicker.core.common.actions.model.ActionNotificationRequest
 import com.buzbuz.smartautoclicker.core.base.gesture.ZoomDirection
 import com.buzbuz.smartautoclicker.core.base.extensions.nextIntInOffset
 import com.buzbuz.smartautoclicker.core.common.actions.utils.RANDOMIZATION_POSITION_MAX_OFFSET_PX
+import com.buzbuz.smartautoclicker.core.common.actions.model.BuiltGesture
+import com.buzbuz.smartautoclicker.core.common.actions.model.HeldPointer
 import com.buzbuz.smartautoclicker.core.common.actions.notification.NotificationRequestExecutor
 import com.buzbuz.smartautoclicker.core.common.actions.text.TextExecutor
 
@@ -41,6 +43,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.math.roundToInt
 import kotlin.random.Random
+import kotlin.time.Duration.Companion.milliseconds
 
 
 @Singleton
@@ -64,13 +67,16 @@ internal class AndroidActionExecutorImpl @Inject constructor(
             }
         }
 
+    override fun getHeldPointer(): HeldPointer? =
+        gestureExecutor.getHeldPointer()
+
     override fun init(service: AccessibilityService) {
         accessibilityServiceRef = WeakReference(service)
         notificationRequestExecutor.init(service)
     }
 
     override fun resetState() {
-        gestureExecutor.clear()
+        gestureExecutor.clear(accessibilityServiceRef?.get())
         notificationRequestExecutor.clear()
     }
 
@@ -79,12 +85,12 @@ internal class AndroidActionExecutorImpl @Inject constructor(
         accessibilityServiceRef = null
     }
 
-    override suspend fun dispatchGesture(gestureDescription: GestureDescription) {
+    override suspend fun dispatchBuiltGesture(gesture: BuiltGesture) {
         val service = accessibilityService ?: return
 
-        if (!gestureExecutor.dispatchGesture(service, gestureDescription)) {
+        if (!gestureExecutor.dispatchBuiltGesture(service, gesture)) {
             Log.w(TAG, "System did not execute the gesture properly, delaying processing to avoid spamming slow system")
-            delay(500)
+            delay(500.milliseconds)
         }
     }
 
@@ -111,7 +117,40 @@ internal class AndroidActionExecutorImpl @Inject constructor(
             screenWidthPx = metrics.widthPixels,
             screenHeightPx = metrics.heightPixels,
         )
-        dispatchGesture(GestureDescription.Builder().buildZoomGesture(strokes, durationMs, random))
+        val actualDuration = durationMs.toNormalizedZoomDuration(random)
+        val builder = AndroidGestureBuilder.createNewBuilder(null)
+        val fingers = listOf(strokes.first, strokes.second).mapIndexed { index, stroke ->
+            builder.newFinger(index, 0L)
+                .press(stroke.from)
+                .move(stroke.to, actualDuration)
+                .release()
+                .build() ?: return
+        }
+        if (gestureExecutor.getHeldPointer() != null) gestureExecutor.checkHeldPointer()
+        val gesture = builder.build(fingers, "Zoom", gestureExecutor.getHeldPointer()) ?: return
+        dispatchBuiltGesture(gesture)
+    }
+
+    override fun checkHeldPointer(): Boolean {
+        if (!gestureExecutor.checkHeldPointer()) {
+            Log.i(TAG, "Held pointer has been lifted by a user touch")
+            return false
+        }
+
+        return gestureExecutor.getHeldPointer() != null
+    }
+
+    override suspend fun releaseHeldPointer() {
+        val service = accessibilityService ?: return
+
+        if (!gestureExecutor.releaseHeldPointer(service)) {
+            Log.w(TAG, "System did not release the held pointer properly")
+        }
+    }
+
+    override suspend fun dispatchPixelWorkaroundGestureIfNeeded() {
+        val service = accessibilityService ?: return
+        gestureExecutor.dispatchPixelWorkaroundGestureIfNeeded(service)
     }
 
     override fun performGlobalAction(globalAction: Int) {

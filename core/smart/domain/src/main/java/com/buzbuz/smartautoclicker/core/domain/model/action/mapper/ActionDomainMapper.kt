@@ -5,9 +5,11 @@ import android.graphics.Point
 import com.buzbuz.smartautoclicker.core.base.identifier.Identifier
 import com.buzbuz.smartautoclicker.core.database.entity.ActionType
 import com.buzbuz.smartautoclicker.core.database.entity.ChangeCounterOperationType
-import com.buzbuz.smartautoclicker.core.database.entity.ClickPositionType
 import com.buzbuz.smartautoclicker.core.database.entity.CompleteActionEntity
+import com.buzbuz.smartautoclicker.core.database.entity.CoordinatesType
 import com.buzbuz.smartautoclicker.core.database.entity.EventToggleType
+import com.buzbuz.smartautoclicker.core.database.entity.GestureFingerMotionEntity
+import com.buzbuz.smartautoclicker.core.database.entity.GestureFingerMotionType
 import com.buzbuz.smartautoclicker.core.database.entity.SystemActionType
 import com.buzbuz.smartautoclicker.core.domain.model.counter.CounterOperationValue
 import com.buzbuz.smartautoclicker.core.domain.model.action.Action
@@ -15,24 +17,28 @@ import com.buzbuz.smartautoclicker.core.domain.model.action.AreaClick
 import com.buzbuz.smartautoclicker.core.domain.model.action.AreaClickDistribution
 import com.buzbuz.smartautoclicker.core.domain.model.action.ChangeCounter
 import com.buzbuz.smartautoclicker.core.domain.model.action.Click
+import com.buzbuz.smartautoclicker.core.domain.model.action.Gesture
 import com.buzbuz.smartautoclicker.core.domain.model.action.Intent
 import com.buzbuz.smartautoclicker.core.domain.model.action.Notification
 import com.buzbuz.smartautoclicker.core.domain.model.action.Pause
 import com.buzbuz.smartautoclicker.core.domain.model.action.SetText
-import com.buzbuz.smartautoclicker.core.domain.model.action.Swipe
 import com.buzbuz.smartautoclicker.core.domain.model.action.SystemAction
 import com.buzbuz.smartautoclicker.core.domain.model.action.ToggleEvent
 import com.buzbuz.smartautoclicker.core.domain.model.action.Zoom
 import com.buzbuz.smartautoclicker.core.base.gesture.ZoomDirection
+import com.buzbuz.smartautoclicker.core.domain.model.action.position.Position
+import com.buzbuz.smartautoclicker.core.domain.model.action.gesture.toDomainGestureFinger
 import com.buzbuz.smartautoclicker.core.domain.model.action.intent.toDomainIntentExtra
+import com.buzbuz.smartautoclicker.core.domain.model.action.position.CoordinatesValue
 import com.buzbuz.smartautoclicker.core.domain.model.action.toggleevent.toDomain
+import com.buzbuz.smartautoclicker.core.domain.model.counter.getDomainCounterOperationValue
 
 /** Convert an Action entity into a Domain Action. */
 internal fun CompleteActionEntity.toDomain(cleanIds: Boolean = false): Action = when (action.type) {
     ActionType.CLICK -> toDomainClick(cleanIds)
     ActionType.AREA_CLICK -> toDomainAreaClick(cleanIds)
-    ActionType.SWIPE -> toDomainSwipe(cleanIds)
     ActionType.ZOOM -> toDomainZoom(cleanIds)
+    ActionType.GESTURE -> toDomainGesture(cleanIds)
     ActionType.PAUSE -> toDomainPause(cleanIds)
     ActionType.INTENT -> toDomainIntent(cleanIds)
     ActionType.TOGGLE_EVENT -> toDomainToggleEvent(cleanIds)
@@ -54,28 +60,54 @@ private fun CompleteActionEntity.toDomainAreaClick(cleanIds: Boolean = false) = 
     intervalMs = action.areaClickInterval!!,
 )
 
-private fun CompleteActionEntity.toDomainClick(cleanIds: Boolean = false) = Click(
-    id = Identifier(id = action.id, asTemporary = cleanIds),
-    eventId = Identifier(id = action.eventId, asTemporary = cleanIds),
-    name = action.name,
-    priority = action.priority,
-    pressDuration = action.pressDuration!!,
-    positionType = action.clickPositionType!!.toDomain(),
-    position = getPositionIfValid(action.x, action.y),
-    clickOnConditionId = action.clickOnConditionId?.let { Identifier(id = it, asTemporary = cleanIds) },
-    clickOffset =
-        if (action.clickOffsetX != null && action.clickOffsetY != null) Point(action.clickOffsetX!!, action.clickOffsetY!!)
-        else null
-)
+/**
+ * A click is stored as a gesture with a single finger pressing on the click position, waiting for the press duration,
+ * and releasing.
+ */
+private fun CompleteActionEntity.toDomainClick(cleanIds: Boolean = false): Click {
+    val motions = gestureFingers.firstOrNull()?.motions?.sortedBy { it.index }
+    val press = motions?.find { it.motionType == GestureFingerMotionType.PRESS }
 
-private fun CompleteActionEntity.toDomainSwipe(cleanIds: Boolean = false) = Swipe(
+    return Click(
+        id = Identifier(id = action.id, asTemporary = cleanIds),
+        eventId = Identifier(id = action.eventId, asTemporary = cleanIds),
+        name = action.name,
+        priority = action.priority,
+        pressDuration = motions?.find { it.motionType == GestureFingerMotionType.WAIT }?.durationMs
+            ?: DEFAULT_PRESS_DURATION_MS,
+        position = press?.toDomainClickPosition(cleanIds),
+        offset = press?.toDomainClickOffset(),
+    )
+}
+
+private fun GestureFingerMotionEntity.toDomainClickPosition(cleanIds: Boolean): Position? {
+    if (xCoordinateType == CoordinatesType.CONDITION && yCoordinateType == CoordinatesType.CONDITION) {
+        return Position.Condition(
+            conditionId = conditionId?.let { Identifier(id = it, asTemporary = cleanIds) },
+        )
+    }
+
+    val x = toClickCoordinatesValue(xCoordinateType, xLiteral, xCounter) ?: return null
+    val y = toClickCoordinatesValue(yCoordinateType, yLiteral, yCounter) ?: return null
+
+    return Position.Coordinates(x = x, y = y)
+}
+
+private fun GestureFingerMotionEntity.toDomainClickOffset(): Position.Coordinates? {
+    val x = toClickCoordinatesValue(xOffsetCoordinateType, xOffsetLiteral, xOffsetCounter) ?: return null
+    val y = toClickCoordinatesValue(yOffsetCoordinateType, yOffsetLiteral, yOffsetCounter) ?: return null
+
+    return Position.Coordinates(x = x, y = y)
+}
+
+private fun CompleteActionEntity.toDomainGesture(cleanIds: Boolean = false) = Gesture(
     id = Identifier(id = action.id, asTemporary = cleanIds),
     eventId = Identifier(id = action.eventId, asTemporary = cleanIds),
     name = action.name,
     priority = action.priority,
-    swipeDuration = action.swipeDuration!!,
-    from = getPositionIfValid(action.fromX, action.fromY),
-    to = getPositionIfValid(action.toX, action.toY),
+    fingers = gestureFingers
+        .sortedBy { it.finger.index }
+        .map { it.toDomainGestureFinger(cleanIds) },
 )
 
 private fun CompleteActionEntity.toDomainZoom(cleanIds: Boolean = false) = Zoom(
@@ -85,7 +117,7 @@ private fun CompleteActionEntity.toDomainZoom(cleanIds: Boolean = false) = Zoom(
     priority = action.priority,
     direction = ZoomDirection.valueOf(action.zoomDirection!!),
     intensityPx = action.zoomIntensity,
-    center = getPositionIfValid(action.zoomCenterX, action.zoomCenterY),
+    center = action.zoomCenterX?.let { x -> action.zoomCenterY?.let { y -> Point(x, y) } },
     zoomDurationMs = action.zoomDuration,
 )
 
@@ -127,10 +159,12 @@ private fun CompleteActionEntity.toDomainChangeCounter(cleanIds: Boolean = false
     priority = action.priority,
     counterName = action.counterName!!,
     operation = action.counterOperation!!.toDomain(),
-    operationValue = CounterOperationValue.getCounterOperationValue(
+    operationValue = getDomainCounterOperationValue(
         type = action.counterOperationValueType,
         numberValue = action.counterOperationValue,
         counterName = action.counterOperationCounterName,
+        conditionId = action.counterOperationConditionId?.let { Identifier(id = it, asTemporary = cleanIds) },
+        conditionPositionType = action.counterOperationConditionPositionType,
     ),
 )
 
@@ -160,9 +194,6 @@ private fun CompleteActionEntity.toDomainSetText(cleanIds: Boolean = false) = Se
     validateInput = action.textValidateInput ?: false,
 )
 
-private fun ClickPositionType.toDomain(): Click.PositionType =
-    Click.PositionType.valueOf(name)
-
 private fun EventToggleType.toDomain(): ToggleEvent.ToggleType =
     ToggleEvent.ToggleType.valueOf(name)
 
@@ -176,5 +207,13 @@ private fun String?.toComponentName(): ComponentName? = this?.let {
     ComponentName.unflattenFromString(it)
 }
 
-private fun getPositionIfValid(x: Int?, y: Int?): Point? =
-    if (x != null && y != null) Point(x, y) else null
+/** A null [type] with a null [literal] means the click has no position yet. */
+private fun toClickCoordinatesValue(type: CoordinatesType?, literal: Int?, counter: String?): CoordinatesValue? =
+    when (type) {
+        CoordinatesType.COUNTER -> CoordinatesValue.Counter(counterName = counter ?: "")
+        CoordinatesType.LITERAL, null -> literal?.let(CoordinatesValue::Literal)
+        CoordinatesType.CONDITION -> null
+    }
+
+/** Press duration used for the clicks without a wait motion, in milliseconds. */
+private const val DEFAULT_PRESS_DURATION_MS = 1L

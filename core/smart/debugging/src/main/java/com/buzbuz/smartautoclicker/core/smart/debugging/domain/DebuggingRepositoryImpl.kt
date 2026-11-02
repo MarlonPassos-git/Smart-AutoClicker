@@ -21,6 +21,7 @@ import com.buzbuz.smartautoclicker.core.base.di.HiltCoroutineDispatchers.IO
 import com.buzbuz.smartautoclicker.core.smart.debugging.data.DebugConfigurationLocalDataSource
 import com.buzbuz.smartautoclicker.core.smart.debugging.data.DebugReportLocalDataSource
 import com.buzbuz.smartautoclicker.core.smart.debugging.domain.model.live.DebugLiveEventOccurrence
+import com.buzbuz.smartautoclicker.core.smart.debugging.domain.model.live.DebugLiveHeldEvent
 import com.buzbuz.smartautoclicker.core.smart.debugging.domain.model.report.DebugReportCounterInitialValue
 import com.buzbuz.smartautoclicker.core.smart.debugging.domain.model.report.DebugReportEventOccurrence
 import com.buzbuz.smartautoclicker.core.smart.debugging.domain.model.report.DebugReportOverview
@@ -31,9 +32,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -50,22 +52,34 @@ internal class DebuggingRepositoryImpl @Inject constructor(
 
     private val ioScope: CoroutineScope = CoroutineScope(ioDispatcher + SupervisorJob())
 
-    override val isLiveDebugging: Flow<Boolean> = debugEngine.isDebuggingSession.map { isDebuggingSession ->
-        isDebuggingSession && isDebugViewEnabled()
-    }
+    override val isLiveDebugging: Flow<Boolean> = debugEngine.isDebuggingSession
+        .combine(debugConfigurationDataSource.isDebugViewEnabled()) { isDebuggingSession, isDebugViewEnabled ->
+            isDebuggingSession && isDebugViewEnabled
+        }
 
     override val lastImageEventProcessed: Flow<DebugLiveEventOccurrence?> =
         debugEngine.lastEventProcessed
 
+    override val heldEvent: Flow<DebugLiveHeldEvent?> =
+        debugEngine.heldEvent
+
     override val isDebugReportAvailable: StateFlow<Boolean> =
         debugReportDataSource.isReportAvailable
 
+    override val isDebugViewEventStatsShown: Flow<Boolean> =
+        debugConfigurationDataSource.isDebugViewEventStatsShown()
 
-    override fun isDebugViewEnabled(): Boolean =
-        debugConfigurationDataSource.isDebugViewEnabled()
+    override val isDebugViewActionsShown: Flow<Boolean> =
+        debugConfigurationDataSource.isDebugViewActionsShown()
 
-    override fun isDebugReportEnabled(): Boolean =
-        debugConfigurationDataSource.isDebugReportEnabled()
+    override val isDebugViewHeldFingerShown: Flow<Boolean> =
+        debugConfigurationDataSource.isDebugViewHeldFingerShown()
+
+    override suspend fun isDebugViewEnabled(): Boolean =
+        debugConfigurationDataSource.isDebugViewEnabled().first()
+
+    override suspend fun isDebugReportEnabled(): Boolean =
+        debugConfigurationDataSource.isDebugReportEnabled().first()
 
     override fun setDebuggingConfig(debugView: Boolean, debugReport: Boolean) {
         ioScope.launch {
@@ -77,6 +91,18 @@ internal class DebuggingRepositoryImpl @Inject constructor(
                 debugReport = debugReport,
             )
         }
+    }
+
+    override fun setDebugViewEventStatsShown(isShown: Boolean) {
+        ioScope.launch { debugConfigurationDataSource.setDebugViewEventStatsShown(isShown) }
+    }
+
+    override fun setDebugViewActionsShown(isShown: Boolean) {
+        ioScope.launch { debugConfigurationDataSource.setDebugViewActionsShown(isShown) }
+    }
+
+    override fun setDebugViewHeldFingerShown(isShown: Boolean) {
+        ioScope.launch { debugConfigurationDataSource.setDebugViewHeldFingerShown(isShown) }
     }
 
 

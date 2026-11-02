@@ -16,8 +16,8 @@
  */
 package com.buzbuz.smartautoclicker.feature.tutorial.domain.model
 
-import com.buzbuz.smartautoclicker.core.common.tutorial.domain.model.data.Tutorial
-import com.buzbuz.smartautoclicker.core.common.tutorial.domain.model.data.TutorialInfo
+import com.buzbuz.smartautoclicker.core.common.tutorial.domain.model.tutorial.Tutorial
+import com.buzbuz.smartautoclicker.core.common.tutorial.domain.model.tutorial.TutorialInfo
 
 interface TutorialItem {
 
@@ -27,7 +27,12 @@ interface TutorialItem {
 
     enum class Type {
         COMBINE_CONDITIONS_NOT_VISIBLE,
+        COMBINE_CONDITIONS_OPERATOR_AND,
+        COMBINE_CONDITIONS_OPERATOR_OR,
         COLOR_CONDITION,
+        COUNTERS_BASICS,
+        EVENTS_PRIORITY,
+        EVENTS_STATE,
         IMAGE_DETECTION_MOVING_TARGET,
         IMAGE_DETECTION_STILL_TARGET,
         NUMBER_CONDITION_STATIC_VALUE,

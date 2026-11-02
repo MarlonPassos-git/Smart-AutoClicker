@@ -29,6 +29,7 @@ data class TutorialCategory(
 ) {
 
     sealed interface Content {
+        data object Divider : Content
         data class Category(val type: Type) : Content
         data class Tutorial(val type: TutorialItem.Type) : Content
         data class Slideshow(val type: TutorialSlideshow.Type) : Content
@@ -37,15 +38,26 @@ data class TutorialCategory(
     enum class Type {
         ACTIONS,
         BASICS,
+        CHANGE_COUNTER_ACTION,
+        CLICK_ACTION,
         COLOR_CONDITION,
         COMBINE_CONDITIONS,
         COUNTERS,
-        EVENT_STATE,
+        COMBINE_EVENTS,
+        EVENTS_PRIORITY,
+        EVENTS_STATE,
         IMAGE_CONDITION,
+        INTENT_ACTION,
+        NOTIFICATION_ACTION,
         NUMBER_CONDITION,
+        PAUSE_ACTION,
         ROOT,
         SCREEN_CONDITIONS,
+        GESTURE_ACTION,
+        SYSTEM_ACTION,
         TEXT_CONDITION,
+        TOGGLE_EVENT_ACTION,
         TRIGGER_CONDITIONS,
+        WRITE_TEXT_ACTION,
     }
 }

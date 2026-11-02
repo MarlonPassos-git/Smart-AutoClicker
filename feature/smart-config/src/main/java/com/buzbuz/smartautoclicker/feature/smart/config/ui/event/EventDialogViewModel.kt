@@ -22,7 +22,6 @@ import android.view.View
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 
-import com.buzbuz.smartautoclicker.core.bitmaps.BitmapRepository
 import com.buzbuz.smartautoclicker.core.domain.model.ConditionOperator
 import com.buzbuz.smartautoclicker.core.domain.model.action.Action
 import com.buzbuz.smartautoclicker.core.domain.model.condition.ScreenCondition
@@ -37,10 +36,10 @@ import com.buzbuz.smartautoclicker.core.common.tutorial.domain.MonitoredViewsMan
 import com.buzbuz.smartautoclicker.core.common.tutorial.domain.TutorialRepository
 import com.buzbuz.smartautoclicker.core.common.tutorial.domain.model.monitoring.MonitoredViewType
 import com.buzbuz.smartautoclicker.feature.smart.config.domain.EditionRepository
-import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.model.action.getIconRes
-import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.model.condition.getIconRes
-import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.model.condition.toUiScreenCondition
-import com.buzbuz.smartautoclicker.feature.smart.config.utils.getImageConditionBitmap
+import com.buzbuz.smartautoclicker.feature.smart.config.domain.usecase.condition.GetImageConditionBitmapJobUseCase
+import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.uistate.action.getIconRes
+import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.uistate.condition.getIconRes
+import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.uistate.condition.toUiScreenCondition
 
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.FlowPreview
@@ -62,7 +61,7 @@ import kotlin.time.Duration.Companion.milliseconds
 @OptIn(FlowPreview::class)
 class EventDialogViewModel @Inject constructor(
     @ApplicationContext context: Context,
-    private val bitmapRepository: BitmapRepository,
+    private val getImageConditionBitmapJobUseCase: GetImageConditionBitmapJobUseCase,
     private val editionRepository: EditionRepository,
     private val monitoredViewsManager: MonitoredViewsManager,
     private val settingsRepository: SettingsRepository,
@@ -112,7 +111,7 @@ class EventDialogViewModel @Inject constructor(
     }
 
     fun getConditionBitmap(condition: ScreenCondition.Image, onBitmapLoaded: (Bitmap?) -> Unit): Job =
-        getImageConditionBitmap(bitmapRepository, condition, onBitmapLoaded)
+        getImageConditionBitmapJobUseCase(viewModelScope, condition, onBitmapLoaded)
 
     fun setEventName(newName: String) {
         updateEditedEvent { oldValue -> oldValue.copyBase(name = newName) }
@@ -172,11 +171,13 @@ class EventDialogViewModel @Inject constructor(
         }
     }
 
-    fun monitorViews(conditionsField: View, conditionOperatorAndView: View, actionsField: View, saveButton: View) {
+    fun monitorViews(conditionsField: View, conditionOperatorAndView: View, conditionOperatorOrView: View, actionsField: View, initialStateField: View, saveButton: View) {
         monitoredViewsManager.apply {
             attach(MonitoredViewType.EVENT_DIALOG_FIELD_CONDITIONS, conditionsField)
             attach(MonitoredViewType.EVENT_DIALOG_FIELD_OPERATOR_ITEM_AND, conditionOperatorAndView)
+            attach(MonitoredViewType.EVENT_DIALOG_FIELD_OPERATOR_ITEM_OR, conditionOperatorOrView)
             attach(MonitoredViewType.EVENT_DIALOG_FIELD_ACTIONS, actionsField)
+            attach(MonitoredViewType.EVENT_DIALOG_FIELD_INITIAL_STATE, initialStateField)
             attach(MonitoredViewType.EVENT_DIALOG_BUTTON_SAVE, saveButton)
         }
     }
@@ -184,6 +185,8 @@ class EventDialogViewModel @Inject constructor(
     fun stopViewMonitoring() {
         monitoredViewsManager.apply {
             detach(MonitoredViewType.EVENT_DIALOG_BUTTON_SAVE)
+            detach(MonitoredViewType.EVENT_DIALOG_FIELD_INITIAL_STATE)
+            detach(MonitoredViewType.EVENT_DIALOG_FIELD_OPERATOR_ITEM_OR)
             detach(MonitoredViewType.EVENT_DIALOG_FIELD_OPERATOR_ITEM_AND)
             detach(MonitoredViewType.EVENT_DIALOG_FIELD_ACTIONS)
             detach(MonitoredViewType.EVENT_DIALOG_FIELD_CONDITIONS)

@@ -16,13 +16,13 @@
  */
 package com.buzbuz.smartautoclicker.feature.tutorial.data.items.root.basics.screenconditions.image
 
-import com.buzbuz.smartautoclicker.core.common.tutorial.domain.model.data.Tutorial
-import com.buzbuz.smartautoclicker.core.common.tutorial.domain.model.data.TutorialInfo
-import com.buzbuz.smartautoclicker.core.common.tutorial.domain.model.data.step.TutorialStep
-import com.buzbuz.smartautoclicker.core.common.tutorial.domain.model.data.step.TutorialStepEndCondition
-import com.buzbuz.smartautoclicker.core.common.tutorial.domain.model.data.step.TutorialStepImage
-import com.buzbuz.smartautoclicker.core.common.tutorial.domain.model.data.step.TutorialStepStartCondition
-import com.buzbuz.smartautoclicker.core.common.tutorial.domain.model.data.subject.TutorialSubject
+import com.buzbuz.smartautoclicker.core.common.tutorial.domain.model.tutorial.Tutorial
+import com.buzbuz.smartautoclicker.core.common.tutorial.domain.model.tutorial.TutorialInfo
+import com.buzbuz.smartautoclicker.core.common.tutorial.domain.model.tutorial.step.TutorialStep
+import com.buzbuz.smartautoclicker.core.common.tutorial.domain.model.tutorial.step.TutorialStepEndCondition
+import com.buzbuz.smartautoclicker.core.common.tutorial.domain.model.tutorial.step.TutorialStepImage
+import com.buzbuz.smartautoclicker.core.common.tutorial.domain.model.tutorial.step.TutorialStepStartCondition
+import com.buzbuz.smartautoclicker.core.common.tutorial.domain.model.tutorial.subject.TutorialSubject
 import com.buzbuz.smartautoclicker.core.common.tutorial.domain.model.monitoring.MonitoredOverlayType
 import com.buzbuz.smartautoclicker.core.common.tutorial.domain.model.monitoring.MonitoredViewType
 import com.buzbuz.smartautoclicker.feature.tutorial.R
@@ -242,27 +242,19 @@ object ImageConditionsMovingTargetTutorial : TutorialItem {
                         MonitoredViewType.ACTION_TYPE_DIALOG_CLICK_ACTION,
                     ),
                 ),
-                // Select position type
+                // Select Pick Condition
                 TutorialStep.TutorialOverlay(
                     contentTextResId = R.string.message_tutorial_screen_condition_moving_target_step_19,
                     stepStartCondition = TutorialStepStartCondition.MonitoredOverlayDisplayed(
                         MonitoredOverlayType.CLICK,
                     ),
                     stepEndCondition = TutorialStepEndCondition.MonitoredViewClicked(
-                        MonitoredViewType.CLICK_DIALOG_FIELD_POSITION_TYPE_ITEM_ON_CONDITION,
-                    ),
-                ),
-                // Select a condition for the click
-                TutorialStep.TutorialOverlay(
-                    contentTextResId = R.string.message_tutorial_screen_condition_moving_target_step_20,
-                    stepStartCondition = TutorialStepStartCondition.Immediate,
-                    stepEndCondition = TutorialStepEndCondition.MonitoredViewClicked(
-                        MonitoredViewType.CLICK_DIALOG_FIELD_SELECT_POSITION_OR_CONDITION,
+                        MonitoredViewType.CLICK_DIALOG_BUTTON_CONDITION,
                     ),
                 ),
                 // Pick blue character
                 TutorialStep.TutorialOverlay(
-                    contentTextResId = R.string.message_tutorial_screen_condition_moving_target_step_21,
+                    contentTextResId = R.string.message_tutorial_screen_condition_moving_target_step_20,
                     stepStartCondition = TutorialStepStartCondition.MonitoredOverlayDisplayed(
                         MonitoredOverlayType.SCREEN_CONDITION_SELECTION,
                     ),
@@ -272,7 +264,7 @@ object ImageConditionsMovingTargetTutorial : TutorialItem {
                 ),
                 // Save Click
                 TutorialStep.TutorialOverlay(
-                    contentTextResId = R.string.message_tutorial_screen_condition_moving_target_step_22,
+                    contentTextResId = R.string.message_tutorial_screen_condition_moving_target_step_21,
                     stepStartCondition = TutorialStepStartCondition.MonitoredOverlayDisplayed(
                         MonitoredOverlayType.CLICK,
                     ),
@@ -282,7 +274,7 @@ object ImageConditionsMovingTargetTutorial : TutorialItem {
                 ),
                 // Close action list
                 TutorialStep.TutorialOverlay(
-                    contentTextResId = R.string.message_tutorial_screen_condition_moving_target_step_23,
+                    contentTextResId = R.string.message_tutorial_screen_condition_moving_target_step_22,
                     stepStartCondition = TutorialStepStartCondition.MonitoredOverlayDisplayed(
                         MonitoredOverlayType.SMART_ACTIONS_BRIEF_MENU,
                     ),
@@ -292,7 +284,7 @@ object ImageConditionsMovingTargetTutorial : TutorialItem {
                 ),
                 // Save Event
                 TutorialStep.TutorialOverlay(
-                    contentTextResId = R.string.message_tutorial_screen_condition_moving_target_step_24,
+                    contentTextResId = R.string.message_tutorial_screen_condition_moving_target_step_23,
                     stepStartCondition = TutorialStepStartCondition.MonitoredOverlayDisplayed(
                         MonitoredOverlayType.EVENT,
                     ),
@@ -302,7 +294,7 @@ object ImageConditionsMovingTargetTutorial : TutorialItem {
                 ),
                 // Save Scenario
                 TutorialStep.TutorialOverlay(
-                    contentTextResId = R.string.message_tutorial_screen_condition_moving_target_step_25,
+                    contentTextResId = R.string.message_tutorial_screen_condition_moving_target_step_24,
                     stepStartCondition = TutorialStepStartCondition.MonitoredOverlayDisplayed(
                         MonitoredOverlayType.SCENARIO,
                     ),
@@ -312,13 +304,13 @@ object ImageConditionsMovingTargetTutorial : TutorialItem {
                 ),
                 // Start detection and game
                 TutorialStep.TutorialOverlay(
-                    contentTextResId = R.string.message_tutorial_screen_condition_moving_target_step_26,
+                    contentTextResId = R.string.message_tutorial_screen_condition_moving_target_step_25,
                     stepStartCondition = TutorialStepStartCondition.Immediate,
                     stepEndCondition = TutorialStepEndCondition.NextButton,
                 ),
                 // Game won
                 TutorialStep.TutorialOverlay(
-                    contentTextResId = R.string.message_tutorial_screen_condition_moving_target_step_27,
+                    contentTextResId = R.string.message_tutorial_screen_condition_moving_target_step_26,
                     stepStartCondition = TutorialStepStartCondition.GameWon,
                     stepEndCondition = TutorialStepEndCondition.NextButton,
                 ),

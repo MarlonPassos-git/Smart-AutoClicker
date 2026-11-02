@@ -45,6 +45,8 @@
     <string name="item_scenario_last_used_never">Ніколи не використовувався</string>
     <plurals name="item_scenario_last_used_minutes">
         <item quantity="one">%1$d хв. тому</item>
+        <item quantity="few">%1$d хв. тому</item>
+        <item quantity="many">%1$d хв. тому</item>
         <item quantity="other">%1$d хв. тому</item>
     </plurals>
     <plurals name="item_scenario_last_used_hours">
@@ -66,7 +68,7 @@
       -  * Desc can have more space to describe the title
       -  * Error have the same space as desc
       -->
-    <string name="item_desc_dumb_scenario">Звичайний досвід автоклікера.\nПросто розміщуйте натискання та свайпи на екрані.</string>
+    <string name="item_desc_dumb_scenario">Звичайний досвід автоклікера.\nПросто розміщуйте натискання та жести на екрані.</string>
     <string name="item_desc_dumb_scenario_max_duration">Зупинити через %1$s</string>
     <string name="item_desc_dumb_scenario_max_duration_infinite">Без максимальної тривалості</string>
     <string name="item_desc_dumb_scenario_repeat_count">Повторити %1$d разів</string>
@@ -132,6 +134,9 @@
     <string name="field_force_entire_screen_title">Примусово весь екран</string>
     <string name="field_force_entire_screen_desc">Примусити селектор захоплення екрана до \"Весь екран\". Може не працювати в залежності від вашого пристрою</string>
 
+    <string name="field_show_on_lock_screen_title">Показувати на екрані блокування</string>
+    <string name="field_show_on_lock_screen_desc">Залишати плаваюче меню видимим, коли пристрій заблоковано.</string>
+
     <string name="field_input_block_workaround_title">Розблокувати сенсорний екран</string>
     <string name="field_input_block_workaround_desc">На пристроях Pixel з Android 15 використання автоклікера може заблокувати сенсорний екран.\nЩоб розблокувати його, потрібно доторкнутися до екрана кількома пальцями одночасно. Це налаштування намагається імітувати це кожні 10 секунд.</string>
 
@@ -152,8 +157,6 @@
     <string name="button_condition_migration_running">Міграція</string>
     <string name="button_condition_migration_finished">Добре</string>
 
-    <string name="field_tutorial_title">Навчання</string>
-    <string name="field_tutorial_desc">Навчитися користуватися Klick\'r</string>
 
     <string name="dialog_title_backup">Резервна копія</string>
     <string name="message_backup">Створіть або імпортуйте zip-архів сценаріїв</string>

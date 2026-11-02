@@ -42,6 +42,7 @@ import com.buzbuz.smartautoclicker.core.base.addDumpTabulationLvl
 import com.buzbuz.smartautoclicker.core.base.extensions.disableMoveAnimations
 import com.buzbuz.smartautoclicker.core.base.extensions.doWhenMeasured
 import com.buzbuz.smartautoclicker.core.base.extensions.safeAddView
+import com.buzbuz.smartautoclicker.core.base.extensions.safeRemoveView
 import com.buzbuz.smartautoclicker.core.base.extensions.safeUpdateViewLayout
 import com.buzbuz.smartautoclicker.core.common.overlays.R
 import com.buzbuz.smartautoclicker.core.common.overlays.base.BaseOverlay
@@ -336,8 +337,8 @@ abstract class OverlayMenu(
         positionDataSource.removeOnLockedPositionChangedListener(onLockedPositionChangedListener)
         saveMenuPosition(displayConfigManager.displayConfig.orientation)
 
-        windowManager.removeView(menuLayout)
-        screenOverlayView?.let { windowManager.removeView(it) }
+        windowManager.safeRemoveView(menuLayout)
+        screenOverlayView?.let { windowManager.safeRemoveView(it) }
         screenOverlayView = null
 
         resizeController.release()
@@ -390,8 +391,8 @@ abstract class OverlayMenu(
         lifecycleRegistry.currentState = Lifecycle.State.CREATED
 
         windowManager.apply {
-            removeView(oldOverlayView)
-            removeView(menuLayout)
+            safeRemoveView(oldOverlayView)
+            safeRemoveView(menuLayout)
             screenOverlayView?.let { overlayView ->
                 if (!safeAddView(overlayView, overlayLayoutParams)) {
                     finish()
@@ -461,9 +462,30 @@ abstract class OverlayMenu(
      */
     protected fun setMenuItemVisibility(view: View, visible: Boolean) {
         Log.d(TAG, "setMenuItemVisibility for ${hashCode()}, $view to $visible")
+
+        if (view.isVisible == visible) return
         view.isVisible = visible
 
-        if (!resizeController.isAnimating) forceWindowResize()
+        if (canResizeWindow()) forceWindowResize()
+    }
+
+    /**
+     * Set the visibility of several menu items.
+     * When changing multiple items visibility, use this method to recompute the window size only once.
+     *
+     * @param viewState map of the item views to their new visibility
+     */
+    protected fun setMenuItemsVisibility(viewState: Map<View, Boolean>) {
+        Log.d(TAG, "setMenuItemVisibility for ${hashCode()}, $viewState")
+
+        var haveChanged = false
+        viewState.forEach { (view, isVisible) ->
+            haveChanged = haveChanged || view.isVisible != isVisible
+            view.isVisible = isVisible
+        }
+
+        if (!haveChanged) return
+        if (canResizeWindow()) forceWindowResize()
     }
 
     /**
@@ -476,6 +498,10 @@ abstract class OverlayMenu(
     protected fun animateLayoutChanges(layoutChanges: () -> Unit) {
         resizeController.animateLayoutChanges(layoutChanges)
     }
+
+    private fun canResizeWindow(): Boolean =
+        !resizeController.isAnimating && !animations.showAnimationIsRunning
+                && !animations.hideAnimationIsRunning && menuBackground.width > 0
 
     private fun forceWindowResize() {
         Log.d(TAG, "Force window resize")

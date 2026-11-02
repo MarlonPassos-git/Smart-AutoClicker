@@ -62,11 +62,14 @@ private fun GestureDescription.Builder.addZoomStroke(
     endpoints: ZoomStrokeEndpoints,
     durationMs: Long,
 ) {
-    val path = Path().apply { line(endpoints.from, endpoints.to, null) }
+    val path = Path().apply {
+        moveTo(endpoints.from.x.toFloat(), endpoints.from.y.toFloat())
+        lineTo(endpoints.to.x.toFloat(), endpoints.to.y.toFloat())
+    }
     addStroke(GestureDescription.StrokeDescription(path, 0, durationMs))
 }
 
-private fun Long.toNormalizedZoomDuration(random: Random?): Long {
+internal fun Long.toNormalizedZoomDuration(random: Random?): Long {
     val randomizedDuration = random?.nextLongInOffset(this, RANDOMIZATION_DURATION_MAX_OFFSET_MS) ?: this
     return randomizedDuration.coerceIn(MINIMUM_STROKE_DURATION_MS, MAXIMUM_STROKE_DURATION_MS)
 }

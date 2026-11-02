@@ -19,6 +19,7 @@ package com.buzbuz.smartautoclicker.feature.smart.config.data
 import com.buzbuz.smartautoclicker.core.domain.model.AND
 import com.buzbuz.smartautoclicker.core.domain.model.action.Action
 import com.buzbuz.smartautoclicker.core.domain.model.action.Click
+import com.buzbuz.smartautoclicker.core.domain.model.action.position.Position
 import com.buzbuz.smartautoclicker.core.domain.model.action.Intent
 import com.buzbuz.smartautoclicker.core.domain.model.action.ToggleEvent
 import com.buzbuz.smartautoclicker.core.domain.model.action.toggleevent.EventToggle
@@ -58,6 +59,7 @@ internal class ActionsEditor<Parent>(
 
     override fun stopItemEdition() {
         intentExtraEditor.stopEdition()
+        eventToggleEditor.stopEdition()
         super.stopItemEdition()
     }
 
@@ -65,7 +67,7 @@ internal class ActionsEditor<Parent>(
         if (item is Click) {
             when (parent) {
                 is TriggerEvent ->
-                    item.isComplete() && item.positionType != Click.PositionType.ON_DETECTED_CONDITION
+                    item.isComplete() && item.position !is Position.Condition
 
                 is ScreenEvent ->
                     if (item.isComplete()) !(parent.conditionOperator == AND && !item.isClickOnConditionValid())
