@@ -44,7 +44,7 @@
         <item quantity="other">%1$d 日前</item>
     </plurals>
 
-    <string name="item_desc_dumb_scenario">一般的な自動タップの使い方です。\n画面上にタップおよびスワイプを配置します。</string>
+    <string name="item_desc_dumb_scenario">一般的な自動タップの使い方です。\n画面上にタップおよびジェスチャーを配置します。</string>
     <string name="item_desc_dumb_scenario_max_duration">%1$s 後に停止</string>
     <string name="item_desc_dumb_scenario_max_duration_infinite">最大時間なし</string>
     <string name="item_desc_dumb_scenario_repeat_count">%1$d 回繰り返す</string>
@@ -81,6 +81,9 @@
     <string name="field_force_entire_screen_title">画面全体を強制</string>
     <string name="field_force_entire_screen_desc">画面キャプチャの選択を「画面全体」に固定します。端末により動作しない場合があります。</string>
 
+    <string name="field_show_on_lock_screen_title">ロック画面に表示</string>
+    <string name="field_show_on_lock_screen_desc">端末がロックされている間もフローティング メニューを表示したままにします。</string>
+
     <string name="field_input_block_workaround_title">タッチ画面のブロック解除</string>
     <string name="field_input_block_workaround_desc">Android 15 を搭載した一部の Pixel 端末では、自動タップの使用によりタッチが反応しなくなることがあります。\n複数指で画面に触れると回復します。本設定は 10 秒ごとにその操作を試みます。</string>
 
@@ -99,8 +102,6 @@
     <string name="button_condition_migration_running">移行中</string>
     <string name="button_condition_migration_finished">OK</string>
 
-    <string name="field_tutorial_title">チュートリアル</string>
-    <string name="field_tutorial_desc">Klick\'r の使い方を学ぶ</string>
 
     <string name="dialog_title_backup">バックアップ</string>
     <string name="message_backup">シナリオの zip アーカイブを作成または読み込みます</string>

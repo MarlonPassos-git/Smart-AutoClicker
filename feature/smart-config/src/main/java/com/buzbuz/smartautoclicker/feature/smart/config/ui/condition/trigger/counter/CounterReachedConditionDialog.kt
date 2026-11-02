@@ -44,7 +44,7 @@ import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.bindings.count
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.bindings.counter.setValueInfo
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.bindings.counter.setup
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.dialogs.showCloseWithoutSavingDialog
-import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.model.counter.allCounterComparisonOperatorDropdownItems
+import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.uistate.counter.allCounterComparisonOperatorDropdownItems
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.condition.OnConditionConfigCompleteListener
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.counter.selection.CounterSelectionDialog
 
@@ -131,6 +131,17 @@ class CounterReachedConditionDialog(
                 viewModel.uiState.collect(::updateUiState)
             }
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        viewModel.monitorSelectCounterView(viewBinding.counterToCheck.root)
+        viewModel.monitorSaveButtonView(viewBinding.layoutTopBar.buttonSave)
+    }
+
+    override fun onStop() {
+        viewModel.detachMonitoredViews()
+        super.onStop()
     }
 
     override fun back() {

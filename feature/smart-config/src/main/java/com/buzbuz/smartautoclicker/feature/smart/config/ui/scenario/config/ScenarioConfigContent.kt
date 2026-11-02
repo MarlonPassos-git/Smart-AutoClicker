@@ -158,7 +158,10 @@ class ScenarioConfigContent(appContext: Context) : NavBarDialogContent(appContex
             editFpsLimit.textLayout.isEnabled = state.isEnabled
             if (state.isEnabled) {
                 editFpsLimit.textField.filters = arrayOf(MinMaxDoubleInputFilter(min = 0.0, max = state.maxValue))
-                editFpsLimit.setText(state.value.toNaturalDisplayString(), InputType.TYPE_NUMBER_FLAG_DECIMAL)
+                editFpsLimit.setText(
+                    text = state.value.toNaturalDisplayString(),
+                    type = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL,
+                )
             } else {
                 editFpsLimit.textField.filters = emptyArray<InputFilter>()
                 editFpsLimit.setText(context.getString(R.string.field_scenario_fps_limit_disable_rate))

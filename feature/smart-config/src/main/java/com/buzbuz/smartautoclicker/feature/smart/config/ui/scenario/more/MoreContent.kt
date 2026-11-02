@@ -23,6 +23,7 @@ import android.view.ViewGroup
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.buzbuz.smartautoclicker.core.common.navigation.getDebuggingNavigator
 
 import com.buzbuz.smartautoclicker.core.common.overlays.dialog.implementation.navbar.NavBarDialogContent
 import com.buzbuz.smartautoclicker.core.common.overlays.dialog.implementation.navbar.viewModels
@@ -37,7 +38,7 @@ import com.buzbuz.smartautoclicker.feature.smart.config.R
 import com.buzbuz.smartautoclicker.feature.smart.config.databinding.ContentMoreBinding
 import com.buzbuz.smartautoclicker.feature.smart.config.di.ScenarioConfigViewModelsEntryPoint
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.counter.config.CountersConfigDialog
-import com.buzbuz.smartautoclicker.feature.smart.debugging.ui.dialog.report.DebugReportDialog
+import com.buzbuz.smartautoclicker.feature.smart.config.ui.scenario.more.debugview.DebugViewSettingsDialog
 
 import kotlinx.coroutines.launch
 
@@ -57,6 +58,12 @@ class MoreContent(appContext: Context) : NavBarDialogContent(appContext) {
                 setTitle(context.getString(R.string.field_show_debug_view_title))
                 setDescription(context.getString(R.string.field_show_debug_view_desc))
                 setOnClickListener(viewModel::toggleIsDebugViewEnabled)
+            }
+
+            fieldDebugViewSettings.apply {
+                setTitle(context.getString(R.string.field_debug_view_settings_title))
+                setDescription(context.getString(R.string.field_debug_view_settings_desc))
+                setOnClickListener { debounceUserInteraction { showDebugViewSettingsDialog() } }
             }
 
             fieldDebugReport.apply {
@@ -113,9 +120,13 @@ class MoreContent(appContext: Context) : NavBarDialogContent(appContext) {
     }
 
     private fun showDebugReport() {
+        context.getDebuggingNavigator().showDebugReportDialog(context)
+    }
+
+    private fun showDebugViewSettingsDialog() {
         dialogController.overlayManager.navigateTo(
             context = context,
-            newOverlay = DebugReportDialog(),
+            newOverlay = DebugViewSettingsDialog(),
         )
     }
 

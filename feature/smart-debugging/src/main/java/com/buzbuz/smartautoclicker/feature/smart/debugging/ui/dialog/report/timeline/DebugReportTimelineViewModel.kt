@@ -17,7 +17,9 @@
 package com.buzbuz.smartautoclicker.feature.smart.debugging.ui.dialog.report.timeline
 
 import android.content.Context
+import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 
@@ -26,11 +28,11 @@ import com.buzbuz.smartautoclicker.core.domain.model.action.Action
 import com.buzbuz.smartautoclicker.core.domain.model.action.ChangeCounter
 import com.buzbuz.smartautoclicker.core.domain.model.action.Click
 import com.buzbuz.smartautoclicker.core.domain.model.action.AreaClick
+import com.buzbuz.smartautoclicker.core.domain.model.action.Gesture
 import com.buzbuz.smartautoclicker.core.domain.model.action.Intent
 import com.buzbuz.smartautoclicker.core.domain.model.action.Notification
 import com.buzbuz.smartautoclicker.core.domain.model.action.Pause
 import com.buzbuz.smartautoclicker.core.domain.model.action.SetText
-import com.buzbuz.smartautoclicker.core.domain.model.action.Swipe
 import com.buzbuz.smartautoclicker.core.domain.model.action.SystemAction
 import com.buzbuz.smartautoclicker.core.domain.model.action.ToggleEvent
 import com.buzbuz.smartautoclicker.core.domain.model.action.Zoom
@@ -41,6 +43,7 @@ import com.buzbuz.smartautoclicker.core.domain.model.scenario.Scenario
 import com.buzbuz.smartautoclicker.core.smart.debugging.domain.DebuggingRepository
 import com.buzbuz.smartautoclicker.core.smart.debugging.domain.model.report.DebugReportConditionResult
 import com.buzbuz.smartautoclicker.core.smart.debugging.domain.model.report.DebugReportEventOccurrence
+import com.buzbuz.smartautoclicker.core.smart.debugging.domain.model.report.DebugReportHoldReleaseReason
 import com.buzbuz.smartautoclicker.feature.smart.debugging.R
 import com.buzbuz.smartautoclicker.feature.smart.debugging.ui.dialog.report.timeline.filter.DebugReportTimelineFilter
 import com.buzbuz.smartautoclicker.feature.smart.debugging.ui.dialog.report.timeline.filter.shouldFilter
@@ -137,16 +140,23 @@ class DebugReportTimelineViewModel @Inject constructor(
             val event = when (occurrence) {
                 is DebugReportEventOccurrence.ScreenEvent -> screenEvents.findWithId(occurrence.eventId)
                 is DebugReportEventOccurrence.TriggerEvent -> trigEvents.findWithId(occurrence.eventId)
+                is DebugReportEventOccurrence.HeldEventCheck.Screen -> screenEvents.findWithId(occurrence.eventId)
+                is DebugReportEventOccurrence.HeldEventCheck.Trigger -> trigEvents.findWithId(occurrence.eventId)
             } ?: return@mapIndexedNotNull null
 
             DebugReportTimelineEventOccurrenceItem(
                 id = index,
                 scenarioId = event.scenarioId.databaseId,
                 eventName = event.name,
+                eventNameIconRes = occurrence.getEventNameIconRes(),
+                cardColorRes = occurrence.getCardColorRes(),
+                hasDetails = occurrence.hasDetails(),
                 timeText = occurrence.relativeTimestampMs.formatDebugTimelineTimestamp(),
                 occurrenceText = occurrence.getOccurrenceText(context),
                 conditionsText = occurrence.conditionsResults.getConditionFulfilledText(context, event.conditions),
-                actions = event.actions.toUiStateItems(),
+                actions =
+                    if (occurrence is DebugReportEventOccurrence.HeldEventCheck) emptyList()
+                    else event.actions.toUiStateItems(),
                 occurrence = occurrence,
             )
         }
@@ -159,12 +169,60 @@ class DebugReportTimelineViewModel @Inject constructor(
             )
         }
 
-    private fun <T : DebugReportEventOccurrence> T.getOccurrenceText(context: Context) : String =
-        when (this) {
+    private fun <T : DebugReportEventOccurrence> T.getOccurrenceText(context: Context) : String {
+        val occurrenceText = when (this) {
             is DebugReportEventOccurrence.ScreenEvent ->
                 context.getString(R.string.item_event_occurrence_frame_number, frameNumber)
-            is DebugReportEventOccurrence.TriggerEvent ->
+            is DebugReportEventOccurrence.HeldEventCheck.Screen ->
+                context.getString(R.string.item_event_occurrence_frame_number, frameNumber)
+            is DebugReportEventOccurrence.TriggerEvent,
+            is DebugReportEventOccurrence.HeldEventCheck.Trigger ->
                 context.getString(R.string.item_event_occurrence_trigger)
+        }
+
+        if (this !is DebugReportEventOccurrence.HeldEventCheck) return occurrenceText
+
+        val holdText = releaseReason?.let { reason ->
+            context.getString(R.string.item_event_occurrence_released, context.getString(reason.getDisplayNameRes()))
+        } ?: context.getString(R.string.item_event_occurrence_hold_duration, holdDurationMs / 1000f)
+
+        return context.getString(R.string.item_event_occurrence_held_check, occurrenceText, holdText)
+    }
+
+    @DrawableRes
+    private fun DebugReportEventOccurrence.getEventNameIconRes(): Int =
+        when (this) {
+            is DebugReportEventOccurrence.ScreenEvent -> R.drawable.ic_screen_event
+            is DebugReportEventOccurrence.TriggerEvent -> R.drawable.ic_trigger_event
+            is DebugReportEventOccurrence.HeldEventCheck -> R.drawable.ic_hold_touch
+        }
+
+    @ColorRes
+    private fun DebugReportEventOccurrence.getCardColorRes(): Int =
+        when {
+            this !is DebugReportEventOccurrence.HeldEventCheck -> R.color.debug_timeline_event_color
+            isHeld -> R.color.debug_timeline_hold_color
+            else -> R.color.debug_timeline_release_color
+        }
+
+    /** Only holds and unfulfilled releases have conditions results worth detailing, other releases have nothing more to display. */
+    private fun DebugReportEventOccurrence.hasDetails(): Boolean =
+        this !is DebugReportEventOccurrence.HeldEventCheck ||
+                isHeld || releaseReason == DebugReportHoldReleaseReason.UNFULFILLED
+
+    @StringRes
+    private fun DebugReportHoldReleaseReason.getDisplayNameRes(): Int =
+        when (this) {
+            DebugReportHoldReleaseReason.UNFULFILLED -> R.string.item_event_occurrence_release_reason_unfulfilled
+            DebugReportHoldReleaseReason.ACTIONS_COMPLETED ->
+                R.string.item_event_occurrence_release_reason_actions_completed
+            DebugReportHoldReleaseReason.DURATION_ELAPSED ->
+                R.string.item_event_occurrence_release_reason_duration_elapsed
+            DebugReportHoldReleaseReason.INTERRUPTED -> R.string.item_event_occurrence_release_reason_interrupted
+            DebugReportHoldReleaseReason.EVENT_DISABLED -> R.string.item_event_occurrence_release_reason_event_disabled
+            DebugReportHoldReleaseReason.OTHER_EVENT -> R.string.item_event_occurrence_release_reason_other_event
+            DebugReportHoldReleaseReason.SCREEN_ROTATION -> R.string.item_event_occurrence_release_reason_screen_rotation
+            DebugReportHoldReleaseReason.SCENARIO_STOPPED -> R.string.item_event_occurrence_release_reason_scenario_stopped
         }
 
     private fun <T : DebugReportConditionResult> List<T>.getConditionFulfilledText(
@@ -174,7 +232,8 @@ class DebugReportTimelineViewModel @Inject constructor(
         when (size) {
             0 -> ""
             1 -> context.getString(
-                R.string.item_event_occurrence_one_condition_fulfilled,
+                if (first().isFulFilled) R.string.item_event_occurrence_one_condition_fulfilled
+                else R.string.item_event_occurrence_one_condition_unfulfilled,
                 conditions.findWithId(first().conditionId)?.name ?: "",
             )
             else -> context.getString(R.string.item_event_occurrence_several_condition_processed, size)
@@ -185,8 +244,8 @@ class DebugReportTimelineViewModel @Inject constructor(
         when (this) {
             is AreaClick -> R.drawable.ic_click
             is Click -> R.drawable.ic_click
-            is Swipe -> R.drawable.ic_swipe
-            is Zoom -> R.drawable.ic_swipe
+            is Zoom -> R.drawable.ic_gesture
+            is Gesture -> R.drawable.ic_gesture
             is Pause -> R.drawable.ic_wait
             is Intent -> R.drawable.ic_intent
             is ToggleEvent ->  R.drawable.ic_toggle_event

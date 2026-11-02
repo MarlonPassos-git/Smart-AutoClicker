@@ -46,6 +46,25 @@ interface SmartProcessingListener {
     /** The processing of the [ScreenEvent] list on a new screen frame has begun. */
     fun onEventsListProcessingStarted(eventType: EventType) = Unit
 
+    /**
+     * The event holding a pointer on the screen has changed.
+     * This is called when a hold starts, when it is taken over by another event, and when the pointer is released,
+     * whatever the reason (conditions unfulfilled, event disabled, lifted by the user, dropped by the system...).
+     *
+     * @param heldEvent the event now holding the pointer, or null if nothing is held anymore.
+     */
+    fun onHeldEventChanged(heldEvent: Event?) = Unit
+
+    /**
+     * The pointer held by an event has been released.
+     * Always called before the [onHeldEventChanged] notifying the end of this hold.
+     *
+     * @param event the event that was holding the pointer.
+     * @param reason the reason of the release.
+     */
+    fun onHeldEventReleased(event: Event, reason: HoldReleaseReason) = Unit
+
+
     /** The processing of an [Event] on the current screen frame has begun. */
     fun onEventProcessingStarted(event: Event) = Unit
 
@@ -55,8 +74,15 @@ interface SmartProcessingListener {
      * @param event the event fulfilled
      * @param fulfilled true if event conditions are fulfilled, false if not.
      * @param results the results for each Condition processed for the event
+     * @param isHeld true if the event is holding a pointer on the screen and this processing is the verification of
+     * its hold. In this case, [fulfilled] tells if the pointer is kept held, or if it is released.
      */
-    fun onEventProcessingCompleted(event: Event, fulfilled: Boolean, results: List<ProcessedConditionResult>)
+    fun onEventProcessingCompleted(
+        event: Event,
+        fulfilled: Boolean,
+        results: List<ProcessedConditionResult>,
+        isHeld: Boolean = false,
+    )
 
     /**
      * A [Event] have been fulfilled and its actions are done being executed..
@@ -110,4 +136,24 @@ interface SmartProcessingListener {
 enum class EventType {
     Screen,
     Trigger
+}
+
+/** The reason of the release of a pointer held by an event. */
+enum class HoldReleaseReason {
+    /** The conditions of the held event are no longer fulfilled. */
+    Unfulfilled,
+    /** All the actions of the held event have been executed. */
+    ActionsCompleted,
+    /** The defined hold duration has elapsed. */
+    DurationElapsed,
+    /** The pointer has been lifted outside of the scenario, most likely by a user interaction with the screen. */
+    Interrupted,
+    /** The held event has been disabled. */
+    EventDisabled,
+    /** The gesture of another event has taken over or ended the hold. */
+    OtherEvent,
+    /** The screen orientation has changed. */
+    ScreenRotation,
+    /** The scenario has been stopped. */
+    ScenarioStopped,
 }

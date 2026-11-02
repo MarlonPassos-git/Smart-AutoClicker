@@ -18,6 +18,8 @@ package com.buzbuz.smartautoclicker.feature.tutorial.data.items.root.counters
 
 import com.buzbuz.smartautoclicker.feature.tutorial.R
 import com.buzbuz.smartautoclicker.feature.tutorial.domain.model.TutorialCategory
+import com.buzbuz.smartautoclicker.feature.tutorial.domain.model.TutorialItem
+import com.buzbuz.smartautoclicker.feature.tutorial.domain.model.TutorialSlideshow
 
 
 internal fun getCountersCategory() =
@@ -28,6 +30,8 @@ internal fun getCountersCategory() =
         longDescriptionRes = R.string.tutorial_category_counters_desc_long,
         iconRes = R.drawable.ic_counter_reached,
         content = listOf(
-
+            TutorialCategory.Content.Divider,
+            TutorialCategory.Content.Tutorial(TutorialItem.Type.COUNTERS_BASICS),
+            TutorialCategory.Content.Slideshow(TutorialSlideshow.Type.COUNTERS_VALUE_USAGES),
         ),
     )

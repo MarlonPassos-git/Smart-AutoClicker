@@ -21,8 +21,7 @@
     <string name="default_click_name">Click</string>
     <integer name="default_click_press_duration">1</integer>
 
-    <string name="default_swipe_name">Swipe</string>
-    <integer name="default_swipe_duration">500</integer>
+    <string name="default_gesture_name">Gesture</string>
 
     <string name="default_pause_name">Wait</string>
     <integer name="default_pause_duration">50</integer>
@@ -42,4 +41,5 @@
     <string name="default_system_action_name">System action</string>
 
     <string name="default_set_text_name">Write text</string>
+    <integer name="default_zoom_duration">500</integer>
 </resources>

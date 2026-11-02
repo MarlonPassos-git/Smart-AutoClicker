@@ -33,6 +33,7 @@ fun Double.toNaturalDisplayString(maxFractionDigits: Int? = null): String {
 
 fun CounterOperationValue.toNaturalDisplayString(): String =
     when (this) {
-        is CounterOperationValue.Counter -> value
+        is CounterOperationValue.Counter -> counterName
         is CounterOperationValue.Number -> value.toNaturalDisplayString()
+        is CounterOperationValue.Condition -> "?"
     }

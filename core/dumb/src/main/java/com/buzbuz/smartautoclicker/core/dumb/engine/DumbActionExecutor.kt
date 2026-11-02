@@ -16,16 +16,9 @@
  */
 package com.buzbuz.smartautoclicker.core.dumb.engine
 
-import android.accessibilityservice.GestureDescription
-import android.graphics.Path
-import android.util.Log
-
-import com.buzbuz.smartautoclicker.core.base.workarounds.UnblockGestureScheduler
-import com.buzbuz.smartautoclicker.core.base.workarounds.buildUnblockGesture
 import com.buzbuz.smartautoclicker.core.common.actions.AndroidActionExecutor
-import com.buzbuz.smartautoclicker.core.common.actions.gesture.buildSingleStroke
-import com.buzbuz.smartautoclicker.core.common.actions.gesture.line
-import com.buzbuz.smartautoclicker.core.common.actions.gesture.moveTo
+import com.buzbuz.smartautoclicker.core.common.actions.gesture.builder.AndroidGestureBuilder
+import com.buzbuz.smartautoclicker.core.common.actions.model.ResolvedFinger
 import com.buzbuz.smartautoclicker.core.common.actions.utils.getPauseDurationMs
 import com.buzbuz.smartautoclicker.core.dumb.domain.model.DumbAction
 import com.buzbuz.smartautoclicker.core.dumb.domain.model.Repeatable
@@ -36,6 +29,7 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.random.Random
+import kotlin.time.Duration.Companion.milliseconds
 
 @Singleton
 class DumbActionExecutor @Inject constructor(
@@ -47,21 +41,14 @@ class DumbActionExecutor @Inject constructor(
 
     private var unblockWorkaroundEnabled: Boolean = false
 
-    private val unblockGestureScheduler: UnblockGestureScheduler? =
-        if (unblockWorkaroundEnabled) UnblockGestureScheduler()
-        else null
-
     fun setUnblockWorkaround(isEnabled: Boolean) {
         unblockWorkaroundEnabled = isEnabled
     }
 
     suspend fun onScenarioLoopFinished() {
-        if (unblockGestureScheduler?.shouldTrigger() == true) {
+        if (unblockWorkaroundEnabled) {
             withContext(Dispatchers.Main) {
-                Log.i(TAG, "Injecting unblock gesture")
-                androidExecutor.dispatchGesture(
-                    GestureDescription.Builder().buildUnblockGesture()
-                )
+                androidExecutor.dispatchPixelWorkaroundGestureIfNeeded()
             }
         }
     }
@@ -70,40 +57,16 @@ class DumbActionExecutor @Inject constructor(
         this.randomize = randomize
         when (action) {
             is DumbAction.DumbClick -> executeDumbClick(action)
-            is DumbAction.DumbSwipe -> executeDumbSwipe(action)
             is DumbAction.DumbZoom -> executeDumbZoom(action)
+            is DumbAction.DumbGesture -> executeDumbGesture(action)
             is DumbAction.DumbPause -> executeDumbPause(action)
         }
     }
 
     private suspend fun executeDumbClick(dumbClick: DumbAction.DumbClick) {
-        val clickGesture = GestureDescription.Builder().buildSingleStroke(
-            path = Path().apply { moveTo(dumbClick.position, random) },
-            durationMs = dumbClick.pressDurationMs,
-            random = random,
-        )
-
-        executeRepeatableGesture(clickGesture, dumbClick)
-    }
-
-    private suspend fun executeDumbSwipe(dumbSwipe: DumbAction.DumbSwipe) {
-        val swipeGesture = GestureDescription.Builder().buildSingleStroke(
-            path = Path().apply {
-                line(
-                    from = dumbSwipe.fromPosition,
-                    to = dumbSwipe.toPosition,
-                    random = random,
-                )
-            },
-            durationMs = dumbSwipe.swipeDurationMs,
-            random = random,
-        )
-
-        executeRepeatableGesture(swipeGesture, dumbSwipe)
-    }
-
-    private suspend fun executeDumbPause(dumbPause: DumbAction.DumbPause) {
-        delay(dumbPause.pauseDurationMs.getPauseDurationMs(random))
+        executeRepeatableGesture(dumbClick, dumbClick.name) { gestureBuilder ->
+            listOfNotNull(dumbClick.toResolvedFinger(gestureBuilder))
+        }
     }
 
     private suspend fun executeDumbZoom(dumbZoom: DumbAction.DumbZoom) {
@@ -118,13 +81,28 @@ class DumbActionExecutor @Inject constructor(
         }
     }
 
-    private suspend fun executeRepeatableGesture(gesture: GestureDescription, repeatable: Repeatable) {
+    private suspend fun executeDumbGesture(dumbGesture: DumbAction.DumbGesture) {
+        executeRepeatableGesture(dumbGesture, dumbGesture.name) { gestureBuilder ->
+            dumbGesture.toResolvedFingers(gestureBuilder)
+        }
+    }
+
+    private suspend fun executeRepeatableGesture(
+        repeatable: Repeatable,
+        name: String,
+        resolveFingers: (AndroidGestureBuilder) -> List<ResolvedFinger>,
+    ) {
+        val gestureBuilder = AndroidGestureBuilder.createNewBuilder(if (randomize) random else null)
+        val builtGesture = gestureBuilder.build(resolveFingers(gestureBuilder), name) ?: return
+
         repeatable.repeat {
             withContext(Dispatchers.Main) {
-                androidExecutor.dispatchGesture(gesture)
+                androidExecutor.dispatchBuiltGesture(builtGesture)
             }
         }
     }
-}
 
-private const val TAG = "DumbActionExecutor"
+    private suspend fun executeDumbPause(dumbPause: DumbAction.DumbPause) {
+        delay(dumbPause.pauseDurationMs.getPauseDurationMs(random).milliseconds)
+    }
+}

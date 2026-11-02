@@ -54,7 +54,7 @@ import com.buzbuz.smartautoclicker.feature.smart.config.domain.model.EditedListS
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.RecoverableOverlayResultQueue
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.formatters.toEffectDescription
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.formatters.toNaturalDisplayString
-import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.model.condition.toUiScreenCondition
+import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.uistate.condition.toUiScreenCondition
 
 import dagger.hilt.android.qualifiers.ApplicationContext
 
@@ -139,11 +139,11 @@ class ScreenConditionsBriefViewModel @Inject constructor(
     }
 
     fun deleteScreenCondition(index: Int, force: Boolean = false): Boolean {
-        val conditions = editionRepository.editionState.getEditedEventConditions<ScreenCondition>()?.toMutableList() ?: return false
+        val conditions = editionRepository.editionState.getEditedEventScreenConditions()?.toMutableList() ?: return false
         if (index !in conditions.indices) return false
 
         editionRepository.startConditionEdition(conditions[index])
-        if (!force && editionRepository.editionState.isEditedConditionReferencedByClick()) {
+        if (!force && editionRepository.editionState.isEditedConditionReferencedByAction()) {
             editionRepository.stopConditionEdition()
             return false
         }
@@ -173,7 +173,7 @@ class ScreenConditionsBriefViewModel @Inject constructor(
     fun swapConditions(i: Int, j: Int) {
         if (i == j) return
 
-        val imageConditions = editionRepository.editionState.getEditedEventConditions<ScreenCondition>()?.toMutableList() ?: return
+        val imageConditions = editionRepository.editionState.getEditedEventScreenConditions()?.toMutableList() ?: return
         if (imageConditions.isEmpty() || i !in imageConditions.indices || j !in imageConditions.indices) return
 
         Collections.swap(imageConditions, i, j)
@@ -181,7 +181,7 @@ class ScreenConditionsBriefViewModel @Inject constructor(
     }
 
     fun moveConditions(from: Int, to: Int) {
-        val imageConditions = editionRepository.editionState.getEditedEventConditions<ScreenCondition>()?.toMutableList() ?: return
+        val imageConditions = editionRepository.editionState.getEditedEventScreenConditions()?.toMutableList() ?: return
         val movedAction = imageConditions.removeAt(from)
         imageConditions.add(to, movedAction)
 

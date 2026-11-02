@@ -8,6 +8,7 @@
  */
 package com.buzbuz.smartautoclicker.core.ui.views.itembrief.renderers
 
+import android.graphics.Paint
 import android.graphics.Canvas
 import android.graphics.PointF
 import android.view.View
@@ -18,8 +19,8 @@ import kotlin.math.sqrt
 
 internal class ZoomBriefRenderer(
     briefView: View,
-    viewStyle: SwipeBriefRendererStyle,
-) : ItemBriefRenderer<SwipeBriefRendererStyle>(briefView, viewStyle) {
+    viewStyle: ZoomBriefRendererStyle,
+) : ItemBriefRenderer<ZoomBriefRendererStyle>(briefView, viewStyle) {
 
     private var description: ZoomDescription? = null
 
@@ -65,3 +66,10 @@ data class ZoomDescription(
 
 const val DEFAULT_ZOOM_INTENSITY_PX = 150
 const val ZOOM_PREVIEW_INNER_RADIUS_PX = 24f
+
+internal data class ZoomBriefRendererStyle(
+    val linePaint: Paint,
+    val outerFromPaint: Paint,
+    val outerToPaint: Paint,
+    val outerRadiusPx: Float,
+)

@@ -21,7 +21,6 @@ import android.content.Context
 import com.buzbuz.smartautoclicker.core.domain.model.AND
 import com.buzbuz.smartautoclicker.core.domain.model.ConditionOperator
 import com.buzbuz.smartautoclicker.core.domain.model.EXACT
-import com.buzbuz.smartautoclicker.core.domain.model.action.Click
 import com.buzbuz.smartautoclicker.core.domain.model.action.AreaClickDistribution
 import com.buzbuz.smartautoclicker.core.domain.model.action.ToggleEvent
 import com.buzbuz.smartautoclicker.core.domain.model.counter.ComparisonOperation
@@ -34,7 +33,6 @@ import com.buzbuz.smartautoclicker.feature.smart.config.utils.getAreaClickInterv
 import com.buzbuz.smartautoclicker.feature.smart.config.utils.getEventConfigPreferences
 import com.buzbuz.smartautoclicker.feature.smart.config.utils.getIntentIsAdvancedConfig
 import com.buzbuz.smartautoclicker.feature.smart.config.utils.getPauseDurationConfig
-import com.buzbuz.smartautoclicker.feature.smart.config.utils.getSwipeDurationConfig
 import com.buzbuz.smartautoclicker.feature.smart.config.utils.getZoomDurationConfig
 import com.buzbuz.smartautoclicker.feature.smart.config.utils.getZoomIntensityConfig
 
@@ -58,8 +56,6 @@ internal class EditionDefaultValues {
         context.getString(R.string.default_click_name)
     fun clickPressDuration(context: Context): Long =
         context.getEventConfigPreferences().getClickPressDurationConfig(context)
-    fun clickPositionType(): Click.PositionType =
-        Click.PositionType.USER_SELECTED
 
     fun areaClickName(context: Context): String = context.getString(R.string.default_area_click_name)
     fun areaClickCount(context: Context): Int = context.getEventConfigPreferences().getAreaClickCountConfig()
@@ -68,10 +64,8 @@ internal class EditionDefaultValues {
     fun areaClickDuration(context: Context): Long = context.getEventConfigPreferences().getAreaClickDurationConfig()
     fun areaClickInterval(context: Context): Long = context.getEventConfigPreferences().getAreaClickIntervalConfig()
 
-    fun swipeName(context: Context): String =
-        context.getString(R.string.default_swipe_name)
-    fun swipeDuration(context: Context): Long =
-        context.getEventConfigPreferences().getSwipeDurationConfig(context)
+    fun gestureName(context: Context): String =
+        context.getString(R.string.default_gesture_name)
 
     fun zoomName(context: Context): String = context.getString(R.string.zoom_default_name)
     fun zoomDuration(context: Context): Long = context.getEventConfigPreferences().getZoomDurationConfig(context)

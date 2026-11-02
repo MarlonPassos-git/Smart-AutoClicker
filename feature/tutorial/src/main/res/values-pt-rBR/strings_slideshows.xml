@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <!--
 * Copyright (C) 2026 Kevin Buzeau
 *
@@ -155,5 +155,234 @@
         matemáticos estão disponíveis para personalizar a verificação. \n\nContadores podem ser usados de várias formas e usar
         uma única condição ou ação relacionada a um contador geralmente não é suficiente para usá-los corretamente. Tutoriais
         interativos cobrindo o recurso Contador estão disponíveis em sua seção dedicada.</string>
+
+    <!-- Pause Action slideshow -->
+    <string name="tutorial_slideshow_pause_action_title">Ação Aguardar</string>
+    <string name="tutorial_slideshow_pause_action_desc">Aprenda como a espera afeta a execução de ações e a detecção</string>
+    <string name="tutorial_slideshow_pause_action_step_1_text">Uma Ação Aguardar suspende o cenário inteiro por uma
+        duração configurada: durante esse tempo, nenhuma ação é executada e nenhuma detecção de tela ocorre.\n\nUm
+        caso de uso muito comum é adicionar uma ação Aguardar no final da sua lista de ações. Quando você toca em algum
+        lugar, o aplicativo precisa de tempo para processar o toque e exibir o resultado — e você geralmente quer
+        aguardar esse momento antes que o Klick\'r volte a analisar a tela.\n\nUma espera entre duas ações também é
+        válida, mas adicionar uma ao final da lista costuma ser a necessidade mais importante.</string>
+
+    <!-- Gesture Action slideshow -->
+    <string name="tutorial_slideshow_gesture_action_title">Ação Gesto</string>
+    <string name="tutorial_slideshow_gesture_action_desc">Aprenda como o gesto é realizado</string>
+    <string name="tutorial_slideshow_gesture_action_step_1_text">Uma Ação Gesto reproduz um trajeto que você gravou ou configurou manualmente, com até cinco dedos ao mesmo tempo.\n\nUm trajeto sempre começa com um toque e termina soltando o dedo, com movimentos e esperas entre eles. A duração total máxima de um gesto é de 60 segundos.\n\nCom isso, você pode recriar facilmente deslizes, zoom com dois dedos e outros gestos complexos. Experimente o botão de gravar na lista de ações para capturar um diretamente na tela!\n\nObservação: as esperas dentro de um gesto só estão disponíveis a partir do Android 8.</string>
+    <string name="tutorial_slideshow_gesture_action_step_2_text">Você pode manter o primeiro dedo pressionado no fim de um gesto e continuar a execução do cenário enquanto isso. Expanda a etapa Soltar do gesto e escolha quando o dedo deve ser solto: imediatamente, quando todas as ações do evento forem executadas, quando o evento deixar de ser atendido ou após um tempo.\n\nLembre-se de que:\n• Só é possível manter um dedo pressionado por vez: iniciar outro soltará o anterior.\n• Enquanto um dedo estiver pressionado, o evento relacionado não será mais acionado até que o dedo seja solto.\n• Se você tocar na tela manualmente, o dedo pressionado será solto.\n• O tempo máximo depende do seu sistema e do aplicativo que está sendo automatizado. Alguns sistemas permitem tempo ilimitado, outros não.</string>
+
+    <!-- Click Action Offset slideshow -->
+    <string name="tutorial_slideshow_click_action_offset_title">Deslocamento do clique</string>
+    <string name="tutorial_slideshow_click_action_offset_desc">Aprenda a ajustar a posição do clique em uma condição detectada</string>
+    <string name="tutorial_slideshow_click_action_offset_step_1_text">Ao clicar em uma condição detectada, o clique
+        é aplicado por padrão no centro da área detectada.\n\nO deslocamento do clique permite mover essa posição
+        um número fixo de pixels ao longo dos eixos X e Y, em relação ao centro da condição. Isso é útil quando o
+        elemento que você quer tocar está próximo — mas não exatamente — do centro da área detectada.</string>
+
+    <!-- Click Action Target slideshow -->
+    <string name="tutorial_slideshow_click_action_target_title">Alvo do clique</string>
+    <string name="tutorial_slideshow_click_action_target_desc">Aprenda a configurar onde o clique será aplicado</string>
+    <string name="tutorial_slideshow_click_action_target_step_1_text">Uma Ação Clique pode mirar dois tipos de
+        posições: uma posição estática sempre igual, ou a posição de uma condição detectada.\n\nEscolha seu método
+        no seletor de alvo no diálogo de configuração da ação.</string>
+    <string name="tutorial_slideshow_click_action_target_step_2_text">Com uma posição estática, o clique sempre
+        ocorre nas mesmas coordenadas exatas, independentemente do que está na tela.\n\nLembre-se que essas
+        coordenadas são sensíveis à rotação: se o dispositivo girar, o clique pode acabar em uma posição inesperada
+        ou fora dos limites da tela.</string>
+    <string name="tutorial_slideshow_click_action_target_step_3_text">Com uma posição de condição, o clique é
+        aplicado no centro de uma Condição de imagem detectada, seguindo o alvo onde quer que apareça na tela.
+        \n\nCom o operador AND, todas as condições devem ser cumpridas, então cada Condição de imagem tem uma
+        posição disponível. Você pode escolher livremente qualquer uma e refiná-la com um deslocamento.</string>
+    <string name="tutorial_slideshow_click_action_target_step_4_text">Com o operador OR, apenas a primeira condição
+        cumprida é avaliada e as demais são ignoradas. Por isso, o Klick\'r não pode saber antecipadamente qual
+        condição será detectada.\n\nEm consequência, com o operador OR você não pode escolher uma condição específica
+        como alvo: o clique sempre será aplicado na primeira condição detectada, seja ela qual for em tempo de
+        execução.</string>
+
+    <!-- Conditions List slideshow -->
+    <string name="tutorial_slideshow_conditions_list_title">Lista de condições</string>
+    <string name="tutorial_slideshow_conditions_list_desc">Aprenda como a lista de condições é executada</string>
+
+    <string name="tutorial_slideshow_conditions_list_step_1_text">Você pode visualizar a condição seguinte/anterior deslizando para a esquerda/direita em
+        qualquer lugar da tela.\n\nVocê pode alterar a ordem de uma condição usando os botões &lt;&lt; e &gt;&gt;, ou
+        tocando diretamente na sua caixa de índice.</string>
+    <string name="tutorial_slideshow_conditions_list_step_2_text">Em cenários altamente otimizados, a ordem das condições na lista
+        importa. Colocar primeiro as condições mais leves, como as Condições de cor, garante que as seguintes, mais
+        pesadas, não sejam avaliadas se a leve não for cumprida.\n\nObserve que essa lógica é invertida se você usar o
+        operador OU, pois as seguintes não serão avaliadas se a primeira for cumprida.</string>
+
+    <!-- Combine Conditions Ordering slideshow -->
+    <string name="tutorial_slideshow_combine_conditions_ordering_title">Ordem das condições e velocidade</string>
+    <string name="tutorial_slideshow_combine_conditions_ordering_desc">Como a ordem das suas condições afeta a
+        velocidade de verificação do evento</string>
+
+    <string name="tutorial_slideshow_combine_conditions_ordering_step_1_text">A ordem das condições na lista afeta a
+        velocidade de verificação do evento.\n\nCom o operador E, a verificação para assim que a primeira condição NÃO
+        cumprida é encontrada. Colocar primeiro as condições menos prováveis permite ao app pular as demais mais cedo,
+        tornando seu evento mais rápido.</string>
+
+    <string name="tutorial_slideshow_combine_conditions_ordering_step_2_text">Com o operador OU, a verificação para
+        assim que a primeira condição cumprida é encontrada. Colocar primeiro as condições mais prováveis permite ao
+        app terminar mais cedo, sem verificar o restante.\n\nEm ambos os casos, colocar a condição mais importante no
+        topo da lista é uma forma simples de manter seu cenário rápido.</string>
+
+
+    <!-- Events State Basics slideshow -->
+    <string name="tutorial_slideshow_events_state_basics_title">Estado dos eventos</string>
+    <string name="tutorial_slideshow_events_state_basics_desc">Aprenda a ativar e desativar eventos enquanto um cenário
+        está em execução</string>
+
+    <string name="tutorial_slideshow_events_state_basics_step_1_text">Cada evento do seu cenário (Eventos de Tela e
+        Eventos Gatilho) tem um estado: está <b>ativado</b> ou <b>desativado</b>.\n\nQuando ativado, o evento executa
+        normalmente e verifica suas condições como de costume. Quando desativado, é completamente ignorado, como se não
+        existisse.\n\nPor padrão, todos os eventos começam ativados. Você pode mudar isso com o campo <b>Estado
+        inicial</b> nas configurações do evento.</string>
+
+    <string name="tutorial_slideshow_events_state_basics_step_2_text">Enquanto um cenário está em execução, você pode
+        mudar o estado de qualquer evento usando a ação <b>Alterar estado do evento</b>. Esta ação permite ativar,
+        desativar ou alternar o estado de um ou mais eventos.\n\nIsso abre muitas possibilidades: eventos que se ativam
+        um após o outro, eventos que se desativam sozinhos após executar uma vez, ou grupos de eventos onde apenas um
+        está ativo por vez.</string>
+
+    <string name="tutorial_slideshow_events_state_basics_step_3_text">Quando <b>todos os eventos do cenário estão
+        desativados</b>, o cenário para sozinho. Não há mais nada a fazer, então o Klick\'r para automaticamente.\n\nÉ
+        uma forma simples de encerrar um cenário: faça seu último evento desativar todos os outros ao concluir sua
+        tarefa, e tudo para por conta própria.</string>
+
+
+    <!-- Actions List slideshow -->
+    <string name="tutorial_slideshow_actions_list_title">Lista de ações</string>
+    <string name="tutorial_slideshow_actions_list_desc">Aprenda como a lista de ações é executada</string>
+    <string name="tutorial_slideshow_actions_list_step_1_text">As ações são executadas em ordem, uma após a outra.
+        Você pode visualizar a ação seguinte/anterior deslizando para a esquerda/direita em qualquer lugar da
+        tela.\n\nVocê pode alterar a ordem de uma ação usando os botões &lt;&lt; e &gt;&gt;, ou tocando diretamente
+        na sua caixa de índice.</string>
+    <string name="tutorial_slideshow_actions_list_step_2_text">Tente manter suas listas de ações curtas. Um autoclicker comum realiza uma ação por evento
+        — esse é o modelo a seguir. Se você se encontrar adicionando muitas ações a um único evento, geralmente é sinal
+        de que o trabalho deve ser dividido em vários eventos, cada um reagindo ao que está realmente na tela. Essa é a
+        filosofia ver-e-agir do Klick\'r: detectar primeiro, depois agir.</string>
+
+    <!-- Write Text Action slideshow -->
+    <string name="tutorial_slideshow_write_text_action_title">Ação Escrever texto</string>
+    <string name="tutorial_slideshow_write_text_action_desc">Aprenda a inserir texto em um campo de entrada ativo</string>
+    <string name="tutorial_slideshow_write_text_action_step_1_text">Antes que a ação Escrever texto seja executada, o
+        campo de entrada alvo já deve estar com foco, assim como você o tocaria para exibir o teclado.\n\nPara isso,
+        adicione uma ação Clique nesse campo antes da ação Escrever texto. Se uma animação de transição ocorrer após o
+        clique, uma ação Aguardar entre as duas pode ajudar a garantir que o campo esteja pronto.\n\nA ação também possui
+        uma opção Validar: quando ativada, ela pressiona automaticamente Enter após definir o texto, confirmando ou
+        enviando o valor.</string>
+    <string name="tutorial_slideshow_write_text_action_step_2_text">Você pode inserir o valor de um contador no texto
+        a escrever. Pressione o botão Adicionar contador na configuração da ação para selecionar um contador: ele
+        inserirá o marcador <b>{nomeDoContador}</b> na posição atual do cursor.\n\nEm tempo de execução, cada marcador
+        <b>{nomeDoContador}</b> é substituído pelo valor atual do contador antes de o texto ser colado no campo. Por
+        exemplo, se um contador chamado <i>maçãs</i> tem o valor 18, o texto \"Tenho {maçãs} maçãs\" se torna
+        \"Tenho 18 maçãs\".</string>
+
+    <!-- System Action slideshow -->
+    <string name="tutorial_slideshow_system_action_title">Ação do sistema</string>
+    <string name="tutorial_slideshow_system_action_desc">Aprenda a acionar ações de navegação do Android</string>
+    <string name="tutorial_slideshow_system_action_step_1_text">Uma Ação do sistema executa uma das ações de navegação
+        integradas do Android: Voltar, Início ou Recentes.\n\nSão as mesmas ações que os botões de navegação na parte
+        inferior da tela. Não requerem coordenadas e funcionam no nível do sistema, independentemente do aplicativo
+        aberto.</string>
+
+    <!-- Change Counter Action slideshow -->
+    <string name="tutorial_slideshow_change_counter_action_title">Ação Alterar contador</string>
+    <string name="tutorial_slideshow_change_counter_action_desc">Aprenda a modificar o valor de um contador</string>
+    <string name="tutorial_slideshow_change_counter_action_step_1_text">Uma ação Alterar contador aplica uma operação
+        a um contador usando um valor estático predefinido. Três operações estão disponíveis: adicionar o valor ao
+        contador (+), subtrair do contador (−) ou definir o contador para esse valor exato (=).\n\nEsta é a forma mais
+        comum de atualizar um contador — por exemplo, adicionar 1 toda vez que uma condição é detectada, ou redefini-lo
+        para 0 quando um objetivo é atingido.</string>
+    <string name="tutorial_slideshow_change_counter_action_step_2_text">Em vez de um valor estático, você pode usar o
+        valor atual de outro contador como operando. As mesmas três operações (+, −, =) se aplicam, mas o valor é lido
+        do contador selecionado em tempo de execução, em vez de ser fixo na configuração.\n\nIsso permite construir
+        cenários dinâmicos onde os contadores interagem entre si.</string>
+
+    <!-- Notification Action slideshow -->
+    <string name="tutorial_slideshow_notification_action_title">Ação Notificação</string>
+    <string name="tutorial_slideshow_notification_action_desc">Aprenda a exibir uma notificação durante seu cenário</string>
+    <string name="tutorial_slideshow_notification_action_step_1_text">Uma ação Notificação exibe uma notificação
+        Android com um título e uma mensagem de sua escolha.\n\nVocê pode inserir o valor atual de um contador no texto
+        da notificação usando o botão Adicionar contador, ou digitando diretamente o marcador <b>{nomeDoContador}</b>.
+        Em tempo de execução ele é substituído pelo valor do contador — por exemplo, \"Tenho {maçãs} maçãs\" se torna
+        \"Tenho 18 maçãs\".</string>
+    <string name="tutorial_slideshow_notification_action_step_2_text">O nível de importância da notificação controla
+        o grau de intrusividade com que ela é apresentada. Níveis mais altos podem mostrar um banner e reproduzir um
+        som, enquanto os mais baixos são entregues silenciosamente na gaveta de notificações.\n\nO comportamento exato
+        depende do dispositivo e pode ser personalizado nas configurações de notificação do Android para o Klick\'r.</string>
+
+    <!-- Toggle Event Action slideshow -->
+    <string name="tutorial_slideshow_toggle_event_action_title">Ação Alterar estado do evento</string>
+    <string name="tutorial_slideshow_toggle_event_action_desc">Aprenda a ativar e desativar eventos em tempo de execução</string>
+    <string name="tutorial_slideshow_toggle_event_action_step_1_text">Um evento desativado é completamente ignorado
+        durante o loop do cenário — suas condições nunca são verificadas e suas ações nunca são executadas. Isso
+        significa que não consome nenhum tempo de processamento.\n\nDesativar eventos que você não está usando é uma
+        ótima maneira de melhorar o desempenho. Por exemplo, em um cenário que alterna entre uma fase de menu e uma
+        fase de jogo, desativar todos os eventos do menu durante a fase de jogo (e vice-versa) mantém apenas os eventos
+        relevantes ativos a cada momento.</string>
+    <string name="tutorial_slideshow_toggle_event_action_step_2_text">Ao configurar a ação, você pode optar por
+        alterar o estado de todos os eventos do cenário de uma vez, ou definir um novo estado para cada evento
+        individualmente.\n\nTrês mudanças de estado estão disponíveis para cada evento: ativá-lo, desativá-lo ou
+        alterná-lo a partir de seu valor atual — um evento ativado se torna desativado e um desativado se torna ativado.</string>
+    <string name="tutorial_slideshow_toggle_event_action_step_3_text">Se todos os eventos do cenário acabarem
+        desativados ao mesmo tempo, o cenário para automaticamente, pois não há mais nada a executar.\n\nIsso pode ser
+        usado intencionalmente como uma forma limpa de encerrar um cenário após atingir um objetivo: uma última ação
+        Alterar estado do evento que desativa todos os eventos encerrará o cenário.</string>
+
+    <!-- Intent Action slideshow -->
+    <string name="tutorial_slideshow_intent_action_title">Ação Intent</string>
+    <string name="tutorial_slideshow_intent_action_desc">Aprenda a se comunicar com outros aplicativos</string>
+    <string name="tutorial_slideshow_intent_action_step_1_text">Intents são a forma como os aplicativos se comunicam
+        entre si no Android. A ação Intent permite que você use esse sistema diretamente no seu cenário.\n\nUm conjunto
+        de modelos predefinidos está disponível para facilitar isso. O mais comum é Iniciar aplicativo, que abre outro
+        app no seu dispositivo exatamente como se você tivesse tocado no seu ícone no lançador.</string>
+    <string name="tutorial_slideshow_intent_action_step_2_text">A guia Avançado permite definir um Intent bruto
+        manualmente, dando controle total sobre a ação, categoria, dados e extras. Isso não é recomendado para usuários
+        comuns — é voltado para desenvolvedores Android que já sabem como os Intents funcionam.\n\nMais modelos prontos
+        para usar serão adicionados em atualizações futuras para facilitar os casos de uso comuns sem precisar recorrer
+        às opções avançadas.</string>
+
+
+    <!-- Event priority slideshow -->
+    <string name="tutorial_slideshow_events_priority_title">Prioridade dos eventos</string>
+    <string name="tutorial_slideshow_events_priority_desc">Aprenda como a ordem dos eventos na sua lista afeta quais eventos são executados</string>
+    <string name="tutorial_slideshow_events_priority_step_1_text">Cada quadro capturado da sua tela é processado verificando seus eventos <b>um a um, de cima para baixo</b>.\n\nA posição de um evento na sua lista determina quando ele tem a chance de ser executado. Por padrão, assim que as condições de um evento são atendidas e suas ações são executadas, <b>o quadro é considerado concluído</b>. O processamento para naquele quadro e o próximo recomeça a partir do primeiro evento da lista.\n\nIsso significa que por padrão apenas um evento pode ser executado por quadro.</string>
+    <string name="tutorial_slideshow_events_priority_step_2_text">Você pode alterar esse comportamento usando o campo <b>Continue executando</b> nas configurações do evento. Quando ativado, após esse evento ser executado, o processamento <b>continua para o próximo evento</b> na lista em vez de parar.\n\nIsso permite que vários eventos sejam executados no mesmo quadro.\n\n<b>Exemplo:</b> sua lista contém o Evento A seguido do Evento B. Se o Evento A continua sendo detectado e não tem <b>Continue executando</b> ativado, ele será executado em cada quadro e o Evento B nunca terá chance de executar.\n\nAtive <b>Continue executando</b> no Evento A e ambos os eventos serão verificados em cada quadro.\n\nUm tutorial interativo também está disponível para praticar esse conceito.</string>
+
+
+    <!-- Events reloading slideshow -->
+    <string name="tutorial_slideshow_events_reloading_title">Recarga de eventos</string>
+    <string name="tutorial_slideshow_events_reloading_desc">Aprenda como a recarga de um evento se comporta no seu cenário</string>
+    <string name="tutorial_slideshow_events_reloading_step_1_text">O parâmetro de recarga de eventos permite que você
+        ignore um evento por um período de tempo determinado após ser cumprido. \n\nUm evento em estado de recarga ainda
+        é considerado ativado: a recarga e o estado do evento são independentes. \n\nSe o evento for desativado enquanto
+        estiver em recarga, o temporizador de recarga será limpo, de modo que o tempo de espera não se aplica mais
+        quando o evento é reativado.</string>
+
+
+    <!-- Counters value usages slideshow -->
+    <string name="tutorial_slideshow_counters_value_usages_title">Usar valores de contador</string>
+    <string name="tutorial_slideshow_counters_value_usages_desc">Aprenda as diferentes formas de exibir e usar os valores de contador no seu cenário</string>
+
+    <string name="tutorial_slideshow_counters_value_usages_step_1_text">Você pode mostrar o valor atual de um contador
+        dentro de uma ação Notificação. Isso é útil para monitorar o progresso enquanto o seu cenário está em
+        execução, ou para exibir um resumo no final.\n\nPara inserir um contador, pressione o botão Adicionar
+        contador na configuração da ação. Isso adiciona um marcador como <b>{counterName}</b> no seu texto. Em
+        tempo de execução, o marcador é substituído pelo valor atual do contador. Por exemplo, se um contador
+        chamado <i>score</i> tem o valor 42, o texto \"Pontuação atual: {score}\" se torna
+        \"Pontuação atual: 42\".</string>
+
+    <string name="tutorial_slideshow_counters_value_usages_step_2_text">Você também pode inserir o valor de um
+        contador em uma ação Escrever texto, para que o texto digitado inclua o valor atual no momento em que a
+        ação é executada.\n\nO marcador funciona da mesma forma que na ação Notificação: pressione o botão Adicionar
+        contador ou digite <b>{counterName}</b> diretamente. Por exemplo, se um contador chamado <i>score</i> tem
+        o valor 42, o texto \"Minha pontuação é {score}\" se torna \"Minha pontuação é 42\".</string>
+
+    <string name="tutorial_slideshow_counters_value_usages_step_3_text">Os valores dos contadores são registrados no
+        relatório de depuração. Se algo não estiver funcionando como esperado no seu cenário, capturar um relatório
+        de depuração mostrará exatamente como seus contadores mudaram ao longo do tempo, facilitando encontrar o
+        problema.</string>
 
 </resources>

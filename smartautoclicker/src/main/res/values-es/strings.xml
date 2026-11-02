@@ -46,14 +46,17 @@
     <string name="item_scenario_last_used_never">Nunca usado</string>
     <plurals name="item_scenario_last_used_minutes">
         <item quantity="one">hace %1$d min.</item>
+        <item quantity="many">hace %1$d min.</item>
         <item quantity="other">hace %1$d min.</item>
     </plurals>
     <plurals name="item_scenario_last_used_hours">
         <item quantity="one">hace %1$d hora</item>
+        <item quantity="many">hace %1$d horas</item>
         <item quantity="other">hace %1$d horas</item>
     </plurals>
     <plurals name="item_scenario_last_used_days">
         <item quantity="one">hace %1$d día</item>
+        <item quantity="many">hace %1$d días</item>
         <item quantity="other">hace %1$d días</item>
     </plurals>
 
@@ -63,7 +66,7 @@
       -  * Desc can have more space to describe the title
       -  * Error have the same space as desc
       -->
-    <string name="item_desc_dumb_scenario">La experiencia normal de clic automático.\nSimplemente haga clic y deslice el dedo en la pantalla.</string>
+    <string name="item_desc_dumb_scenario">La experiencia normal de clic automático.\nSimplemente coloque clics y gestos en la pantalla.</string>
     <string name="item_desc_dumb_scenario_max_duration">Detener después de %1$s</string>
     <string name="item_desc_dumb_scenario_max_duration_infinite">Sin duración máxima</string>
     <string name="item_desc_dumb_scenario_repeat_count">Repetir %1$d veces</string>
@@ -131,6 +134,9 @@
     <string name="field_force_entire_screen_title">Forzar pantalla completa</string>
     <string name="field_force_entire_screen_desc">Fuerce el selector de captura de pantalla a \"Pantalla completa\". Puede que no funcione dependiendo de su dispositivo</string>
 
+    <string name="field_show_on_lock_screen_title">Mostrar en la pantalla de bloqueo</string>
+    <string name="field_show_on_lock_screen_desc">Mantener el menú flotante visible cuando el dispositivo está bloqueado.</string>
+
     <string name="field_input_block_workaround_title">Desbloquear pantalla táctil</string>
     <string name="field_input_block_workaround_desc">En dispositivos Pixel con Android 15, el uso de un control automático puede bloquear la pantalla táctil.\nPara desbloquearla, debes tocar la pantalla con varios dedos al mismo tiempo. Esta configuración intenta simular esto cada 10 segundos.</string>
 
@@ -151,8 +157,6 @@
     <string name="button_condition_migration_running">Migrar</string>
     <string name="button_condition_migration_finished">DE ACUERDO</string>
 
-    <string name="field_tutorial_title">Tutorial</string>
-    <string name="field_tutorial_desc">Aprende a usar Klick\'r</string>
 
     <string name="dialog_title_backup">Copia de seguridad</string>
     <string name="message_backup">Crea o importa un archivo zip de escenarios</string>

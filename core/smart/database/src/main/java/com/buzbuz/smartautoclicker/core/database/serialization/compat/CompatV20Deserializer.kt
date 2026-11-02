@@ -31,10 +31,10 @@ import kotlinx.serialization.json.JsonObject
 
 
 /** Deserializer for all Json object version below 20. */
-internal open class CompatV20Deserializer : CompatDeserializer() {
+internal open class CompatV20Deserializer : CompatV24Deserializer() {
 
-    override fun deserializeCompleteScenario(jsonCompleteScenario: JsonObject): CompleteScenario =
-        super.deserializeCompleteScenario(jsonCompleteScenario)
+    override fun deserialize(jsonCompleteScenario: JsonObject): CompleteScenario =
+        super.deserialize(jsonCompleteScenario)
             .migrateToCounterTable()
 
     override fun deserializeCounterConditionValue(jsonCounterCondition: JsonObject): Double =
@@ -97,6 +97,7 @@ internal open class CompatV20Deserializer : CompatDeserializer() {
         )
 
     private fun MutableMap<String, CountersEntity>.putIfValidCounter(scenarioId: Long, name: String?) {
-        if (name != null) put(name, CountersEntity(name = name, scenarioId = scenarioId, startingValue = 0.0))
+        if (!name.isNullOrEmpty())
+            put(name, CountersEntity(name = name, scenarioId = scenarioId, startingValue = 0.0))
     }
 }

@@ -22,18 +22,12 @@ import androidx.lifecycle.viewModelScope
 
 import com.buzbuz.smartautoclicker.core.base.identifier.Identifier
 import com.buzbuz.smartautoclicker.core.domain.model.action.Action
-import com.buzbuz.smartautoclicker.core.domain.model.condition.Condition
-import com.buzbuz.smartautoclicker.core.domain.model.condition.ScreenCondition
-import com.buzbuz.smartautoclicker.core.domain.model.condition.TriggerCondition
-import com.buzbuz.smartautoclicker.core.domain.model.event.Event
 import com.buzbuz.smartautoclicker.feature.smart.config.R
 import com.buzbuz.smartautoclicker.feature.smart.config.domain.EditionRepository
 import com.buzbuz.smartautoclicker.feature.smart.config.domain.usecase.copy.GetActionsForCopyUseCase
 import com.buzbuz.smartautoclicker.feature.smart.config.domain.usecase.copy.model.ActionsForCopy
 import com.buzbuz.smartautoclicker.feature.smart.config.domain.usecase.copy.unreachable.IsActionRelatedToUnreachableItemUseCase
-import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.model.action.toUiAction
-import com.buzbuz.smartautoclicker.feature.smart.config.ui.copy.condition.ConditionCopyItem
-import com.buzbuz.smartautoclicker.feature.smart.config.ui.copy.fix.eventchildren.FixEventChildrenCopyDialog
+import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.uistate.action.toUiAction
 
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
@@ -128,27 +122,6 @@ class ActionCopyViewModel @Inject constructor(
         }
 
         return false
-    }
-
-    fun getFixEventDialogArgument(actionsToCopy: List<Action>): FixEventChildrenCopyDialog.Arguments? {
-        val editedEvent = editionRepository.editionState.getEditedEvent() ?: return null
-
-        val allEvents = editionRepository.editionState.getAllEditedEvents()
-        val editedEventIndex = allEvents.indexOfFirst { event -> editedEvent.id == event.id }
-        if (editedEventIndex !in allEvents.indices) return null
-
-        val newEvent = editedEvent.copyBase(
-            actions = editedEvent.actions + actionsToCopy
-        )
-        val resultingEventList = allEvents.toMutableList().apply {
-            set(editedEventIndex, newEvent)
-        }
-
-        return FixEventChildrenCopyDialog.Arguments(
-            resultingEventList = resultingEventList,
-            parent = newEvent,
-            showHelpMessage = true,
-        )
     }
 
     fun saveCopyActions(actionCopies: List<Action>) {

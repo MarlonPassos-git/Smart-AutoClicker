@@ -19,6 +19,7 @@ package com.buzbuz.smartautoclicker.core.database.di
 import android.content.Context
 import androidx.room.Room
 
+import com.buzbuz.smartautoclicker.core.database.migrations.MigrationTo28
 import com.buzbuz.smartautoclicker.core.database.ClickDatabase
 import com.buzbuz.smartautoclicker.core.database.migrations.Migration10to11
 import com.buzbuz.smartautoclicker.core.database.migrations.Migration12to13
@@ -26,6 +27,8 @@ import com.buzbuz.smartautoclicker.core.database.migrations.Migration19to20
 import com.buzbuz.smartautoclicker.core.database.migrations.Migration21to22
 import com.buzbuz.smartautoclicker.core.database.migrations.Migration26to27
 import com.buzbuz.smartautoclicker.core.database.migrations.Migration1to2
+import com.buzbuz.smartautoclicker.core.database.migrations.Migration23to24
+import com.buzbuz.smartautoclicker.core.database.migrations.Migration24to25
 import com.buzbuz.smartautoclicker.core.database.migrations.Migration2to3
 import com.buzbuz.smartautoclicker.core.database.migrations.Migration3to4
 import com.buzbuz.smartautoclicker.core.database.migrations.Migration4to5
@@ -65,6 +68,11 @@ internal object SmartDatabaseModule {
             Migration19to20,
             Migration21to22,
             Migration26to27,
+            MigrationTo28(23),
+            MigrationTo28(24),
+            MigrationTo28(25),
+            MigrationTo28(26),
+            MigrationTo28(27),
         ).build()
 
 }

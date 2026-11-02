@@ -16,6 +16,18 @@
  */
 package com.buzbuz.smartautoclicker.feature.tutorial.data.mapping
 
+import com.buzbuz.smartautoclicker.feature.tutorial.data.items.root.basics.actions.getActionsListSlideshow
+import com.buzbuz.smartautoclicker.feature.tutorial.data.items.root.basics.actions.changecounter.getChangeCounterActionSlideshow
+import com.buzbuz.smartautoclicker.feature.tutorial.data.items.root.basics.actions.click.getClickActionOffsetSlideshow
+import com.buzbuz.smartautoclicker.feature.tutorial.data.items.root.basics.actions.click.getClickActionTargetSlideshow
+import com.buzbuz.smartautoclicker.feature.tutorial.data.items.root.basics.actions.pause.getPauseActionSlideshow
+import com.buzbuz.smartautoclicker.feature.tutorial.data.items.root.basics.actions.gesture.getGestureActionSlideshow
+import com.buzbuz.smartautoclicker.feature.tutorial.data.items.root.basics.actions.intent.getIntentActionSlideshow
+import com.buzbuz.smartautoclicker.feature.tutorial.data.items.root.basics.actions.notification.getNotificationActionSlideshow
+import com.buzbuz.smartautoclicker.feature.tutorial.data.items.root.basics.actions.changeeventstate.getChangeEventStateActionSlideshow
+import com.buzbuz.smartautoclicker.feature.tutorial.data.items.root.basics.actions.system.getSystemActionSlideshow
+import com.buzbuz.smartautoclicker.feature.tutorial.data.items.root.basics.actions.writetext.getWriteTextActionSlideshow
+import com.buzbuz.smartautoclicker.feature.tutorial.data.items.root.basics.screenconditions.getScreenConditionsListSlideshow
 import com.buzbuz.smartautoclicker.feature.tutorial.data.items.root.basics.screenconditions.getScreenConditionsThresholdSlideshow
 import com.buzbuz.smartautoclicker.feature.tutorial.data.items.root.basics.screenconditions.getScreenConditionsTypeSlideshow
 import com.buzbuz.smartautoclicker.feature.tutorial.data.items.root.basics.screenconditions.image.getImageConditionsCaptureSlideshow
@@ -24,17 +36,40 @@ import com.buzbuz.smartautoclicker.feature.tutorial.data.items.root.basics.scree
 import com.buzbuz.smartautoclicker.feature.tutorial.data.items.root.basics.screenconditions.text.getTextConditionsDetectionAreaSlideshow
 import com.buzbuz.smartautoclicker.feature.tutorial.data.items.root.basics.triggerconditions.getBroadcastReceivedSlideshow
 import com.buzbuz.smartautoclicker.feature.tutorial.data.items.root.basics.triggerconditions.getCounterReachedSlideshow
+import com.buzbuz.smartautoclicker.feature.tutorial.data.items.root.combineconditions.getCombineConditionsOrderingSlideshow
+import com.buzbuz.smartautoclicker.feature.tutorial.data.items.root.combineevents.getEventsReloadingSlideshow
+import com.buzbuz.smartautoclicker.feature.tutorial.data.items.root.combineevents.state.getEventsStateBasicsSlideshow
+import com.buzbuz.smartautoclicker.feature.tutorial.data.items.root.combineevents.priority.getEventsPrioritySlideshow
+import com.buzbuz.smartautoclicker.feature.tutorial.data.items.root.counters.getCountersValueUsagesSlideshow
 import com.buzbuz.smartautoclicker.feature.tutorial.domain.model.TutorialSlideshow
+import com.buzbuz.smartautoclicker.feature.tutorial.domain.model.TutorialSlideshow.Type.*
 
 
 internal fun TutorialSlideshow.Type.toTutorialSlideshow(): TutorialSlideshow =
     when (this) {
-        TutorialSlideshow.Type.BROADCAST_RECEIVED_CONDITION -> getBroadcastReceivedSlideshow()
-        TutorialSlideshow.Type.COUNTER_REACHED_CONDITION -> getCounterReachedSlideshow()
-        TutorialSlideshow.Type.IMAGE_CONDITION_CAPTURE -> getImageConditionsCaptureSlideshow()
-        TutorialSlideshow.Type.IMAGE_CONDITION_DETECTION_AREA -> getImageConditionsDetectionAreaSlideshow()
-        TutorialSlideshow.Type.NUMBER_CONDITION_DETECTION_AREA -> getNumberConditionsDetectionAreaSlideshow()
-        TutorialSlideshow.Type.SCREEN_CONDITIONS_DETECTION_THRESHOLD -> getScreenConditionsThresholdSlideshow()
-        TutorialSlideshow.Type.SCREEN_CONDITIONS_TYPE -> getScreenConditionsTypeSlideshow()
-        TutorialSlideshow.Type.TEXT_CONDITION_DETECTION_AREA -> getTextConditionsDetectionAreaSlideshow()
+        ACTIONS_LIST -> getActionsListSlideshow()
+        BROADCAST_RECEIVED_CONDITION -> getBroadcastReceivedSlideshow()
+        CHANGE_COUNTER_ACTION -> getChangeCounterActionSlideshow()
+        CLICK_ACTION_OFFSET -> getClickActionOffsetSlideshow()
+        CLICK_ACTION_TARGET -> getClickActionTargetSlideshow()
+        COMBINE_CONDITIONS_ORDERING -> getCombineConditionsOrderingSlideshow()
+        COUNTER_REACHED_CONDITION -> getCounterReachedSlideshow()
+        COUNTERS_VALUE_USAGES -> getCountersValueUsagesSlideshow()
+        EVENTS_RELOADING -> getEventsReloadingSlideshow()
+        EVENTS_STATE_BASICS -> getEventsStateBasicsSlideshow()
+        EVENTS_PRIORITY_BASICS -> getEventsPrioritySlideshow()
+        IMAGE_CONDITION_CAPTURE -> getImageConditionsCaptureSlideshow()
+        IMAGE_CONDITION_DETECTION_AREA -> getImageConditionsDetectionAreaSlideshow()
+        INTENT_ACTION -> getIntentActionSlideshow()
+        NOTIFICATION_ACTION -> getNotificationActionSlideshow()
+        NUMBER_CONDITION_DETECTION_AREA -> getNumberConditionsDetectionAreaSlideshow()
+        PAUSE_ACTION -> getPauseActionSlideshow()
+        SCREEN_CONDITIONS_DETECTION_THRESHOLD -> getScreenConditionsThresholdSlideshow()
+        SCREEN_CONDITIONS_LIST -> getScreenConditionsListSlideshow()
+        SCREEN_CONDITIONS_TYPE -> getScreenConditionsTypeSlideshow()
+        GESTURE_ACTION -> getGestureActionSlideshow()
+        SYSTEM_ACTION -> getSystemActionSlideshow()
+        TOGGLE_EVENT_ACTION -> getChangeEventStateActionSlideshow()
+        TEXT_CONDITION_DETECTION_AREA -> getTextConditionsDetectionAreaSlideshow()
+        WRITE_TEXT_ACTION -> getWriteTextActionSlideshow()
     }

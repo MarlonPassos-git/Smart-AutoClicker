@@ -115,8 +115,10 @@ class DebugConditionContentViewModel @Inject constructor(
     fun setOccurrence(scenarioId: Long, occurrence: DebugReportEventOccurrence) {
         viewModelScope.launch {
             val event = when (occurrence) {
-                is DebugReportEventOccurrence.ScreenEvent -> smartRepository.getScreenEvents(scenarioId)
-                is DebugReportEventOccurrence.TriggerEvent -> smartRepository.getTriggerEvents(scenarioId)
+                is DebugReportEventOccurrence.ScreenEvent,
+                is DebugReportEventOccurrence.HeldEventCheck.Screen -> smartRepository.getScreenEvents(scenarioId)
+                is DebugReportEventOccurrence.TriggerEvent,
+                is DebugReportEventOccurrence.HeldEventCheck.Trigger -> smartRepository.getTriggerEvents(scenarioId)
             }.findWithId(occurrence.eventId) ?: return@launch
 
             eventOccurrence.update { event to occurrence }
@@ -241,7 +243,8 @@ class DebugConditionContentViewModel @Inject constructor(
 
     private fun CounterOperationValue.toNaturalDisplayString(): String =
         when (this) {
-            is CounterOperationValue.Counter -> value
+            is CounterOperationValue.Counter -> counterName
             is CounterOperationValue.Number -> value.toNaturalDisplayString()
+            is CounterOperationValue.Condition -> "?"
         }
 }

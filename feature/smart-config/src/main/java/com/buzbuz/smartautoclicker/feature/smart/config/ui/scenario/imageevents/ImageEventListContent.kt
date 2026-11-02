@@ -37,7 +37,7 @@ import com.buzbuz.smartautoclicker.feature.smart.config.ui.event.EventDialog
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.copy.event.EventCopyDialog
 import com.buzbuz.smartautoclicker.core.ui.databinding.IncludeLoadableListBinding
 import com.buzbuz.smartautoclicker.feature.smart.config.di.ScenarioConfigViewModelsEntryPoint
-import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.model.event.UiImageEvent
+import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.uistate.event.UiImageEvent
 
 import kotlinx.coroutines.launch
 
@@ -114,10 +114,10 @@ class ImageEventListContent(appContext: Context) : NavBarDialogContent(appContex
     }
 
     private fun onEventItemBound(index: Int, eventItemView: View?) {
-        if (index != 0) return
+        if (index > 3) return
 
-        if (eventItemView != null) viewModel.monitorFirstEventView(eventItemView)
-        else viewModel.stopViewMonitoring()
+        if (eventItemView != null) viewModel.monitorEventView(index, eventItemView)
+        else viewModel.stopEventViewMonitoring(index)
     }
 
     private fun updateEventList(newItems: List<UiImageEvent>?) {

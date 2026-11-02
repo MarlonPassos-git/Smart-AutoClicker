@@ -23,21 +23,20 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.buzbuz.smartautoclicker.core.common.tutorial.domain.MonitoredViewsManager
 import com.buzbuz.smartautoclicker.core.common.tutorial.domain.model.monitoring.MonitoredViewType
-import com.buzbuz.smartautoclicker.core.common.tutorial.impl.monitoring.ViewPositioningType
 
 import com.buzbuz.smartautoclicker.core.domain.model.condition.ScreenCondition
 import com.buzbuz.smartautoclicker.core.domain.model.counter.CounterOperationValue
 import com.buzbuz.smartautoclicker.feature.smart.config.domain.EditionRepository
-import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.model.condition.UiNumberFormatDropdownItem
-import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.model.condition.toDropdownItem
-import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.model.condition.toNumberFormatType
-import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.model.counter.UiCounterOperatorDropdownItem
+import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.uistate.condition.UiNumberFormatDropdownItem
+import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.uistate.condition.toDropdownItem
+import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.uistate.condition.toNumberFormatType
+import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.uistate.counter.UiCounterOperatorDropdownItem
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.formatters.toAreaDisplayText
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.formatters.toEffectDescription
-import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.model.counter.UiOperandType
-import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.model.counter.UiStaticOrCounterSelection
-import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.model.counter.toComparisonOperation
-import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.model.counter.toCounterOperatorDropdownItem
+import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.uistate.counter.UiOperandType
+import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.uistate.counter.UiStaticOrCounterSelection
+import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.uistate.counter.toComparisonOperation
+import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.uistate.counter.toCounterOperatorDropdownItem
 
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.FlowPreview
@@ -83,7 +82,7 @@ class NumberConditionViewModel @Inject constructor(
         editedConditionHasChanged.value
 
     fun isConditionRelatedToClick(): Boolean =
-        editionRepository.editionState.isEditedConditionReferencedByClick()
+        editionRepository.editionState.isEditedConditionReferencedByAction()
 
     fun setName(name: String) {
         updateEditedCondition { it.copy(name = name) }
@@ -104,6 +103,7 @@ class NumberConditionViewModel @Inject constructor(
             when (type) {
                 UiOperandType.STATIC -> CounterOperationValue.Number(0.0)
                 UiOperandType.COUNTER -> CounterOperationValue.Counter("")
+                UiOperandType.CONDITION -> return
             }
         )
     }
@@ -194,9 +194,12 @@ class NumberConditionViewModel @Inject constructor(
     private fun CounterOperationValue.toUiStaticOrCounterSelection(): UiStaticOrCounterSelection =
         when (this) {
             is CounterOperationValue.Counter ->
-                UiStaticOrCounterSelection.CounterValue(editionRepository.editionState.getCounter(value))
+                UiStaticOrCounterSelection.CounterValue(editionRepository.editionState.getCounter(counterName))
 
             is CounterOperationValue.Number ->
                 UiStaticOrCounterSelection.StaticValue(value)
+
+            is CounterOperationValue.Condition ->
+                UiStaticOrCounterSelection.StaticValue(0.0)
         }
 }

@@ -47,14 +47,17 @@
     <string name="item_scenario_last_used_never">Nunca usado</string>
     <plurals name="item_scenario_last_used_minutes">
         <item quantity="one">há %1$d min.</item>
+        <item quantity="many">há %1$d min.</item>
         <item quantity="other">há %1$d min.</item>
     </plurals>
     <plurals name="item_scenario_last_used_hours">
         <item quantity="one">há %1$d hora</item>
+        <item quantity="many">há %1$d horas</item>
         <item quantity="other">há %1$d horas</item>
     </plurals>
     <plurals name="item_scenario_last_used_days">
         <item quantity="one">há %1$d dia</item>
+        <item quantity="many">há %1$d dias</item>
         <item quantity="other">há %1$d dias</item>
     </plurals>
 
@@ -64,7 +67,7 @@
       -  * Desc can have more space to describe the title
       -  * Error have the same space as desc
       -->
-    <string name="item_desc_dumb_scenario">A experiência regular do auto clicker.\nBasta colocar cliques e deslizes na tela.</string>
+    <string name="item_desc_dumb_scenario">A experiência regular do auto clicker.\nBasta colocar cliques e gestos na tela.</string>
     <string name="item_desc_dumb_scenario_max_duration">Parar após %1$s</string>
     <string name="item_desc_dumb_scenario_max_duration_infinite">Sem duração máxima</string>
     <string name="item_desc_dumb_scenario_repeat_count">Repetir %1$d vezes</string>
@@ -130,6 +133,9 @@
     <string name="field_force_entire_screen_title">Forçar a tela inteira</string>
     <string name="field_force_entire_screen_desc">Force o seletor de captura de tela a \"Tela inteira\". Pode não funcionar dependendo de seu dispositivo</string>
 
+    <string name="field_show_on_lock_screen_title">Mostrar na tela de bloqueio</string>
+    <string name="field_show_on_lock_screen_desc">Manter o menu flutuante visível quando o dispositivo estiver bloqueado.</string>
+
     <string name="field_input_block_workaround_title">Desbloquear o toque</string>
     <string name="field_input_block_workaround_desc">Em dispositivos Pixel com Android 15, o uso de um clicker automático pode bloquear a tela de toque.\nPara desbloqueá-la, você precisa tocar a tela com vários dedos ao mesmo tempo. Essa configuração tenta simular isso a cada 10s.</string>
 
@@ -150,8 +156,6 @@
     <string name="button_condition_migration_running">Migração</string>
     <string name="button_condition_migration_finished">OK</string>
 
-    <string name="field_tutorial_title">Tutorial</string>
-    <string name="field_tutorial_desc">Aprenda a usar o Klick\'r</string>
 
     <string name="dialog_title_backup">Backup</string>
     <string name="message_backup">Crie ou importe um arquivo zip de cenários</string>

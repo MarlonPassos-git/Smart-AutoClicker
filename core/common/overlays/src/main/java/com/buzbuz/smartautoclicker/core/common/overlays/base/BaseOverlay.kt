@@ -18,17 +18,11 @@ package com.buzbuz.smartautoclicker.core.common.overlays.base
 
 import android.app.Application
 import android.content.Context
-import android.content.res.Configuration
-import android.hardware.display.DisplayManager
-import android.os.Build
 import android.util.Log
-import android.view.Display
 import android.view.KeyEvent
 import android.view.View
-import android.view.WindowManager
 
 import androidx.annotation.CallSuper
-import androidx.appcompat.view.ContextThemeWrapper
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleRegistry
 import androidx.lifecycle.ViewModelStore
@@ -48,8 +42,6 @@ import com.buzbuz.smartautoclicker.core.common.overlays.manager.OverlayManager
 import com.buzbuz.smartautoclicker.core.display.config.DisplayConfigManager
 import com.buzbuz.smartautoclicker.core.display.di.DisplayEntryPoint
 
-import com.google.android.material.color.DynamicColors
-
 import dagger.hilt.EntryPoints
 
 import kotlinx.coroutines.CoroutineScope
@@ -60,6 +52,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 import java.io.PrintWriter
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * Base class for an overlay based ui providing lifecycle management.
@@ -70,7 +63,6 @@ import java.io.PrintWriter
 abstract class BaseOverlay internal constructor(
     private val theme: Int? = null,
     private val recreateOnRotation: Boolean = false,
-    private val useWindowContext: Boolean = false,
 ) : Overlay(), Dumpable {
 
     /** The context for this overlay. */
@@ -151,7 +143,7 @@ abstract class BaseOverlay internal constructor(
 
         Log.d(TAG, "create overlay ${hashCode()}")
         if (!this::context.isInitialized) context = appContext
-        context = newOverlayContext(appContext)
+        context = newOverlayContext(appContext, theme) { displayConfigManager.displayConfig.orientation }
 
         dismissListener?.let { listener -> onDestroyListener = { listener(appContext, this@BaseOverlay) } }
         onCreate()
@@ -229,7 +221,7 @@ abstract class BaseOverlay internal constructor(
             onDestroyListener = null
 
             CoroutineScope(Dispatchers.Main).launch {
-                delay(5000)
+                delay(5000.milliseconds)
                 modelStore.clear()
                 cancel()
             }
@@ -240,7 +232,7 @@ abstract class BaseOverlay internal constructor(
         if (debounceUserInteractionJob == null && lifecycleRegistry.currentState == State.RESUMED) {
             debounceUserInteractionJob = lifecycleScope.launch {
                 userInteraction()
-                delay(500)
+                delay(500.milliseconds)
                 debounceUserInteractionJob = null
             }
         }
@@ -299,36 +291,6 @@ abstract class BaseOverlay internal constructor(
 
     override fun handleKeyEvent(keyEvent: KeyEvent): Boolean =
         onKeyEvent(keyEvent)
-
-    /**
-     * Get a new context wrapper from the provided theme. If the theme is null, the application theme is used.
-     *
-     * This is required because an overlay can be attached to a context without UI configuration changes notification,
-     * which can leads to an invalid theming for the dialog, an invalid rotation ...
-     *
-     * @param appContext the Android application context.
-     */
-    private fun newOverlayContext(appContext: Context): Context {
-        val baseContext = if (useWindowContext && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            val display = appContext.getSystemService(DisplayManager::class.java)
-                .getDisplay(Display.DEFAULT_DISPLAY)
-            appContext.createDisplayContext(display)
-                .createWindowContext(WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY, null)
-        } else {
-            appContext
-        }
-
-        return if (theme == null) baseContext
-        else DynamicColors.wrapContextIfAvailable(
-            ContextThemeWrapper(baseContext, theme).apply {
-                applyOverrideConfiguration(
-                    Configuration(applicationContext.resources.configuration).apply {
-                        orientation = displayConfigManager.displayConfig.orientation
-                    }
-                )
-            }
-        )
-    }
 
     override fun dump(writer: PrintWriter, prefix: CharSequence) {
         val contentPrefix = prefix.addDumpTabulationLvl()

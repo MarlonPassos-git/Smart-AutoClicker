@@ -23,9 +23,6 @@ import com.buzbuz.smartautoclicker.feature.dumb.config.data.getClickRepeatCountC
 import com.buzbuz.smartautoclicker.feature.dumb.config.data.getClickRepeatDelayConfig
 import com.buzbuz.smartautoclicker.feature.dumb.config.data.getDumbConfigPreferences
 import com.buzbuz.smartautoclicker.feature.dumb.config.data.getPauseDurationConfig
-import com.buzbuz.smartautoclicker.feature.dumb.config.data.getSwipeDurationConfig
-import com.buzbuz.smartautoclicker.feature.dumb.config.data.getSwipeRepeatCountConfig
-import com.buzbuz.smartautoclicker.feature.dumb.config.data.getSwipeRepeatDelayConfig
 import com.buzbuz.smartautoclicker.feature.dumb.config.data.getZoomDurationConfig
 import com.buzbuz.smartautoclicker.feature.dumb.config.data.getZoomIntensityConfig
 
@@ -41,17 +38,8 @@ internal fun Context.getDefaultDumbClickRepeatCount(): Int = getDumbConfigPrefer
 internal fun Context.getDefaultDumbClickRepeatDelay(): Long = getDumbConfigPreferences()
     .getClickRepeatDelayConfig(0)
 
-internal fun Context.getDefaultDumbSwipeName(): String =
-    getString(R.string.default_dumb_swipe_name)
-
-internal fun Context.getDefaultDumbSwipeDurationMs(): Long = getDumbConfigPreferences()
-    .getSwipeDurationConfig(resources.getInteger(R.integer.default_dumb_swipe_duration).toLong())
-
-internal fun Context.getDefaultDumbSwipeRepeatCount(): Int = getDumbConfigPreferences()
-    .getSwipeRepeatCountConfig(1)
-
-internal fun Context.getDefaultDumbSwipeRepeatDelay(): Long = getDumbConfigPreferences()
-    .getSwipeRepeatDelayConfig(0)
+internal fun Context.getDefaultDumbGestureName(): String =
+    getString(R.string.default_dumb_gesture_name)
 
 internal fun Context.getDefaultDumbPauseName(): String =
     getString(R.string.default_dumb_pause_name)
@@ -62,7 +50,7 @@ internal fun Context.getDefaultDumbPauseDurationMs(): Long = getDumbConfigPrefer
 internal fun Context.getDefaultDumbZoomName(): String = getString(R.string.zoom_default_name)
 
 internal fun Context.getDefaultDumbZoomDurationMs(): Long = getDumbConfigPreferences()
-    .getZoomDurationConfig(resources.getInteger(R.integer.default_dumb_swipe_duration).toLong())
+    .getZoomDurationConfig(resources.getInteger(R.integer.default_dumb_zoom_duration).toLong())
 
 internal fun Context.getDefaultDumbZoomIntensityPx(): Int = getDumbConfigPreferences()
     .getZoomIntensityConfig(150)

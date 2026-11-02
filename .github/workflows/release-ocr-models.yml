@@ -29,7 +29,10 @@ jobs:
       - name: Configurar Python
         uses: actions/setup-python@v6
         with:
-          python-version: '3.9'
+          python-version: '3.12'
+
+      - name: Instalar conversor compatível com ONNX
+        run: pip install --no-deps paddle2onnx==2.1.0
 
       - name: Instalar dependências Python
         run: pip install -r scripts/ocr-models/requirements.txt

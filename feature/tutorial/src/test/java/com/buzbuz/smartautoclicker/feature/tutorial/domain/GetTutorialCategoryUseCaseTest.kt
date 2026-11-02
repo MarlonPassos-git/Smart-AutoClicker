@@ -87,14 +87,14 @@ class GetTutorialCategoryUseCaseTest {
         val header = state.items[0] as TutorialCategoryUiItems.Header
         assertEquals(R.string.tutorial_category_root_name, header.categoryNameRes)
 
-        // Header + SectionDivider + BASICS + COMBINE_CONDITIONS + EVENT_STATE + COUNTERS
+        // Header + Divider + BASICS + COMBINE_CONDITIONS + EVENT_STATE + COUNTERS
         assertEquals(6, state.items.size)
         assertTrue(state.items[1] is TutorialCategoryUiItems.SectionDivider)
         assertEquals(
             listOf(
                 TutorialCategory.Type.BASICS,
                 TutorialCategory.Type.COMBINE_CONDITIONS,
-                TutorialCategory.Type.EVENT_STATE,
+                TutorialCategory.Type.COMBINE_EVENTS,
                 TutorialCategory.Type.COUNTERS,
             ),
             state.items.filterIsInstance<TutorialCategoryUiItems.Item.Category>().map { it.type },

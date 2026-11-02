@@ -57,7 +57,7 @@ android {
     defaultConfig {
         applicationId = getExtraActualApplicationId()
 
-        versionCode = 90
+        versionCode = 104
         versionName = "4.0.0-beta05"
     }
 
@@ -75,7 +75,12 @@ android {
             abi {
                 isEnable = true
                 reset()
-                include("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
+                include(
+                    *buildParameters.abiFilters.typedValue
+                        .ifBlank { "armeabi-v7a,arm64-v8a,x86,x86_64" }
+                        .split(',')
+                        .toTypedArray()
+                )
                 isUniversalApk = true
             }
         }
@@ -124,7 +129,7 @@ if (project.isBuildForVariant(KlickrFlavour.F_DROID)) {
                 else          -> 0  // universal
             }
             val baseVersionCode = output.versionCode.get()
-            output.versionCode.set(abiVersionCode * 10_000 + baseVersionCode)
+            output.versionCode.set(baseVersionCode * 10_000 + abiVersionCode)
         }
     }
 }
@@ -160,6 +165,8 @@ dependencies {
     implementation(project(":core:common:actions"))
     implementation(project(":core:common:base"))
     implementation(project(":core:common:bitmaps"))
+    implementation(project(":core:common:revenue"))
+    implementation(project(":core:common:review"))
     implementation(project(":core:common:display"))
     implementation(project(":core:common:navigation"))
     implementation(project(":core:common:overlays"))

@@ -23,9 +23,9 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModel
 import com.buzbuz.smartautoclicker.core.base.workarounds.isImpactedByInputBlock
 import com.buzbuz.smartautoclicker.core.common.quality.domain.QualityRepository
+import com.buzbuz.smartautoclicker.core.common.revenue.domain.IRevenueRepository
+import com.buzbuz.smartautoclicker.core.common.revenue.domain.model.UserBillingState
 import com.buzbuz.smartautoclicker.core.settings.domain.SettingsRepository
-import com.buzbuz.smartautoclicker.feature.revenue.IRevenueRepository
-import com.buzbuz.smartautoclicker.feature.revenue.UserBillingState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
@@ -54,6 +54,9 @@ class SettingsViewModel @Inject constructor(
 
     val isInputWorkaroundEnabled: Flow<Boolean> =
         settingsRepository.isInputBlockWorkaroundEnabledFlow
+
+    val isShowOnLockScreenEnabled: Flow<Boolean> =
+        settingsRepository.showOnLockScreenFlow
 
     val shouldShowEntireScreenCapture: Flow<Boolean> =
         flowOf(Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM)
@@ -86,16 +89,16 @@ class SettingsViewModel @Inject constructor(
         settingsRepository.toggleForceEntireScreenCapture()
     }
 
+    fun toggleShowOnLockScreen() {
+        settingsRepository.toggleShowOnLockScreenFlow()
+    }
+
     fun toggleInputBlockWorkaround() {
         settingsRepository.toggleInputBlockWorkaround()
     }
 
     fun showPrivacySettings(activity: Activity) {
         revenueRepository.startPrivacySettingUiFlow(activity)
-    }
-
-    fun showPurchaseActivity(context: Context) {
-        revenueRepository.startPurchaseUiFlow(context)
     }
 
     fun showTroubleshootingDialog(activity: FragmentActivity) {

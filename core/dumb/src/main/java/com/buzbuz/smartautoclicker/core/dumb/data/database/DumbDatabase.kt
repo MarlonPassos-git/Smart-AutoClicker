@@ -29,6 +29,8 @@ import javax.inject.Singleton
         DumbScenarioEntity::class,
         DumbActionEntity::class,
         DumbScenarioStatsEntity::class,
+        DumbGestureFingerEntity::class,
+        DumbGestureFingerMotionEntity::class,
     ],
     version = DUMB_DATABASE_VERSION,
     exportSchema = true,
@@ -39,6 +41,7 @@ import javax.inject.Singleton
 )
 @TypeConverters(
     DumbActionTypeStringConverter::class,
+    DumbGestureFingerMotionTypeStringConverter::class,
 )
 @Singleton
 abstract class DumbDatabase : RoomDatabase() {
@@ -48,4 +51,9 @@ abstract class DumbDatabase : RoomDatabase() {
 }
 
 /** Current version of the database. */
-const val DUMB_DATABASE_VERSION = 3
+const val DUMB_DATABASE_VERSION = 4
+
+const val DUMB_SCENARIO_TABLE = "dumb_scenario_table"
+const val DUMB_ACTION_TABLE = "dumb_action_table"
+const val DUMB_GESTURE_FINGER_TABLE = "dumb_gesture_finger_table"
+const val DUMB_GESTURE_FINGER_MOTION_TABLE = "dumb_gesture_finger_motion_table"

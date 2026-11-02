@@ -44,7 +44,7 @@
         <item quantity="other">%1$d 天前</item>
     </plurals>
 
-    <string name="item_desc_dumb_scenario">一般自動點擊體驗。\n於螢幕上設定點擊與滑動即可。</string>
+    <string name="item_desc_dumb_scenario">一般自動點擊體驗。\n於螢幕上設定點擊與手勢即可。</string>
     <string name="item_desc_dumb_scenario_max_duration">於 %1$s 後停止</string>
     <string name="item_desc_dumb_scenario_max_duration_infinite">無最長持續時間</string>
     <string name="item_desc_dumb_scenario_repeat_count">重複 %1$d 次</string>
@@ -81,6 +81,9 @@
     <string name="field_force_entire_screen_title">強制全螢幕</string>
     <string name="field_force_entire_screen_desc">將螢幕擷取選擇器固定為「整個螢幕」。視裝置而定，可能無法生效。</string>
 
+    <string name="field_show_on_lock_screen_title">在鎖定畫面上顯示</string>
+    <string name="field_show_on_lock_screen_desc">裝置鎖定時保持懸浮選單可見。</string>
+
     <string name="field_input_block_workaround_title">解除觸控阻塞</string>
     <string name="field_input_block_workaround_desc">於部分搭載 Android 15 的 Pixel 裝置上，使用自動點擊器可能導致觸控暫時無回應。\n可同時以多指觸碰螢幕以恢復。本設定將嘗試每 10 秒模擬該操作。</string>
 
@@ -99,8 +102,6 @@
     <string name="button_condition_migration_running">正在移轉</string>
     <string name="button_condition_migration_finished">確定</string>
 
-    <string name="field_tutorial_title">教程</string>
-    <string name="field_tutorial_desc">了解如何使用 Klick\'r</string>
 
     <string name="dialog_title_backup">備份</string>
     <string name="message_backup">建立或匯入情境的 zip 壓縮檔</string>

@@ -21,14 +21,17 @@ import com.buzbuz.smartautoclicker.core.domain.model.action.Action
 import com.buzbuz.smartautoclicker.core.domain.model.action.AreaClick
 import com.buzbuz.smartautoclicker.core.domain.model.action.ChangeCounter
 import com.buzbuz.smartautoclicker.core.domain.model.action.Click
+import com.buzbuz.smartautoclicker.core.domain.model.action.Gesture
 import com.buzbuz.smartautoclicker.core.domain.model.action.Intent
 import com.buzbuz.smartautoclicker.core.domain.model.action.Notification
 import com.buzbuz.smartautoclicker.core.domain.model.action.Pause
 import com.buzbuz.smartautoclicker.core.domain.model.action.SetText
-import com.buzbuz.smartautoclicker.core.domain.model.action.Swipe
 import com.buzbuz.smartautoclicker.core.domain.model.action.Zoom
 import com.buzbuz.smartautoclicker.core.domain.model.action.SystemAction
 import com.buzbuz.smartautoclicker.core.domain.model.action.ToggleEvent
+import com.buzbuz.smartautoclicker.core.domain.model.action.gesture.GestureFingerMotion
+import com.buzbuz.smartautoclicker.core.domain.model.action.position.CoordinatesValue
+import com.buzbuz.smartautoclicker.core.domain.model.action.position.Position
 import com.buzbuz.smartautoclicker.core.domain.model.condition.Condition
 import com.buzbuz.smartautoclicker.core.domain.model.condition.ScreenCondition
 import com.buzbuz.smartautoclicker.core.domain.model.condition.TriggerCondition
@@ -68,7 +71,7 @@ class GetCounterReadReferencesUseCase @Inject constructor(
                     is ScreenCondition.Number -> {
                         val counterValue = condition.counterValue
                         if (counterValue is CounterOperationValue.Counter) {
-                            addReference(event, counterValue.value, condition)
+                            addReference(event, counterValue.counterName, condition)
                         }
                     }
 
@@ -77,7 +80,7 @@ class GetCounterReadReferencesUseCase @Inject constructor(
 
                         val operationValue = condition.counterValue
                         if (operationValue is CounterOperationValue.Counter) {
-                            addReference(event, operationValue.value, condition)
+                            addReference(event, operationValue.counterName, condition)
                         }
                     }
 
@@ -109,17 +112,48 @@ class GetCounterReadReferencesUseCase @Inject constructor(
                     is ChangeCounter -> {
                         val operationValue = action.operationValue
                         if (operationValue is CounterOperationValue.Counter) {
-                            addReference(event, operationValue.value, action)
+                            addReference(event, operationValue.counterName, action)
+                        }
+                    }
+
+                    is Click -> {
+                        listOfNotNull(action.position, action.offset).forEach { position ->
+                            if (position !is Position.Coordinates) return@forEach
+                            listOf(position.x, position.y).forEach { coordValue ->
+                                if (coordValue is CoordinatesValue.Counter) {
+                                    addReference(event, coordValue.counterName, action)
+                                }
+                            }
+                        }
+                    }
+
+                    is Gesture -> {
+                        action.fingers.forEach { finger ->
+                            finger.motions.forEach { motion ->
+                                val positions: List<Position> = when (motion) {
+                                    is GestureFingerMotion.Press -> listOf(motion.position, motion.offset)
+                                    is GestureFingerMotion.Move -> listOf(motion.position, motion.offset)
+                                    is GestureFingerMotion.Wait,
+                                    is GestureFingerMotion.Release -> emptyList()
+                                }
+                                positions.forEach { position ->
+                                    if (position is Position.Coordinates) {
+                                        listOf(position.x, position.y).forEach { coordValue ->
+                                            if (coordValue is CoordinatesValue.Counter) {
+                                                addReference(event, coordValue.counterName, action)
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
 
                     is AreaClick,
-                    is Click,
+                    is Zoom,
                     is Intent,
                     is Pause,
                     is SystemAction,
-                    is Swipe,
-                    is Zoom,
                     is ToggleEvent -> Unit
                 }
             }

@@ -27,6 +27,7 @@ import com.buzbuz.smartautoclicker.core.base.Dumpable
 import com.buzbuz.smartautoclicker.core.base.data.AppComponentsProvider
 import com.buzbuz.smartautoclicker.core.base.extensions.requestFilterKeyEvents
 import com.buzbuz.smartautoclicker.core.base.extensions.startForegroundMediaProjectionServiceCompat
+import com.buzbuz.smartautoclicker.core.base.lifecycle.ActivityLifecycleTracker
 import com.buzbuz.smartautoclicker.core.base.notifications.NotificationIds
 import com.buzbuz.smartautoclicker.core.bitmaps.BitmapRepository
 import com.buzbuz.smartautoclicker.core.common.accessibility.domain.LocalAccessibilityServiceConnection
@@ -34,6 +35,9 @@ import com.buzbuz.smartautoclicker.core.common.actions.AndroidActionExecutor
 import com.buzbuz.smartautoclicker.core.common.overlays.manager.OverlayManager
 import com.buzbuz.smartautoclicker.core.common.quality.domain.QualityMetricsMonitor
 import com.buzbuz.smartautoclicker.core.common.quality.domain.QualityRepository
+import com.buzbuz.smartautoclicker.core.common.navigation.getReviewNavigator
+import com.buzbuz.smartautoclicker.core.common.revenue.domain.IRevenueRepository
+import com.buzbuz.smartautoclicker.core.common.review.ReviewRepository
 import com.buzbuz.smartautoclicker.core.common.tutorial.domain.TutorialRepository
 import com.buzbuz.smartautoclicker.core.display.config.DisplayConfigManager
 import com.buzbuz.smartautoclicker.core.domain.model.scenario.Scenario
@@ -44,8 +48,6 @@ import com.buzbuz.smartautoclicker.core.settings.domain.SettingsRepository
 import com.buzbuz.smartautoclicker.core.smart.debugging.domain.DebuggingRepository
 import com.buzbuz.smartautoclicker.feature.qstile.domain.QSTileActionHandler
 import com.buzbuz.smartautoclicker.feature.qstile.domain.QSTileRepository
-import com.buzbuz.smartautoclicker.feature.revenue.IRevenueRepository
-import com.buzbuz.smartautoclicker.feature.review.ReviewRepository
 import com.buzbuz.smartautoclicker.localservice.LocalService
 
 import dagger.hilt.android.AndroidEntryPoint
@@ -87,6 +89,7 @@ class SmartAutoClickerService : AccessibilityService() {
     @Inject lateinit var actionExecutor: AndroidActionExecutor
     @Inject lateinit var debuggingRepository: DebuggingRepository
     @Inject lateinit var tutorialRepository: TutorialRepository
+    @Inject lateinit var activityLifecycleTracker: ActivityLifecycleTracker
 
     override fun onServiceConnected() {
         super.onServiceConnected()
@@ -156,13 +159,11 @@ class SmartAutoClickerService : AccessibilityService() {
         reviewRepository.onUserSessionStopped()
         actionExecutor.resetState()
 
-        if (reviewRepository.isUserCandidateForReview()) {
+        // Starting the review task over one of our activities (e.g. ScenarioActivity stopping the scenario in its
+        // onCreate) can desync the activity lifecycle with the system, leading to a crash.
+        if (reviewRepository.isUserCandidateForReview() && !activityLifecycleTracker.hasActiveActivity()) {
             Log.i(TAG, "User is candidate for review")
-
-            reviewRepository.getReviewActivityIntent(this)?.let { intent ->
-                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
-                startActivity(intent)
-            }
+            getReviewNavigator().startReviewActivity(this)
         }
 
         requestFilterKeyEvents(false)
@@ -170,6 +171,23 @@ class SmartAutoClickerService : AccessibilityService() {
 
         displayConfigManager.stopMonitoring()
         bitmapManager.clearCache()
+    }
+
+    @Suppress("DEPRECATION")
+    override fun onTrimMemory(level: Int) {
+        super.onTrimMemory(level)
+
+        // UI_HIDDEN is ignored: it is sent each time the scenario activity closes, which isn't memory pressure.
+        when (level) {
+            TRIM_MEMORY_RUNNING_LOW,
+            TRIM_MEMORY_RUNNING_CRITICAL,
+            TRIM_MEMORY_BACKGROUND,
+            TRIM_MEMORY_MODERATE,
+            TRIM_MEMORY_COMPLETE -> {
+                Log.i(TAG, "Trimming memory, level=$level")
+                bitmapManager.clearCache()
+            }
+        }
     }
 
     override fun onKeyEvent(event: KeyEvent?): Boolean =

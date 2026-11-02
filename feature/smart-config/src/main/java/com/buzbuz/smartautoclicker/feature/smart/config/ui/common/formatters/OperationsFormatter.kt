@@ -54,7 +54,7 @@ internal fun ChangeCounter.OperationType.toNameRes(): Int =
 fun ComparisonOperation.toEffectDescription(context: Context, counterName: String? = null, operand: String) =
     context.getString(
         R.string.field_change_counter_check_effect_desc,
-        counterName ?: "",
+        if (counterName.isNullOrEmpty()) "?" else counterName,
         context.getString(toNameRes()),
         operand,
     )
@@ -80,16 +80,29 @@ internal fun ChangeCounter.OperationType.toEffectDescription(context: Context, c
     }
 
 
+/** Display string of a counter operation value targeting a condition position, e.g. "MyCondition (Left)". */
+internal fun Context.getConditionOperandDisplayString(conditionName: String?, @StringRes positionTypeName: Int): String =
+    getString(
+        R.string.field_counter_operation_condition_value,
+        if (conditionName.isNullOrEmpty()) "?" else conditionName,
+        getString(positionTypeName),
+    )
+
 internal fun CounterOperationValue.toEffectDescription(context: Context, operation: ComparisonOperation): String =
     when (this) {
         is CounterOperationValue.Counter -> context.getString(
             R.string.message_number_condition_counter_value_desc,
             context.getString(operation.toFullNameRes()),
-            value.ifEmpty { "?" },
+            counterName.ifEmpty { "?" },
         )
         is CounterOperationValue.Number -> context.getString(
             R.string.message_number_condition_static_value_desc,
             context.getString(operation.toFullNameRes()),
             value.toNaturalDisplayString(),
+        )
+        is CounterOperationValue.Condition -> context.getString(
+            R.string.message_number_condition_static_value_desc,
+            context.getString(operation.toFullNameRes()),
+            "?",
         )
     }

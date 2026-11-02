@@ -16,17 +16,25 @@
  */
 package com.buzbuz.smartautoclicker.feature.smart.config.domain.usecase.copy.references
 
+import android.os.Build
+
+import androidx.test.ext.junit.runners.AndroidJUnit4
+
 import com.buzbuz.smartautoclicker.core.base.identifier.Identifier
 import com.buzbuz.smartautoclicker.core.domain.IRepository
 import com.buzbuz.smartautoclicker.core.domain.model.action.ChangeCounter
 import com.buzbuz.smartautoclicker.core.domain.model.action.Click
+import com.buzbuz.smartautoclicker.core.domain.model.action.Gesture
 import com.buzbuz.smartautoclicker.core.domain.model.action.Intent
 import com.buzbuz.smartautoclicker.core.domain.model.action.Notification
 import com.buzbuz.smartautoclicker.core.domain.model.action.Pause
 import com.buzbuz.smartautoclicker.core.domain.model.action.SetText
-import com.buzbuz.smartautoclicker.core.domain.model.action.Swipe
 import com.buzbuz.smartautoclicker.core.domain.model.action.SystemAction
 import com.buzbuz.smartautoclicker.core.domain.model.action.ToggleEvent
+import com.buzbuz.smartautoclicker.core.domain.model.action.position.CoordinatesValue
+import com.buzbuz.smartautoclicker.core.domain.model.action.gesture.GestureFinger
+import com.buzbuz.smartautoclicker.core.domain.model.action.gesture.GestureFingerMotion
+import com.buzbuz.smartautoclicker.core.domain.model.action.position.Position
 import com.buzbuz.smartautoclicker.core.domain.model.action.toggleevent.EventToggle
 import com.buzbuz.smartautoclicker.core.domain.model.condition.ScreenCondition
 import com.buzbuz.smartautoclicker.core.domain.model.counter.Counter
@@ -48,7 +56,12 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
 
+import org.robolectric.annotation.Config
+
+@RunWith(AndroidJUnit4::class)
+@Config(sdk = [Build.VERSION_CODES.Q])
 class GetActionMissingReferencesUseCaseTest {
 
     private val mockEditionState: IEditionState = mockk()
@@ -74,9 +87,225 @@ class GetActionMissingReferencesUseCaseTest {
     }
 
     @Test
-    fun `swipe action has no missing references`() = runTest {
-        val result = useCase(mockk<Swipe>(relaxed = true))
+    fun `gesture action has no missing references`() = runTest {
+        val result = useCase(mockk<Gesture>(relaxed = true))
         assertActionItem(result, expectedMissingCount = 0)
+    }
+
+    @Test
+    fun `gesture with literal coordinates has no missing references`() = runTest {
+        val gesture = gesture(finger(pressMotion(Position.Coordinates(
+            CoordinatesValue.Literal(100), CoordinatesValue.Literal(200),
+        ))))
+        assertActionItem(useCase(gesture), expectedMissingCount = 0)
+    }
+
+    @Test
+    fun `gesture with reachable counter coordinate has no missing references`() = runTest {
+        every { mockEditionState.getCounter(COUNTER_NAME) } returns mockk<Counter>()
+        val gesture = gesture(finger(pressMotion(Position.Coordinates(
+            CoordinatesValue.Counter(COUNTER_NAME), CoordinatesValue.Literal(0),
+        ))))
+        assertActionItem(useCase(gesture), expectedMissingCount = 0)
+    }
+
+    @Test
+    fun `gesture with missing counter coordinate has one counter reference`() = runTest {
+        every { mockEditionState.getCounter(COUNTER_NAME) } returns null
+        val gesture = gesture(finger(pressMotion(Position.Coordinates(
+            CoordinatesValue.Counter(COUNTER_NAME), CoordinatesValue.Literal(0),
+        ))))
+        val result = useCase(gesture)
+        assertActionItem(result, expectedMissingCount = 1)
+        assertEquals(MissingCopyReference.CounterReference(COUNTER_NAME), result.missingReferences[0])
+    }
+
+    @Test
+    fun `gesture with null condition position has no missing references`() = runTest {
+        val gesture = gesture(finger(pressMotion(Position.Condition(conditionId = null))))
+        assertActionItem(useCase(gesture), expectedMissingCount = 0)
+    }
+
+    @Test
+    fun `gesture with conditionId found in event has no missing references`() = runTest {
+        val conditionId = Identifier(databaseId = 100L)
+        val condition = mockk<ScreenCondition>(relaxed = true) { every { id } returns conditionId }
+        val event = mockk<ScreenEvent>(relaxed = true) {
+            every { id } returns EVENT_ID
+            every { conditions } returns listOf(condition)
+        }
+        every { mockEditionState.getAllEditedEvents() } returns listOf(event)
+
+        val gesture = gesture(finger(pressMotion(Position.Condition(conditionId))))
+        assertActionItem(useCase(gesture), expectedMissingCount = 0)
+    }
+
+    @Test
+    fun `gesture with conditionId not found but name in repository has one screen condition reference`() = runTest {
+        val conditionId = Identifier(databaseId = 100L)
+        every { mockEditionState.getAllEditedEvents() } returns emptyList()
+        coEvery { mockSmartRepository.getConditionName(conditionId) } returns CONDITION_NAME
+
+        val gesture = gesture(finger(pressMotion(Position.Condition(conditionId))))
+        val result = useCase(gesture)
+        assertActionItem(result, expectedMissingCount = 1)
+        val ref = result.missingReferences[0] as MissingCopyReference.ScreenConditionReference
+        assertEquals(CONDITION_NAME, ref.name)
+        assertEquals(conditionId, ref.conditionId)
+    }
+
+    @Test
+    fun `gesture with conditionId not found anywhere has one screen condition reference with unknown name`() = runTest {
+        val conditionId = Identifier(databaseId = 100L)
+        every { mockEditionState.getAllEditedEvents() } returns emptyList()
+        coEvery { mockSmartRepository.getConditionName(conditionId) } returns null
+
+        val gesture = gesture(finger(pressMotion(Position.Condition(conditionId))))
+        val result = useCase(gesture)
+        assertActionItem(result, expectedMissingCount = 1)
+        val ref = result.missingReferences[0] as MissingCopyReference.ScreenConditionReference
+        assertEquals("Unknown", ref.name)
+        assertEquals(conditionId, ref.conditionId)
+    }
+
+    @Test
+    fun `gesture with conditionId in another edited event has one screen condition reference named from edition`() = runTest {
+        val conditionId = Identifier(tempId = 100L)
+        val condition = mockk<ScreenCondition>(relaxed = true) {
+            every { id } returns conditionId
+            every { name } returns CONDITION_NAME
+        }
+        val otherEvent = mockk<ScreenEvent>(relaxed = true) {
+            every { id } returns OTHER_EVENT_ID
+            every { conditions } returns listOf(condition)
+        }
+        val targetEvent = mockk<ScreenEvent>(relaxed = true) {
+            every { id } returns EVENT_ID
+            every { conditions } returns emptyList()
+        }
+        every { mockEditionState.getAllEditedEvents() } returns listOf(targetEvent, otherEvent)
+        coEvery { mockSmartRepository.getConditionName(conditionId) } returns null
+
+        val gesture = gesture(finger(pressMotion(Position.Condition(conditionId))))
+        val result = useCase(gesture)
+        assertActionItem(result, expectedMissingCount = 1)
+        val ref = result.missingReferences[0] as MissingCopyReference.ScreenConditionReference
+        assertEquals(CONDITION_NAME, ref.name)
+        assertEquals(conditionId, ref.conditionId)
+    }
+
+    @Test
+    fun `gesture with conditionId in its own eventsToCopy event has no missing references`() = runTest {
+        val conditionId = Identifier(databaseId = 100L)
+        val condition = mockk<ScreenCondition>(relaxed = true) { every { id } returns conditionId }
+        val copyEvent = mockk<ScreenEvent>(relaxed = true) {
+            every { id } returns EVENT_ID
+            every { conditions } returns listOf(condition)
+        }
+        every { mockEditionState.getAllEditedEvents() } returns emptyList()
+
+        val gesture = gesture(finger(pressMotion(Position.Condition(conditionId))))
+        assertActionItem(useCase(gesture, eventsToCopy = listOf(copyEvent)), expectedMissingCount = 0)
+    }
+
+    @Test
+    fun `gesture with missing counter in press offset has one counter reference`() = runTest {
+        every { mockEditionState.getCounter(COUNTER_NAME) } returns null
+        val gesture = gesture(finger(pressMotion(
+            position = literalPosition(),
+            offset = Position.Coordinates(CoordinatesValue.Literal(0), CoordinatesValue.Counter(COUNTER_NAME)),
+        )))
+        val result = useCase(gesture)
+        assertActionItem(result, expectedMissingCount = 1)
+        assertEquals(MissingCopyReference.CounterReference(COUNTER_NAME), result.missingReferences[0])
+    }
+
+    @Test
+    fun `gesture with missing condition in press offset has one screen condition reference`() = runTest {
+        val conditionId = Identifier(databaseId = 100L)
+        every { mockEditionState.getAllEditedEvents() } returns emptyList()
+        coEvery { mockSmartRepository.getConditionName(conditionId) } returns CONDITION_NAME
+
+        val gesture = gesture(finger(pressMotion(
+            position = literalPosition(),
+            offset = Position.Condition(conditionId),
+        )))
+        val result = useCase(gesture)
+        assertActionItem(result, expectedMissingCount = 1)
+        val ref = result.missingReferences[0] as MissingCopyReference.ScreenConditionReference
+        assertEquals(CONDITION_NAME, ref.name)
+        assertEquals(conditionId, ref.conditionId)
+    }
+
+    @Test
+    fun `gesture with missing counter in move position has one counter reference`() = runTest {
+        every { mockEditionState.getCounter(COUNTER_NAME) } returns null
+        val gesture = gesture(finger(
+            pressMotion(literalPosition()),
+            moveMotion(Position.Coordinates(CoordinatesValue.Counter(COUNTER_NAME), CoordinatesValue.Literal(0))),
+            releaseMotion(),
+        ))
+        val result = useCase(gesture)
+        assertActionItem(result, expectedMissingCount = 1)
+        assertEquals(MissingCopyReference.CounterReference(COUNTER_NAME), result.missingReferences[0])
+    }
+
+    @Test
+    fun `gesture with missing condition in move offset has one screen condition reference`() = runTest {
+        val conditionId = Identifier(databaseId = 100L)
+        every { mockEditionState.getAllEditedEvents() } returns emptyList()
+        coEvery { mockSmartRepository.getConditionName(conditionId) } returns CONDITION_NAME
+
+        val gesture = gesture(finger(
+            pressMotion(literalPosition()),
+            moveMotion(position = literalPosition(), offset = Position.Condition(conditionId)),
+            releaseMotion(),
+        ))
+        val result = useCase(gesture)
+        assertActionItem(result, expectedMissingCount = 1)
+        val ref = result.missingReferences[0] as MissingCopyReference.ScreenConditionReference
+        assertEquals(conditionId, ref.conditionId)
+    }
+
+    @Test
+    fun `gesture with both missing counter coordinates has two counter references`() = runTest {
+        every { mockEditionState.getCounter(COUNTER_NAME) } returns null
+        every { mockEditionState.getCounter(COUNTER_VALUE_NAME) } returns null
+        val gesture = gesture(finger(pressMotion(Position.Coordinates(
+            CoordinatesValue.Counter(COUNTER_NAME), CoordinatesValue.Counter(COUNTER_VALUE_NAME),
+        ))))
+        val result = useCase(gesture)
+        assertActionItem(result, expectedMissingCount = 2)
+        assertTrue(result.missingReferences.contains(MissingCopyReference.CounterReference(COUNTER_NAME)))
+        assertTrue(result.missingReferences.contains(MissingCopyReference.CounterReference(COUNTER_VALUE_NAME)))
+    }
+
+    @Test
+    fun `gesture with missing references across fingers reports all of them`() = runTest {
+        val conditionId = Identifier(databaseId = 100L)
+        every { mockEditionState.getAllEditedEvents() } returns emptyList()
+        every { mockEditionState.getCounter(COUNTER_NAME) } returns null
+        coEvery { mockSmartRepository.getConditionName(conditionId) } returns CONDITION_NAME
+
+        val gesture = gesture(
+            finger(pressMotion(Position.Coordinates(CoordinatesValue.Counter(COUNTER_NAME), CoordinatesValue.Literal(0)))),
+            finger(pressMotion(Position.Condition(conditionId))),
+        )
+        val result = useCase(gesture)
+        assertActionItem(result, expectedMissingCount = 2)
+        assertTrue(result.missingReferences.contains(MissingCopyReference.CounterReference(COUNTER_NAME)))
+        assertTrue(result.missingReferences.contains(MissingCopyReference.ScreenConditionReference(CONDITION_NAME, conditionId)))
+    }
+
+    @Test
+    fun `gesture with wait and release motions only checks positioned motions`() = runTest {
+        every { mockEditionState.getCounter(COUNTER_NAME) } returns mockk<Counter>()
+        val gesture = gesture(finger(
+            pressMotion(Position.Coordinates(CoordinatesValue.Counter(COUNTER_NAME), CoordinatesValue.Literal(0))),
+            waitMotion(),
+            releaseMotion(),
+        ))
+        assertActionItem(useCase(gesture), expectedMissingCount = 0)
     }
 
     @Test
@@ -129,23 +358,196 @@ class GetActionMissingReferencesUseCaseTest {
         assertTrue(result.missingReferences.contains(MissingCopyReference.CounterReference(COUNTER_VALUE_NAME)))
     }
 
+    @Test
+    fun `change counter with condition value found in event has no missing references`() = runTest {
+        val conditionId = Identifier(databaseId = 100L)
+        val condition = mockk<ScreenCondition>(relaxed = true) { every { id } returns conditionId }
+        val event = mockk<ScreenEvent>(relaxed = true) {
+            every { id } returns EVENT_ID
+            every { conditions } returns listOf(condition)
+        }
+        every { mockEditionState.getAllEditedEvents() } returns listOf(event)
+        every { mockEditionState.getCounter(COUNTER_NAME) } returns mockk<Counter>()
+
+        val result = useCase(changeCounter(COUNTER_NAME, conditionValue(conditionId)))
+        assertActionItem(result, expectedMissingCount = 0)
+    }
+
+    @Test
+    fun `change counter with condition value not found has one screen condition reference`() = runTest {
+        val conditionId = Identifier(databaseId = 100L)
+        every { mockEditionState.getAllEditedEvents() } returns emptyList()
+        every { mockEditionState.getCounter(COUNTER_NAME) } returns mockk<Counter>()
+        coEvery { mockSmartRepository.getConditionName(conditionId) } returns CONDITION_NAME
+
+        val result = useCase(changeCounter(COUNTER_NAME, conditionValue(conditionId)))
+        assertActionItem(result, expectedMissingCount = 1)
+        assertEquals(
+            MissingCopyReference.ScreenConditionReference(name = CONDITION_NAME, conditionId = conditionId),
+            result.missingReferences[0],
+        )
+    }
+
+    @Test
+    fun `change counter with missing counter name and condition value has two references`() = runTest {
+        val conditionId = Identifier(databaseId = 100L)
+        every { mockEditionState.getAllEditedEvents() } returns emptyList()
+        every { mockEditionState.getCounter(COUNTER_NAME) } returns null
+        coEvery { mockSmartRepository.getConditionName(conditionId) } returns null
+
+        val result = useCase(changeCounter(COUNTER_NAME, conditionValue(conditionId)))
+        assertActionItem(result, expectedMissingCount = 2)
+        assertTrue(result.missingReferences.contains(MissingCopyReference.CounterReference(COUNTER_NAME)))
+        assertTrue(result.missingReferences.contains(
+            MissingCopyReference.ScreenConditionReference(name = "Unknown", conditionId = conditionId)
+        ))
+    }
+
     // endregion
 
     // region Click
 
     @Test
     fun `click user selected position has no missing references`() = runTest {
-        val click = mockk<Click>(relaxed = true) {
-            every { positionType } returns Click.PositionType.USER_SELECTED
-        }
+        assertActionItem(useCase(click(position = literalPosition())), expectedMissingCount = 0)
+    }
+
+    @Test
+    fun `click with reachable counter coordinate has no missing references`() = runTest {
+        every { mockEditionState.getCounter(COUNTER_NAME) } returns mockk<Counter>()
+        val click = click(position = Position.Coordinates(
+            CoordinatesValue.Counter(COUNTER_NAME), CoordinatesValue.Literal(200),
+        ))
         assertActionItem(useCase(click), expectedMissingCount = 0)
+    }
+
+    @Test
+    fun `click with missing counter coordinate has one counter reference`() = runTest {
+        every { mockEditionState.getCounter(COUNTER_NAME) } returns null
+        val click = click(position = Position.Coordinates(
+            CoordinatesValue.Counter(COUNTER_NAME), CoordinatesValue.Literal(200),
+        ))
+
+        val result = useCase(click)
+        assertActionItem(result, expectedMissingCount = 1)
+        assertEquals(MissingCopyReference.CounterReference(COUNTER_NAME), result.missingReferences[0])
+    }
+
+    @Test
+    fun `click with null position has no missing references`() = runTest {
+        assertActionItem(useCase(click(position = null)), expectedMissingCount = 0)
+    }
+
+    @Test
+    fun `click with both missing counter coordinates has two counter references`() = runTest {
+        every { mockEditionState.getCounter(COUNTER_NAME) } returns null
+        every { mockEditionState.getCounter(COUNTER_VALUE_NAME) } returns null
+        val click = click(position = Position.Coordinates(
+            CoordinatesValue.Counter(COUNTER_NAME), CoordinatesValue.Counter(COUNTER_VALUE_NAME),
+        ))
+
+        val result = useCase(click)
+        assertActionItem(result, expectedMissingCount = 2)
+        assertTrue(result.missingReferences.contains(MissingCopyReference.CounterReference(COUNTER_NAME)))
+        assertTrue(result.missingReferences.contains(MissingCopyReference.CounterReference(COUNTER_VALUE_NAME)))
+    }
+
+    @Test
+    fun `click user selected position with reachable counter offset has no missing references`() = runTest {
+        every { mockEditionState.getCounter(COUNTER_NAME) } returns mockk<Counter>()
+        val click = click(
+            position = literalPosition(),
+            offset = Position.Coordinates(CoordinatesValue.Counter(COUNTER_NAME), CoordinatesValue.Literal(0)),
+        )
+        assertActionItem(useCase(click), expectedMissingCount = 0)
+    }
+
+    @Test
+    fun `click user selected position with missing counter offset has one counter reference`() = runTest {
+        every { mockEditionState.getCounter(COUNTER_NAME) } returns null
+        val click = click(
+            position = literalPosition(),
+            offset = Position.Coordinates(CoordinatesValue.Counter(COUNTER_NAME), CoordinatesValue.Literal(0)),
+        )
+        val result = useCase(click)
+        assertActionItem(result, expectedMissingCount = 1)
+        assertEquals(MissingCopyReference.CounterReference(COUNTER_NAME), result.missingReferences[0])
+    }
+
+    @Test
+    fun `click with missing counter in both position and offset has two counter references`() = runTest {
+        every { mockEditionState.getCounter(COUNTER_NAME) } returns null
+        every { mockEditionState.getCounter(COUNTER_VALUE_NAME) } returns null
+        val click = click(
+            position = Position.Coordinates(CoordinatesValue.Counter(COUNTER_NAME), CoordinatesValue.Literal(0)),
+            offset = Position.Coordinates(CoordinatesValue.Literal(0), CoordinatesValue.Counter(COUNTER_VALUE_NAME)),
+        )
+        val result = useCase(click)
+        assertActionItem(result, expectedMissingCount = 2)
+        assertTrue(result.missingReferences.contains(MissingCopyReference.CounterReference(COUNTER_NAME)))
+        assertTrue(result.missingReferences.contains(MissingCopyReference.CounterReference(COUNTER_VALUE_NAME)))
+    }
+
+    @Test
+    fun `click on detected condition with reachable counter offset has no missing references`() = runTest {
+        val conditionId = Identifier(databaseId = 100L)
+        val condition = mockk<ScreenCondition>(relaxed = true) { every { id } returns conditionId }
+        val event = mockk<ScreenEvent>(relaxed = true) {
+            every { id } returns EVENT_ID
+            every { conditions } returns listOf(condition)
+        }
+        every { mockEditionState.getAllEditedEvents() } returns listOf(event)
+        every { mockEditionState.getCounter(COUNTER_NAME) } returns mockk<Counter>()
+
+        val click = click(
+            position = Position.Condition(conditionId),
+            offset = Position.Coordinates(CoordinatesValue.Counter(COUNTER_NAME), CoordinatesValue.Literal(0)),
+        )
+        assertActionItem(useCase(click), expectedMissingCount = 0)
+    }
+
+    @Test
+    fun `click on detected condition with missing counter offset has one counter reference`() = runTest {
+        val conditionId = Identifier(databaseId = 100L)
+        val condition = mockk<ScreenCondition>(relaxed = true) { every { id } returns conditionId }
+        val event = mockk<ScreenEvent>(relaxed = true) {
+            every { id } returns EVENT_ID
+            every { conditions } returns listOf(condition)
+        }
+        every { mockEditionState.getAllEditedEvents() } returns listOf(event)
+        every { mockEditionState.getCounter(COUNTER_NAME) } returns null
+
+        val click = click(
+            position = Position.Condition(conditionId),
+            offset = Position.Coordinates(CoordinatesValue.Literal(0), CoordinatesValue.Counter(COUNTER_NAME)),
+        )
+        val result = useCase(click)
+        assertActionItem(result, expectedMissingCount = 1)
+        assertEquals(MissingCopyReference.CounterReference(COUNTER_NAME), result.missingReferences[0])
+    }
+
+    @Test
+    fun `click on missing condition with missing counter offset has both references`() = runTest {
+        val conditionId = Identifier(databaseId = 100L)
+        every { mockEditionState.getAllEditedEvents() } returns emptyList()
+        every { mockEditionState.getCounter(COUNTER_NAME) } returns null
+        coEvery { mockSmartRepository.getConditionName(conditionId) } returns CONDITION_NAME
+
+        val click = click(
+            position = Position.Condition(conditionId),
+            offset = Position.Coordinates(CoordinatesValue.Counter(COUNTER_NAME), CoordinatesValue.Literal(0)),
+        )
+        val result = useCase(click)
+        assertActionItem(result, expectedMissingCount = 2)
+        assertTrue(result.missingReferences.contains(MissingCopyReference.ScreenConditionReference(CONDITION_NAME, conditionId)))
+        assertTrue(result.missingReferences.contains(MissingCopyReference.CounterReference(COUNTER_NAME)))
     }
 
     @Test
     fun `click on detected condition with null conditionId has no missing references`() = runTest {
         val click = mockk<Click>(relaxed = true) {
-            every { positionType } returns Click.PositionType.ON_DETECTED_CONDITION
-            every { clickOnConditionId } returns null
+            every { position } returns Position.Condition(null)
+            every { offset } returns null
         }
         assertActionItem(useCase(click), expectedMissingCount = 0)
     }
@@ -162,8 +564,8 @@ class GetActionMissingReferencesUseCaseTest {
 
         val click = mockk<Click>(relaxed = true) {
             every { eventId } returns EVENT_ID
-            every { positionType } returns Click.PositionType.ON_DETECTED_CONDITION
-            every { clickOnConditionId } returns conditionId
+            every { position } returns Position.Condition(conditionId)
+            every { offset } returns null
         }
         assertActionItem(useCase(click), expectedMissingCount = 0)
     }
@@ -171,7 +573,10 @@ class GetActionMissingReferencesUseCaseTest {
     @Test
     fun `click on detected condition with conditionId found in a different edited event has one screen condition reference`() = runTest {
         val conditionId = Identifier(databaseId = 100L)
-        val condition = mockk<ScreenCondition>(relaxed = true) { every { id } returns conditionId }
+        val condition = mockk<ScreenCondition>(relaxed = true) {
+            every { id } returns conditionId
+            every { name } returns CONDITION_NAME
+        }
         val otherEvent = mockk<ScreenEvent>(relaxed = true) {
             every { id } returns OTHER_EVENT_ID
             every { conditions } returns listOf(condition)
@@ -181,8 +586,8 @@ class GetActionMissingReferencesUseCaseTest {
 
         val click = mockk<Click>(relaxed = true) {
             every { eventId } returns EVENT_ID
-            every { positionType } returns Click.PositionType.ON_DETECTED_CONDITION
-            every { clickOnConditionId } returns conditionId
+            every { position } returns Position.Condition(conditionId)
+            every { offset } returns null
         }
         val result = useCase(click)
         assertActionItem(result, expectedMissingCount = 1)
@@ -203,8 +608,8 @@ class GetActionMissingReferencesUseCaseTest {
 
         val click = mockk<Click>(relaxed = true) {
             every { eventId } returns EVENT_ID
-            every { positionType } returns Click.PositionType.ON_DETECTED_CONDITION
-            every { clickOnConditionId } returns conditionId
+            every { position } returns Position.Condition(conditionId)
+            every { offset } returns null
         }
         assertActionItem(useCase(click, eventsToCopy = listOf(copyEvent)), expectedMissingCount = 0)
     }
@@ -212,7 +617,10 @@ class GetActionMissingReferencesUseCaseTest {
     @Test
     fun `click on detected condition with conditionId in a different eventsToCopy event has one screen condition reference`() = runTest {
         val conditionId = Identifier(databaseId = 100L)
-        val condition = mockk<ScreenCondition>(relaxed = true) { every { id } returns conditionId }
+        val condition = mockk<ScreenCondition>(relaxed = true) {
+            every { id } returns conditionId
+            every { name } returns CONDITION_NAME
+        }
         val copyEvent = mockk<ScreenEvent>(relaxed = true) {
             every { id } returns OTHER_EVENT_ID
             every { conditions } returns listOf(condition)
@@ -222,8 +630,8 @@ class GetActionMissingReferencesUseCaseTest {
 
         val click = mockk<Click>(relaxed = true) {
             every { eventId } returns EVENT_ID
-            every { positionType } returns Click.PositionType.ON_DETECTED_CONDITION
-            every { clickOnConditionId } returns conditionId
+            every { position } returns Position.Condition(conditionId)
+            every { offset } returns null
         }
         val result = useCase(click, eventsToCopy = listOf(copyEvent))
         assertActionItem(result, expectedMissingCount = 1)
@@ -233,17 +641,51 @@ class GetActionMissingReferencesUseCaseTest {
     }
 
     @Test
-    fun `click on detected condition with conditionId not found in repository has no missing references`() = runTest {
+    fun `click on detected condition with conditionId not found anywhere has one screen condition reference with unknown name`() = runTest {
         val conditionId = Identifier(databaseId = 100L)
         every { mockEditionState.getAllEditedEvents() } returns emptyList()
         coEvery { mockSmartRepository.getConditionName(conditionId) } returns null
 
         val click = mockk<Click>(relaxed = true) {
             every { eventId } returns EVENT_ID
-            every { positionType } returns Click.PositionType.ON_DETECTED_CONDITION
-            every { clickOnConditionId } returns conditionId
+            every { position } returns Position.Condition(conditionId)
+            every { offset } returns null
         }
-        assertActionItem(useCase(click), expectedMissingCount = 0)
+        val result = useCase(click)
+        assertActionItem(result, expectedMissingCount = 1)
+        val ref = result.missingReferences[0] as MissingCopyReference.ScreenConditionReference
+        assertEquals("Unknown", ref.name)
+        assertEquals(conditionId, ref.conditionId)
+    }
+
+    @Test
+    fun `click on detected condition from another edited event not in database has one screen condition reference`() = runTest {
+        val conditionId = Identifier(tempId = 100L)
+        val condition = mockk<ScreenCondition>(relaxed = true) {
+            every { id } returns conditionId
+            every { name } returns CONDITION_NAME
+        }
+        val otherEvent = mockk<ScreenEvent>(relaxed = true) {
+            every { id } returns OTHER_EVENT_ID
+            every { conditions } returns listOf(condition)
+        }
+        val targetEvent = mockk<ScreenEvent>(relaxed = true) {
+            every { id } returns EVENT_ID
+            every { conditions } returns emptyList()
+        }
+        every { mockEditionState.getAllEditedEvents() } returns listOf(targetEvent, otherEvent)
+        coEvery { mockSmartRepository.getConditionName(conditionId) } returns null
+
+        val click = mockk<Click>(relaxed = true) {
+            every { eventId } returns EVENT_ID
+            every { position } returns Position.Condition(conditionId)
+            every { offset } returns null
+        }
+        val result = useCase(click)
+        assertActionItem(result, expectedMissingCount = 1)
+        val ref = result.missingReferences[0] as MissingCopyReference.ScreenConditionReference
+        assertEquals(CONDITION_NAME, ref.name)
+        assertEquals(conditionId, ref.conditionId)
     }
 
     @Test
@@ -254,8 +696,8 @@ class GetActionMissingReferencesUseCaseTest {
 
         val click = mockk<Click>(relaxed = true) {
             every { eventId } returns EVENT_ID
-            every { positionType } returns Click.PositionType.ON_DETECTED_CONDITION
-            every { clickOnConditionId } returns conditionId
+            every { position } returns Position.Condition(conditionId)
+            every { offset } returns null
         }
         val result = useCase(click)
         assertActionItem(result, expectedMissingCount = 1)
@@ -388,6 +830,54 @@ class GetActionMissingReferencesUseCaseTest {
         assertEquals(expectedMissingCount, result.missingReferences.size)
     }
 
+    private fun gesture(vararg fingers: GestureFinger) = Gesture(
+        id = ACTION_ID,
+        eventId = EVENT_ID,
+        priority = 0,
+        fingers = fingers.toList(),
+    )
+
+    private fun finger(vararg motions: GestureFingerMotion) = GestureFinger(
+        id = Identifier(databaseId = 50L),
+        startTimeMs = 0L,
+        motions = motions.toList(),
+    )
+
+    private fun literalPosition() = Position.Coordinates(
+        CoordinatesValue.Literal(100), CoordinatesValue.Literal(200),
+    )
+
+    private fun pressMotion(position: Position, offset: Position = NO_OFFSET) = GestureFingerMotion.Press(
+        id = Identifier(databaseId = 51L),
+        position = position,
+        offset = offset,
+    )
+
+    private fun moveMotion(position: Position, offset: Position = NO_OFFSET) = GestureFingerMotion.Move(
+        id = Identifier(databaseId = 52L),
+        position = position,
+        offset = offset,
+        durationMs = 100L,
+    )
+
+    private fun waitMotion() = GestureFingerMotion.Wait(
+        id = Identifier(databaseId = 53L),
+        durationMs = 100L,
+    )
+
+    private fun releaseMotion() = GestureFingerMotion.Release(
+        id = Identifier(databaseId = 54L),
+    )
+
+    private fun click(position: Position?, offset: Position? = null) = Click(
+        id = ACTION_ID,
+        eventId = EVENT_ID,
+        priority = 0,
+        pressDuration = 100L,
+        position = position,
+        offset = offset,
+    )
+
     private fun changeCounter(counterName: String, operationValue: CounterOperationValue) = ChangeCounter(
         id = ACTION_ID,
         eventId = EVENT_ID,
@@ -395,6 +885,11 @@ class GetActionMissingReferencesUseCaseTest {
         counterName = counterName,
         operation = ChangeCounter.OperationType.SET,
         operationValue = operationValue,
+    )
+
+    private fun conditionValue(conditionId: Identifier) = CounterOperationValue.Condition(
+        conditionId = conditionId,
+        positionType = CounterOperationValue.Condition.PositionType.CONDITION_CENTER_X,
     )
 
     private fun notification(messageText: String) = Notification(
@@ -436,5 +931,6 @@ class GetActionMissingReferencesUseCaseTest {
         const val COUNTER_VALUE_NAME = "otherCounter"
         const val CONDITION_NAME = "myCondition"
         const val EVENT_NAME = "myEvent"
+        val NO_OFFSET = Position.Coordinates(CoordinatesValue.Literal(0), CoordinatesValue.Literal(0))
     }
 }

@@ -39,10 +39,10 @@ enum class ActionType {
     CLICK,
     /** A finite sequence of taps generated inside a polygon. */
     AREA_CLICK,
-    /** A swipe on the screen. */
-    SWIPE,
     /** A symmetric two-finger zoom gesture. */
     ZOOM,
+    /** A complex gesture to execute on the screen. */
+    GESTURE,
     /** A pause, waiting before the next action. */
     PAUSE,
     /** An Android Intent, allowing to interact with other applications. */
@@ -66,21 +66,31 @@ enum class AreaClickDistributionEntity {
 }
 
 
-/**
- * Type of click position for a [ActionType.CLICK].
- * Indicates how to click on the screen for the action.
- */
-enum class ClickPositionType {
-    /** The user must manually select a position to be clicked. */
-    USER_SELECTED,
-    /**
-     * Click on the detected condition.
-     * When the condition operator is AND, click on the condition specified by the user.
-     * When the condition operator is OR, click on the condition detected condition.
-     */
-    ON_DETECTED_CONDITION,
+enum class GestureFingerMotionType {
+    MOVE,
+    PRESS,
+    RELEASE,
+    WAIT,
 }
 
+/** How long the finger of a [GestureFingerMotionType.RELEASE] stays pressed once its gesture is over. */
+enum class GestureReleaseHoldType {
+    /** Until the conditions of the event are no longer fulfilled. */
+    UNTIL_UNFULFILLED,
+    /** Until all the actions of the event have been executed. */
+    UNTIL_ACTIONS_END,
+    /**
+     * For a custom duration defined by the user, starting once the gesture is over. The duration is stored in
+     * [GestureFingerMotionEntity.holdDurationMs].
+     */
+    FOR_DURATION,
+}
+
+enum class CoordinatesType {
+    CONDITION,
+    COUNTER,
+    LITERAL,
+}
 
 /**
  * Type of [ConditionEntity].
@@ -143,6 +153,30 @@ enum class CounterOperationValueType {
     NUMBER,
     /** The operand is a value reference by another counter. */
     COUNTER,
+    /**
+     * The operand is a coordinate of a screen condition detected in the same event.
+     * Only valid for [ChangeCounterOperationType].
+     */
+    CONDITION,
+}
+
+/**
+ * The coordinate of a detected screen condition to use as operand when the [CounterOperationValueType] is
+ * [CounterOperationValueType.CONDITION]. All values are in pixels, relative to the screen.
+ */
+enum class CounterOperationConditionPositionType {
+    /** The bottom edge of the detected condition area. */
+    CONDITION_BOTTOM,
+    /** The horizontal center of the detected condition area. */
+    CONDITION_CENTER_X,
+    /** The vertical center of the detected condition area. */
+    CONDITION_CENTER_Y,
+    /** The left edge of the detected condition area. */
+    CONDITION_LEFT,
+    /** The right edge of the detected condition area. */
+    CONDITION_RIGHT,
+    /** The top edge of the detected condition area. */
+    CONDITION_TOP,
 }
 
 
@@ -195,4 +229,19 @@ enum class NumberFormatType {
 enum class NotificationMessageType {
     TEXT,
     COUNTER_VALUE;
+}
+
+/**
+ * DELETED but kept because referenced in migrations/deserialization.
+ * The position of a [ActionType.CLICK] is now defined by its press [GestureFingerMotionEntity].
+ */
+enum class ClickPositionType {
+    /** The user must manually select a position to be clicked. */
+    USER_SELECTED,
+    /**
+     * Click on the detected condition.
+     * When the condition operator is AND, click on the condition specified by the user.
+     * When the condition operator is OR, click on the condition detected condition.
+     */
+    ON_DETECTED_CONDITION,
 }

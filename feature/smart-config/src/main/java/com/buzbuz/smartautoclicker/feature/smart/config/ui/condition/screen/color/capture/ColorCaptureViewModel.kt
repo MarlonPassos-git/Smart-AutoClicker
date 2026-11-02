@@ -30,8 +30,8 @@ import com.buzbuz.smartautoclicker.core.display.config.DisplayConfigManager
 import com.buzbuz.smartautoclicker.core.display.recorder.DisplayRecorder
 import com.buzbuz.smartautoclicker.core.common.tutorial.domain.model.monitoring.MonitoredViewType
 import com.buzbuz.smartautoclicker.core.common.tutorial.domain.MonitoredViewsManager
+import com.buzbuz.smartautoclicker.feature.smart.config.R
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.condition.screen.color.extensions.toRgbaHexString
-import com.buzbuz.smartautoclicker.feature.smart.debugging.R
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
@@ -43,6 +43,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
 
 class ColorCaptureViewModel @Inject constructor(
     @param:Dispatcher(Main) private val mainDispatcher: CoroutineDispatcher,
@@ -66,11 +67,11 @@ class ColorCaptureViewModel @Inject constructor(
         return selectedPosition to selectedColor
     }
 
-    fun captureScreen(initialFocusPosition: PointF?) {
+    fun captureScreen() {
         _uiState.update { capturingState() }
 
         screenshotJob = viewModelScope.launch(ioDispatcher) {
-            delay(200L) // Wait a bit to ensure menu is effectively invisible and a new screen frame is available
+            delay(200L.milliseconds) // Wait a bit to ensure menu is effectively invisible and a new screen frame is available
 
             val screenshot = displayRecorder.takeScreenshot()
             _uiState.update {
@@ -78,7 +79,7 @@ class ColorCaptureViewModel @Inject constructor(
                     withContext(mainDispatcher) {
                         monitoredViewsManager.notifyClick(MonitoredViewType.SCREEN_CONDITION_CAPTURE_MENU_BUTTON_CAPTURE)
                     }
-                    pixelSelectionState(screenshot, initialFocusPosition)
+                    pixelSelectionState(screenshot)
                 }
             }
         }
@@ -125,9 +126,9 @@ class ColorCaptureViewModel @Inject constructor(
             showHideButtonEnabled = false,
         )
 
-    private fun pixelSelectionState(screenshot: Bitmap, initialFocusPosition: PointF?): ColorCaptureUiState {
+    private fun pixelSelectionState(screenshot: Bitmap): ColorCaptureUiState {
         val displaySize = displayConfigManager.displayConfig.sizePx
-        val position = initialFocusPosition ?: PointF(displaySize.x / 2f, displaySize.y / 2f)
+        val position = PointF(displaySize.x / 2f, displaySize.y / 2f)
         val selectorColor = screenshot.getPixelColor(position)
 
         return ColorCaptureUiState(

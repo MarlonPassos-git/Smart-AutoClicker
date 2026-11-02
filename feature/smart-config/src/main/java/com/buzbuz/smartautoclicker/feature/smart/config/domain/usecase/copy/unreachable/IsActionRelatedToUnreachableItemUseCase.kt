@@ -22,14 +22,17 @@ import com.buzbuz.smartautoclicker.core.domain.model.action.Action
 import com.buzbuz.smartautoclicker.core.domain.model.action.AreaClick
 import com.buzbuz.smartautoclicker.core.domain.model.action.ChangeCounter
 import com.buzbuz.smartautoclicker.core.domain.model.action.Click
+import com.buzbuz.smartautoclicker.core.domain.model.action.Gesture
 import com.buzbuz.smartautoclicker.core.domain.model.action.Intent
 import com.buzbuz.smartautoclicker.core.domain.model.action.Notification
 import com.buzbuz.smartautoclicker.core.domain.model.action.Pause
 import com.buzbuz.smartautoclicker.core.domain.model.action.SetText
-import com.buzbuz.smartautoclicker.core.domain.model.action.Swipe
 import com.buzbuz.smartautoclicker.core.domain.model.action.Zoom
 import com.buzbuz.smartautoclicker.core.domain.model.action.SystemAction
 import com.buzbuz.smartautoclicker.core.domain.model.action.ToggleEvent
+import com.buzbuz.smartautoclicker.core.domain.model.action.gesture.GestureFingerMotion
+import com.buzbuz.smartautoclicker.core.domain.model.action.position.CoordinatesValue
+import com.buzbuz.smartautoclicker.core.domain.model.action.position.Position
 import com.buzbuz.smartautoclicker.core.domain.model.counter.CounterOperationValue
 import com.buzbuz.smartautoclicker.core.domain.model.event.Event
 import com.buzbuz.smartautoclicker.feature.smart.config.domain.EditionRepository
@@ -48,8 +51,9 @@ class IsActionRelatedToUnreachableItemUseCase @Inject constructor(
         }
 
         return when (action) {
-            is ChangeCounter -> action.isRelatedToUnreachableItem()
+            is ChangeCounter -> action.isRelatedToUnreachableItem(copyResultEvents)
             is Click -> action.isRelatedToUnreachableItem(copyResultEvents)
+            is Gesture -> action.isRelatedToUnreachableItem(copyResultEvents)
             is Notification -> action.isRelatedToUnreachableItem()
             is SetText -> action.isRelatedToUnreachableItem()
             is ToggleEvent -> action.isRelatedToUnreachableItem(copyResultEvents)
@@ -57,32 +61,28 @@ class IsActionRelatedToUnreachableItemUseCase @Inject constructor(
             // Nothing is referenced in those actions
             is AreaClick,
             is Pause,
-            is Swipe,
             is Zoom,
             is Intent,
+            is Pause,
             is SystemAction -> false
         }
     }
 
-    private fun ChangeCounter.isRelatedToUnreachableItem(): Boolean {
+    private fun ChangeCounter.isRelatedToUnreachableItem(copyResultEvents: Map<Identifier, Event>): Boolean {
         if (editionRepository.counterIsUnreachable(counterName)) return true
 
         return when (val ctnValue = operationValue) {
-            is CounterOperationValue.Counter -> editionRepository.counterIsUnreachable(ctnValue.value)
+            is CounterOperationValue.Counter -> editionRepository.counterIsUnreachable(ctnValue.counterName)
             is CounterOperationValue.Number -> false
+            is CounterOperationValue.Condition ->
+                ctnValue.conditionId?.let { conditionIsUnreachable(copyResultEvents, eventId, it) } ?: false
         }
     }
 
-    private fun Click.isRelatedToUnreachableItem(copyResultEvents: Map<Identifier, Event>): Boolean {
-        if (positionType == Click.PositionType.ON_DETECTED_CONDITION) {
-            clickOnConditionId?.let { conditionId ->
-                return copyResultEvents[eventId]?.conditions
-                    ?.find { condition -> condition.id == conditionId } == null
-            }
+    private fun Click.isRelatedToUnreachableItem(copyResultEvents: Map<Identifier, Event>): Boolean =
+        listOfNotNull(position, offset).any { clickPosition ->
+            clickPosition.isUnreachable(copyResultEvents, eventId)
         }
-
-        return false
-    }
 
     private fun Notification.isRelatedToUnreachableItem(): Boolean {
         messageText.findCounterReferences().forEach { counterName ->
@@ -100,6 +100,33 @@ class IsActionRelatedToUnreachableItemUseCase @Inject constructor(
         return false
     }
 
+    private fun Gesture.isRelatedToUnreachableItem(copyResultEvents: Map<Identifier, Event>): Boolean =
+        fingers.any { finger ->
+            finger.motions.any { motion ->
+                val positions: List<Position> = when (motion) {
+                    is GestureFingerMotion.Press -> listOf(motion.position, motion.offset)
+                    is GestureFingerMotion.Move -> listOf(motion.position, motion.offset)
+                    is GestureFingerMotion.Wait,
+                    is GestureFingerMotion.Release -> emptyList()
+                }
+
+                positions.any { position -> position.isUnreachable(copyResultEvents, eventId) }
+            }
+        }
+
+    private fun Position.isUnreachable(copyResultEvents: Map<Identifier, Event>, eventId: Identifier): Boolean =
+        when (this) {
+            is Position.Condition -> {
+                val condId = conditionId ?: return false
+                conditionIsUnreachable(copyResultEvents, eventId, condId)
+            }
+
+            is Position.Coordinates -> listOf(x, y).any { coordinatesValue ->
+                coordinatesValue is CoordinatesValue.Counter
+                        && editionRepository.counterIsUnreachable(coordinatesValue.counterName)
+            }
+        }
+
     private fun ToggleEvent.isRelatedToUnreachableItem(copyResultEvents: Map<Identifier, Event>): Boolean {
         if (toggleAll) return false
 
@@ -112,4 +139,11 @@ class IsActionRelatedToUnreachableItemUseCase @Inject constructor(
 
     private fun EditionRepository.counterIsUnreachable(counterName: String): Boolean =
         editionState.getCounter(counterName) == null
+
+    private fun conditionIsUnreachable(
+        copyResultEvents: Map<Identifier, Event>,
+        eventId: Identifier,
+        conditionId: Identifier,
+    ): Boolean =
+        copyResultEvents[eventId]?.conditions?.any { condition -> condition.id == conditionId } != true
 }

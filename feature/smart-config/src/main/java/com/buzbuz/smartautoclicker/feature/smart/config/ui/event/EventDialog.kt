@@ -26,6 +26,7 @@ import android.view.ViewGroup
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.buzbuz.smartautoclicker.core.common.navigation.getDebuggingNavigator
 
 import com.buzbuz.smartautoclicker.core.common.overlays.base.viewModels
 import com.buzbuz.smartautoclicker.core.common.overlays.dialog.OverlayDialog
@@ -53,12 +54,11 @@ import com.buzbuz.smartautoclicker.feature.smart.config.R
 import com.buzbuz.smartautoclicker.feature.smart.config.databinding.DialogEventConfigBinding
 import com.buzbuz.smartautoclicker.feature.smart.config.di.ScenarioConfigViewModelsEntryPoint
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.action.brief.SmartActionsBriefMenu
-import com.buzbuz.smartautoclicker.feature.smart.config.ui.action.brief.SmartActionsLegacyDialog
+import com.buzbuz.smartautoclicker.feature.smart.config.ui.action.legacy.SmartActionsLegacyDialog
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.dialogs.showCloseWithoutSavingDialog
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.dialogs.showDeleteEventWithAssociatedActionsDialog
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.condition.screen.brief.ScreenConditionsBriefMenu
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.condition.trigger.TriggerConditionListDialog
-import com.buzbuz.smartautoclicker.feature.smart.debugging.ui.dialog.live.eventtry.TryEventOverlayMenu
 
 import com.google.android.material.bottomsheet.BottomSheetDialog
 
@@ -272,7 +272,9 @@ class EventDialog(
         viewModel.monitorViews(
             conditionsField = viewBinding.layoutConditionSelector,
             conditionOperatorAndView = viewBinding.fieldConditionsOperator.dualStateButton.buttonLeft,
+            conditionOperatorOrView = viewBinding.fieldConditionsOperator.dualStateButton.buttonRight,
             actionsField = viewBinding.layoutActionsSelector,
+            initialStateField = viewBinding.fieldIsEnabled.root,
             saveButton = viewBinding.layoutTopBar.buttonSave,
         )
     }
@@ -447,10 +449,10 @@ class EventDialog(
 
     private fun showTryElementMenu() {
         viewModel.getTryInfo()?.let { (scenario, imageEvent) ->
-            overlayManager.navigateTo(
+            context.getDebuggingNavigator().showTryEventOverlayMenu(
                 context = context,
-                newOverlay = TryEventOverlayMenu(scenario, imageEvent),
-                hideCurrent = true,
+                scenario = scenario,
+                triedElement = imageEvent,
             )
         }
     }

@@ -23,14 +23,17 @@ import com.buzbuz.smartautoclicker.core.domain.model.action.Action
 import com.buzbuz.smartautoclicker.core.domain.model.action.AreaClick
 import com.buzbuz.smartautoclicker.core.domain.model.action.ChangeCounter
 import com.buzbuz.smartautoclicker.core.domain.model.action.Click
+import com.buzbuz.smartautoclicker.core.domain.model.action.Gesture
 import com.buzbuz.smartautoclicker.core.domain.model.action.Intent
 import com.buzbuz.smartautoclicker.core.domain.model.action.Notification
 import com.buzbuz.smartautoclicker.core.domain.model.action.Pause
 import com.buzbuz.smartautoclicker.core.domain.model.action.SetText
-import com.buzbuz.smartautoclicker.core.domain.model.action.Swipe
 import com.buzbuz.smartautoclicker.core.domain.model.action.Zoom
 import com.buzbuz.smartautoclicker.core.domain.model.action.SystemAction
 import com.buzbuz.smartautoclicker.core.domain.model.action.ToggleEvent
+import com.buzbuz.smartautoclicker.core.domain.model.action.gesture.GestureFingerMotion
+import com.buzbuz.smartautoclicker.core.domain.model.action.position.CoordinatesValue
+import com.buzbuz.smartautoclicker.core.domain.model.action.position.Position
 import com.buzbuz.smartautoclicker.core.domain.model.counter.CounterOperationValue
 import com.buzbuz.smartautoclicker.core.domain.model.event.Event
 import com.buzbuz.smartautoclicker.feature.smart.config.domain.EditionRepository
@@ -60,8 +63,9 @@ class GetActionMissingReferencesUseCase @Inject constructor(
         }
 
         val missingReferences = when (action) {
-            is ChangeCounter -> action.getMissingReferences()
+            is ChangeCounter -> action.getMissingReferences(copyResultEvents)
             is Click -> action.getMissingReferences(copyResultEvents)
+            is Gesture -> action.getMissingReferences(copyResultEvents)
             is Notification -> action.getMissingReferences()
             is SetText -> action.getMissingReferences()
             is ToggleEvent -> action.getMissingReferences(copyResultEvents)
@@ -70,7 +74,6 @@ class GetActionMissingReferencesUseCase @Inject constructor(
             is Intent,
             is AreaClick,
             is Pause,
-            is Swipe,
             is Zoom,
             is SystemAction -> emptyList()
         }
@@ -81,30 +84,96 @@ class GetActionMissingReferencesUseCase @Inject constructor(
         )
     }
 
-    private fun ChangeCounter.getMissingReferences(): List<MissingCopyReference> =
+    private suspend fun ChangeCounter.getMissingReferences(
+        copyResultEvents: Map<Identifier, Event>,
+    ): List<MissingCopyReference> =
         buildList {
             if (editionRepository.editionState.getCounter(counterName) == null) {
                 add(MissingCopyReference.CounterReference(counterName))
             }
 
-            if (operationValue is CounterOperationValue.Counter) {
-                val valueCounterName = (operationValue as CounterOperationValue.Counter).value
-                if (editionRepository.editionState.getCounter(valueCounterName) == null) {
-                    add(MissingCopyReference.CounterReference(valueCounterName))
+            when (val value = operationValue) {
+                is CounterOperationValue.Counter -> {
+                    if (editionRepository.editionState.getCounter(value.counterName) == null) {
+                        add(MissingCopyReference.CounterReference(value.counterName))
+                    }
+                }
+
+                is CounterOperationValue.Condition ->
+                    value.conditionId?.let { conditionId ->
+                        getMissingConditionReference(copyResultEvents, eventId, conditionId)?.let(::add)
+                    }
+
+                is CounterOperationValue.Number -> Unit
+            }
+        }
+
+    private suspend fun Click.getMissingReferences(copyResultEvents: Map<Identifier, Event>): List<MissingCopyReference> =
+        listOfNotNull(position, offset).flatMap { clickPosition ->
+            clickPosition.getMissingReference(copyResultEvents, eventId)
+        }
+
+    private suspend fun Gesture.getMissingReferences(copyResultEvents: Map<Identifier, Event>): List<MissingCopyReference> {
+        val result = mutableListOf<MissingCopyReference>()
+        fingers.forEach { finger ->
+            finger.motions.forEach { motion ->
+                val positions: List<Position> = when (motion) {
+                    is GestureFingerMotion.Press -> listOf(motion.position, motion.offset)
+                    is GestureFingerMotion.Move -> listOf(motion.position, motion.offset)
+                    is GestureFingerMotion.Wait,
+                    is GestureFingerMotion.Release -> emptyList()
+                }
+
+                positions.forEach { position ->
+                    result.addAll(position.getMissingReference(copyResultEvents, eventId))
                 }
             }
         }
 
-    private suspend fun Click.getMissingReferences(copyResultEvents: Map<Identifier, Event>): List<MissingCopyReference> {
-        if (positionType != Click.PositionType.ON_DETECTED_CONDITION) return emptyList()
+        return result
+    }
 
-        val conditionId = clickOnConditionId ?: return emptyList()
-        val isFound = copyResultEvents[eventId]?.conditions
-            ?.find { condition -> condition.id == conditionId } != null
-        if (isFound) return emptyList()
+    private suspend fun Position.getMissingReference(
+        copyResultEvents: Map<Identifier, Event>,
+        eventId: Identifier,
+    ): List<MissingCopyReference> {
+        when (this) {
+            is Position.Condition -> {
+                val condId = conditionId ?: return emptyList()
+                return listOfNotNull(getMissingConditionReference(copyResultEvents, eventId, condId))
+            }
 
-        val name = smartRepository.getConditionName(conditionId) ?: return emptyList()
-        return listOf(MissingCopyReference.ScreenConditionReference(name = name, conditionId = conditionId))
+            is Position.Coordinates -> {
+                val result = mutableListOf<MissingCopyReference>()
+                listOf(x, y).forEach { coordinatesValue ->
+                    if (coordinatesValue is CoordinatesValue.Counter) {
+                        if (editionRepository.editionState.getCounter(coordinatesValue.counterName) == null) {
+                            result.add(MissingCopyReference.CounterReference(coordinatesValue.counterName))
+                        }
+                    }
+                }
+
+                return result
+            }
+        }
+    }
+
+    /** @return the missing reference if the condition can't be found in the action event, null if it is found. */
+    private suspend fun getMissingConditionReference(
+        copyResultEvents: Map<Identifier, Event>,
+        eventId: Identifier,
+        conditionId: Identifier,
+    ): MissingCopyReference.ScreenConditionReference? {
+        val isFound = copyResultEvents[eventId]?.conditions?.any { it.id == conditionId } == true
+        if (isFound) return null
+
+        // The referenced condition can belong to another edited event not yet saved in database
+        val name = copyResultEvents.values
+            .firstNotNullOfOrNull { event -> event.conditions.find { it.id == conditionId }?.name }
+            ?: smartRepository.getConditionName(conditionId)
+            ?: "Unknown"
+
+        return MissingCopyReference.ScreenConditionReference(name = name, conditionId = conditionId)
     }
 
     private fun Notification.getMissingReferences(): List<MissingCopyReference> =

@@ -72,14 +72,14 @@ internal open class CompatV13Deserializer : CompatV20Deserializer() {
 
     private var currentTemporaryId: Long = -1
 
-    override fun deserializeCompleteScenario(jsonCompleteScenario: JsonObject): CompleteScenario {
+    override fun deserialize(jsonCompleteScenario: JsonObject): CompleteScenario {
         legacyEndConditions.clear()
         legacyEndConditionOperator = 0
         toggleEventAggregation.clear()
         newEventToggles.clear()
         currentTemporaryId = -1
 
-        return super.deserializeCompleteScenario(jsonCompleteScenario)
+        return super.deserialize(jsonCompleteScenario)
             .migrateToEventToggle()
             .migrateLegacyEndConditions(jsonCompleteScenario)
     }
@@ -159,6 +159,7 @@ internal open class CompatV13Deserializer : CompatV20Deserializer() {
                                 action = aggregatorCompleteAction.action,
                                 intentExtras = emptyList(),
                                 eventsToggle = toggleEvents,
+                                gestureFingers = emptyList(),
                             )
                         } else completeActionEntity
                     }
@@ -233,7 +234,7 @@ internal open class CompatV13Deserializer : CompatV20Deserializer() {
             add(CompleteEventEntity(
                 event = stopTriggerEvent,
                 conditions = stopTriggerEventConditions.map { condition -> CompleteConditionEntity(condition) },
-                actions = listOf(CompleteActionEntity(stopScenarioAction, emptyList(), emptyList())),
+                actions = listOf(CompleteActionEntity(stopScenarioAction, emptyList(), emptyList(), emptyList())),
             ))
 
             addAll(
@@ -243,7 +244,7 @@ internal open class CompatV13Deserializer : CompatV20Deserializer() {
                             event = completeEvent.event,
                             conditions = completeEvent.conditions,
                             actions = completeEvent.actions.toMutableList().apply {
-                                add(CompleteActionEntity(execCountAction, emptyList(), emptyList()))
+                                add(CompleteActionEntity(execCountAction, emptyList(), emptyList(), emptyList()))
                             }
                         )
                     } ?: completeEvent

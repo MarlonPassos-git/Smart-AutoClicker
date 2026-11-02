@@ -16,11 +16,21 @@
  */
 package com.buzbuz.smartautoclicker.feature.smart.config.domain.usecase.counter
 
+import android.os.Build
+
+import androidx.test.ext.junit.runners.AndroidJUnit4
+
 import com.buzbuz.smartautoclicker.core.base.identifier.Identifier
 import com.buzbuz.smartautoclicker.core.domain.model.action.Action
 import com.buzbuz.smartautoclicker.core.domain.model.action.ChangeCounter
+import com.buzbuz.smartautoclicker.core.domain.model.action.Click
+import com.buzbuz.smartautoclicker.core.domain.model.action.Gesture
 import com.buzbuz.smartautoclicker.core.domain.model.action.Notification
 import com.buzbuz.smartautoclicker.core.domain.model.action.SetText
+import com.buzbuz.smartautoclicker.core.domain.model.action.position.CoordinatesValue
+import com.buzbuz.smartautoclicker.core.domain.model.action.gesture.GestureFinger
+import com.buzbuz.smartautoclicker.core.domain.model.action.gesture.GestureFingerMotion
+import com.buzbuz.smartautoclicker.core.domain.model.action.position.Position
 import com.buzbuz.smartautoclicker.core.domain.model.condition.Condition
 import com.buzbuz.smartautoclicker.core.domain.model.condition.ScreenCondition
 import com.buzbuz.smartautoclicker.core.domain.model.condition.TriggerCondition
@@ -43,7 +53,12 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
 
+import org.robolectric.annotation.Config
+
+@RunWith(AndroidJUnit4::class)
+@Config(sdk = [Build.VERSION_CODES.Q])
 class GetCounterReadReferencesUseCaseTest {
 
     private val mockEditionState: IEditionState = mockk()
@@ -164,6 +179,154 @@ class GetCounterReadReferencesUseCaseTest {
     }
 
     @Test
+    fun `Gesture with Counter coordinate creates read reference`() = runTest {
+        val action = gestureAction(Position.Coordinates(
+            CoordinatesValue.Counter(COUNTER_A), CoordinatesValue.Literal(0),
+        ))
+        mockEvents(listOf(event(actions = listOf(action))))
+
+        val result = useCase().first()
+
+        assertEquals(setOf(COUNTER_A), result.keys)
+        val ref = result[COUNTER_A]?.first() as? CounterReference.ActionElement
+        assertEquals(action, ref?.action)
+    }
+
+    @Test
+    fun `Gesture with Literal coordinate creates no read reference`() = runTest {
+        val action = gestureAction(Position.Coordinates(
+            CoordinatesValue.Literal(100), CoordinatesValue.Literal(200),
+        ))
+        mockEvents(listOf(event(actions = listOf(action))))
+
+        assertTrue(useCase().first().isEmpty())
+    }
+
+    @Test
+    fun `Gesture with Condition position creates no read reference`() = runTest {
+        val action = gestureAction(Position.Condition(Identifier(databaseId = 100L)))
+        mockEvents(listOf(event(actions = listOf(action))))
+
+        assertTrue(useCase().first().isEmpty())
+    }
+
+    @Test
+    fun `Gesture with Counter in press offset creates read reference`() = runTest {
+        val action = gestureAction(
+            pressPosition = literalPosition(),
+            pressOffset = Position.Coordinates(CoordinatesValue.Literal(0), CoordinatesValue.Counter(COUNTER_A)),
+        )
+        mockEvents(listOf(event(actions = listOf(action))))
+
+        val result = useCase().first()
+
+        assertEquals(setOf(COUNTER_A), result.keys)
+        val ref = result[COUNTER_A]?.first() as? CounterReference.ActionElement
+        assertEquals(action, ref?.action)
+    }
+
+    @Test
+    fun `Gesture with Counter in move position and offset creates read reference for each`() = runTest {
+        val action = gestureAction(
+            pressPosition = literalPosition(),
+            move = GestureFingerMotion.Move(
+                id = Identifier(databaseId = 52L),
+                position = Position.Coordinates(CoordinatesValue.Counter(COUNTER_A), CoordinatesValue.Literal(0)),
+                offset = Position.Coordinates(CoordinatesValue.Literal(0), CoordinatesValue.Counter(COUNTER_B)),
+                durationMs = 100L,
+            ),
+        )
+        mockEvents(listOf(event(actions = listOf(action))))
+
+        val result = useCase().first()
+
+        assertEquals(setOf(COUNTER_A, COUNTER_B), result.keys)
+    }
+
+    @Test
+    fun `Gesture with both Counter coordinates creates read reference for each`() = runTest {
+        val action = gestureAction(Position.Coordinates(
+            CoordinatesValue.Counter(COUNTER_A), CoordinatesValue.Counter(COUNTER_B),
+        ))
+        mockEvents(listOf(event(actions = listOf(action))))
+
+        val result = useCase().first()
+
+        assertEquals(setOf(COUNTER_A, COUNTER_B), result.keys)
+    }
+
+    @Test
+    fun `Gesture referencing same counter in several fingers creates one reference`() = runTest {
+        val counterPosition = Position.Coordinates(CoordinatesValue.Counter(COUNTER_A), CoordinatesValue.Literal(0))
+        val action = gestureAction(counterPosition).let { gesture ->
+            gesture.copy(fingers = gesture.fingers + gesture.fingers[0].copy(id = Identifier(databaseId = 60L)))
+        }
+        mockEvents(listOf(event(actions = listOf(action))))
+
+        val result = useCase().first()
+
+        assertEquals(setOf(COUNTER_A), result.keys)
+        assertEquals(1, result[COUNTER_A]?.size)
+    }
+
+    @Test
+    fun `Click with Counter coordinate creates read reference`() = runTest {
+        val action = clickAction(position = Position.Coordinates(
+            CoordinatesValue.Counter(COUNTER_A), CoordinatesValue.Literal(0),
+        ))
+        mockEvents(listOf(event(actions = listOf(action))))
+
+        val result = useCase().first()
+
+        assertEquals(setOf(COUNTER_A), result.keys)
+        val ref = result[COUNTER_A]?.first() as? CounterReference.ActionElement
+        assertEquals(action, ref?.action)
+    }
+
+    @Test
+    fun `Click with both Counter coordinates creates read reference for each`() = runTest {
+        val action = clickAction(position = Position.Coordinates(
+            CoordinatesValue.Counter(COUNTER_A), CoordinatesValue.Counter(COUNTER_B),
+        ))
+        mockEvents(listOf(event(actions = listOf(action))))
+
+        val result = useCase().first()
+
+        assertEquals(setOf(COUNTER_A, COUNTER_B), result.keys)
+    }
+
+    @Test
+    fun `Click with Literal coordinate creates no read reference`() = runTest {
+        val action = clickAction(position = literalPosition())
+        mockEvents(listOf(event(actions = listOf(action))))
+
+        assertTrue(useCase().first().isEmpty())
+    }
+
+    @Test
+    fun `Click on Condition with Counter offset creates read reference`() = runTest {
+        val action = clickAction(
+            position = Position.Condition(Identifier(databaseId = 100L)),
+            offset = Position.Coordinates(CoordinatesValue.Counter(COUNTER_A), CoordinatesValue.Literal(0)),
+        )
+        mockEvents(listOf(event(actions = listOf(action))))
+
+        val result = useCase().first()
+
+        assertEquals(setOf(COUNTER_A), result.keys)
+        val ref = result[COUNTER_A]?.first() as? CounterReference.ActionElement
+        assertEquals(action, ref?.action)
+    }
+
+    @Test
+    fun `Click on Condition without offset creates no read reference`() = runTest {
+        val action = clickAction(position = Position.Condition(Identifier(databaseId = 100L)))
+        mockEvents(listOf(event(actions = listOf(action))))
+
+        assertTrue(useCase().first().isEmpty())
+    }
+
+    @Test
     fun `ChangeCounter with Counter operationValue creates read reference`() = runTest {
         val action = changeCounterAction(
             counterName = COUNTER_A,
@@ -207,6 +370,44 @@ class GetCounterReadReferencesUseCaseTest {
         every { this@mockk.actions } returns actions
         every { this@mockk.conditions } returns conditions
     }
+
+    private fun literalPosition() = Position.Coordinates(
+        CoordinatesValue.Literal(100), CoordinatesValue.Literal(200),
+    )
+
+    private fun gestureAction(
+        pressPosition: Position,
+        pressOffset: Position = Position.Coordinates(CoordinatesValue.Literal(0), CoordinatesValue.Literal(0)),
+        move: GestureFingerMotion.Move? = null,
+    ): Gesture = Gesture(
+        id = Identifier(databaseId = 4L),
+        eventId = Identifier(databaseId = 1L),
+        name = "Gesture",
+        priority = 0,
+        fingers = listOf(GestureFinger(
+            id = Identifier(databaseId = 50L),
+            startTimeMs = 0L,
+            motions = listOfNotNull(
+                GestureFingerMotion.Press(
+                    id = Identifier(databaseId = 51L),
+                    position = pressPosition,
+                    offset = pressOffset,
+                ),
+                move,
+                GestureFingerMotion.Release(id = Identifier(databaseId = 54L)),
+            ),
+        )),
+    )
+
+    private fun clickAction(position: Position, offset: Position? = null): Click = Click(
+        id = Identifier(databaseId = 5L),
+        eventId = Identifier(databaseId = 1L),
+        name = "Click",
+        priority = 0,
+        pressDuration = 100L,
+        position = position,
+        offset = offset,
+    )
 
     private fun counterReachedCondition(
         counterName: String,

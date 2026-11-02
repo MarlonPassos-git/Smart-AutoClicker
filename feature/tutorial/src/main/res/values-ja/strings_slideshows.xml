@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <!--
 * Copyright (C) 2026 Kevin Buzeau
 *
@@ -147,5 +147,195 @@
         実行できます。すべての数学的比較演算子が検証のカスタマイズに利用できます。\n\nカウンターはさまざまな方法で使用でき、
         カウンターに関連する単一の条件やアクションだけでは正しく使いこなすには不十分なことがよくあります。カウンター機能を
         カバーするインタラクティブなチュートリアルは、専用のセクションで利用できます。</string>
+
+    <!-- Pause Action slideshow -->
+    <string name="tutorial_slideshow_pause_action_title">待機アクション</string>
+    <string name="tutorial_slideshow_pause_action_desc">待機がアクションの実行と検出に与える影響を学ぶ</string>
+    <string name="tutorial_slideshow_pause_action_step_1_text">待機アクションはシナリオ全体を設定した時間だけ
+        一時停止します。その間、アクションは実行されず、画面の検出も行われません。\n\nよくある使い方は、アクション
+        リストの末尾に待機を追加することです。どこかをタップすると、タップされたアプリがそれを処理して結果を表示
+        するまでに時間がかかります。Klick\'r が再び画面を分析し始める前に、その瞬間を待ちたいことが多いでしょう。
+        \n\n2つのアクションの間に待機を入れることも有効ですが、リストの末尾に追加することの方が重要なケースが
+        多いです。</string>
+
+    <!-- Gesture Action slideshow -->
+    <string name="tutorial_slideshow_gesture_action_title">ジェスチャーアクション</string>
+    <string name="tutorial_slideshow_gesture_action_desc">ジェスチャーの実行方法を学ぶ</string>
+    <string name="tutorial_slideshow_gesture_action_step_1_text">ジェスチャーアクションは、記録または手動で設定した軌跡を、最大 5 本の指で同時に実行します。\n\n軌跡は必ず「押す」から始まり「離す」で終わり、その間に移動や待機を入れることができます。ジェスチャー全体の最大時間は 60 秒です。\n\nこれにより、スワイプやピンチズームなどの複雑なジェスチャーを簡単に再現できます。アクションリストの記録ボタンを使って、画面上で直接ジェスチャーを記録してみましょう！\n\n注：ジェスチャー内の待機は Android 8 以降でのみ利用できます。</string>
+    <string name="tutorial_slideshow_gesture_action_step_2_text">ジェスチャーの最後で最初の指を押したままにして、その間もシナリオの実行を続けることができます。ジェスチャーの「離す」ステップを展開し、指を離すタイミングを選んでください：すぐに、イベントのすべてのアクションが実行された後、イベントの条件が満たされなくなったとき、または一定時間後。\n\n注意点：\n• 押し続けられる指は一度に 1 本だけです。別の押し続けを開始すると、前の指は離されます。\n• 指を押し続けている間、関連するイベントは指が離されるまで再び実行されません。\n• 画面を手動でタッチすると、押し続けは中断されます。\n• 押し続けられる最大時間は、お使いのシステムと自動化しているアプリによって異なります。無制限に押し続けられるシステムもあれば、そうでないものもあります。</string>
+
+    <!-- Click Action Offset slideshow -->
+    <string name="tutorial_slideshow_click_action_offset_title">クリックオフセット</string>
+    <string name="tutorial_slideshow_click_action_offset_desc">検出された条件に対するクリック位置の調整方法を学ぶ</string>
+    <string name="tutorial_slideshow_click_action_offset_step_1_text">検出された条件をクリックする場合、デフォルトでは
+        クリックは検出された領域の中心に適用されます。\n\nクリックオフセットを使うと、その位置を条件の中心を基準に
+        X軸とY軸方向にピクセル単位で移動できます。タップしたい要素が検出された領域の中心の近くにあるが、厳密に
+        中心ではない場合に便利です。</string>
+
+    <!-- Click Action Target slideshow -->
+    <string name="tutorial_slideshow_click_action_target_title">クリックターゲット</string>
+    <string name="tutorial_slideshow_click_action_target_desc">クリックが適用される場所の設定方法を学ぶ</string>
+    <string name="tutorial_slideshow_click_action_target_step_1_text">クリックアクションは2種類の位置を対象にできます：
+        常に同じ固定位置、または検出された条件の位置です。\n\nアクション設定ダイアログのターゲットセレクターで
+        ターゲット指定の方法を選択してください。</string>
+    <string name="tutorial_slideshow_click_action_target_step_2_text">固定位置の場合、クリックは画面に何が表示されて
+        いるかに関係なく、常に同じ正確な座標で発生します。\n\nこれらの座標は回転に敏感であることに注意してください：
+        デバイスが回転すると、クリックが予期しない位置に当たったり、画面の端を超えてしまうことがあります。</string>
+    <string name="tutorial_slideshow_click_action_target_step_3_text">条件の位置の場合、クリックは検出された画像条件の
+        中心に適用され、画面上のどこに表示されてもターゲットを追跡します。\n\nANDオペレーターでは、すべての条件が
+        満たされる必要があるため、各画像条件には利用可能な位置があります。自由にどれかを選んでオフセットで
+        調整できます。</string>
+    <string name="tutorial_slideshow_click_action_target_step_4_text">ORオペレーターでは、最初に満たされた条件のみが
+        評価され、残りは無視されます。そのため、Klick\'r はどの条件が検出されるかを事前に知ることができません。
+        \n\n結果として、ORオペレーターでは特定の条件をターゲットとして選ぶことができません：クリックは常に実行時に
+        最初に検出された条件に適用されます。</string>
+
+    <!-- Conditions List slideshow -->
+    <string name="tutorial_slideshow_conditions_list_title">条件リスト</string>
+    <string name="tutorial_slideshow_conditions_list_desc">条件リストの実行方法を学ぶ</string>
+
+    <string name="tutorial_slideshow_conditions_list_step_1_text">画面上のどこでも左/右にスワイプすると、次/前の条件を表示できます。\n\n&lt;&lt; と &gt;&gt; ボタンを使うか、インデックスボックスを直接タップして条件の順序を変更できます。</string>
+    <string name="tutorial_slideshow_conditions_list_step_2_text">高度に最適化されたシナリオでは、リスト内の条件の順序が重要になります。色の条件のような軽い条件を先頭に置くことで、軽い条件が満たされない場合に、後に続く重い条件が評価されなくなります。\n\nOR 演算子を使用する場合はこのロジックが逆になり、最初の条件が満たされると後に続く条件は評価されません。</string>
+
+    <!-- Combine Conditions Ordering slideshow -->
+    <string name="tutorial_slideshow_combine_conditions_ordering_title">条件の順序と速度</string>
+    <string name="tutorial_slideshow_combine_conditions_ordering_desc">条件の順序がイベントの確認速度に与える影響</string>
+
+    <string name="tutorial_slideshow_combine_conditions_ordering_step_1_text">リスト内の条件の順序はイベントの確認速度に影響します。\n\nAND
+        演算子を使用する場合、最初に満たされない条件が見つかった時点で確認が停止します。最も満たされにくい条件を先頭に置くことで、アプリが残りの条件を早くスキップできるようになり、イベントが速くなります。</string>
+
+    <string name="tutorial_slideshow_combine_conditions_ordering_step_2_text">OR
+        演算子を使用する場合、最初に満たされた条件が見つかった時点で確認が停止します。最も満たされやすい条件を先頭に置くことで、アプリが残りを確認せずに早く完了できます。\n\nどちらの場合も、最も重要な条件をリストの先頭に置くこ
+        とが、シナリオを速く保つシンプルな方法です。</string>
+
+
+    <!-- Events State Basics slideshow -->
+    <string name="tutorial_slideshow_events_state_basics_title">イベントの状態</string>
+    <string name="tutorial_slideshow_events_state_basics_desc">シナリオの実行中にイベントを有効・無効にする方法を学ぶ</string>
+
+    <string name="tutorial_slideshow_events_state_basics_step_1_text">シナリオ内のすべてのイベント（スクリーンイベントとトリガーイベント）には状態があります：<b>有効
+        </b>または<b>無効</b>です。\n\n有効の場合、イベントは通常どおり実行され、条件を確認します。無効の場合、存在しないかのように完全にスキップされます。\n\nデフォルトでは、すべてのイベントは有効な状態で開始さ
+        れます。イベント設定の<b>初期状態</b>フィールドで変更できます。</string>
+
+    <string name="tutorial_slideshow_events_state_basics_step_2_text">シナリオの実行中は、<b>イベント状態を変更</b>アクションを使って任意のイベントの状態を変更で
+        きます。このアクションにより、1つ以上のイベントを有効化・無効化、または切り替えることができます。\n\nこれにより多くのことが可能になります：次々とお互いをオンにするイベント、一度実行されたら自分でオフになるイベント、ま
+        たは同時に1つだけがアクティブなイベントのグループ。</string>
+
+    <string name="tutorial_slideshow_events_state_basics_step_3_text"><b>シナリオ内のすべてのイベントが無効になった</b>とき、シナリオは自動的に停止します。やるこ
+        とが何もなくなるため、Klick\'rが自動的に停止します。\n\nこれはシナリオを終了するシンプルな方法です：最後のイベントが役割を果たした後に他のすべてを無効にすれば、すべてが自動的に停止します。</string>
+
+
+    <!-- Actions List slideshow -->
+    <string name="tutorial_slideshow_actions_list_title">アクションリスト</string>
+    <string name="tutorial_slideshow_actions_list_desc">アクションリストの実行方法を学ぶ</string>
+    <string name="tutorial_slideshow_actions_list_step_1_text">アクションは順番に、一つずつ実行されます。
+        画面上のどこでも左/右にスワイプすると、次/前のアクションを表示できます。\n\n&lt;&lt; と &gt;&gt;
+        ボタンを使うか、インデックスボックスを直接タップしてアクションの順序を変更できます。</string>
+    <string name="tutorial_slideshow_actions_list_step_2_text">アクションリストは
+        短く保つようにしましょう。通常のオートクリッカーはイベントごとに一か所をタップします——それが従うべきモデルです。一つの
+        イベントに多くのアクションを追加していると感じたら、それは作業を複数のイベントに分割すべきサインです。各イベントが
+        実際に画面に表示されているものに反応するようにしましょう。これが Klick\'r の「見て動く」哲学です：まず検出、それから
+        アクション。</string>
+
+    <!-- Write Text Action slideshow -->
+    <string name="tutorial_slideshow_write_text_action_title">テキスト入力アクション</string>
+    <string name="tutorial_slideshow_write_text_action_desc">フォーカスされた入力フィールドへのテキスト入力方法を学ぶ</string>
+    <string name="tutorial_slideshow_write_text_action_step_1_text">テキスト入力アクションが実行される前に、対象の入力
+        フィールドがすでにフォーカスされている必要があります——キーボードを表示するためにタップするのと同じです。\n\nこれを
+        実現するには、テキスト入力アクションの前にそのフィールドへのクリックアクションを追加してください。クリック後に
+        トランジションアニメーションが再生される場合は、間に待機アクションを入れるとフィールドの準備が整うのを確認するのに
+        役立ちます。\n\nアクションには「確定」オプションもあります：有効にすると、テキスト設定後に自動的に Enter が押され、
+        入力が確定または送信されます。</string>
+    <string name="tutorial_slideshow_write_text_action_step_2_text">書き込むテキストにカウンターの値を挿入できます。
+        アクション設定の「カウンターを追加」ボタンを押してカウンターを選択すると、テキストフィールドの現在のカーソル位置に
+        プレースホルダー <b>{カウンター名}</b> が挿入されます。\n\n実行時には、テキストがフィールドに貼り付けられる前に
+        すべての <b>{カウンター名}</b> プレースホルダーがカウンターの現在値に置き換えられます。例えば、<i>りんご</i>
+        という名前のカウンターの値が18の場合、「りんごが{りんご}個あります」は「りんごが18個あります」になります。</string>
+
+    <!-- System Action slideshow -->
+    <string name="tutorial_slideshow_system_action_title">システムアクション</string>
+    <string name="tutorial_slideshow_system_action_desc">Android のナビゲーションアクションを実行する方法を学ぶ</string>
+    <string name="tutorial_slideshow_system_action_step_1_text">システムアクションは Android の組み込みナビゲーション
+        アクションの一つを実行します：戻る、ホーム、または最近使用したアプリ。\n\nこれらは画面下部のナビゲーションボタンと
+        同じアクションです。座標は不要で、現在開いているアプリに関係なくシステムレベルで動作します。</string>
+
+    <!-- Change Counter Action slideshow -->
+    <string name="tutorial_slideshow_change_counter_action_title">カウンター変更アクション</string>
+    <string name="tutorial_slideshow_change_counter_action_desc">カウンターの値を変更する方法を学ぶ</string>
+    <string name="tutorial_slideshow_change_counter_action_step_1_text">カウンター変更アクションは、事前定義された静的な値
+        を使ってカウンターに操作を適用します。利用可能な操作は3つ：カウンターに値を加算する（+）、カウンターから減算する
+        （−）、またはカウンターをその値に設定する（=）。\n\nこれはカウンターを更新する最も一般的な方法です——例えば、条件が
+        検出されるたびに1を加えたり、目標達成時に0にリセットしたりします。</string>
+    <string name="tutorial_slideshow_change_counter_action_step_2_text">静的な値の代わりに、別のカウンターの現在値を
+        オペランドとして使用できます。同じ3つの操作（+、−、=）が適用されますが、量は設定時に固定されるのではなく、実行時に
+        選択されたカウンターから読み取られます。\n\nこれにより、カウンター同士が相互作用する動的なシナリオを構築できます。</string>
+
+    <!-- Notification Action slideshow -->
+    <string name="tutorial_slideshow_notification_action_title">通知アクション</string>
+    <string name="tutorial_slideshow_notification_action_desc">シナリオ中に通知を表示する方法を学ぶ</string>
+    <string name="tutorial_slideshow_notification_action_step_1_text">通知アクションは、お好みのタイトルとメッセージで
+        Android 通知を表示します。\n\n「カウンターを追加」ボタンを使うか、プレースホルダー <b>{カウンター名}</b> を直接
+        入力することで、通知テキストにカウンターの現在値を挿入できます。実行時にはカウンターの値に置き換えられます——例えば、
+        「りんごが{りんご}個あります」は「りんごが18個あります」になります。</string>
+    <string name="tutorial_slideshow_notification_action_step_2_text">通知の重要度レベルは、通知がどれほど目立つ形で
+        表示されるかを制御します。高い重要度レベルではヘッドアップバナーが表示されたり音が鳴ったりしますが、低いものは
+        通知トレイに静かに届きます。\n\n正確な動作はデバイスによって異なり、Klick\'r の Android 通知設定でさらに
+        カスタマイズできます。</string>
+
+    <!-- Toggle Event Action slideshow -->
+    <string name="tutorial_slideshow_toggle_event_action_title">イベント状態変更アクション</string>
+    <string name="tutorial_slideshow_toggle_event_action_desc">実行時にイベントを有効・無効にする方法を学ぶ</string>
+    <string name="tutorial_slideshow_toggle_event_action_step_1_text">無効化されたイベントはシナリオループ中に完全に
+        スキップされます——その条件は一切チェックされず、アクションも実行されません。つまり、処理時間を全く消費しません。
+        \n\n使用していないイベントを無効化することはパフォーマンス向上に非常に効果的です。例えば、メニューフェーズとゲーム
+        フェーズを交互に行うシナリオでは、ゲームフェーズ中にメニュー関連のイベントをすべて無効化する（逆も同様）ことで、
+        常に関連するイベントだけをアクティブに保てます。</string>
+    <string name="tutorial_slideshow_toggle_event_action_step_2_text">アクションを設定する際、シナリオ内のすべての
+        イベントの状態を一括変更するか、各イベントの新しい状態を個別に定義するかを選択できます。\n\n各イベントに対して
+        3つの状態変更が利用可能です：有効にする、無効にする、または現在の値からトグルする——有効なイベントは無効になり、
+        無効なイベントは有効になります。</string>
+    <string name="tutorial_slideshow_toggle_event_action_step_3_text">シナリオ内のすべてのイベントが同時に無効になった
+        場合、実行するものが何もなくなるため、シナリオは自動的に停止します。\n\nこれを意図的に利用することで、目標達成後に
+        シナリオをクリーンに終了させることができます：すべてのイベントを無効にする最後のイベント状態変更アクションがシナリオ
+        を停止させます。</string>
+
+    <!-- Intent Action slideshow -->
+    <string name="tutorial_slideshow_intent_action_title">Intent アクション</string>
+    <string name="tutorial_slideshow_intent_action_desc">他のアプリケーションと通信する方法を学ぶ</string>
+    <string name="tutorial_slideshow_intent_action_step_1_text">Intent は Android でアプリが互いに通信する方法です。
+        Intent アクションを使うと、シナリオから直接このシステムを活用できます。\n\n使いやすくするための定義済みテンプレートが
+        用意されています。最も一般的なのは「アプリを起動」で、ランチャーからアイコンをタップしたときと全く同じように、デバイス
+        上の別のアプリを起動します。</string>
+    <string name="tutorial_slideshow_intent_action_step_2_text">「詳細設定」タブでは、生の Intent を手動で定義し、
+        アクション、カテゴリ、データ、extras を完全に制御できます。これは一般ユーザーには推奨されません——Intent の仕組みを
+        すでに知っている Android 開発者向けです。\n\n将来のアップデートでは、詳細設定に頼らずに一般的なユースケースを簡単に
+        設定できるよう、すぐに使えるテンプレートが追加される予定です。</string>
+
+
+    <!-- Event priority slideshow -->
+    <string name="tutorial_slideshow_events_priority_title">イベントの優先順位</string>
+    <string name="tutorial_slideshow_events_priority_desc">リスト内のイベントの順序が実行されるイベントに与える影響を学びます</string>
+    <string name="tutorial_slideshow_events_priority_step_1_text">画面からキャプチャされた各フレームは、イベントを<b>上から下に1つずつ</b>確認することで処理されます。\n\nイベントリスト内のイベントの位置が、そのイベントが実行される機会を得るタイミングを決定します。デフォルトでは、イベントの条件が満たされてアクションが実行されると、<b>そのフレームは処理済みとみなされます</b>。そのフレームの処理は停止し、次のフレームはリストの最初のイベントから再開します。\n\nつまり、デフォルトでは1フレームにつき1つのイベントしか実行できません。</string>
+    <string name="tutorial_slideshow_events_priority_step_2_text">この動作は、イベント設定の<b>実行を続ける</b>フィールドで変更できます。有効にすると、そのイベントが実行された後、処理が停止する代わりに<b>リストの次のイベントへ続きます</b>。\n\nこれにより、同じフレームで複数のイベントを実行できます。\n\n<b>例：</b>リストにイベントAの次にイベントBが含まれているとします。イベントAが継続して検出され、<b>実行を続ける</b>が有効でない場合、イベントAは毎フレーム実行され、イベントBは一度も実行される機会がありません。\n\nイベントAで<b>実行を続ける</b>を有効にすると、両方のイベントが毎フレーム確認されます。\n\nこの概念を練習するためのインタラクティブなチュートリアルも利用できます。</string>
+
+
+    <!-- Events reloading slideshow -->
+    <string name="tutorial_slideshow_events_reloading_title">イベントのリロード</string>
+    <string name="tutorial_slideshow_events_reloading_desc">シナリオ内でのイベントのリロードの動作について学ぶ</string>
+    <string name="tutorial_slideshow_events_reloading_step_1_text">イベントリロードパラメーターを使用すると、条件が
+        満たされた後、一定時間イベントをスキップできます。 \n\nリロード状態のイベントはまだ有効と見なされます：リロードと
+        イベントの状態は独立しています。 \n\nリロード中にイベントが無効化された場合、リロードタイマーはクリアされるため、
+        イベントが再度有効化されたときにクールダウンは適用されません。</string>
+
+
+    <!-- Counters value usages slideshow -->
+    <string name="tutorial_slideshow_counters_value_usages_title">カウンター値の使い方</string>
+    <string name="tutorial_slideshow_counters_value_usages_desc">シナリオでカウンターの値を表示・使用するさまざまな方法を学びましょう</string>
+
+    <string name="tutorial_slideshow_counters_value_usages_step_1_text">通知アクションの中に、カウンターの現在値を表示できます。これはシナリオの実行中に進行状況を確認したり、終了時にまとめを表示したりするのに便利です。\n\nカウンターを挿入するには、アクション設定の「カウンターを追加」ボタンを押してください。これにより、テキストに <b>{counterName}</b> のようなプレースホルダーが追加されます。実行時には、このプレースホルダーがカウンターの実際の値に置き換えられます。例えば、<i>score</i> という名前のカウンターの値が42の場合、「現在のスコア: {score}」は「現在のスコア: 42」になります。</string>
+
+    <string name="tutorial_slideshow_counters_value_usages_step_2_text">テキスト書き込みアクションにもカウンターの値を挿入できます。これにより、アクションが実行された時点の現在値がテキストに含まれます。\n\nプレースホルダーの使い方は通知アクションと同じです。「カウンターを追加」ボタンを押すか、<b>{counterName}</b> を直接入力してください。例えば、<i>score</i> という名前のカウンターの値が42の場合、「私のスコアは {score} です」は「私のスコアは 42 です」になります。</string>
+
+    <string name="tutorial_slideshow_counters_value_usages_step_3_text">カウンターの値はデバッグレポートに記録されます。シナリオで予期しない動作が発生した場合は、デバッグレポートを取得することで、カウンターがどのように変化したかを正確に確認でき、問題の原因を見つけやすくなります。</string>
 
 </resources>

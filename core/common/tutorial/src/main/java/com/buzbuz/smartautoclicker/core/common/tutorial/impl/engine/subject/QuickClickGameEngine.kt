@@ -21,8 +21,8 @@ import android.util.Log
 import com.buzbuz.smartautoclicker.core.base.di.Dispatcher
 import com.buzbuz.smartautoclicker.core.base.di.HiltCoroutineDispatchers.IO
 import com.buzbuz.smartautoclicker.core.common.tutorial.domain.TutorialSubjectController
-import com.buzbuz.smartautoclicker.core.common.tutorial.domain.model.data.subject.TutorialSubject
-import com.buzbuz.smartautoclicker.core.common.tutorial.domain.model.data.subject.quickclickgame.QuickClickGameTargetType
+import com.buzbuz.smartautoclicker.core.common.tutorial.domain.model.tutorial.subject.TutorialSubject
+import com.buzbuz.smartautoclicker.core.common.tutorial.domain.model.tutorial.subject.quickclickgame.QuickClickGameTargetType
 import com.buzbuz.smartautoclicker.core.common.tutorial.domain.model.state.TutorialSubjectState
 
 import kotlinx.coroutines.CoroutineDispatcher
@@ -45,7 +45,7 @@ internal class QuickClickGameEngine (
     private val coroutineScopeIo: CoroutineScope = CoroutineScope(SupervisorJob() + ioDispatcher)
 
     private var gameJob: Job? = null
-    private var onGameCompleted: ((isWon: Boolean) -> Unit)? = null
+    private var onGameCompleted: ((isWon: Boolean) -> Boolean)? = null
 
 
     private val _state: MutableStateFlow<TutorialSubjectState.QuickClickGame> = MutableStateFlow(defaultState())
@@ -94,8 +94,9 @@ internal class QuickClickGameEngine (
                     targets = emptyMap()
                 )
             }
-            onGameCompleted?.invoke(isWon)
-            onGameCompleted = null
+
+            val consumed = onGameCompleted?.invoke(isWon) ?: true
+            if (consumed) onGameCompleted = null
             gameJob = null
         }
     }
@@ -103,6 +104,7 @@ internal class QuickClickGameEngine (
     override fun stop() {
         Log.d(TAG, "Stop game")
 
+        onGameCompleted = null
         gameJob?.cancel()
         gameJob = null
 
@@ -119,7 +121,7 @@ internal class QuickClickGameEngine (
         }
     }
 
-    fun monitorNextCompletion(listener: ((isWon: Boolean) -> Unit)?) {
+    fun monitorNextCompletion(listener: ((isWon: Boolean) -> Boolean)?) {
         onGameCompleted = listener
     }
 

@@ -24,9 +24,11 @@ import android.view.ViewGroup
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.buzbuz.smartautoclicker.core.common.navigation.getTutorialNavigator
 
 import com.buzbuz.smartautoclicker.core.common.overlays.base.viewModels
 import com.buzbuz.smartautoclicker.core.common.overlays.dialog.OverlayDialog
+import com.buzbuz.smartautoclicker.core.common.tutorial.domain.model.Tip
 import com.buzbuz.smartautoclicker.core.domain.model.counter.CounterOperationValue
 import com.buzbuz.smartautoclicker.core.ui.bindings.dialogs.DialogNavigationButton
 import com.buzbuz.smartautoclicker.core.ui.bindings.dialogs.setButtonEnabledState
@@ -51,8 +53,8 @@ import com.buzbuz.smartautoclicker.core.ui.bindings.dropdown.setItems
 import com.buzbuz.smartautoclicker.core.ui.bindings.dropdown.setSelectedItem
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.dialogs.showCloseWithoutSavingDialog
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.dialogs.showDeleteConditionsWithAssociatedActionsDialog
-import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.model.condition.allNumberFormatDropdownItems
-import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.model.counter.allCounterComparisonOperatorDropdownItems
+import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.uistate.condition.allNumberFormatDropdownItems
+import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.uistate.counter.allCounterComparisonOperatorDropdownItems
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.condition.OnConditionConfigCompleteListener
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.condition.screen.areaselector.ConditionAreaSelectorMenu
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.condition.screen.image.MAX_THRESHOLD
@@ -241,6 +243,7 @@ class NumberConditionDialog(
         overlayManager.navigateTo(
             context = context,
             newOverlay = ConditionAreaSelectorMenu(
+                onHelpClicked = { context.getTutorialNavigator().showTipDialog(context, Tip.NUMBER_DETECTION_AREA) },
                 onAreaSelected = viewModel::setDetectionArea,
             ),
             hideCurrent = true,

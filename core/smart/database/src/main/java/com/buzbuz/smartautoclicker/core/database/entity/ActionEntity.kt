@@ -16,6 +16,7 @@
  */
 package com.buzbuz.smartautoclicker.core.database.entity
 
+import android.annotation.SuppressLint
 import androidx.room.*
 
 import com.buzbuz.smartautoclicker.core.base.interfaces.EntityWithId
@@ -39,26 +40,6 @@ import kotlinx.serialization.Serializable
  * @param name the name of this action
  * @param type type of this action. Must be the this representation of the [ActionType] enum.
  *
- * @param clickPositionType [ActionType.CLICK] only: indicates how the click position is interpreted. If USER_SELECTED,
- *  [x] and [y] will be used. If ON_DETECTED_CONDITION, the [clickOnConditionId] will be used.
- * @param x [ActionType.CLICK] only: the x position of the click. Null for others [ActionType].
- * @param y [ActionType.CLICK] only: the y position of the click. Null for others [ActionType].
- * @param clickOnConditionId [ActionType.CLICK] only: if defined, the condition to click on. If null, the x and y
- *  coordinates will be used.
- * @param pressDuration [ActionType.CLICK] only: the duration of the click press in milliseconds.
- *  Null for others [ActionType].
- * @param clickOffsetX [ActionType.CLICK] & [ClickPositionType.ON_DETECTED_CONDITION] only: the offset to apply in the X
- *  axis when clicking on a condition. Null for others [ActionType].
- * @param clickOffsetY [ActionType.CLICK] & [ClickPositionType.ON_DETECTED_CONDITION] only: the offset to apply in the Y
- *  axis when clicking on a condition.
- *
- * @param fromX [ActionType.SWIPE] only: the swipe start x coordinates. Null for others [ActionType].
- * @param fromY [ActionType.SWIPE] only: the swipe start y coordinates. Null for others [ActionType].
- * @param toX [ActionType.SWIPE] only: the swipe end x coordinates. Null for others [ActionType].
- * @param toY [ActionType.SWIPE] only: the swipe end y coordinates. Null for others [ActionType].
- * @param swipeDuration [ActionType.SWIPE] only: the delay between the swipe start and end in milliseconds.
- *  Null for others [ActionType].
- *
  * @param pauseDuration [ActionType.PAUSE] only: the duration of the pause in milliseconds.
  *
  * @param isAdvanced [ActionType.INTENT] only: true if the user have picked advanced intent config, false if simple.
@@ -80,6 +61,11 @@ import kotlinx.serialization.Serializable
  * for the operation on this counter. Null for others [ActionType].
  * @param counterOperationCounterName [ActionType.CHANGE_COUNTER] & [CounterOperationValueType.COUNTER] only: the name
  * of the counter containing the value for the operation on this counter. Null for others [ActionType].
+ * @param counterOperationConditionId [ActionType.CHANGE_COUNTER] & [CounterOperationValueType.CONDITION] only: the
+ * identifier of the screen condition, in the same event, whose detected position is used for the operation on this
+ * counter. Null for others [ActionType].
+ * @param counterOperationConditionPositionType [ActionType.CHANGE_COUNTER] & [CounterOperationValueType.CONDITION]
+ * only: the coordinate of the detected condition to use for the operation on this counter. Null for others [ActionType].
  *
  * @param notificationMessageText [ActionType.NOTIFICATION] only: used as notification message.
  * @param notificationImportance [ActionType.NOTIFICATION] only: how the notification will behave.
@@ -89,21 +75,16 @@ import kotlinx.serialization.Serializable
  * @param textValue [ActionType.TEXT] only: the text to type in the focused view
  * @param textValidateInput [ActionType.TEXT] only: the type of system action to execute.
  */
+@SuppressLint("UnsafeOptInUsageError")
 @Entity(
     tableName = ACTION_TABLE,
-    indices = [Index("eventId"), Index("clickOnConditionId")],
+    indices = [Index("eventId")],
     foreignKeys = [
         ForeignKey(
             entity = EventEntity::class,
             parentColumns = ["id"],
             childColumns = ["eventId"],
             onDelete = ForeignKey.CASCADE,
-        ),
-        ForeignKey(
-            entity = ConditionEntity::class,
-            parentColumns = ["id"],
-            childColumns = ["clickOnConditionId"],
-            onDelete = ForeignKey.SET_NULL,
         ),
     ]
 )
@@ -115,27 +96,13 @@ data class ActionEntity(
     @ColumnInfo(name = "name") val name: String,
     @ColumnInfo(name = "type") val type: ActionType,
 
-    // ActionType.CLICK
-    @ColumnInfo(name = "clickPositionType") val clickPositionType: ClickPositionType? = null,
-    @ColumnInfo(name = "x") val x: Int? = null,
-    @ColumnInfo(name = "y") val y: Int? = null,
-    @ColumnInfo(name = "clickOnConditionId") var clickOnConditionId: Long? = null,
-    @ColumnInfo(name = "pressDuration") val pressDuration: Long? = null,
-    @ColumnInfo(name = "clickOffsetX") val clickOffsetX: Int? = null,
-    @ColumnInfo(name = "clickOffsetY") val clickOffsetY: Int? = null,
-
     // ActionType.AREA_CLICK
+    @ColumnInfo(name = "pressDuration") val pressDuration: Long? = null,
     @ColumnInfo(name = "areaClickCount") val areaClickCount: Int? = null,
     @ColumnInfo(name = "areaClickInterval") val areaClickInterval: Long? = null,
     @ColumnInfo(name = "areaClickDistribution") val areaClickDistribution: AreaClickDistributionEntity? = null,
     @ColumnInfo(name = "areaClickVertices") val areaClickVertices: String? = null,
 
-    // ActionType.SWIPE
-    @ColumnInfo(name = "fromX") val fromX: Int? = null,
-    @ColumnInfo(name = "fromY") val fromY: Int? = null,
-    @ColumnInfo(name = "toX") val toX: Int? = null,
-    @ColumnInfo(name = "toY") val toY: Int? = null,
-    @ColumnInfo(name = "swipeDuration") val swipeDuration: Long? = null,
 
     // ActionType.ZOOM
     @ColumnInfo(name = "zoom_direction") val zoomDirection: String? = null,
@@ -164,6 +131,8 @@ data class ActionEntity(
     @ColumnInfo(name = "counter_operation_value_type") val counterOperationValueType: CounterOperationValueType? = null,
     @ColumnInfo(name = "counter_operation_value") val counterOperationValue: Double? = null,
     @ColumnInfo(name = "counter_operation_counter_name") val counterOperationCounterName: String? = null,
+    @ColumnInfo(name = "counter_operation_condition_id") var counterOperationConditionId: Long? = null,
+    @ColumnInfo(name = "counter_operation_condition_position_type") val counterOperationConditionPositionType: CounterOperationConditionPositionType? = null,
 
     // ActionType.NOTIFICATION
     @ColumnInfo(name = "notification_message_text") val notificationMessageText: String? = null,
@@ -178,14 +147,19 @@ data class ActionEntity(
 ) : EntityWithId
 
 /**
- * Entity embedding an intent action and its extras.
- *
- * Automatically do the junction between action_table and intent_extra_table, and provide this
- * representation of the one to many relations between scenario to actions and conditions entities.
+ * Entity embedding an action and its relations.
+ * Depending on the [ActionEntity.type], the relevant list will be filled.
  */
+@SuppressLint("UnsafeOptInUsageError")
 @Serializable
 data class CompleteActionEntity(
     @Embedded val action: ActionEntity,
+    @Relation(
+        parentColumn = "id",
+        entityColumn = "action_id",
+        entity = GestureFingerEntity::class
+    )
+    val gestureFingers: List<GestureFingerWithMotions>,
     @Relation(
         parentColumn = "id",
         entityColumn = "action_id"
