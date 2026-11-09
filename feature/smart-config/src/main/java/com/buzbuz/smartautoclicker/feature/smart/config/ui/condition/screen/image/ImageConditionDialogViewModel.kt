@@ -299,6 +299,3 @@ data class PendingReferenceSave(
     val bitmap: Bitmap,
     val replacementIndex: Int?,
 )
-
-/** The maximum threshold value selectable by the user. */
-const val MAX_THRESHOLD = 20f

@@ -19,6 +19,7 @@ package com.buzbuz.smartautoclicker.core.database.serialization.compat
 import android.util.Log
 import androidx.annotation.VisibleForTesting
 
+import com.buzbuz.smartautoclicker.core.base.config.ScreenConditionThreshold
 import com.buzbuz.smartautoclicker.core.base.extensions.getBoolean
 import com.buzbuz.smartautoclicker.core.base.extensions.getDouble
 import com.buzbuz.smartautoclicker.core.base.extensions.getEnum
@@ -95,9 +96,9 @@ internal open class CompatDeserializer(
         const val DETECTION_TYPE_DEFAULT_VALUE = DETECTION_TYPE_LOWER_BOUND
 
         /** Condition threshold lower bound on compat deserialization. */
-        const val CONDITION_THRESHOLD_LOWER_BOUND = 0
+        const val CONDITION_THRESHOLD_LOWER_BOUND = ScreenConditionThreshold.MIN
         /** Condition threshold upper bound on compat deserialization. */
-        const val CONDITION_THRESHOLD_UPPER_BOUND = 20
+        const val CONDITION_THRESHOLD_UPPER_BOUND = ScreenConditionThreshold.MAX
         /** Condition threshold default value on compat deserialization. */
         const val CONDITION_THRESHOLD_DEFAULT_VALUE = 4
 

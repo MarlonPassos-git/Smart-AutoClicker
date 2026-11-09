@@ -35,6 +35,7 @@ import com.buzbuz.smartautoclicker.feature.smart.debugging.databinding.OverlayTr
 import com.buzbuz.smartautoclicker.feature.smart.debugging.di.DebuggingViewModelsEntryPoint
 import com.buzbuz.smartautoclicker.feature.smart.debugging.ui.dialog.live.uistate.ScreenConditionResultUiState
 import com.buzbuz.smartautoclicker.feature.smart.debugging.ui.view.DebugOverlayView
+import com.buzbuz.smartautoclicker.core.ui.bindings.fields.setScreenConditionThreshold
 import com.google.android.material.slider.Slider
 
 import kotlinx.coroutines.launch
@@ -57,9 +58,7 @@ class TryImageConditionOverlayMenu(
     override fun onCreateMenu(layoutInflater: LayoutInflater): ViewGroup {
         viewBinding = OverlayTryImageConditionMenuBinding.inflate(LayoutInflater.from(context)).apply {
             sliderThreshold.apply {
-                valueFrom = MIN_THRESHOLD
-                valueTo = MAX_THRESHOLD
-                value = imageCondition.threshold.toFloat()
+                setScreenConditionThreshold(imageCondition.threshold)
 
                 addOnChangeListener(Slider.OnChangeListener { _, sliderValue, fromUser ->
                     if (fromUser) viewModel.setThreshold(sliderValue.toInt())

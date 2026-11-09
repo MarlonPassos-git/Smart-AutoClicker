@@ -24,6 +24,7 @@ import android.view.ViewGroup
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.buzbuz.smartautoclicker.core.base.config.ScreenConditionThreshold
 import com.buzbuz.smartautoclicker.core.common.navigation.getTutorialNavigator
 
 import com.buzbuz.smartautoclicker.core.common.overlays.base.viewModels
@@ -39,7 +40,7 @@ import com.buzbuz.smartautoclicker.core.ui.bindings.fields.setOnClickListener
 import com.buzbuz.smartautoclicker.core.ui.bindings.fields.setOnTextChangedListener
 import com.buzbuz.smartautoclicker.core.ui.bindings.fields.setOnValueChangedFromUserListener
 import com.buzbuz.smartautoclicker.core.ui.bindings.fields.setSliderRange
-import com.buzbuz.smartautoclicker.core.ui.bindings.fields.setSliderValue
+import com.buzbuz.smartautoclicker.core.ui.bindings.fields.setScreenConditionThreshold
 import com.buzbuz.smartautoclicker.core.ui.bindings.fields.setText
 import com.buzbuz.smartautoclicker.core.ui.bindings.fields.setTitle
 import com.buzbuz.smartautoclicker.core.ui.bindings.fields.setValueLabelState
@@ -52,7 +53,6 @@ import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.dialogs.showCl
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.common.dialogs.showDeleteConditionsWithAssociatedActionsDialog
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.condition.OnConditionConfigCompleteListener
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.condition.screen.areaselector.ConditionAreaSelectorMenu
-import com.buzbuz.smartautoclicker.feature.smart.config.ui.condition.screen.image.MAX_THRESHOLD
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.condition.screen.text.alphabet.AlphabetActivity
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.condition.screen.text.alphabet.selection.AlphabetSelectionFragment
 
@@ -133,7 +133,7 @@ class TextConditionDialog(
             fieldSliderThreshold.apply {
                 setTitle(context.getString(R.string.generic_condition_threshold_title))
                 setValueLabelState(isEnabled = true, prefix = "%")
-                setSliderRange(0f, MAX_THRESHOLD)
+                setSliderRange(ScreenConditionThreshold.MIN.toFloat(), ScreenConditionThreshold.MAX.toFloat())
                 setOnValueChangedFromUserListener { value -> viewModel.setThreshold(value.roundToInt()) }
             }
         }
@@ -196,7 +196,7 @@ class TextConditionDialog(
             fieldSelectArea.setError(uiState.detectionAreaError)
             fieldShouldAppear.setChecked(uiState.shouldBeDetectedChecked)
             fieldShouldAppear.setDescription(if (uiState.shouldBeDetectedChecked) 1 else 0)
-            fieldSliderThreshold.setSliderValue(uiState.detectionThreshold.toFloat())
+            fieldSliderThreshold.slider.setScreenConditionThreshold(uiState.detectionThreshold)
         }
     }
 

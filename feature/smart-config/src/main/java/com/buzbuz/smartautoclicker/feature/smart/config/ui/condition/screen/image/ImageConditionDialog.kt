@@ -28,6 +28,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.ItemTouchHelper
+import com.buzbuz.smartautoclicker.core.base.config.ScreenConditionThreshold
 import com.buzbuz.smartautoclicker.core.common.navigation.getTutorialNavigator
 
 import com.buzbuz.smartautoclicker.core.common.overlays.base.viewModels
@@ -51,7 +52,7 @@ import com.buzbuz.smartautoclicker.core.ui.bindings.fields.setOnClickListener
 import com.buzbuz.smartautoclicker.core.ui.bindings.fields.setOnTextChangedListener
 import com.buzbuz.smartautoclicker.core.ui.bindings.fields.setOnValueChangedFromUserListener
 import com.buzbuz.smartautoclicker.core.ui.bindings.fields.setSliderRange
-import com.buzbuz.smartautoclicker.core.ui.bindings.fields.setSliderValue
+import com.buzbuz.smartautoclicker.core.ui.bindings.fields.setScreenConditionThreshold
 import com.buzbuz.smartautoclicker.core.ui.bindings.fields.setText
 import com.buzbuz.smartautoclicker.core.ui.bindings.fields.setTitle
 import com.buzbuz.smartautoclicker.core.ui.bindings.fields.setValueLabelState
@@ -171,7 +172,7 @@ class ImageConditionDialog(
     private fun configureThresholdField() = viewBinding.fieldSliderThreshold.apply {
         setTitle(context.getString(R.string.generic_condition_threshold_title))
         setValueLabelState(isEnabled = true, prefix = "%")
-        setSliderRange(0f, MAX_THRESHOLD)
+        setSliderRange(ScreenConditionThreshold.MIN.toFloat(), ScreenConditionThreshold.MAX.toFloat())
         setOnValueChangedFromUserListener { value -> viewModel.setThreshold(value.roundToInt()) }
     }
 
@@ -275,7 +276,7 @@ class ImageConditionDialog(
     }
 
     private fun updateThreshold(newThreshold: Int) {
-        viewBinding.fieldSliderThreshold.setSliderValue(newThreshold.toFloat())
+        viewBinding.fieldSliderThreshold.slider.setScreenConditionThreshold(newThreshold)
     }
 
     private fun updateSaveButton(isValidCondition: Boolean) {

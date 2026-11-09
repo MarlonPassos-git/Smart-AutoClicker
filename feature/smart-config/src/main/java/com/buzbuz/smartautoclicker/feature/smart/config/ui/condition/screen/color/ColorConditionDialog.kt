@@ -27,6 +27,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 
+import com.buzbuz.smartautoclicker.core.base.config.ScreenConditionThreshold
 import com.buzbuz.smartautoclicker.core.common.overlays.base.viewModels
 import com.buzbuz.smartautoclicker.core.common.overlays.dialog.OverlayDialog
 import com.buzbuz.smartautoclicker.core.ui.bindings.dialogs.DialogNavigationButton
@@ -39,7 +40,7 @@ import com.buzbuz.smartautoclicker.core.ui.bindings.fields.setOnClickListener
 import com.buzbuz.smartautoclicker.core.ui.bindings.fields.setOnTextChangedListener
 import com.buzbuz.smartautoclicker.core.ui.bindings.fields.setOnValueChangedFromUserListener
 import com.buzbuz.smartautoclicker.core.ui.bindings.fields.setSliderRange
-import com.buzbuz.smartautoclicker.core.ui.bindings.fields.setSliderValue
+import com.buzbuz.smartautoclicker.core.ui.bindings.fields.setScreenConditionThreshold
 import com.buzbuz.smartautoclicker.core.ui.bindings.fields.setText
 import com.buzbuz.smartautoclicker.core.ui.bindings.fields.setTitle
 import com.buzbuz.smartautoclicker.core.ui.bindings.fields.setValueLabelState
@@ -54,7 +55,6 @@ import com.buzbuz.smartautoclicker.feature.smart.config.ui.condition.screen.colo
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.condition.screen.color.extensions.rgbToColorInt
 import com.buzbuz.smartautoclicker.feature.smart.config.ui.condition.screen.color.extensions.setGradientBackground
 import com.buzbuz.smartautoclicker.core.ui.utils.updateColorIndicatorDrawableColor
-import com.buzbuz.smartautoclicker.feature.smart.config.ui.condition.screen.image.MAX_THRESHOLD
 
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.slider.Slider
@@ -125,7 +125,7 @@ class ColorConditionDialog(
             fieldSliderThreshold.apply {
                 setTitle(context.getString(R.string.generic_condition_threshold_title))
                 setValueLabelState(isEnabled = true, prefix = "%")
-                setSliderRange(0f, MAX_THRESHOLD)
+                setSliderRange(ScreenConditionThreshold.MIN.toFloat(), ScreenConditionThreshold.MAX.toFloat())
                 setOnValueChangedFromUserListener { value -> viewModel.setThreshold(value.roundToInt()) }
             }
         }
@@ -214,7 +214,7 @@ class ColorConditionDialog(
             fieldShouldAppear.setChecked(uiState.shouldBeDetectedChecked)
             fieldShouldAppear.setDescription(if (uiState.shouldBeDetectedChecked) 1 else 0)
 
-            fieldSliderThreshold.setSliderValue(uiState.detectionThreshold.toFloat())
+            fieldSliderThreshold.slider.setScreenConditionThreshold(uiState.detectionThreshold)
         }
     }
 
