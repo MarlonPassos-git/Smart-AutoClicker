@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.buzbuz.androidLibrary)
     alias(libs.plugins.buzbuz.androidUnitTest)
@@ -23,8 +25,22 @@ plugins {
     alias(libs.plugins.buzbuz.hilt)
 }
 
+val detectionRules = Properties().apply {
+    rootProject.file("config/detection.properties").inputStream().use { load(it) }
+}
+val thresholdMin = detectionRules.getProperty("screenConditionThresholdMin").toInt()
+val thresholdMax = detectionRules.getProperty("screenConditionThresholdMax").toInt()
+require(thresholdMin >= 0 && thresholdMin < thresholdMax && thresholdMax <= 100) {
+    "screenConditionThresholdMin/Max=$thresholdMin/$thresholdMax; expected 0 <= min < max <= 100"
+}
+
 android {
     namespace = "com.buzbuz.smartautoclicker.core.extensions"
+    buildFeatures.buildConfig = true
+    defaultConfig {
+        buildConfigField("int", "SCREEN_CONDITION_THRESHOLD_MIN", thresholdMin.toString())
+        buildConfigField("int", "SCREEN_CONDITION_THRESHOLD_MAX", thresholdMax.toString())
+    }
 }
 
 dependencies {
