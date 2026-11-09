@@ -43,7 +43,7 @@ class CompatDeserializerTests {
 
     private val deserializer = object : CompatDeserializer() {}
 
-    private fun createJsonImageCondition(detectionType: Int): JsonObject = JsonObject(
+    private fun createJsonImageCondition(detectionType: Int, threshold: Int = 4): JsonObject = JsonObject(
         mapOf(
             "id" to JsonPrimitive(1L),
             "eventId" to JsonPrimitive(1L),
@@ -57,9 +57,20 @@ class CompatDeserializerTests {
             "areaBottom" to JsonPrimitive(100),
             "shouldBeDetected" to JsonPrimitive(true),
             "detectionType" to JsonPrimitive(detectionType),
-            "threshold" to JsonPrimitive(4),
+            "threshold" to JsonPrimitive(threshold),
         )
     )
+
+    @Test
+    fun deserializeConditionImageDetected_threshold_extendedRange_isPreserved() {
+        for (threshold in listOf(25, 30)) {
+            val result = deserializer.deserializeConditionImageDetected(
+                createJsonImageCondition(detectionType = 1, threshold = threshold),
+            )
+            assertNotNull(result)
+            assertEquals(threshold, result!!.threshold)
+        }
+    }
 
     @Test
     fun deserializeConditionImageDetected_detectionType_exactMatch_isPreserved() {
@@ -157,6 +168,15 @@ class CompatDeserializerTests {
     }
 
     @Test
+    fun deserializeConditionNumberDetected_threshold_extendedRange_isPreserved() {
+        for (threshold in listOf(25, 30)) {
+            val result = deserializer.deserializeConditionNumberDetected(createJsonNumberCondition(threshold))
+            assertNotNull(result)
+            assertEquals(threshold, result!!.threshold)
+        }
+    }
+
+    @Test
     fun deserializeConditionNumberDetected_threshold_belowLowerBound_isClamped() {
         // threshold = -1, below CONDITION_THRESHOLD_LOWER_BOUND = 0
         val json = createJsonNumberCondition(threshold = -1)
@@ -169,13 +189,13 @@ class CompatDeserializerTests {
 
     @Test
     fun deserializeConditionNumberDetected_threshold_aboveUpperBound_isClamped() {
-        // threshold = 99, above CONDITION_THRESHOLD_UPPER_BOUND = 20
+        // threshold = 99, above CONDITION_THRESHOLD_UPPER_BOUND = 30
         val json = createJsonNumberCondition(threshold = 99)
 
         val result = deserializer.deserializeConditionNumberDetected(json)
 
         assertNotNull(result)
-        assertEquals(20, result!!.threshold)
+        assertEquals(30, result!!.threshold)
     }
 
     @Test
