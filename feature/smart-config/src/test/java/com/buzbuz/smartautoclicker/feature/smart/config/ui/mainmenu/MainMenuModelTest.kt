@@ -29,6 +29,7 @@ import com.buzbuz.smartautoclicker.core.processing.domain.model.DetectionState
 import com.buzbuz.smartautoclicker.core.smart.debugging.domain.DebuggingRepository
 import com.buzbuz.smartautoclicker.feature.smart.config.domain.EditionRepository
 
+import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
@@ -145,6 +146,81 @@ class MainMenuModelTest {
 
         verify(exactly = 0) { mockRevenueNavigator.startPaywallActivity(any()) }
         coVerify(exactly = 1) { mockSmartProcessingRepository.startDetection(mockContext, false, false, null) }
+    }
+
+    @Test
+    fun questions_cancelDoesNotStartOrOverwriteConfirmedAnswers() {
+        val context = androidx.test.core.app.ApplicationProvider.getApplicationContext<Context>()
+        val counter = prepareQuestions(context)
+        RecentStartAnswers(context).write(7, listOf(counter), mapOf("target" to 75.0))
+
+        viewModel.toggleDetection(context)
+        org.junit.Assert.assertEquals(75.0, viewModel.startQuestions.value!!.initialAnswers.getValue("target"), 0.0)
+        viewModel.toggleDetection(context)
+        coVerify(exactly = 1) { mockSmartProcessingRepository.getStartCounters() }
+        viewModel.cancelStartQuestions()
+        coVerify(exactly = 0) { mockSmartProcessingRepository.startDetection(any(), any(), any(), any(), any()) }
+        org.junit.Assert.assertEquals(75.0, RecentStartAnswers(context).read(7, listOf(counter)).getValue("target"), 0.0)
+    }
+
+    @Test
+    fun questions_confirmStartsOnceAndPreservesDefaults() {
+        val context = androidx.test.core.app.ApplicationProvider.getApplicationContext<Context>()
+        val counter = prepareQuestions(context)
+        viewModel.toggleDetection(context)
+        viewModel.confirmStartQuestions(context, mapOf("target" to 90.0))
+        viewModel.confirmStartQuestions(context, mapOf("target" to 80.0))
+
+        coVerify(exactly = 1) { mockSmartProcessingRepository.startDetection(context, false, false, null, mapOf("target" to 90.0)) }
+        org.junit.Assert.assertEquals(50.0, counter.defaultValue, 0.0)
+        org.junit.Assert.assertEquals(90.0, RecentStartAnswers(context).read(7, listOf(counter)).getValue("target"), 0.0)
+    }
+
+    @Test
+    fun questions_invalidAnswerCannotStartOrPersistAndScenarioChangeCancels() {
+        val context = androidx.test.core.app.ApplicationProvider.getApplicationContext<Context>()
+        val counter = prepareQuestions(context)
+        viewModel.toggleDetection(context)
+        org.junit.Assert.assertThrows(IllegalArgumentException::class.java) {
+            viewModel.confirmStartQuestions(context, mapOf("target" to 101.0))
+        }
+        org.junit.Assert.assertNotNull(viewModel.startQuestions.value)
+        org.junit.Assert.assertEquals(50.0, RecentStartAnswers(context).read(7, listOf(counter)).getValue("target"), 0.0)
+        every { mockSmartProcessingRepository.scenarioId } returns MutableStateFlow(com.buzbuz.smartautoclicker.core.base.identifier.Identifier(databaseId = 8L))
+        viewModel.confirmStartQuestions(context, mapOf("target" to 90.0))
+        org.junit.Assert.assertNull(viewModel.startQuestions.value)
+        coVerify(exactly = 0) { mockSmartProcessingRepository.startDetection(any(), any(), any(), any(), any()) }
+    }
+
+    @Test
+    fun questions_scenarioChangeDuringCounterLoadingDoesNotOpenFormOrStart() {
+        val context = androidx.test.core.app.ApplicationProvider.getApplicationContext<Context>()
+        for (hasQuestions in listOf(true, false)) {
+            val counter = prepareQuestions(context)
+            val scenario = MutableStateFlow<com.buzbuz.smartautoclicker.core.base.identifier.Identifier?>(counter.scenarioId)
+            every { mockSmartProcessingRepository.scenarioId } returns scenario
+            coEvery { mockSmartProcessingRepository.getStartCounters() } coAnswers {
+                scenario.value = com.buzbuz.smartautoclicker.core.base.identifier.Identifier(databaseId = 8L)
+                if (hasQuestions) listOf(counter) else emptyList()
+            }
+
+            viewModel.toggleDetection(context)
+
+            org.junit.Assert.assertNull(viewModel.startQuestions.value)
+            coVerify(exactly = 0) { mockSmartProcessingRepository.startDetection(any(), any(), any(), any(), any()) }
+        }
+    }
+
+    private fun prepareQuestions(context: Context): com.buzbuz.smartautoclicker.core.domain.model.counter.Counter {
+        context.getSharedPreferences("scenario_start_answers", Context.MODE_PRIVATE).edit().clear().commit()
+        userBillingState.value = UserBillingState.PURCHASED
+        val counter = com.buzbuz.smartautoclicker.core.domain.model.counter.Counter(
+            "target", 50.0, com.buzbuz.smartautoclicker.core.base.identifier.Identifier(databaseId = 7L),
+            com.buzbuz.smartautoclicker.core.domain.model.counter.CounterStartQuestion("Meta", minimum = 1.0, maximum = 100.0),
+        )
+        every { mockSmartProcessingRepository.scenarioId } returns MutableStateFlow(counter.scenarioId)
+        coEvery { mockSmartProcessingRepository.getStartCounters() } returns listOf(counter)
+        return counter
     }
 
     /** MockK can't stub [IRevenueRepository.consumeTrial] because it returns a value class. */
