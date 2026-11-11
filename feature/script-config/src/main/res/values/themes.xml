@@ -1,0 +1,5 @@
+<resources>
+    <style name="ScriptCalibrationTheme" parent="AppTheme">
+        <item name="areaSelectorStyle">@style/AppTheme.Overlay.Selector.Area</item>
+    </style>
+</resources>

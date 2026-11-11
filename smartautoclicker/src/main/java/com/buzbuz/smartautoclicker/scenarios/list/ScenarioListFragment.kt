@@ -145,6 +145,8 @@ class ScenarioListFragment : Fragment() {
         val uiState = scenarioListViewModel.uiState.value ?: return false
 
         when (item.itemId) {
+            R.id.action_scripts -> startActivity(Intent(requireContext(),
+                com.buzbuz.smartautoclicker.feature.script.config.ScriptLibraryActivity::class.java))
             R.id.action_import_export -> {
                 if (uiState.type == ScenarioListUiState.Type.EXPORT) {
                     showBackupDialog(

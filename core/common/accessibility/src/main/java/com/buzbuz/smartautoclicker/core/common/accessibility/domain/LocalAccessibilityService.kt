@@ -24,6 +24,10 @@ interface LocalAccessibilityService {
 
     fun startDumbScenario(dumbScenario: DumbScenario)
     fun startSmartScenario(resultCode: Int, data: Intent, scenario: Scenario)
+    /** Starts an imported revision after projection consent, returning false while another mode owns resources. */
+    fun startScript(resultCode: Int, data: Intent, storageId: String, answersJson: String): Boolean
+    /** Opens an exclusive calibration session for a saved revision; does not execute its JavaScript. */
+    fun startScriptCalibration(resultCode: Int, data: Intent, storageId: String, name: String, image: Boolean): Boolean
     fun stopScenario()
     fun release()
 

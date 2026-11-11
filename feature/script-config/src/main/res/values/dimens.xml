@@ -1,0 +1,4 @@
+<resources>
+    <dimen name="script_overlay_compact_width">136dp</dimen>
+    <dimen name="script_overlay_expanded_width">248dp</dimen>
+</resources>

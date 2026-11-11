@@ -98,6 +98,9 @@ class DetectorEngine @Inject constructor(
     private var processingJob: Job? = null
     /** Coroutine job for the cleaning of the detection once stopped. */
     private var processingShutdownJob: Job? = null
+    /** Recording setup/shutdown are tracked so a mode switch can await native resource release. */
+    private var recordingStartJob: Job? = null
+    private var recordingStopJob: Job? = null
     /** Coroutine job for the debounced orientation change handler. */
     private var orientationChangeJob: Job? = null
 
@@ -156,10 +159,11 @@ class DetectorEngine @Inject constructor(
         Log.i(TAG, "startScreenRecord")
 
         processingScope = CoroutineScope(ioDispatcher.limitedParallelism(1))
+        recordingStopJob = null
 
         displayConfigManager.addOrientationListener(screenOrientationListener)
 
-        processingScope?.launch {
+        recordingStartJob = processingScope?.launch(start = CoroutineStart.LAZY) {
             displayRecorder.apply {
                 startProjection(resultCode, data) {
                     Log.w(TAG, "projection lost")
@@ -174,6 +178,7 @@ class DetectorEngine @Inject constructor(
                 else DetectorState.RECORDING
             )
         }
+        recordingStartJob?.start()
     }
 
     /**
@@ -357,28 +362,52 @@ class DetectorEngine @Inject constructor(
      * resources.
      */
     internal fun stopScreenRecord() {
-        if (_state.value == DetectorState.DETECTING) {
-            stopDetection()
-            stopRecording()
-        } else if (_state.value == DetectorState.RECORDING) {
-            stopRecording()
-        }
+        if (processingScope == null || recordingStopJob?.isActive == true) return
+        if (_state.value == DetectorState.DETECTING) stopDetection()
+        stopRecording()
+    }
+
+    /** Stops setup, detection and capture and waits until another mode may own the resources. */
+    internal suspend fun stopScreenRecordAndWait() {
+        stopScreenRecord()
+        recordingStopJob?.join()
+        check(_state.value == DetectorState.CREATED) { "Screen recording resources were not fully released: ${_state.value}" }
     }
 
     private fun stopRecording() {
+        val recordingScope = processingScope ?: return
         Log.i(TAG, "stopScreenRecord")
         _state.value = DetectorState.TRANSITIONING
 
-        processingScope?.launch {
+        recordingStopJob = recordingScope.launch(start = CoroutineStart.LAZY) {
+            recordingStartJob?.cancelAndJoin()
+            recordingStartJob = null
+            orientationChangeJob?.cancelAndJoin()
+            orientationChangeJob = null
             processingShutdownJob?.join()
+
+            // Initialization or a failed capture can leave resources without reaching DETECTING.
+            processingJob?.cancelAndJoin()
+            processingJob = null
+            if (imageDetector != null || scenarioProcessor != null) {
+                imageDetector?.close()
+                imageDetector = null
+                scenarioProcessor?.onScenarioEnd()
+                scenarioProcessor = null
+                debuggingListener.onSessionEnded()
+                scalingManager.stopScaling()
+                bitmapRepository.clearCache()
+                bitmapRepository.resetCacheSize()
+            }
 
             displayConfigManager.removeOrientationListener(screenOrientationListener)
             displayRecorder.stopProjection()
-            _state.emit(DetectorState.CREATED)
-
-            processingScope?.cancel()
             processingScope = null
+            _state.emit(DetectorState.CREATED)
+            // Capture the old scope: a CREATED observer may already start the next recording.
+            recordingScope.cancel()
         }
+        recordingStopJob?.start()
     }
 
     /** Process the latest images provided by the [DisplayRecorder]. */

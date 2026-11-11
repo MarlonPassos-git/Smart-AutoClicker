@@ -49,6 +49,11 @@ import com.buzbuz.smartautoclicker.core.smart.debugging.domain.DebuggingReposito
 import com.buzbuz.smartautoclicker.feature.qstile.domain.QSTileActionHandler
 import com.buzbuz.smartautoclicker.feature.qstile.domain.QSTileRepository
 import com.buzbuz.smartautoclicker.localservice.LocalService
+import com.buzbuz.smartautoclicker.localservice.SessionOwnership
+import com.buzbuz.smartautoclicker.localservice.ScriptServiceDriver
+import com.buzbuz.smartautoclicker.localservice.ScriptCalibrationDriver
+import com.buzbuz.smartautoclicker.core.display.recorder.DisplayRecorder
+import com.buzbuz.smartautoclicker.code.smart.detectionmodels.text.OCRModelsRepository
 
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.FileDescriptor
@@ -90,6 +95,9 @@ class SmartAutoClickerService : AccessibilityService() {
     @Inject lateinit var debuggingRepository: DebuggingRepository
     @Inject lateinit var tutorialRepository: TutorialRepository
     @Inject lateinit var activityLifecycleTracker: ActivityLifecycleTracker
+    @Inject lateinit var sessionOwnership: SessionOwnership
+    @Inject lateinit var scriptDisplayRecorder: DisplayRecorder
+    @Inject lateinit var scriptOcrModels: OCRModelsRepository
 
     override fun onServiceConnected() {
         super.onServiceConnected()
@@ -125,6 +133,9 @@ class SmartAutoClickerService : AccessibilityService() {
                 tutorialRepository = tutorialRepository,
                 onStart = ::onLocalServiceStarted,
                 onStop = ::onLocalServiceStopped,
+                ownership = sessionOwnership,
+                createScriptDriver = { ScriptServiceDriver(this, scriptDisplayRecorder, displayConfigManager, actionExecutor, scriptOcrModels, appComponentsProvider.originalAppId) },
+                createCalibrationDriver = { ScriptCalibrationDriver(this, scriptDisplayRecorder, displayConfigManager) },
             )
         )
     }
@@ -151,7 +162,7 @@ class SmartAutoClickerService : AccessibilityService() {
         requestFilterKeyEvents(true)
 
         displayConfigManager.startMonitoring(this)
-        tileRepository.setTileScenario(scenarioId = scenarioId, isSmart = isSmart)
+        if (scenarioId > 0) tileRepository.setTileScenario(scenarioId = scenarioId, isSmart = isSmart)
     }
 
     private fun onLocalServiceStopped() {
@@ -199,6 +210,11 @@ class SmartAutoClickerService : AccessibilityService() {
      */
     override fun dump(fd: FileDescriptor?, writer: PrintWriter?, args: Array<out String>?) {
         if (writer == null) return
+
+        if (args?.contains("--script-json") == true) {
+            (localServiceConnection.getLocalService() as? LocalService)?.writeScriptDiagnostics(writer)
+            return
+        }
 
         writer.append("* SmartAutoClickerService:").println()
         writer.append(Dumpable.DUMP_DISPLAY_TAB)

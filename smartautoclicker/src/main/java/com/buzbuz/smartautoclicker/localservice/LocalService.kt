@@ -21,6 +21,7 @@ import android.content.Context
 import android.content.Intent
 import android.media.projection.MediaProjectionManager
 import android.view.KeyEvent
+import java.io.PrintWriter
 
 import com.buzbuz.smartautoclicker.core.base.data.AppComponentsProvider
 import com.buzbuz.smartautoclicker.core.common.accessibility.domain.LocalAccessibilityService
@@ -42,6 +43,10 @@ import com.buzbuz.smartautoclicker.feature.notifications.ServiceNotificationCont
 import com.buzbuz.smartautoclicker.feature.notifications.ServiceNotificationListener
 
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
@@ -66,6 +71,9 @@ class LocalService(
     private val debuggingRepository: DebuggingRepository,
     private val onStart: (scenarioId: Long, isSmart: Boolean, foregroundNotification: Notification?) -> Unit,
     private val onStop: () -> Unit,
+    private val ownership: SessionOwnership,
+    private val createScriptDriver: (() -> ScriptServiceDriver)? = null,
+    private val createCalibrationDriver: (() -> ScriptCalibrationDriver)? = null,
 ) : LocalAccessibilityService {
 
     /** Scope for this LocalService. */
@@ -74,6 +82,12 @@ class LocalService(
     private var startJob: Job? = null
     /** Coroutine job for the paywall result upon start from notification. */
     private var paywallResultJob: Job? = null
+    private var stopping: Boolean = false
+    private var resourceLease: AutoCloseable? = null
+    private var scriptDriver: ScriptServiceDriver? = null
+    private var scriptStatusJob: Job? = null
+    private var calibrationDriver: ScriptCalibrationDriver? = null
+    private var shutdownJob: Job? = null
 
     /** Controls the notifications for the foreground service. */
     private val notificationController: ServiceNotificationController by lazy {
@@ -116,9 +130,8 @@ class LocalService(
     }
 
     override fun startDumbScenario(dumbScenario: DumbScenario) {
-        if (state.isStarted) return
-        state = LocalServiceState(isStarted = true, isSmartLoaded = false)
-        onStart(dumbScenario.id.databaseId, false, null)
+        if (!claimResources(isSmart = false)) return
+        notifyStart(dumbScenario.id.databaseId, false) { null }
 
         startJob = serviceScope.launch {
             delay(500.milliseconds)
@@ -147,19 +160,16 @@ class LocalService(
      * @param scenario the identifier of the scenario of clicks to be used for detection.
      */
     override fun startSmartScenario(resultCode: Int, data: Intent, scenario: Scenario) {
-        if (isStarted) return
-        state = LocalServiceState(isStarted = true, isSmartLoaded = true)
+        if (!claimResources(isSmart = true)) return
 
-        onStart(
-            scenario.id.databaseId,
-            true,
+        notifyStart(scenario.id.databaseId, true) {
             notificationController.createNotification(
                 context = context,
                 scenarioName = scenario.name,
                 isRunning = false,
                 isMenuVisible = true
             )
-        )
+        }
 
         startJob = serviceScope.launch {
             val mainMenu = MainMenu { stopScenario() }
@@ -182,24 +192,127 @@ class LocalService(
     }
 
     override fun stopScenario() {
-        if (!isStarted) return
-        state = LocalServiceState(isStarted = false, isSmartLoaded = false)
+        if (!isStarted || stopping) return
+        stopping = true
 
-        serviceScope.launch {
-            startJob?.join()
-            startJob = null
+        // Enter cleanup before release() can cancel the service scope during accessibility unbind.
+        shutdownJob = serviceScope.launch(start = CoroutineStart.UNDISPATCHED) {
+            withContext(NonCancellable) {
+                startJob?.join()
+                startJob = null
+                scriptDriver?.stopAndJoin()
+                scriptDriver = null
+                scriptStatusJob?.cancel()
+                scriptStatusJob = null
+                calibrationDriver?.close()
+                calibrationDriver = null
 
-            dumbEngine.release()
-            overlayManager.closeAll(context)
-            smartProcessingRepository.stopScreenRecord()
+                dumbEngine.release()
+                overlayManager.closeAll(context)
+                smartProcessingRepository.stopScreenRecordAndWait()
 
-            onStop()
-            notificationController.destroyNotification()
+                onStop()
+                notificationController.destroyNotification()
+                state = LocalServiceState(isStarted = false, isSmartLoaded = false)
+                stopping = false
+                resourceLease?.close()
+                resourceLease = null
+            }
         }
     }
 
     override fun release() {
         serviceScope.cancel()
+    }
+
+    /** Exports the current bounded history without changing collection, e.g. service dump with `--script-json`. */
+    internal fun writeScriptDiagnostics(writer: PrintWriter) {
+        val driver = scriptDriver ?: return
+        val retained = driver.diagnostics.jsonLines()
+        if (retained.isNotEmpty()) writer.println(retained)
+    }
+
+    override fun startScript(resultCode: Int, data: Intent, storageId: String, answersJson: String): Boolean {
+        val factory = createScriptDriver ?: return false
+        if (!claimResources(isSmart = true)) return false
+        try {
+            val driver = factory()
+            scriptDriver = driver
+            notifyStart(-1, true) {
+                notificationController.createNotification(context, "Script", isRunning = true, isMenuVisible = true)
+            }
+            startJob = serviceScope.launch {
+                overlayManager.navigateTo(context,
+                    com.buzbuz.smartautoclicker.feature.script.config.ScriptRunOverlay(driver) { stopScenario() })
+                driver.start(serviceScope, resultCode, data, storageId, answersJson)
+                scriptStatusJob = driver.status.onEach { status ->
+                    notificationController.updateNotification(context,
+                        status.state == com.buzbuz.smartautoclicker.core.script.runtime.session.ScriptSessionState.RUNNING,
+                        !overlayManager.isOverlayStackHidden())
+                }.launchIn(serviceScope)
+            }
+            return true
+        } catch (failure: Exception) {
+            stopScenario()
+            throw failure
+        }
+    }
+
+    override fun startScriptCalibration(resultCode: Int, data: Intent, storageId: String, name: String, image: Boolean): Boolean {
+        val factory = createCalibrationDriver ?: return false
+        if (!claimResources(isSmart = true)) return false
+        try {
+            val driver = factory()
+            calibrationDriver = driver
+            notifyStart(-1, true) {
+                notificationController.createNotification(context, "Calibração: $name", isRunning = false, isMenuVisible = true)
+            }
+            startJob = serviceScope.launch {
+                try {
+                    driver.start(serviceScope, resultCode, data) { stopScenario() }
+                    overlayManager.navigateTo(context,
+                        com.buzbuz.smartautoclicker.feature.script.config.ScriptCalibrationOverlay(name,
+                            saveSelection = { size, area ->
+                                val saved = driver.save(storageId, name, image, size, area)
+                                finishCalibration(saved)
+                            }, onCancelClicked = { finishCalibration(storageId) }))
+                } catch (cancelled: CancellationException) { throw cancelled }
+                catch (failure: Exception) {
+                    finishCalibration(storageId, failure.message ?: "Não foi possível iniciar a captura")
+                }
+            }
+            return true
+        } catch (failure: Exception) {
+            stopScenario()
+            throw failure
+        }
+    }
+
+    private fun finishCalibration(storageId: String, failure: String? = null) {
+        stopScenario()
+        serviceScope.launch {
+            shutdownJob?.join()
+            context.startActivity(Intent(context, com.buzbuz.smartautoclicker.feature.script.config.ScriptLibraryActivity::class.java)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK).putExtra("selected", storageId).putExtra("scriptError", failure))
+        }
+    }
+
+    private fun claimResources(isSmart: Boolean): Boolean {
+        if (isStarted) return false
+        resourceLease = ownership.tryAcquire() ?: return false
+        state = LocalServiceState(isStarted = true, isSmartLoaded = isSmart)
+        return true
+    }
+
+    private fun notifyStart(scenarioId: Long, isSmart: Boolean, notification: () -> Notification?) {
+        try {
+            onStart(scenarioId, isSmart, notification())
+        } catch (failure: Exception) {
+            state = LocalServiceState(isStarted = false, isSmartLoaded = false)
+            resourceLease?.close()
+            resourceLease = null
+            throw failure
+        }
     }
 
     internal fun onKeyEvent(event: KeyEvent?): Boolean {
@@ -208,6 +321,8 @@ class LocalService(
     }
 
     private fun play() {
+        if (stopping || calibrationDriver != null) return
+        scriptDriver?.let { it.resume(); return }
         serviceScope.launch {
             if (state.isSmartLoaded && !smartProcessingRepository.isRunning()) {
                 if (shouldStartPaywall()) startPaywall()
@@ -219,6 +334,8 @@ class LocalService(
     }
 
     private fun pause() {
+        if (stopping || calibrationDriver != null) return
+        scriptDriver?.let { it.pause(); return }
         serviceScope.launch {
             when {
                 dumbEngine.isRunning.value -> dumbEngine.stopDumbScenario()

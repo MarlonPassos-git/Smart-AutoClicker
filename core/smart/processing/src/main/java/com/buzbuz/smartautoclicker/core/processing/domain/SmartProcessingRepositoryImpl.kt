@@ -208,6 +208,12 @@ internal class SmartProcessingRepositoryImpl @Inject constructor(
         _scenarioId.value = null
     }
 
+    override suspend fun stopScreenRecordAndWait() {
+        projectionErrorHandler = null
+        detectorEngine.stopScreenRecordAndWait()
+        _scenarioId.value = null
+    }
+
     override suspend fun tryEvent(context: Context, scenario: Scenario, event: ScreenEvent) {
         val counters = scenarioRepository.getCounters(scenario.id.databaseId)
         val triedElement = ImageEventTry(scenario, counters, event)

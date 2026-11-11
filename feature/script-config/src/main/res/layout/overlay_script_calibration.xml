@@ -1,0 +1,22 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content" android:layout_height="wrap_content">
+    <androidx.cardview.widget.CardView android:id="@+id/menu_background"
+        style="@style/AppTheme.Overlay.FloatingMenu.CardView">
+        <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="vertical">
+            <TextView android:id="@+id/instructions" android:layout_width="240dp" android:layout_height="wrap_content"
+                android:minLines="4" android:maxLines="4" android:ellipsize="end"
+                android:padding="12dp" android:textColor="@android:color/white" android:background="#E6000000"
+                android:accessibilityLiveRegion="polite" />
+            <LinearLayout android:id="@+id/menu_items" style="@style/AppTheme.Overlay.FloatingMenu.LayoutButtons" android:orientation="horizontal">
+                <ImageButton android:id="@+id/btn_confirm" style="@style/AppTheme.Overlay.FloatingMenu.Buttons"
+                    android:src="@drawable/ic_capture" android:contentDescription="@string/script_capture" />
+                <ImageButton android:id="@+id/btn_cancel" style="@style/AppTheme.Overlay.FloatingMenu.Buttons"
+                    android:src="@drawable/ic_cancel" android:contentDescription="@string/script_cancel" />
+                <ImageButton android:id="@+id/btn_hide_overlay" style="@style/AppTheme.Overlay.FloatingMenu.Buttons"
+                    android:src="@drawable/ic_visible_on" android:contentDescription="@string/script_hide_selection" />
+                <ImageButton android:id="@+id/btn_move" style="@style/AppTheme.Overlay.FloatingMenu.Buttons"
+                    android:src="@drawable/ic_move" android:contentDescription="@string/script_move" />
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+</FrameLayout>

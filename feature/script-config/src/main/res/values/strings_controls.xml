@@ -1,0 +1,4 @@
+<resources>
+    <string name="script_controls_expand">Expandir controles</string>
+    <string name="script_controls_collapse">Recolher controles</string>
+</resources>

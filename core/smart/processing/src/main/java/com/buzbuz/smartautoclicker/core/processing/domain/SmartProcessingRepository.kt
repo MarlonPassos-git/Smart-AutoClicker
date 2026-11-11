@@ -110,6 +110,11 @@ interface SmartProcessingRepository : Dumpable {
      */
     fun stopScreenRecord()
 
+    /** Stops capture and waits for native cleanup before a mode switch.
+     * Example: `repository.stopScreenRecordAndWait()` before handing capture to a script.
+     */
+    suspend fun stopScreenRecordAndWait()
+
     /**
      * Creates a dedicated scenario containing only the [ScreenEvent] to be tested.
      *
