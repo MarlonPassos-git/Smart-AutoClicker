@@ -1,0 +1,14 @@
+{
+  "formatVersion": 1,
+  "apiVersion": 1,
+  "id": "generic-recovery",
+  "name": "Exemplo: espera e recuperação",
+  "scriptVersion": "1.0.0",
+  "entry": "entry.js",
+  "parameters": {
+    "cycles": { "type": "number", "label": "Máximo de ciclos", "default": 3, "min": 1, "max": 100 },
+    "execute": { "type": "boolean", "label": "Permitir cliques", "default": false },
+    "completion": { "type": "choice", "label": "Ao concluir", "default": "parar", "choices": ["parar", "aguardar novo ciclo"] }
+  },
+  "resources": {}
+}
