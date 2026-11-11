@@ -256,6 +256,27 @@ class OverlayMenuTests {
     }
 
     @Test
+    fun restoresASavedPositionOnTheLeftEdge() {
+        assertSavedPositionIsRestored(Point(0, 90))
+    }
+
+    @Test
+    fun restoresASavedPositionOnTheTopEdge() {
+        assertSavedPositionIsRestored(Point(90, 0))
+    }
+
+    private fun assertSavedPositionIsRestored(position: Point) {
+        overlayMenuController = OverlayMenuTestImpl(overlayMenuControllerImpl)
+        mockViewsFromImpl()
+        mockWhen(mockOverlayMenuPositionDataSource.loadMenuPosition(DEFAULT_DISPLAY_CONFIG.orientation)).thenReturn(position)
+        overlayMenuController.create(mockContext)
+        overlayMenuController.start()
+        val menu = captureWindowManagerAddedMenuView(mockWindowManager)
+        assertEquals(position.x, menu.params.x)
+        assertEquals(position.y, menu.params.y)
+    }
+
+    @Test
     fun setupViewClickListeners() {
         overlayMenuController = OverlayMenuTestImpl(overlayMenuControllerImpl)
         val menuItems = sequenceOf(
