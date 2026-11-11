@@ -19,6 +19,7 @@
 #ifndef KLICK_R_SCREEN_IMAGE_HPP
 #define KLICK_R_SCREEN_IMAGE_HPP
 
+#include <cstddef>
 #include "detection_image.hpp"
 
 namespace smartautoclicker {
@@ -27,6 +28,7 @@ namespace smartautoclicker {
 
     private:
         static cv::Mat cropMat(const cv::Mat& mat, const cv::Rect& roi);
+        mutable std::size_t hsvCroppedPixels = 0;
 
     public:
         void processNewData(std::unique_ptr<cv::Mat> newData, const char* metricsTag);

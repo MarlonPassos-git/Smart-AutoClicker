@@ -28,6 +28,7 @@ void ScreenImage::processNewData(std::unique_ptr<cv::Mat> newData, const char* m
     this->colorMat = std::move(*newData);
     grayValid = false;
     hsvValid = false;
+    hsvCroppedPixels = 0;
 }
 
 cv::Mat ScreenImage::cropColor(const cv::Rect &roi) const {
@@ -42,9 +43,24 @@ cv::Mat ScreenImage::cropGray(const cv::Rect &roi) const {
 }
 
 cv::Mat ScreenImage::cropHsv(const cv::Rect &roi) const {
-    const cv::Mat& hsv = getHsvMat();
-    if (hsv.empty()) return {};
-    return cropMat(hsv, roi);
+    if (hsvValid) return cropMat(getHsvMat(), roi);
+
+    cv::Mat colorCrop = cropColor(roi);
+    if (colorCrop.empty()) return {};
+
+    // Small template candidates don't need a full-screen HSV conversion. If repeated crops would
+    // consume one screen's worth of pixels, switch to the shared cache for the rest of this frame.
+    // This bounds extra conversion work while preserving exactly the same color conversion steps.
+    if (hsvCroppedPixels >= colorMat.total() - colorCrop.total()) {
+        return cropMat(getHsvMat(), roi);
+    }
+    hsvCroppedPixels += colorCrop.total();
+
+    cv::Mat rgbCrop;
+    cv::Mat hsvCrop;
+    cv::cvtColor(colorCrop, rgbCrop, cv::COLOR_RGBA2RGB);
+    cv::cvtColor(rgbCrop, hsvCrop, cv::COLOR_RGB2HSV);
+    return hsvCrop;
 }
 
 cv::Mat ScreenImage::cropMat(const cv::Mat& mat, const cv::Rect& roi) {
