@@ -1,0 +1,1039 @@
+{
+  "formatVersion": 1,
+  "apiVersion": 1,
+  "id": "farm-walls-sm-s916b",
+  "name": "Farm e muros — Samsung 2340×1080",
+  "scriptVersion": "1.0.0",
+  "entry": "entry.js",
+  "parameters": {
+    "finishMode": {
+      "type": "choice",
+      "label": "Finalizar a partida quando",
+      "default": "destruição",
+      "choices": [
+        "destruição",
+        "saque total",
+        "fim natural"
+      ]
+    },
+    "targetDestruction": {
+      "type": "number",
+      "label": "Meta de destruição (%)",
+      "default": 50,
+      "min": 1,
+      "max": 100
+    },
+    "improveWalls": {
+      "type": "boolean",
+      "label": "Melhorar muros",
+      "default": true
+    },
+    "wallTrigger": {
+      "type": "choice",
+      "label": "Quando melhorar muros",
+      "default": "qualquer depósito cheio",
+      "choices": [
+        "ouro cheio",
+        "elixir cheio",
+        "qualquer depósito cheio",
+        "ambos cheios",
+        "saldo disponível"
+      ]
+    },
+    "stopFarm": {
+      "type": "choice",
+      "label": "Parar o farm quando",
+      "default": "nunca",
+      "choices": [
+        "nunca",
+        "ouro cheio",
+        "elixir cheio",
+        "qualquer depósito cheio",
+        "ambos cheios"
+      ]
+    },
+    "goldReserve": {
+      "type": "number",
+      "label": "Reserva de ouro para muros",
+      "default": 0,
+      "min": 0,
+      "max": 1000000000000
+    },
+    "elixirReserve": {
+      "type": "number",
+      "label": "Reserva de elixir para muros",
+      "default": 0,
+      "min": 0,
+      "max": 1000000000000
+    },
+    "goldMinimum": {
+      "type": "number",
+      "label": "Parar se o ouro chegar a (0 desativa)",
+      "default": 0,
+      "min": 0,
+      "max": 1000000000000
+    },
+    "elixirMinimum": {
+      "type": "number",
+      "label": "Parar se o elixir chegar a (0 desativa)",
+      "default": 0,
+      "min": 0,
+      "max": 1000000000000
+    },
+    "goldCapacity": {
+      "type": "number",
+      "label": "Capacidade dos depósitos de ouro",
+      "default": 30500000,
+      "min": 1,
+      "max": 1000000000000
+    },
+    "elixirCapacity": {
+      "type": "number",
+      "label": "Capacidade dos depósitos de elixir",
+      "default": 29000000,
+      "min": 1,
+      "max": 1000000000000
+    },
+    "resourcePriority": {
+      "type": "choice",
+      "label": "Preferência para os muros",
+      "default": "ouro",
+      "choices": [
+        "ouro",
+        "elixir"
+      ]
+    },
+    "maxWallBatch": {
+      "type": "number",
+      "label": "Máximo de muros por lote",
+      "default": 50,
+      "min": 1,
+      "max": 50
+    },
+    "maxBattles": {
+      "type": "number",
+      "label": "Máximo de batalhas (0 não limita)",
+      "default": 0,
+      "min": 0,
+      "max": 10000
+    }
+  },
+  "resources": {
+    "decimal": {
+      "type": "number",
+      "format": "COMMA_DECIMAL"
+    },
+    "quantity": {
+      "type": "number",
+      "format": "POSITIVE_QUANTITY"
+    },
+    "village": {
+      "type": "image",
+      "path": "images/village.png",
+      "width": 160,
+      "height": 55
+    },
+    "search": {
+      "type": "image",
+      "path": "images/search.png",
+      "width": 380,
+      "height": 50
+    },
+    "opponent": {
+      "type": "image",
+      "path": "images/opponent.png",
+      "width": 175,
+      "height": 45
+    },
+    "result": {
+      "type": "image",
+      "path": "images/result.png",
+      "width": 210,
+      "height": 75
+    },
+    "exitConfirm": {
+      "type": "image",
+      "path": "images/exitConfirm.png",
+      "width": 75,
+      "height": 50
+    },
+    "hero1": {
+      "type": "image",
+      "path": "images/hero1.png",
+      "width": 55,
+      "height": 92
+    },
+    "hero2": {
+      "type": "image",
+      "path": "images/hero2.png",
+      "width": 55,
+      "height": 100
+    },
+    "hero3": {
+      "type": "image",
+      "path": "images/hero3.png",
+      "width": 100,
+      "height": 48
+    },
+    "hero4": {
+      "type": "image",
+      "path": "images/hero4.png",
+      "width": 100,
+      "height": 40
+    },
+    "hero5": {
+      "type": "image",
+      "path": "images/hero5.png",
+      "width": 100,
+      "height": 40
+    },
+    "hero6": {
+      "type": "image",
+      "path": "images/hero6.png",
+      "width": 100,
+      "height": 48
+    },
+    "hero7": {
+      "type": "image",
+      "path": "images/hero7.png",
+      "width": 70,
+      "height": 55
+    },
+    "hero8": {
+      "type": "image",
+      "path": "images/hero8.png",
+      "width": 55,
+      "height": 120
+    },
+    "hero9": {
+      "type": "image",
+      "path": "images/hero9.png",
+      "width": 75,
+      "height": 50
+    },
+    "spell": {
+      "type": "image",
+      "path": "images/spell.png",
+      "width": 65,
+      "height": 45
+    },
+    "builderOne": {
+      "type": "image",
+      "path": "images/builderOne.png",
+      "width": 21,
+      "height": 38
+    },
+    "wall": {
+      "type": "image",
+      "path": "images/wall.png",
+      "width": 40,
+      "height": 40
+    },
+    "wallTitle": {
+      "type": "image",
+      "path": "images/wallTitle.png",
+      "width": 150,
+      "height": 42
+    },
+    "selected18": {
+      "type": "image",
+      "path": "images/selected18.png",
+      "width": 72,
+      "height": 42
+    },
+    "selected19": {
+      "type": "image",
+      "path": "images/selected19.png",
+      "width": 72,
+      "height": 42
+    },
+    "more": {
+      "type": "image",
+      "path": "images/more.png",
+      "width": 155,
+      "height": 165
+    },
+    "batchRemove": {
+      "type": "image",
+      "path": "images/batchRemove.png",
+      "width": 37,
+      "height": 38
+    },
+    "batchAdd": {
+      "type": "image",
+      "path": "images/batchAdd.png",
+      "width": 60,
+      "height": 85
+    },
+    "batchTitle": {
+      "type": "image",
+      "path": "images/batchTitle.png",
+      "width": 520,
+      "height": 65
+    },
+    "batchOk": {
+      "type": "image",
+      "path": "images/batchOk.png",
+      "width": 90,
+      "height": 57
+    },
+    "singleTitle": {
+      "type": "image",
+      "path": "images/singleTitle.png",
+      "width": 780,
+      "height": 65
+    },
+    "goldConfirm": {
+      "type": "image",
+      "path": "images/goldConfirm.png",
+      "width": 60,
+      "height": 65
+    },
+    "elixirConfirm": {
+      "type": "image",
+      "path": "images/elixirConfirm.png",
+      "width": 60,
+      "height": 65
+    },
+    "villageText": {
+      "type": "text",
+      "model": "LATIN",
+      "alternatives": [
+        "Batalha"
+      ]
+    },
+    "searchText": {
+      "type": "text",
+      "model": "LATIN",
+      "alternatives": [
+        "Procurar partida"
+      ]
+    },
+    "attack": {
+      "type": "text",
+      "model": "LATIN",
+      "alternatives": [
+        "Atacar"
+      ]
+    },
+    "battle": {
+      "type": "text",
+      "model": "LATIN",
+      "alternatives": [
+        "Saque"
+      ]
+    },
+    "buildersFree": {
+      "type": "text",
+      "model": "LATIN",
+      "alternatives": [
+        "1/6",
+        "2/6",
+        "3/6",
+        "4/6",
+        "5/6",
+        "6/6",
+        "1/7",
+        "2/7",
+        "3/7",
+        "4/7",
+        "5/7",
+        "6/7",
+        "7/7",
+        "177",
+        "276]",
+        "376]",
+        "476]",
+        "576]",
+        "676]"
+      ]
+    },
+    "goldLabel": {
+      "type": "text",
+      "model": "LATIN",
+      "alternatives": [
+        "Ouro"
+      ]
+    },
+    "elixirLabel": {
+      "type": "text",
+      "model": "LATIN",
+      "alternatives": [
+        "Elixir"
+      ]
+    },
+    "goldAvailable1": {
+      "type": "color",
+      "argb": -1381654
+    },
+    "goldAvailable2": {
+      "type": "color",
+      "argb": -1381654
+    },
+    "goldInsufficient1": {
+      "type": "color",
+      "argb": -1934991
+    },
+    "goldInsufficient2": {
+      "type": "color",
+      "argb": -1934991
+    },
+    "goldBatchAvailable1": {
+      "type": "color",
+      "argb": -1381654
+    },
+    "goldBatchAvailable2": {
+      "type": "color",
+      "argb": -1381654
+    },
+    "goldBatchInsufficient1": {
+      "type": "color",
+      "argb": -1934991
+    },
+    "goldBatchInsufficient2": {
+      "type": "color",
+      "argb": -1934991
+    },
+    "elixirAvailable1": {
+      "type": "color",
+      "argb": -1381654
+    },
+    "elixirAvailable2": {
+      "type": "color",
+      "argb": -1381654
+    },
+    "elixirInsufficient1": {
+      "type": "color",
+      "argb": -1934991
+    },
+    "elixirInsufficient2": {
+      "type": "color",
+      "argb": -1934991
+    },
+    "elixirBatchAvailable1": {
+      "type": "color",
+      "argb": -1381654
+    },
+    "elixirBatchAvailable2": {
+      "type": "color",
+      "argb": -1381654
+    },
+    "elixirBatchInsufficient1": {
+      "type": "color",
+      "argb": -1934991
+    },
+    "elixirBatchInsufficient2": {
+      "type": "color",
+      "argb": -1934991
+    },
+    "confirmGreen1": {
+      "type": "color",
+      "argb": -10034676
+    },
+    "confirmGreen2": {
+      "type": "color",
+      "argb": -10034676
+    },
+    "resultText": {
+      "type": "text",
+      "model": "LATIN",
+      "alternatives": [
+        "Voltar"
+      ]
+    }
+  },
+  "screen": {
+    "width": 2340,
+    "height": 1080,
+    "regions": {
+      "village": {
+        "left": 125,
+        "top": 990,
+        "right": 285,
+        "bottom": 1045
+      },
+      "search": {
+        "left": 225,
+        "top": 745,
+        "right": 605,
+        "bottom": 795
+      },
+      "opponent": {
+        "left": 2040,
+        "top": 760,
+        "right": 2215,
+        "bottom": 805
+      },
+      "result": {
+        "left": 1065,
+        "top": 895,
+        "right": 1275,
+        "bottom": 970
+      },
+      "exitConfirm": {
+        "left": 1320,
+        "top": 650,
+        "right": 1450,
+        "bottom": 740
+      },
+      "hero1": {
+        "left": 0,
+        "top": 864,
+        "right": 2340,
+        "bottom": 1080
+      },
+      "hero2": {
+        "left": 0,
+        "top": 864,
+        "right": 2340,
+        "bottom": 1080
+      },
+      "hero3": {
+        "left": 0,
+        "top": 864,
+        "right": 2340,
+        "bottom": 1080
+      },
+      "hero4": {
+        "left": 0,
+        "top": 864,
+        "right": 2340,
+        "bottom": 1080
+      },
+      "hero5": {
+        "left": 0,
+        "top": 864,
+        "right": 2340,
+        "bottom": 1080
+      },
+      "hero6": {
+        "left": 0,
+        "top": 864,
+        "right": 2340,
+        "bottom": 1080
+      },
+      "hero7": {
+        "left": 0,
+        "top": 864,
+        "right": 2340,
+        "bottom": 1080
+      },
+      "hero8": {
+        "left": 0,
+        "top": 864,
+        "right": 2340,
+        "bottom": 1080
+      },
+      "hero9": {
+        "left": 0,
+        "top": 864,
+        "right": 2340,
+        "bottom": 1080
+      },
+      "spell": {
+        "left": 400,
+        "top": 930,
+        "right": 1900,
+        "bottom": 1060
+      },
+      "builderOne": {
+        "left": 2055,
+        "top": 815,
+        "right": 2076,
+        "bottom": 853
+      },
+      "wall": {
+        "left": 300,
+        "top": 80,
+        "right": 1950,
+        "bottom": 960
+      },
+      "wallTitle": {
+        "left": 940,
+        "top": 680,
+        "right": 1150,
+        "bottom": 755
+      },
+      "selected18": {
+        "left": 850,
+        "top": 690,
+        "right": 1470,
+        "bottom": 748
+      },
+      "selected19": {
+        "left": 850,
+        "top": 690,
+        "right": 1470,
+        "bottom": 748
+      },
+      "more": {
+        "left": 1090,
+        "top": 765,
+        "right": 1245,
+        "bottom": 930
+      },
+      "batchRemove": {
+        "left": 718,
+        "top": 780,
+        "right": 755,
+        "bottom": 818
+      },
+      "batchAdd": {
+        "left": 1170,
+        "top": 770,
+        "right": 1230,
+        "bottom": 855
+      },
+      "batchTitle": {
+        "left": 909,
+        "top": 299,
+        "right": 1431,
+        "bottom": 366
+      },
+      "batchOk": {
+        "left": 1329,
+        "top": 667,
+        "right": 1421,
+        "bottom": 726
+      },
+      "singleTitle": {
+        "left": 770,
+        "top": 42,
+        "right": 1550,
+        "bottom": 107
+      },
+      "goldConfirm": {
+        "left": 1640,
+        "top": 922,
+        "right": 1700,
+        "bottom": 987
+      },
+      "elixirConfirm": {
+        "left": 1640,
+        "top": 922,
+        "right": 1700,
+        "bottom": 987
+      },
+      "villageText": {
+        "left": 100,
+        "top": 975,
+        "right": 320,
+        "bottom": 1065
+      },
+      "searchText": {
+        "left": 180,
+        "top": 730,
+        "right": 650,
+        "bottom": 820
+      },
+      "attack": {
+        "left": 1740,
+        "top": 930,
+        "right": 2110,
+        "bottom": 1010
+      },
+      "battle": {
+        "left": 160,
+        "top": 88,
+        "right": 430,
+        "bottom": 138
+      },
+      "buildersFree": {
+        "left": 2045,
+        "top": 795,
+        "right": 2140,
+        "bottom": 860
+      },
+      "goldLabel": {
+        "left": 1340,
+        "top": 488,
+        "right": 1500,
+        "bottom": 532
+      },
+      "elixirLabel": {
+        "left": 1340,
+        "top": 488,
+        "right": 1500,
+        "bottom": 532
+      },
+      "builders": {
+        "left": 2047,
+        "top": 815,
+        "right": 2076,
+        "bottom": 855
+      },
+      "destruction": {
+        "left": 2140,
+        "top": 815,
+        "right": 2250,
+        "bottom": 880
+      },
+      "troops": {
+        "left": 80,
+        "top": 920,
+        "right": 2260,
+        "bottom": 970
+      },
+      "batchConfirmCost": {
+        "left": 1160,
+        "top": 488,
+        "right": 1360,
+        "bottom": 532
+      },
+      "singleConfirmCost": {
+        "left": 1425,
+        "top": 924,
+        "right": 1620,
+        "bottom": 958
+      },
+      "goldBalance": {
+        "left": 1910,
+        "top": 25,
+        "right": 2180,
+        "bottom": 90
+      },
+      "goldLoot": {
+        "left": 170,
+        "top": 130,
+        "right": 410,
+        "bottom": 182
+      },
+      "goldCost": {
+        "left": 1305,
+        "top": 762,
+        "right": 1437,
+        "bottom": 790
+      },
+      "goldBatchCost": {
+        "left": 1290,
+        "top": 755,
+        "right": 1440,
+        "bottom": 795
+      },
+      "goldAvailable1": {
+        "left": 1334,
+        "top": 768,
+        "right": 1337,
+        "bottom": 771
+      },
+      "goldAvailable2": {
+        "left": 1400,
+        "top": 775,
+        "right": 1403,
+        "bottom": 778
+      },
+      "goldInsufficient1": {
+        "left": 1334,
+        "top": 768,
+        "right": 1337,
+        "bottom": 771
+      },
+      "goldInsufficient2": {
+        "left": 1400,
+        "top": 775,
+        "right": 1403,
+        "bottom": 778
+      },
+      "goldBatchAvailable1": {
+        "left": 1424,
+        "top": 777,
+        "right": 1427,
+        "bottom": 780
+      },
+      "goldBatchAvailable2": {
+        "left": 1346,
+        "top": 772,
+        "right": 1349,
+        "bottom": 775
+      },
+      "goldBatchInsufficient1": {
+        "left": 1424,
+        "top": 777,
+        "right": 1427,
+        "bottom": 780
+      },
+      "goldBatchInsufficient2": {
+        "left": 1346,
+        "top": 772,
+        "right": 1349,
+        "bottom": 775
+      },
+      "elixirBalance": {
+        "left": 1910,
+        "top": 98,
+        "right": 2180,
+        "bottom": 163
+      },
+      "elixirLoot": {
+        "left": 170,
+        "top": 188,
+        "right": 410,
+        "bottom": 240
+      },
+      "elixirCost": {
+        "left": 1515,
+        "top": 762,
+        "right": 1647,
+        "bottom": 790
+      },
+      "elixirBatchCost": {
+        "left": 1500,
+        "top": 755,
+        "right": 1650,
+        "bottom": 795
+      },
+      "elixirAvailable1": {
+        "left": 1544,
+        "top": 768,
+        "right": 1547,
+        "bottom": 771
+      },
+      "elixirAvailable2": {
+        "left": 1610,
+        "top": 775,
+        "right": 1613,
+        "bottom": 778
+      },
+      "elixirInsufficient1": {
+        "left": 1544,
+        "top": 768,
+        "right": 1547,
+        "bottom": 771
+      },
+      "elixirInsufficient2": {
+        "left": 1610,
+        "top": 775,
+        "right": 1613,
+        "bottom": 778
+      },
+      "elixirBatchAvailable1": {
+        "left": 1634,
+        "top": 777,
+        "right": 1637,
+        "bottom": 780
+      },
+      "elixirBatchAvailable2": {
+        "left": 1556,
+        "top": 772,
+        "right": 1559,
+        "bottom": 775
+      },
+      "elixirBatchInsufficient1": {
+        "left": 1634,
+        "top": 777,
+        "right": 1637,
+        "bottom": 780
+      },
+      "elixirBatchInsufficient2": {
+        "left": 1556,
+        "top": 772,
+        "right": 1559,
+        "bottom": 775
+      },
+      "confirmGreen1": {
+        "left": 1474,
+        "top": 928,
+        "right": 1477,
+        "bottom": 931
+      },
+      "confirmGreen2": {
+        "left": 1552,
+        "top": 932,
+        "right": 1555,
+        "bottom": 935
+      },
+      "resultText": {
+        "left": 1000,
+        "top": 850,
+        "right": 1340,
+        "bottom": 1020
+      }
+    },
+    "positions": {
+      "attackOpen": {
+        "x": 200,
+        "y": 975
+      },
+      "searchOpen": {
+        "x": 400,
+        "y": 800
+      },
+      "attackConfirm": {
+        "x": 1930,
+        "y": 975
+      },
+      "exitBattle": {
+        "x": 210,
+        "y": 845
+      },
+      "resultReturn": {
+        "x": 1170,
+        "y": 930
+      },
+      "wallDismiss": {
+        "x": 1800,
+        "y": 1000
+      },
+      "batchDismiss": {
+        "x": 600,
+        "y": 120
+      },
+      "more": {
+        "x": 1170,
+        "y": 850
+      },
+      "remove": {
+        "x": 750,
+        "y": 850
+      },
+      "goldPay": {
+        "x": 1370,
+        "y": 850
+      },
+      "elixirPay": {
+        "x": 1585,
+        "y": 850
+      },
+      "singleOk": {
+        "x": 1550,
+        "y": 945
+      },
+      "batchOk": {
+        "x": 1380,
+        "y": 695
+      },
+      "zoomCenter": {
+        "x": 1170,
+        "y": 520
+      },
+      "deploy1": {
+        "x": 800,
+        "y": 120
+      },
+      "deploy2": {
+        "x": 1540,
+        "y": 120
+      },
+      "deploy3": {
+        "x": 600,
+        "y": 260
+      },
+      "deploy4": {
+        "x": 1740,
+        "y": 260
+      },
+      "deploy5": {
+        "x": 400,
+        "y": 400
+      },
+      "deploy6": {
+        "x": 1940,
+        "y": 400
+      },
+      "deploy7": {
+        "x": 250,
+        "y": 560
+      },
+      "deploy8": {
+        "x": 2090,
+        "y": 560
+      },
+      "deploy9": {
+        "x": 450,
+        "y": 700
+      },
+      "deploy10": {
+        "x": 1890,
+        "y": 700
+      },
+      "deploy11": {
+        "x": 650,
+        "y": 840
+      },
+      "deploy12": {
+        "x": 1690,
+        "y": 840
+      },
+      "scan1": {
+        "x": 750,
+        "y": 300
+      },
+      "scan2": {
+        "x": 1350,
+        "y": 300
+      },
+      "scan3": {
+        "x": 750,
+        "y": 700
+      },
+      "scan4": {
+        "x": 1350,
+        "y": 700
+      },
+      "heroDeploy1": {
+        "x": 350,
+        "y": 650
+      },
+      "heroDeploy2": {
+        "x": 2100,
+        "y": 600
+      },
+      "heroDeploy3": {
+        "x": 1170,
+        "y": 120
+      },
+      "heroDeploy4": {
+        "x": 1170,
+        "y": 840
+      },
+      "spellDeploy1": {
+        "x": 1710,
+        "y": 510
+      },
+      "spellDeploy2": {
+        "x": 1638,
+        "y": 645
+      },
+      "spellDeploy3": {
+        "x": 1440,
+        "y": 744
+      },
+      "spellDeploy4": {
+        "x": 1170,
+        "y": 780
+      },
+      "spellDeploy5": {
+        "x": 900,
+        "y": 744
+      },
+      "spellDeploy6": {
+        "x": 702,
+        "y": 645
+      },
+      "spellDeploy7": {
+        "x": 630,
+        "y": 510
+      },
+      "spellDeploy8": {
+        "x": 702,
+        "y": 375
+      },
+      "spellDeploy9": {
+        "x": 900,
+        "y": 276
+      },
+      "spellDeploy10": {
+        "x": 1170,
+        "y": 240
+      },
+      "spellDeploy11": {
+        "x": 1440,
+        "y": 276
+      },
+      "spellDeploy12": {
+        "x": 1638,
+        "y": 375
+      }
+    }
+  }
+}
