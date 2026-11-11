@@ -1,0 +1,477 @@
+{
+  "device": "SM_S916B",
+  "resolution": [
+    2340,
+    1080
+  ],
+  "scenery": "Clássica",
+  "date": "2026-11-09",
+  "goldCapacity": 30500000,
+  "elixirCapacity": 29000000,
+  "darkElixirCapacity": 470000,
+  "eligibleWallLevels": [
+    18
+  ],
+  "nextLevel": 19,
+  "costPerResource": 4200000,
+  "builderCount": 6,
+  "notes": "Perfil da vila observada, no zoom e enquadramento capturados. Nível 19 já está no máximo. Custos incluem o desconto visível nesta data; a versão otimizada reconhece o custo selecionado e exige o mesmo valor na confirmação. As imagens são recortes de capturas reais do aparelho, sem geração ou retoque. Qualidade nativa 2340 obrigatória. OCR de saldo pode perder dígitos iniciais mesmo nessa qualidade; disponibilidade usa branco/cinza-claro ou vermelho no preço selecionado e verde na confirmação. OCR do saldo é usado na entrada por recurso cheio, validada no aparelho com ouro em 30.500.000 e elixir em 29.000.000.",
+  "manualCalibration": {
+    "goldBefore": 17373842,
+    "goldAfter": 13173842,
+    "elixirBefore": 7600642,
+    "elixirAfter": 3400642,
+    "gemsBeforeAndAfter": 328,
+    "result": "Dois muros 18→19 confirmados manualmente, com consumo de 4.200.000 por recurso."
+  },
+  "detectionQuality": 2340,
+  "layout": "Muros em fileiras diagonais, preparados pelo usuário",
+  "scan": {
+    "centers": [
+      [
+        750,
+        300
+      ],
+      [
+        1350,
+        300
+      ],
+      [
+        750,
+        700
+      ],
+      [
+        1350,
+        700
+      ]
+    ],
+    "zoomOutRepeats": 2,
+    "zoomOutIntensity": 400,
+    "zoomInIntensity": 100,
+    "zoomDurationMs": 350,
+    "attemptsPerSector": 6,
+    "intervalMs": 700,
+    "candidateArea": [
+      300,
+      80,
+      1950,
+      960
+    ],
+    "referenceArea": [
+      1450,
+      580,
+      1490,
+      620
+    ]
+  },
+  "automaticValidation": {
+    "confirmedUpgrades": 15,
+    "gemsBeforeAndAfter": 328,
+    "insufficientElixirFallbackToGoldConfirmed": true,
+    "priceColorVersionValidatedOnDevice": true,
+    "fullResourceEntryValidatedOnDevice": true,
+    "completeCycleValidatedOnDevice": true,
+    "evidenceDirectory": "/tmp/klickr-parametros-before",
+    "evidence": [
+      "walls10-confirmed.png",
+      "walls11-final.png",
+      "klickr-muros10.mp4",
+      "klickr-muros11.mp4",
+      "klickr-ciclo-completo-13-muros.mp4",
+      "wall-cycle-counters-contact.png",
+      "village-after-wall-cycle.png"
+    ],
+    "limitation": "Disponibilidade por cor validada com o preço branco/cinza-claro, insuficiência em vermelho e confirmação verde. O OCR do saldo final perdeu um dígito; a decisão por cores continuou correta. Sem construtor e sem alvos cobertos por frames e testes do grafo; a vila real tinha um construtor livre e alvos elegíveis.",
+    "fullResourceEntry": {
+      "gold": 30500000,
+      "elixir": 29000000,
+      "gems": 328,
+      "trigger": "gold",
+      "selectedLevel": 18,
+      "recognizedCost": 4200000,
+      "result": "Entrada automática, seleção e custo confirmados; versão anterior exigia branco puro e parou com aviso antes de gastar."
+    },
+    "availablePriceRgb": [
+      234,
+      234,
+      234
+    ],
+    "insufficientPriceRgb": [
+      197,
+      105,
+      98
+    ],
+    "confirmPriceRgb": [
+      89,
+      197,
+      10
+    ],
+    "priceColorThreshold": 10,
+    "confirmColorThreshold": 6,
+    "confirmedUpgradesInCompleteCycle": 13,
+    "goldUpgradesInCompleteCycle": 7,
+    "elixirUpgradesInCompleteCycle": 6,
+    "balancesBeforeCompleteCycle": {
+      "gold": 30500000,
+      "elixir": 29000000
+    },
+    "balancesAfterCompleteCycle": {
+      "gold": 1239217,
+      "elixir": 3800000
+    },
+    "farmResumedAfterInsufficientBalance": true,
+    "initialConfirmedUpgrades": 2,
+    "initialResourcesUsed": [
+      "gold",
+      "gold"
+    ]
+  },
+  "farmValidation": {
+    "savedArmy": "servo",
+    "requiredTroop": "Superservo ativo",
+    "activationDarkElixirCostAuthorizedAndUsed": 25000,
+    "target": 50,
+    "observedExitReadings": [
+      54,
+      50
+    ],
+    "automaticConfirmationAndVillageReturn": true,
+    "evidenceDirectory": "/tmp/klickr-parametros-before",
+    "evidence": [
+      "klickr-farm-confirmacao-final.mp4"
+    ],
+    "selectionCorrection": "Selecionar somente o card reconhecido; o card temporário anterior deslocava a tropa para outro slot.",
+    "exitCorrection": "Referência atual do botão OK, com pequena área de busca e prioridade anterior à nova solicitação de saída.",
+    "villageReturnSettlingMs": 3000,
+    "fullEntryVillageRecognition": "Mesmas alternativas por imagem ou texto que a abertura de batalhas.",
+    "settledBalancesReadAfterReturn": [
+      {
+        "gold": 27902358,
+        "elixir": 25154103
+      },
+      {
+        "gold": 28636321,
+        "elixir": 26462129
+      }
+    ],
+    "fullEntryPending": false
+  },
+  "artifact": {
+    "path": "farm-parametrizado.zip",
+    "sha256": "05eb9c9e68c4bb115227609084dbf2b74f2d19f81bc97a15a8c1499052975646"
+  },
+  "executionOptionsValidation": {
+    "date": "2026-11-09",
+    "installedScenarioId": 33,
+    "questionCount": 5,
+    "finishModes": [
+      "destruction",
+      "remaining_opponent_gold_and_elixir_zero",
+      "natural_end"
+    ],
+    "lootAreas": {
+      "gold": [
+        170,
+        130,
+        410,
+        182
+      ],
+      "elixir": [
+        170,
+        188,
+        410,
+        240
+      ]
+    },
+    "wallTriggers": [
+      "gold_full",
+      "elixir_full",
+      "either_full",
+      "both_full",
+      "affordable_balance"
+    ],
+    "storageStops": [
+      "never",
+      "gold_full",
+      "elixir_full",
+      "either_full",
+      "both_full"
+    ],
+    "conditionalPercentageFieldValidatedOnDevice": true,
+    "conditionalWallTriggerFieldValidatedOnDevice": true,
+    "resourcePriorityQuestionHidden": true,
+    "defaultResourcePriority": "gold_then_elixir",
+    "alwaysTriggerValidatedBelowFullCapacity": true,
+    "alwaysTriggerUpgrades": {
+      "gold": 1,
+      "elixir": 2
+    },
+    "lootModeContinuedAboveDestructionTarget": true,
+    "observedDestructionWithLootRemaining": [
+      59,
+      61
+    ],
+    "zeroLootExitValidation": "Frames determinísticos cobrem duas leituras zero, leitura ausente e recursos restantes. As rodadas reais observadas terminaram com saque restante; o disparo real por dois zeros não foi observado.",
+    "nativeLootReadingLimitation": "A regra usa somente igualdade a zero. OCR parcial de um saldo positivo de elixir foi observado e permaneceu positivo; não usar essas leituras para contabilizar o saque.",
+    "checks": {
+      "localTests": 1652,
+      "androidCalibrationTests": 13,
+      "scenarioGraphTests": 22
+    },
+    "evidenceDirectory": "/tmp/klickr-parametros-before/ajustes-formulario-e-gatilhos",
+    "phoneDownloadUpdatePending": false
+  },
+  "deploymentOptimizationValidation": {
+    "date": "2026-11-09",
+    "installedScenarioId": 36,
+    "questionCount": 12,
+    "eventCount": 281,
+    "counterCount": 49,
+    "apkSha256": "4a6de51b1f55c5711692d0a98bdd804d49fba03916a65fb9ee10b498bc7bc22b",
+    "quantityArea": [
+      80,
+      920,
+      2260,
+      970
+    ],
+    "quantityConfidence": 80,
+    "recognitionWindows": {
+      "coreWidthPx": 600,
+      "contextEachSidePx": 100,
+      "selection": "leftmost_positive_quantity"
+    },
+    "burstSizes": [
+      16,
+      8,
+      4,
+      2,
+      1
+    ],
+    "touchPressMs": 20,
+    "touchReleaseIntervalMs": 20,
+    "maximumConfiguredBurstMs": 640,
+    "previousDeployment": {
+      "units": 54,
+      "durationMs": 23896,
+      "medianIntervalPerUnitMs": 412
+    },
+    "observedAttacks": [
+      {
+        "quantities": [
+          25,
+          29
+        ],
+        "attemptedClicks": 54,
+        "durationFromFirstQuantityReadMs": 5125,
+        "batchSizes": [
+          16,
+          8,
+          1,
+          16,
+          8,
+          4,
+          1
+        ],
+        "automaticVillageReturn": true
+      },
+      {
+        "quantities": [
+          25,
+          29
+        ],
+        "attemptedClicks": 54,
+        "durationFromFirstQuantityReadMs": 5608,
+        "batchSizes": [
+          16,
+          8,
+          1,
+          16,
+          8,
+          4,
+          1
+        ],
+        "automaticVillageReturn": true
+      }
+    ],
+    "result": "Dois ataques completos com a tropa temporária e Superservos: todos os cards esgotados, sem cliques excedentes. As regras de encerramento continuam verificadas entre lotes; quantidades restantes são relidas após consumir o orçamento.",
+    "advancedSettings": {
+      "collapsedValuesRetained": true,
+      "configurableStorageCapacities": true,
+      "minimumBalanceStopValidatedOnDevice": true,
+      "minimumBalanceStop": {
+        "configuredGold": 5000000,
+        "observedGold": 3688011,
+        "gesturesExecuted": 0
+      },
+      "wallReserveValidation": "Grafo cobre custo variável, igualdade no limite, fallback e retomada. A tentativa no jogo não concluiu a seleção do muro; gasto com reserva ainda não validado fisicamente."
+    },
+    "checks": {
+      "localTests": 1656,
+      "androidTests": 26,
+      "scenarioGraphTests": 35
+    },
+    "evidenceDirectory": "/tmp/klickr-optimization-validation",
+    "evidence": [
+      "slow-observed.pb",
+      "fast-adjusted-final.pb",
+      "fast-adjusted-final.json",
+      "fast-adjusted-final.png",
+      "minimum-stop-state.txt",
+      "minimum-stop-village.png"
+    ],
+    "phoneVideo": "/sdcard/Download/klickr-lotes-rapidos-validado-20261109.mp4",
+    "gameBoosterTouchProtectionDisabled": false,
+    "limitations": "Perfil visual calibrado para o Samsung 2340×1080 em português. A barra não é rolada horizontalmente; heróis delimitam as tropas. Manter o Game Booster desbloqueado. Reservas de muros cobertas pelo grafo, sem confirmação de gasto real nesta etapa."
+  },
+  "wallPriceBrightnessRegression": {
+    "date": "2026-11-09",
+    "cause": "O verde claro da confirmação e o vermelho claro do saldo insuficiente ficavam fora das faixas antigas, interrompendo o cenário nas etapas 9 e 5.",
+    "green": {
+      "expectedRgba": -10034676,
+      "threshold": 7,
+      "observedRgb": [
+        [
+          89,
+          197,
+          10
+        ],
+        [
+          115,
+          255,
+          13
+        ],
+        [
+          119,
+          251,
+          20
+        ]
+      ]
+    },
+    "red": {
+      "expectedRgba": -1934991,
+      "threshold": 10,
+      "observedRgb": [
+        [
+          197,
+          105,
+          98
+        ],
+        [
+          255,
+          136,
+          127
+        ],
+        [
+          253,
+          137,
+          127
+        ]
+      ]
+    },
+    "validation": {
+      "goldUpgrades": 3,
+      "elixirUpgrades": 1,
+      "automaticGoldToElixirFallback": true,
+      "goldBefore": 16088999,
+      "goldAfter": 3488999,
+      "elixirBefore": 21356394,
+      "elixirAfter": 17156394,
+      "gemsBeforeAndAfter": 338,
+      "stoppedManuallyAfterValidation": true,
+      "scenarioGraphTests": 37,
+      "androidWallCalibrationTests": 16,
+      "unitTestsAndFdroidDebugBuild": "./gradlew testFDroidDebugUnitTest assembleFDroidDebug: passou"
+    },
+    "evidence": {
+      "confirmationFrame": "/tmp/wall-current.png",
+      "insufficientGoldFrame": "/tmp/wall-validation-paused.png",
+      "elixirUpgradeResult": "/tmp/wall-elixir-result.png"
+    },
+    "fixtures": {
+      "confirmation_current.png": {
+        "source": "/tmp/wall-current.png",
+        "crop": [
+          770,
+          42,
+          1700,
+          987
+        ]
+      },
+      "selection_prices_current.png": {
+        "source": "/tmp/wall-validation-paused.png",
+        "crop": [
+          1295,
+          750,
+          1650,
+          800
+        ]
+      }
+    }
+  },
+  "batchWallUpgrade": {
+    "date": "2026-11-09",
+    "mode": "Melhorar Mais, adicionar até o limite de saldo/reserva e remover excedente",
+    "batchPriceColorAreas": {
+      "gold": [
+        [
+          1424,
+          777,
+          1427,
+          780
+        ],
+        [
+          1346,
+          772,
+          1349,
+          775
+        ]
+      ],
+      "elixir": [
+        [
+          1634,
+          777,
+          1637,
+          780
+        ],
+        [
+          1556,
+          772,
+          1559,
+          775
+        ]
+      ]
+    },
+    "observedSelectionCounts": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "deviceValidation": {
+      "initialElixir": 8756394,
+      "finalElixir": 356394,
+      "unitCost": 4200000,
+      "attemptedBatchSize": 3,
+      "removedExcessWalls": 1,
+      "upgradedWalls": 2,
+      "payments": 1,
+      "gemsBeforeAndAfter": 338
+    },
+    "checks": {
+      "scenarioGraphTests": 40,
+      "nativeBatchTests": 3,
+      "unitTestsAndFdroidDebugBuild": "passou"
+    },
+    "evidence": {
+      "before": "/tmp/wall-bulk-initial.png",
+      "confirmation": "/tmp/wall-batch-live7.png",
+      "after": "/tmp/wall-batch-live-after.png",
+      "returnValidation": "/tmp/wall-batch-return-verified2.png"
+    },
+    "limitations": "Dois pagamentos para depósitos cheios pressupõem saldo, custo e fileira elegível suficientes. Reservas continuam dependentes de leitura numérica confiável. O lote real usou elixir; sete muros com ouro e seis com elixir foram cobertos pelo grafo.",
+    "resultRecognitionValidatedOnDeviceWithoutAdditionalSpending": true
+  }
+}
