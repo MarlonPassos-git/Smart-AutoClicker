@@ -1,0 +1,132 @@
+{
+  "schemaVersion": 1,
+  "recordedAtUtc": "2026-11-10T11:15:15.695825+00:00",
+  "head": "41e3d77b707639c693d71bb58b2c9d407fad6930",
+  "dirty": true,
+  "variant": "fDroidDebug",
+  "command": "./gradlew testFDroidDebugUnitTest assembleFDroidDebug :core:script:android:assembleFDroidDebugAndroidTest",
+  "artifacts": [
+    {
+      "file": "smartautoclicker-fDroid-universal-debug.apk",
+      "filters": [],
+      "bytes": 74829813,
+      "sha256": "b353a006a19871d61da35ee30bc29762b021498bccc53a2dfc5cb03cb2ed0e1a",
+      "quickJsNativeLibraries": [
+        {
+          "path": "lib/arm64-v8a/libquickjs.so",
+          "bytes": 792672,
+          "compressedBytes": 792672
+        },
+        {
+          "path": "lib/armeabi-v7a/libquickjs.so",
+          "bytes": 532584,
+          "compressedBytes": 532584
+        },
+        {
+          "path": "lib/x86/libquickjs.so",
+          "bytes": 817792,
+          "compressedBytes": 817792
+        },
+        {
+          "path": "lib/x86_64/libquickjs.so",
+          "bytes": 835176,
+          "compressedBytes": 835176
+        }
+      ],
+      "quickJsNativeCompressedBytes": 2978224
+    },
+    {
+      "file": "smartautoclicker-fDroid-x86_64-debug.apk",
+      "filters": [
+        {
+          "filterType": "ABI",
+          "value": "x86_64"
+        }
+      ],
+      "bytes": 40942490,
+      "sha256": "349175539c57d163a22ec4b066808b9deb86bcbbf593b2a9deac2f8dc13bcc91",
+      "quickJsNativeLibraries": [
+        {
+          "path": "lib/x86_64/libquickjs.so",
+          "bytes": 835176,
+          "compressedBytes": 835176
+        }
+      ],
+      "quickJsNativeCompressedBytes": 835176
+    },
+    {
+      "file": "smartautoclicker-fDroid-x86-debug.apk",
+      "filters": [
+        {
+          "filterType": "ABI",
+          "value": "x86"
+        }
+      ],
+      "bytes": 40835384,
+      "sha256": "d114edd507e091717cf9b89e20c5e3f61d1c8a19b811c7956980ea1cedad593f",
+      "quickJsNativeLibraries": [
+        {
+          "path": "lib/x86/libquickjs.so",
+          "bytes": 817792,
+          "compressedBytes": 817792
+        }
+      ],
+      "quickJsNativeCompressedBytes": 817792
+    },
+    {
+      "file": "smartautoclicker-fDroid-arm64-v8a-debug.apk",
+      "filters": [
+        {
+          "filterType": "ABI",
+          "value": "arm64-v8a"
+        }
+      ],
+      "bytes": 36482664,
+      "sha256": "c873432ba5b45a0d667bc3df403cee8fe3a358c7988d0d1998adcdcc1fc16640",
+      "quickJsNativeLibraries": [
+        {
+          "path": "lib/arm64-v8a/libquickjs.so",
+          "bytes": 792672,
+          "compressedBytes": 792672
+        }
+      ],
+      "quickJsNativeCompressedBytes": 792672
+    },
+    {
+      "file": "smartautoclicker-fDroid-armeabi-v7a-debug.apk",
+      "filters": [
+        {
+          "filterType": "ABI",
+          "value": "armeabi-v7a"
+        }
+      ],
+      "bytes": 32715220,
+      "sha256": "cad6837b46351bb4d45e5d48ec2aa1d8bf3a0599740d7c46ff34a1def31b5544",
+      "quickJsNativeLibraries": [
+        {
+          "path": "lib/armeabi-v7a/libquickjs.so",
+          "bytes": 532584,
+          "compressedBytes": 532584
+        }
+      ],
+      "quickJsNativeCompressedBytes": 532584
+    }
+  ],
+  "limitations": [
+    "Current APK totals and the QuickJS native ZIP entries only; there is no measured pre-feature APK delta.",
+    "Dex/resources contributed by the feature are not isolated from the rest of this dirty checkout.",
+    "ABI packages are built; runtime checks so far exercised x86_64 only.",
+    "Debug APKs are not release size or startup/battery measurements."
+  ],
+  "sourceSha256": {
+    "core/script/android/src/main/java/com/buzbuz/smartautoclicker/core/script/android/AndroidScreenAutomationBackend.kt": "6fb9669ef66a48175f3aeb5f80ef664edac41a8558a88e3b60125f0d860cf425",
+    "feature/script-config/src/main/java/com/buzbuz/smartautoclicker/feature/script/config/ScriptRunOverlay.kt": "35a7515e879526ba96c7244f5d294ad74b093b2ae2baf87248307839a9215167",
+    "smartautoclicker/src/main/java/com/buzbuz/smartautoclicker/localservice/ScriptServiceDriver.kt": "3da39d7a6d900ea995ae710fd2f2a8899e151306fea91f275766d34a02ac7ab6",
+    "core/script/android/src/main/java/com/buzbuz/smartautoclicker/core/script/android/PackageScriptExecution.kt": "435584621253cabc8c327d91786a3a85dc7ff3f16cf6310565f5d29f8cd6a25d",
+    "core/script/runtime/src/main/java/com/buzbuz/smartautoclicker/core/script/runtime/session/ScriptSession.kt": "c6f30bf53086eaf35358300cc502344b499bc81f61fab53a5d076333a4ba428d",
+    "feature/script-config/src/main/java/com/buzbuz/smartautoclicker/feature/script/config/ScriptLibraryActivity.kt": "babdc6eeb039f7be269bebba9aeadd7fda75c3ebfb368b2bbf494e607d478013",
+    "feature/script-config/src/main/res/layout/activity_script_library.xml": "d2800245602405bc1cd1c9ed451dcbf5af50933b68c90dbd30539fdc1e4bf76f",
+    "smartautoclicker/src/main/java/com/buzbuz/smartautoclicker/SmartAutoClickerService.kt": "e3732a12c0e951ea2608344ae0f7174a7728dd8aff0c6f58b81051b8d3fbcd86",
+    "smartautoclicker/src/main/java/com/buzbuz/smartautoclicker/localservice/LocalService.kt": "f381ee4dd50cf00b48c63dd519962a397633367b135d44a6beecf95d1404ad96"
+  }
+}

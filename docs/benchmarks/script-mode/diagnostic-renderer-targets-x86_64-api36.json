@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "recordedAtUtc": "2026-11-10T12:16:04.386094+00:00",
+  "baseline": "capture-gesture-diagnostics-x86_64-api36.json",
+  "registration": "After implementing the renderer, before inspecting its new measurement output. Uses only the previous collection.",
+  "detailedRoundP95Ms": [
+    18.96611700206995,
+    23.250544000416994,
+    27.654234997928143,
+    32.35949099808931,
+    42.8851250000298
+  ],
+  "detailedRoundP95MedianMs": 27.654234997928143,
+  "inclusiveRoundP95IqrMs": 9.10894699767232,
+  "detailedAggregateP95MaximumMs": 17,
+  "everyDetailedRoundP95MaximumMs": 17,
+  "derivation": "floor(previous detailed median round p95 - inclusive round p95 IQR - 1 ms); require the aggregate and every new detailed round to stay below the same limit.",
+  "normalAggregateP95MaximumMs": 6,
+  "normalDerivation": "ceil(previous normal aggregate p95 + previous normal round p95 range)",
+  "quality": "100 measured samples per mode; 23 confirmed touches per run, no duplicates/cancellations; unchanged color tolerance 0 and confirmations.",
+  "cpu": "Observed cost, not an acceptance ceiling."
+}

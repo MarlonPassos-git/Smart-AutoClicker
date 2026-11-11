@@ -1,0 +1,3717 @@
+{
+  "schemaVersion": 1,
+  "device": "sdk_gphone64_x86_64",
+  "api": 36,
+  "abi": "x86_64",
+  "clock": "elapsedRealtimeNanos",
+  "fixture": "wall_calibration/confirmation_current.png",
+  "width": 930,
+  "height": 945,
+  "warmupPerRound": 3,
+  "samplesPerRound": 20,
+  "recognitionFailures": 0,
+  "scope": "available bitmap to AndroidActionExecutor.dispatchBuiltGesture; no OS capture or gesture injection",
+  "rounds": [
+    {
+      "round": 0,
+      "path": "scenario",
+      "samples": [
+        {
+          "reactionNs": 26932090,
+          "bindFrameNs": 11381,
+          "numberNs": 26110359,
+          "colorNs": 21831,
+          "afterRecognitionToGestureNs": 499527,
+          "coordinationAndBridgeNs": 788519,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 27971039,
+          "bindFrameNs": 12113,
+          "numberNs": 27108241,
+          "colorNs": 45926,
+          "afterRecognitionToGestureNs": 498004,
+          "coordinationAndBridgeNs": 804759,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 28142060,
+          "bindFrameNs": 9959,
+          "numberNs": 27323644,
+          "colorNs": 39995,
+          "afterRecognitionToGestureNs": 508595,
+          "coordinationAndBridgeNs": 768462,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 31635533,
+          "bindFrameNs": 12423,
+          "numberNs": 30868604,
+          "colorNs": 35005,
+          "afterRecognitionToGestureNs": 479600,
+          "coordinationAndBridgeNs": 719501,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29854823,
+          "bindFrameNs": 13385,
+          "numberNs": 29013915,
+          "colorNs": 28774,
+          "afterRecognitionToGestureNs": 482716,
+          "coordinationAndBridgeNs": 798749,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 27677599,
+          "bindFrameNs": 10179,
+          "numberNs": 26885884,
+          "colorNs": 26950,
+          "afterRecognitionToGestureNs": 429436,
+          "coordinationAndBridgeNs": 754586,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 27357108,
+          "bindFrameNs": 9899,
+          "numberNs": 26528032,
+          "colorNs": 52849,
+          "afterRecognitionToGestureNs": 441429,
+          "coordinationAndBridgeNs": 766328,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 27336900,
+          "bindFrameNs": 10389,
+          "numberNs": 26567025,
+          "colorNs": 27141,
+          "afterRecognitionToGestureNs": 500309,
+          "coordinationAndBridgeNs": 732345,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 27183652,
+          "bindFrameNs": 10309,
+          "numberNs": 26424117,
+          "colorNs": 28143,
+          "afterRecognitionToGestureNs": 494758,
+          "coordinationAndBridgeNs": 721083,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 27216183,
+          "bindFrameNs": 13175,
+          "numberNs": 26427052,
+          "colorNs": 33913,
+          "afterRecognitionToGestureNs": 484449,
+          "coordinationAndBridgeNs": 742043,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 27354633,
+          "bindFrameNs": 12143,
+          "numberNs": 26512714,
+          "colorNs": 29054,
+          "afterRecognitionToGestureNs": 533411,
+          "coordinationAndBridgeNs": 800722,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 28035170,
+          "bindFrameNs": 13635,
+          "numberNs": 27309498,
+          "colorNs": 29676,
+          "afterRecognitionToGestureNs": 446097,
+          "coordinationAndBridgeNs": 682361,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 28038977,
+          "bindFrameNs": 16020,
+          "numberNs": 27184494,
+          "colorNs": 37380,
+          "afterRecognitionToGestureNs": 523853,
+          "coordinationAndBridgeNs": 801083,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 27038360,
+          "bindFrameNs": 9939,
+          "numberNs": 26307989,
+          "colorNs": 24165,
+          "afterRecognitionToGestureNs": 475112,
+          "coordinationAndBridgeNs": 696267,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 27493803,
+          "bindFrameNs": 9778,
+          "numberNs": 26713090,
+          "colorNs": 26560,
+          "afterRecognitionToGestureNs": 534823,
+          "coordinationAndBridgeNs": 744375,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29033432,
+          "bindFrameNs": 10700,
+          "numberNs": 28233701,
+          "colorNs": 29445,
+          "afterRecognitionToGestureNs": 519455,
+          "coordinationAndBridgeNs": 759586,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 49767335,
+          "bindFrameNs": 21119,
+          "numberNs": 48822953,
+          "colorNs": 48251,
+          "afterRecognitionToGestureNs": 543890,
+          "coordinationAndBridgeNs": 875012,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 26776578,
+          "bindFrameNs": 10139,
+          "numberNs": 25954807,
+          "colorNs": 27071,
+          "afterRecognitionToGestureNs": 555692,
+          "coordinationAndBridgeNs": 784561,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 27195094,
+          "bindFrameNs": 10700,
+          "numberNs": 26413738,
+          "colorNs": 27391,
+          "afterRecognitionToGestureNs": 506230,
+          "coordinationAndBridgeNs": 743265,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 27192228,
+          "bindFrameNs": 10219,
+          "numberNs": 26415341,
+          "colorNs": 29235,
+          "afterRecognitionToGestureNs": 494056,
+          "coordinationAndBridgeNs": 737433,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        }
+      ],
+      "reaction": {
+        "p50Ns": 27357108,
+        "p95Ns": 31635533
+      },
+      "cpuProcessMsIncludingWarmup": 725,
+      "memoryBefore": {
+        "nativeHeapBytes": 33306400,
+        "javaUsedBytes": 3742192
+      },
+      "memoryAfter": {
+        "nativeHeapBytes": 51797264,
+        "javaUsedBytes": 4006480
+      }
+    },
+    {
+      "round": 0,
+      "path": "script",
+      "samples": [
+        {
+          "reactionNs": 31740640,
+          "bindFrameNs": 12604,
+          "numberNs": 26370026,
+          "colorNs": 23083,
+          "afterRecognitionToGestureNs": 1208587,
+          "coordinationAndBridgeNs": 5334927,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 31976633,
+          "bindFrameNs": 19857,
+          "numberNs": 26809470,
+          "colorNs": 21801,
+          "afterRecognitionToGestureNs": 1257179,
+          "coordinationAndBridgeNs": 5125505,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 32331138,
+          "bindFrameNs": 12804,
+          "numberNs": 27016719,
+          "colorNs": 20519,
+          "afterRecognitionToGestureNs": 1238984,
+          "coordinationAndBridgeNs": 5281096,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 31904417,
+          "bindFrameNs": 12033,
+          "numberNs": 26625084,
+          "colorNs": 21891,
+          "afterRecognitionToGestureNs": 1253170,
+          "coordinationAndBridgeNs": 5245409,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 32089033,
+          "bindFrameNs": 11892,
+          "numberNs": 26889320,
+          "colorNs": 21089,
+          "afterRecognitionToGestureNs": 1238463,
+          "coordinationAndBridgeNs": 5166732,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 31896853,
+          "bindFrameNs": 11312,
+          "numberNs": 26795854,
+          "colorNs": 23534,
+          "afterRecognitionToGestureNs": 1235076,
+          "coordinationAndBridgeNs": 5066153,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 32119702,
+          "bindFrameNs": 11752,
+          "numberNs": 26838604,
+          "colorNs": 23173,
+          "afterRecognitionToGestureNs": 1206564,
+          "coordinationAndBridgeNs": 5246173,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 31960984,
+          "bindFrameNs": 11702,
+          "numberNs": 26806184,
+          "colorNs": 22602,
+          "afterRecognitionToGestureNs": 1311681,
+          "coordinationAndBridgeNs": 5120496,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 32026636,
+          "bindFrameNs": 14618,
+          "numberNs": 26652125,
+          "colorNs": 26880,
+          "afterRecognitionToGestureNs": 1307733,
+          "coordinationAndBridgeNs": 5333013,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 32237622,
+          "bindFrameNs": 12423,
+          "numberNs": 26811614,
+          "colorNs": 30928,
+          "afterRecognitionToGestureNs": 1337679,
+          "coordinationAndBridgeNs": 5382657,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 32253973,
+          "bindFrameNs": 12794,
+          "numberNs": 26604206,
+          "colorNs": 39514,
+          "afterRecognitionToGestureNs": 1534228,
+          "coordinationAndBridgeNs": 5597459,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 35493019,
+          "bindFrameNs": 13896,
+          "numberNs": 29871895,
+          "colorNs": 34194,
+          "afterRecognitionToGestureNs": 1300930,
+          "coordinationAndBridgeNs": 5573034,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 32385028,
+          "bindFrameNs": 12694,
+          "numberNs": 26899229,
+          "colorNs": 33122,
+          "afterRecognitionToGestureNs": 1413822,
+          "coordinationAndBridgeNs": 5439983,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 31855967,
+          "bindFrameNs": 18394,
+          "numberNs": 26318259,
+          "colorNs": 23574,
+          "afterRecognitionToGestureNs": 1490296,
+          "coordinationAndBridgeNs": 5495740,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 31481554,
+          "bindFrameNs": 21590,
+          "numberNs": 26546307,
+          "colorNs": 21080,
+          "afterRecognitionToGestureNs": 1175936,
+          "coordinationAndBridgeNs": 4892577,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 32152453,
+          "bindFrameNs": 19427,
+          "numberNs": 26532651,
+          "colorNs": 20218,
+          "afterRecognitionToGestureNs": 1184502,
+          "coordinationAndBridgeNs": 5580157,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 32125873,
+          "bindFrameNs": 13225,
+          "numberNs": 26699413,
+          "colorNs": 21530,
+          "afterRecognitionToGestureNs": 1202797,
+          "coordinationAndBridgeNs": 5391705,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 32523419,
+          "bindFrameNs": 11351,
+          "numberNs": 27624048,
+          "colorNs": 22072,
+          "afterRecognitionToGestureNs": 1219578,
+          "coordinationAndBridgeNs": 4865948,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 31647335,
+          "bindFrameNs": 11933,
+          "numberNs": 26867068,
+          "colorNs": 20849,
+          "afterRecognitionToGestureNs": 1148144,
+          "coordinationAndBridgeNs": 4747485,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 31948039,
+          "bindFrameNs": 12343,
+          "numberNs": 27094304,
+          "colorNs": 20778,
+          "afterRecognitionToGestureNs": 1158273,
+          "coordinationAndBridgeNs": 4820614,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        }
+      ],
+      "reaction": {
+        "p50Ns": 32026636,
+        "p95Ns": 32523419
+      },
+      "cpuProcessMsIncludingWarmup": 900,
+      "memoryBefore": {
+        "nativeHeapBytes": 51797264,
+        "javaUsedBytes": 4006480
+      },
+      "memoryAfter": {
+        "nativeHeapBytes": 51930800,
+        "javaUsedBytes": 5891280
+      }
+    },
+    {
+      "round": 0,
+      "path": "script-grouped",
+      "samples": [
+        {
+          "reactionNs": 30723843,
+          "bindFrameNs": 11883,
+          "numberNs": 26218241,
+          "colorNs": 39564,
+          "afterRecognitionToGestureNs": 1978902,
+          "coordinationAndBridgeNs": 4454155,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30609849,
+          "bindFrameNs": 17332,
+          "numberNs": 26622319,
+          "colorNs": 21931,
+          "afterRecognitionToGestureNs": 1538857,
+          "coordinationAndBridgeNs": 3948267,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30416416,
+          "bindFrameNs": 15519,
+          "numberNs": 26308511,
+          "colorNs": 25497,
+          "afterRecognitionToGestureNs": 1491558,
+          "coordinationAndBridgeNs": 4066889,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30076659,
+          "bindFrameNs": 10740,
+          "numberNs": 26150003,
+          "colorNs": 24436,
+          "afterRecognitionToGestureNs": 1531082,
+          "coordinationAndBridgeNs": 3891480,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30491206,
+          "bindFrameNs": 11411,
+          "numberNs": 26568428,
+          "colorNs": 23104,
+          "afterRecognitionToGestureNs": 1497769,
+          "coordinationAndBridgeNs": 3888263,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30438417,
+          "bindFrameNs": 11432,
+          "numberNs": 26530447,
+          "colorNs": 22172,
+          "afterRecognitionToGestureNs": 1520101,
+          "coordinationAndBridgeNs": 3874366,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30656056,
+          "bindFrameNs": 12664,
+          "numberNs": 26518715,
+          "colorNs": 23575,
+          "afterRecognitionToGestureNs": 1790719,
+          "coordinationAndBridgeNs": 4101102,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29803116,
+          "bindFrameNs": 14187,
+          "numberNs": 26057920,
+          "colorNs": 24767,
+          "afterRecognitionToGestureNs": 1458065,
+          "coordinationAndBridgeNs": 3706242,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30430302,
+          "bindFrameNs": 23223,
+          "numberNs": 26383571,
+          "colorNs": 22463,
+          "afterRecognitionToGestureNs": 1459187,
+          "coordinationAndBridgeNs": 4001045,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30054908,
+          "bindFrameNs": 11682,
+          "numberNs": 26280789,
+          "colorNs": 24345,
+          "afterRecognitionToGestureNs": 1447235,
+          "coordinationAndBridgeNs": 3738092,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30971647,
+          "bindFrameNs": 10970,
+          "numberNs": 26822054,
+          "colorNs": 28403,
+          "afterRecognitionToGestureNs": 1870208,
+          "coordinationAndBridgeNs": 4110220,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30426164,
+          "bindFrameNs": 16080,
+          "numberNs": 26602723,
+          "colorNs": 39404,
+          "afterRecognitionToGestureNs": 1494553,
+          "coordinationAndBridgeNs": 3767957,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30501625,
+          "bindFrameNs": 16100,
+          "numberNs": 26466847,
+          "colorNs": 26309,
+          "afterRecognitionToGestureNs": 1591385,
+          "coordinationAndBridgeNs": 3992369,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30473172,
+          "bindFrameNs": 22733,
+          "numberNs": 26334108,
+          "colorNs": 24937,
+          "afterRecognitionToGestureNs": 1510022,
+          "coordinationAndBridgeNs": 4091394,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30699748,
+          "bindFrameNs": 14017,
+          "numberNs": 26926429,
+          "colorNs": 23034,
+          "afterRecognitionToGestureNs": 1576026,
+          "coordinationAndBridgeNs": 3736268,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30214969,
+          "bindFrameNs": 12133,
+          "numberNs": 26634301,
+          "colorNs": 35557,
+          "afterRecognitionToGestureNs": 1408262,
+          "coordinationAndBridgeNs": 3532978,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30579642,
+          "bindFrameNs": 11592,
+          "numberNs": 26916251,
+          "colorNs": 27953,
+          "afterRecognitionToGestureNs": 1458235,
+          "coordinationAndBridgeNs": 3623846,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30839279,
+          "bindFrameNs": 13325,
+          "numberNs": 26867779,
+          "colorNs": 35317,
+          "afterRecognitionToGestureNs": 1856692,
+          "coordinationAndBridgeNs": 3922858,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 31004599,
+          "bindFrameNs": 18555,
+          "numberNs": 26824929,
+          "colorNs": 32160,
+          "afterRecognitionToGestureNs": 1750574,
+          "coordinationAndBridgeNs": 4128955,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 31339788,
+          "bindFrameNs": 21240,
+          "numberNs": 27480619,
+          "colorNs": 49923,
+          "afterRecognitionToGestureNs": 1602306,
+          "coordinationAndBridgeNs": 3788006,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        }
+      ],
+      "reaction": {
+        "p50Ns": 30491206,
+        "p95Ns": 31004599
+      },
+      "cpuProcessMsIncludingWarmup": 789,
+      "memoryBefore": {
+        "nativeHeapBytes": 51930800,
+        "javaUsedBytes": 5891280
+      },
+      "memoryAfter": {
+        "nativeHeapBytes": 51964848,
+        "javaUsedBytes": 7005392
+      }
+    },
+    {
+      "round": 1,
+      "path": "script",
+      "samples": [
+        {
+          "reactionNs": 30768547,
+          "bindFrameNs": 12092,
+          "numberNs": 26600889,
+          "colorNs": 22242,
+          "afterRecognitionToGestureNs": 978696,
+          "coordinationAndBridgeNs": 4133324,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 31140925,
+          "bindFrameNs": 13044,
+          "numberNs": 27216112,
+          "colorNs": 22432,
+          "afterRecognitionToGestureNs": 933141,
+          "coordinationAndBridgeNs": 3889337,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30825754,
+          "bindFrameNs": 11602,
+          "numberNs": 26882366,
+          "colorNs": 27221,
+          "afterRecognitionToGestureNs": 954340,
+          "coordinationAndBridgeNs": 3904565,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30676484,
+          "bindFrameNs": 12363,
+          "numberNs": 26476766,
+          "colorNs": 26079,
+          "afterRecognitionToGestureNs": 1033679,
+          "coordinationAndBridgeNs": 4161276,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30073823,
+          "bindFrameNs": 15328,
+          "numberNs": 26129034,
+          "colorNs": 21220,
+          "afterRecognitionToGestureNs": 958047,
+          "coordinationAndBridgeNs": 3908241,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30541070,
+          "bindFrameNs": 26119,
+          "numberNs": 26143241,
+          "colorNs": 21701,
+          "afterRecognitionToGestureNs": 944061,
+          "coordinationAndBridgeNs": 4350009,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30488582,
+          "bindFrameNs": 12042,
+          "numberNs": 26659960,
+          "colorNs": 21500,
+          "afterRecognitionToGestureNs": 913604,
+          "coordinationAndBridgeNs": 3795080,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30876239,
+          "bindFrameNs": 11853,
+          "numberNs": 26990721,
+          "colorNs": 30597,
+          "afterRecognitionToGestureNs": 930025,
+          "coordinationAndBridgeNs": 3843068,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30615559,
+          "bindFrameNs": 11752,
+          "numberNs": 26759867,
+          "colorNs": 23675,
+          "afterRecognitionToGestureNs": 952476,
+          "coordinationAndBridgeNs": 3820265,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30311209,
+          "bindFrameNs": 11953,
+          "numberNs": 26500961,
+          "colorNs": 23204,
+          "afterRecognitionToGestureNs": 980589,
+          "coordinationAndBridgeNs": 3775091,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30264311,
+          "bindFrameNs": 21410,
+          "numberNs": 26254429,
+          "colorNs": 24857,
+          "afterRecognitionToGestureNs": 925676,
+          "coordinationAndBridgeNs": 3963615,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30177719,
+          "bindFrameNs": 13886,
+          "numberNs": 26259288,
+          "colorNs": 21610,
+          "afterRecognitionToGestureNs": 884630,
+          "coordinationAndBridgeNs": 3882935,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30619237,
+          "bindFrameNs": 13545,
+          "numberNs": 26717367,
+          "colorNs": 29396,
+          "afterRecognitionToGestureNs": 856697,
+          "coordinationAndBridgeNs": 3858929,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30554506,
+          "bindFrameNs": 12283,
+          "numberNs": 26841360,
+          "colorNs": 22963,
+          "afterRecognitionToGestureNs": 881404,
+          "coordinationAndBridgeNs": 3677900,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30392091,
+          "bindFrameNs": 11772,
+          "numberNs": 26483539,
+          "colorNs": 27321,
+          "afterRecognitionToGestureNs": 985619,
+          "coordinationAndBridgeNs": 3869459,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29940885,
+          "bindFrameNs": 13455,
+          "numberNs": 26249670,
+          "colorNs": 22141,
+          "afterRecognitionToGestureNs": 913294,
+          "coordinationAndBridgeNs": 3655619,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30265613,
+          "bindFrameNs": 18064,
+          "numberNs": 26436150,
+          "colorNs": 21821,
+          "afterRecognitionToGestureNs": 854182,
+          "coordinationAndBridgeNs": 3789578,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30576717,
+          "bindFrameNs": 11401,
+          "numberNs": 26753595,
+          "colorNs": 26730,
+          "afterRecognitionToGestureNs": 909506,
+          "coordinationAndBridgeNs": 3784991,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 35663559,
+          "bindFrameNs": 20087,
+          "numberNs": 31330832,
+          "colorNs": 23043,
+          "afterRecognitionToGestureNs": 901752,
+          "coordinationAndBridgeNs": 4289597,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30493020,
+          "bindFrameNs": 14497,
+          "numberNs": 26786647,
+          "colorNs": 21611,
+          "afterRecognitionToGestureNs": 882596,
+          "coordinationAndBridgeNs": 3670265,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        }
+      ],
+      "reaction": {
+        "p50Ns": 30541070,
+        "p95Ns": 31140925
+      },
+      "cpuProcessMsIncludingWarmup": 783,
+      "memoryBefore": {
+        "nativeHeapBytes": 51964912,
+        "javaUsedBytes": 7005392
+      },
+      "memoryAfter": {
+        "nativeHeapBytes": 51993952,
+        "javaUsedBytes": 8160464
+      }
+    },
+    {
+      "round": 1,
+      "path": "script-grouped",
+      "samples": [
+        {
+          "reactionNs": 29363621,
+          "bindFrameNs": 13335,
+          "numberNs": 26115699,
+          "colorNs": 31539,
+          "afterRecognitionToGestureNs": 1283598,
+          "coordinationAndBridgeNs": 3203048,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29666380,
+          "bindFrameNs": 20739,
+          "numberNs": 26260320,
+          "colorNs": 22873,
+          "afterRecognitionToGestureNs": 1217304,
+          "coordinationAndBridgeNs": 3362448,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29783559,
+          "bindFrameNs": 11361,
+          "numberNs": 26753535,
+          "colorNs": 25538,
+          "afterRecognitionToGestureNs": 1261066,
+          "coordinationAndBridgeNs": 2993125,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29247504,
+          "bindFrameNs": 17684,
+          "numberNs": 26094088,
+          "colorNs": 25497,
+          "afterRecognitionToGestureNs": 1262559,
+          "coordinationAndBridgeNs": 3110235,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30695049,
+          "bindFrameNs": 11882,
+          "numberNs": 27752449,
+          "colorNs": 28113,
+          "afterRecognitionToGestureNs": 1215199,
+          "coordinationAndBridgeNs": 2902605,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 31703911,
+          "bindFrameNs": 11632,
+          "numberNs": 28648890,
+          "colorNs": 29466,
+          "afterRecognitionToGestureNs": 1214157,
+          "coordinationAndBridgeNs": 3013923,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30496116,
+          "bindFrameNs": 12453,
+          "numberNs": 27622866,
+          "colorNs": 28423,
+          "afterRecognitionToGestureNs": 1183110,
+          "coordinationAndBridgeNs": 2832374,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30474325,
+          "bindFrameNs": 11462,
+          "numberNs": 27572431,
+          "colorNs": 25638,
+          "afterRecognitionToGestureNs": 1176597,
+          "coordinationAndBridgeNs": 2864794,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30273288,
+          "bindFrameNs": 12002,
+          "numberNs": 27117097,
+          "colorNs": 30898,
+          "afterRecognitionToGestureNs": 1378516,
+          "coordinationAndBridgeNs": 3113291,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30086818,
+          "bindFrameNs": 11712,
+          "numberNs": 27180617,
+          "colorNs": 31549,
+          "afterRecognitionToGestureNs": 1262418,
+          "coordinationAndBridgeNs": 2862940,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 32801050,
+          "bindFrameNs": 22322,
+          "numberNs": 28573990,
+          "colorNs": 24216,
+          "afterRecognitionToGestureNs": 1235638,
+          "coordinationAndBridgeNs": 4180522,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 31430799,
+          "bindFrameNs": 16160,
+          "numberNs": 28338348,
+          "colorNs": 23044,
+          "afterRecognitionToGestureNs": 1221441,
+          "coordinationAndBridgeNs": 3053247,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 31044414,
+          "bindFrameNs": 13546,
+          "numberNs": 27885178,
+          "colorNs": 24346,
+          "afterRecognitionToGestureNs": 1250816,
+          "coordinationAndBridgeNs": 3121344,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 31139252,
+          "bindFrameNs": 12994,
+          "numberNs": 27969436,
+          "colorNs": 25829,
+          "afterRecognitionToGestureNs": 1401599,
+          "coordinationAndBridgeNs": 3130993,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 31101682,
+          "bindFrameNs": 15139,
+          "numberNs": 27635089,
+          "colorNs": 34255,
+          "afterRecognitionToGestureNs": 1738060,
+          "coordinationAndBridgeNs": 3417199,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30256647,
+          "bindFrameNs": 76002,
+          "numberNs": 27400279,
+          "colorNs": 22261,
+          "afterRecognitionToGestureNs": 1186927,
+          "coordinationAndBridgeNs": 2758105,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30770620,
+          "bindFrameNs": 32431,
+          "numberNs": 27387244,
+          "colorNs": 24015,
+          "afterRecognitionToGestureNs": 1206643,
+          "coordinationAndBridgeNs": 3326930,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30999830,
+          "bindFrameNs": 13114,
+          "numberNs": 27634297,
+          "colorNs": 24486,
+          "afterRecognitionToGestureNs": 1158793,
+          "coordinationAndBridgeNs": 3327933,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 31279675,
+          "bindFrameNs": 11171,
+          "numberNs": 28286761,
+          "colorNs": 43481,
+          "afterRecognitionToGestureNs": 1132595,
+          "coordinationAndBridgeNs": 2938262,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 31078959,
+          "bindFrameNs": 13705,
+          "numberNs": 28327117,
+          "colorNs": 23364,
+          "afterRecognitionToGestureNs": 1129498,
+          "coordinationAndBridgeNs": 2714773,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        }
+      ],
+      "reaction": {
+        "p50Ns": 30695049,
+        "p95Ns": 31703911
+      },
+      "cpuProcessMsIncludingWarmup": 769,
+      "memoryBefore": {
+        "nativeHeapBytes": 51994048,
+        "javaUsedBytes": 8160464
+      },
+      "memoryAfter": {
+        "nativeHeapBytes": 52022848,
+        "javaUsedBytes": 9274576
+      }
+    },
+    {
+      "round": 1,
+      "path": "scenario",
+      "samples": [
+        {
+          "reactionNs": 28003220,
+          "bindFrameNs": 15660,
+          "numberNs": 27276326,
+          "colorNs": 22603,
+          "afterRecognitionToGestureNs": 453270,
+          "coordinationAndBridgeNs": 688631,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 28834860,
+          "bindFrameNs": 10560,
+          "numberNs": 28135067,
+          "colorNs": 21720,
+          "afterRecognitionToGestureNs": 461356,
+          "coordinationAndBridgeNs": 667513,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 28735924,
+          "bindFrameNs": 9708,
+          "numberNs": 27939240,
+          "colorNs": 25388,
+          "afterRecognitionToGestureNs": 542868,
+          "coordinationAndBridgeNs": 761588,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 28215327,
+          "bindFrameNs": 18866,
+          "numberNs": 27380201,
+          "colorNs": 25659,
+          "afterRecognitionToGestureNs": 531977,
+          "coordinationAndBridgeNs": 790601,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 28653109,
+          "bindFrameNs": 12734,
+          "numberNs": 27910426,
+          "colorNs": 21330,
+          "afterRecognitionToGestureNs": 488697,
+          "coordinationAndBridgeNs": 708619,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 28961367,
+          "bindFrameNs": 9507,
+          "numberNs": 28199538,
+          "colorNs": 23063,
+          "afterRecognitionToGestureNs": 525676,
+          "coordinationAndBridgeNs": 729259,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 28941008,
+          "bindFrameNs": 9558,
+          "numberNs": 27976319,
+          "colorNs": 23123,
+          "afterRecognitionToGestureNs": 722335,
+          "coordinationAndBridgeNs": 932008,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 28568590,
+          "bindFrameNs": 10239,
+          "numberNs": 27755144,
+          "colorNs": 23814,
+          "afterRecognitionToGestureNs": 518874,
+          "coordinationAndBridgeNs": 779393,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 28949395,
+          "bindFrameNs": 9849,
+          "numberNs": 28190360,
+          "colorNs": 23975,
+          "afterRecognitionToGestureNs": 512802,
+          "coordinationAndBridgeNs": 725211,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29258164,
+          "bindFrameNs": 9838,
+          "numberNs": 28558450,
+          "colorNs": 23665,
+          "afterRecognitionToGestureNs": 452629,
+          "coordinationAndBridgeNs": 666211,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 28661784,
+          "bindFrameNs": 10149,
+          "numberNs": 27889746,
+          "colorNs": 23324,
+          "afterRecognitionToGestureNs": 521758,
+          "coordinationAndBridgeNs": 738565,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 28529025,
+          "bindFrameNs": 10229,
+          "numberNs": 27723445,
+          "colorNs": 24106,
+          "afterRecognitionToGestureNs": 541555,
+          "coordinationAndBridgeNs": 771245,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30207374,
+          "bindFrameNs": 12674,
+          "numberNs": 29490940,
+          "colorNs": 22903,
+          "afterRecognitionToGestureNs": 471133,
+          "coordinationAndBridgeNs": 680857,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30251567,
+          "bindFrameNs": 9608,
+          "numberNs": 29590607,
+          "colorNs": 23685,
+          "afterRecognitionToGestureNs": 423835,
+          "coordinationAndBridgeNs": 627667,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 32112127,
+          "bindFrameNs": 10850,
+          "numberNs": 31343375,
+          "colorNs": 24055,
+          "afterRecognitionToGestureNs": 496932,
+          "coordinationAndBridgeNs": 733847,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30474064,
+          "bindFrameNs": 12002,
+          "numberNs": 29687539,
+          "colorNs": 22302,
+          "afterRecognitionToGestureNs": 523612,
+          "coordinationAndBridgeNs": 752221,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 28893048,
+          "bindFrameNs": 9608,
+          "numberNs": 27992098,
+          "colorNs": 28373,
+          "afterRecognitionToGestureNs": 620494,
+          "coordinationAndBridgeNs": 862969,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 28160885,
+          "bindFrameNs": 11031,
+          "numberNs": 27448699,
+          "colorNs": 22111,
+          "afterRecognitionToGestureNs": 463440,
+          "coordinationAndBridgeNs": 679044,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29226083,
+          "bindFrameNs": 9949,
+          "numberNs": 28456660,
+          "colorNs": 21961,
+          "afterRecognitionToGestureNs": 511159,
+          "coordinationAndBridgeNs": 737513,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 28827826,
+          "bindFrameNs": 9227,
+          "numberNs": 28092437,
+          "colorNs": 22472,
+          "afterRecognitionToGestureNs": 485280,
+          "coordinationAndBridgeNs": 703690,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        }
+      ],
+      "reaction": {
+        "p50Ns": 28834860,
+        "p95Ns": 30474064
+      },
+      "cpuProcessMsIncludingWarmup": 676,
+      "memoryBefore": {
+        "nativeHeapBytes": 52022784,
+        "javaUsedBytes": 9274576
+      },
+      "memoryAfter": {
+        "nativeHeapBytes": 52049504,
+        "javaUsedBytes": 9373008
+      }
+    },
+    {
+      "round": 2,
+      "path": "script-grouped",
+      "samples": [
+        {
+          "reactionNs": 35334432,
+          "bindFrameNs": 27822,
+          "numberNs": 31692110,
+          "colorNs": 33763,
+          "afterRecognitionToGestureNs": 1538637,
+          "coordinationAndBridgeNs": 3580737,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 31408076,
+          "bindFrameNs": 15429,
+          "numberNs": 28089832,
+          "colorNs": 23254,
+          "afterRecognitionToGestureNs": 1695490,
+          "coordinationAndBridgeNs": 3279561,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30316669,
+          "bindFrameNs": 14116,
+          "numberNs": 27381023,
+          "colorNs": 27061,
+          "afterRecognitionToGestureNs": 1197807,
+          "coordinationAndBridgeNs": 2894469,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 33471857,
+          "bindFrameNs": 13866,
+          "numberNs": 30533065,
+          "colorNs": 28463,
+          "afterRecognitionToGestureNs": 1294298,
+          "coordinationAndBridgeNs": 2896463,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30905934,
+          "bindFrameNs": 22572,
+          "numberNs": 27830135,
+          "colorNs": 23063,
+          "afterRecognitionToGestureNs": 1136302,
+          "coordinationAndBridgeNs": 3030164,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30128786,
+          "bindFrameNs": 11802,
+          "numberNs": 27447987,
+          "colorNs": 24476,
+          "afterRecognitionToGestureNs": 1119350,
+          "coordinationAndBridgeNs": 2644521,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30524819,
+          "bindFrameNs": 11382,
+          "numberNs": 27738863,
+          "colorNs": 22933,
+          "afterRecognitionToGestureNs": 1130350,
+          "coordinationAndBridgeNs": 2751641,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30906475,
+          "bindFrameNs": 11251,
+          "numberNs": 27522567,
+          "colorNs": 30387,
+          "afterRecognitionToGestureNs": 1556780,
+          "coordinationAndBridgeNs": 3342270,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30273288,
+          "bindFrameNs": 19968,
+          "numberNs": 27266958,
+          "colorNs": 23504,
+          "afterRecognitionToGestureNs": 1184853,
+          "coordinationAndBridgeNs": 2962858,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30627943,
+          "bindFrameNs": 11852,
+          "numberNs": 27181939,
+          "colorNs": 32631,
+          "afterRecognitionToGestureNs": 1104412,
+          "coordinationAndBridgeNs": 3401521,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30038837,
+          "bindFrameNs": 10710,
+          "numberNs": 27288809,
+          "colorNs": 23073,
+          "afterRecognitionToGestureNs": 1255986,
+          "coordinationAndBridgeNs": 2716245,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30111354,
+          "bindFrameNs": 11742,
+          "numberNs": 27427780,
+          "colorNs": 21511,
+          "afterRecognitionToGestureNs": 1087760,
+          "coordinationAndBridgeNs": 2650321,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29782096,
+          "bindFrameNs": 10800,
+          "numberNs": 26653547,
+          "colorNs": 21992,
+          "afterRecognitionToGestureNs": 1624657,
+          "coordinationAndBridgeNs": 3095757,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29939762,
+          "bindFrameNs": 16100,
+          "numberNs": 27026938,
+          "colorNs": 51707,
+          "afterRecognitionToGestureNs": 1146892,
+          "coordinationAndBridgeNs": 2845017,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29977182,
+          "bindFrameNs": 10911,
+          "numberNs": 27271126,
+          "colorNs": 22171,
+          "afterRecognitionToGestureNs": 1146000,
+          "coordinationAndBridgeNs": 2672974,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30608156,
+          "bindFrameNs": 11722,
+          "numberNs": 27789439,
+          "colorNs": 41437,
+          "afterRecognitionToGestureNs": 1120572,
+          "coordinationAndBridgeNs": 2765558,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 31204043,
+          "bindFrameNs": 12052,
+          "numberNs": 28331024,
+          "colorNs": 23664,
+          "afterRecognitionToGestureNs": 1228755,
+          "coordinationAndBridgeNs": 2837303,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30362655,
+          "bindFrameNs": 11111,
+          "numberNs": 27592038,
+          "colorNs": 24065,
+          "afterRecognitionToGestureNs": 1133436,
+          "coordinationAndBridgeNs": 2735441,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29964298,
+          "bindFrameNs": 21590,
+          "numberNs": 27252952,
+          "colorNs": 28043,
+          "afterRecognitionToGestureNs": 1104322,
+          "coordinationAndBridgeNs": 2661713,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30355952,
+          "bindFrameNs": 11872,
+          "numberNs": 27568494,
+          "colorNs": 22964,
+          "afterRecognitionToGestureNs": 1105052,
+          "coordinationAndBridgeNs": 2752622,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        }
+      ],
+      "reaction": {
+        "p50Ns": 30355952,
+        "p95Ns": 33471857
+      },
+      "cpuProcessMsIncludingWarmup": 771,
+      "memoryBefore": {
+        "nativeHeapBytes": 52049440,
+        "javaUsedBytes": 9373008
+      },
+      "memoryAfter": {
+        "nativeHeapBytes": 52078032,
+        "javaUsedBytes": 10552656
+      }
+    },
+    {
+      "round": 2,
+      "path": "scenario",
+      "samples": [
+        {
+          "reactionNs": 32650477,
+          "bindFrameNs": 11522,
+          "numberNs": 31832513,
+          "colorNs": 38322,
+          "afterRecognitionToGestureNs": 484288,
+          "coordinationAndBridgeNs": 768120,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29403225,
+          "bindFrameNs": 11642,
+          "numberNs": 28684998,
+          "colorNs": 28172,
+          "afterRecognitionToGestureNs": 419347,
+          "coordinationAndBridgeNs": 678413,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 28714795,
+          "bindFrameNs": 10320,
+          "numberNs": 27868216,
+          "colorNs": 31158,
+          "afterRecognitionToGestureNs": 518233,
+          "coordinationAndBridgeNs": 805101,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 28697783,
+          "bindFrameNs": 12734,
+          "numberNs": 28003009,
+          "colorNs": 24186,
+          "afterRecognitionToGestureNs": 418475,
+          "coordinationAndBridgeNs": 657854,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29148979,
+          "bindFrameNs": 11823,
+          "numberNs": 28392340,
+          "colorNs": 43241,
+          "afterRecognitionToGestureNs": 437922,
+          "coordinationAndBridgeNs": 701575,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30249823,
+          "bindFrameNs": 11291,
+          "numberNs": 29396252,
+          "colorNs": 36729,
+          "afterRecognitionToGestureNs": 530354,
+          "coordinationAndBridgeNs": 805551,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 31373070,
+          "bindFrameNs": 16460,
+          "numberNs": 30609628,
+          "colorNs": 38712,
+          "afterRecognitionToGestureNs": 424426,
+          "coordinationAndBridgeNs": 708270,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30012198,
+          "bindFrameNs": 10500,
+          "numberNs": 29228568,
+          "colorNs": 27232,
+          "afterRecognitionToGestureNs": 503584,
+          "coordinationAndBridgeNs": 745898,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29212337,
+          "bindFrameNs": 11793,
+          "numberNs": 28456460,
+          "colorNs": 23675,
+          "afterRecognitionToGestureNs": 509064,
+          "coordinationAndBridgeNs": 720409,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 28224876,
+          "bindFrameNs": 10289,
+          "numberNs": 27352118,
+          "colorNs": 27341,
+          "afterRecognitionToGestureNs": 601238,
+          "coordinationAndBridgeNs": 835128,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 27962223,
+          "bindFrameNs": 11702,
+          "numberNs": 27145671,
+          "colorNs": 24987,
+          "afterRecognitionToGestureNs": 543550,
+          "coordinationAndBridgeNs": 779863,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 28288334,
+          "bindFrameNs": 13665,
+          "numberNs": 27535913,
+          "colorNs": 22442,
+          "afterRecognitionToGestureNs": 495299,
+          "coordinationAndBridgeNs": 716314,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 28368054,
+          "bindFrameNs": 10109,
+          "numberNs": 27586768,
+          "colorNs": 24987,
+          "afterRecognitionToGestureNs": 507572,
+          "coordinationAndBridgeNs": 746190,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30056281,
+          "bindFrameNs": 15970,
+          "numberNs": 29252583,
+          "colorNs": 29515,
+          "afterRecognitionToGestureNs": 475933,
+          "coordinationAndBridgeNs": 758213,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29636182,
+          "bindFrameNs": 15259,
+          "numberNs": 28832295,
+          "colorNs": 31068,
+          "afterRecognitionToGestureNs": 486713,
+          "coordinationAndBridgeNs": 757560,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 28537232,
+          "bindFrameNs": 13476,
+          "numberNs": 27736358,
+          "colorNs": 32471,
+          "afterRecognitionToGestureNs": 482485,
+          "coordinationAndBridgeNs": 754927,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 28420222,
+          "bindFrameNs": 11231,
+          "numberNs": 27663632,
+          "colorNs": 42500,
+          "afterRecognitionToGestureNs": 464351,
+          "coordinationAndBridgeNs": 702859,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 28288986,
+          "bindFrameNs": 10189,
+          "numberNs": 27616855,
+          "colorNs": 33934,
+          "afterRecognitionToGestureNs": 406152,
+          "coordinationAndBridgeNs": 628008,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 27970918,
+          "bindFrameNs": 10599,
+          "numberNs": 27194121,
+          "colorNs": 43812,
+          "afterRecognitionToGestureNs": 480431,
+          "coordinationAndBridgeNs": 722386,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 28064014,
+          "bindFrameNs": 15830,
+          "numberNs": 27350755,
+          "colorNs": 26710,
+          "afterRecognitionToGestureNs": 438924,
+          "coordinationAndBridgeNs": 670719,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        }
+      ],
+      "reaction": {
+        "p50Ns": 28697783,
+        "p95Ns": 31373070
+      },
+      "cpuProcessMsIncludingWarmup": 698,
+      "memoryBefore": {
+        "nativeHeapBytes": 52078256,
+        "javaUsedBytes": 10552656
+      },
+      "memoryAfter": {
+        "nativeHeapBytes": 52107968,
+        "javaUsedBytes": 10716720
+      }
+    },
+    {
+      "round": 2,
+      "path": "script",
+      "samples": [
+        {
+          "reactionNs": 30335244,
+          "bindFrameNs": 12323,
+          "numberNs": 27114773,
+          "colorNs": 24065,
+          "afterRecognitionToGestureNs": 755758,
+          "coordinationAndBridgeNs": 3184083,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29312596,
+          "bindFrameNs": 13175,
+          "numberNs": 26343716,
+          "colorNs": 24866,
+          "afterRecognitionToGestureNs": 745950,
+          "coordinationAndBridgeNs": 2930839,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29905999,
+          "bindFrameNs": 11372,
+          "numberNs": 27007402,
+          "colorNs": 23464,
+          "afterRecognitionToGestureNs": 720672,
+          "coordinationAndBridgeNs": 2863761,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30436544,
+          "bindFrameNs": 12093,
+          "numberNs": 27482883,
+          "colorNs": 21750,
+          "afterRecognitionToGestureNs": 694373,
+          "coordinationAndBridgeNs": 2919818,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29928090,
+          "bindFrameNs": 12193,
+          "numberNs": 26901934,
+          "colorNs": 22853,
+          "afterRecognitionToGestureNs": 736421,
+          "coordinationAndBridgeNs": 2991110,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29852618,
+          "bindFrameNs": 11802,
+          "numberNs": 26740230,
+          "colorNs": 26059,
+          "afterRecognitionToGestureNs": 872226,
+          "coordinationAndBridgeNs": 3074527,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29320300,
+          "bindFrameNs": 17533,
+          "numberNs": 26479501,
+          "colorNs": 20528,
+          "afterRecognitionToGestureNs": 685306,
+          "coordinationAndBridgeNs": 2802738,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30389306,
+          "bindFrameNs": 11702,
+          "numberNs": 27426798,
+          "colorNs": 22793,
+          "afterRecognitionToGestureNs": 678483,
+          "coordinationAndBridgeNs": 2928013,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30874966,
+          "bindFrameNs": 11071,
+          "numberNs": 27875019,
+          "colorNs": 22532,
+          "afterRecognitionToGestureNs": 692769,
+          "coordinationAndBridgeNs": 2966344,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 31099057,
+          "bindFrameNs": 11411,
+          "numberNs": 27634428,
+          "colorNs": 29596,
+          "afterRecognitionToGestureNs": 989035,
+          "coordinationAndBridgeNs": 3423622,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30931652,
+          "bindFrameNs": 14948,
+          "numberNs": 27773318,
+          "colorNs": 23283,
+          "afterRecognitionToGestureNs": 806513,
+          "coordinationAndBridgeNs": 3120103,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30234736,
+          "bindFrameNs": 16090,
+          "numberNs": 27126555,
+          "colorNs": 21600,
+          "afterRecognitionToGestureNs": 733396,
+          "coordinationAndBridgeNs": 3070491,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29770956,
+          "bindFrameNs": 10761,
+          "numberNs": 26976724,
+          "colorNs": 24556,
+          "afterRecognitionToGestureNs": 677130,
+          "coordinationAndBridgeNs": 2758915,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30226430,
+          "bindFrameNs": 11401,
+          "numberNs": 27304829,
+          "colorNs": 26289,
+          "afterRecognitionToGestureNs": 690355,
+          "coordinationAndBridgeNs": 2883911,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30110512,
+          "bindFrameNs": 11712,
+          "numberNs": 27293137,
+          "colorNs": 23193,
+          "afterRecognitionToGestureNs": 704602,
+          "coordinationAndBridgeNs": 2782470,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30338891,
+          "bindFrameNs": 13495,
+          "numberNs": 26919226,
+          "colorNs": 29866,
+          "afterRecognitionToGestureNs": 967495,
+          "coordinationAndBridgeNs": 3376304,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30170775,
+          "bindFrameNs": 28924,
+          "numberNs": 27069327,
+          "colorNs": 21410,
+          "afterRecognitionToGestureNs": 768502,
+          "coordinationAndBridgeNs": 3051114,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 33773463,
+          "bindFrameNs": 12003,
+          "numberNs": 30784487,
+          "colorNs": 23905,
+          "afterRecognitionToGestureNs": 667532,
+          "coordinationAndBridgeNs": 2953068,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29674394,
+          "bindFrameNs": 12583,
+          "numberNs": 26558108,
+          "colorNs": 31639,
+          "afterRecognitionToGestureNs": 745569,
+          "coordinationAndBridgeNs": 3072064,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30001167,
+          "bindFrameNs": 11422,
+          "numberNs": 27064849,
+          "colorNs": 24866,
+          "afterRecognitionToGestureNs": 836519,
+          "coordinationAndBridgeNs": 2900030,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        }
+      ],
+      "reaction": {
+        "p50Ns": 30170775,
+        "p95Ns": 31099057
+      },
+      "cpuProcessMsIncludingWarmup": 753,
+      "memoryBefore": {
+        "nativeHeapBytes": 52107904,
+        "javaUsedBytes": 10716720
+      },
+      "memoryAfter": {
+        "nativeHeapBytes": 52136544,
+        "javaUsedBytes": 11839024
+      }
+    },
+    {
+      "round": 3,
+      "path": "scenario",
+      "samples": [
+        {
+          "reactionNs": 27535532,
+          "bindFrameNs": 10329,
+          "numberNs": 26742605,
+          "colorNs": 22743,
+          "afterRecognitionToGestureNs": 546044,
+          "coordinationAndBridgeNs": 759855,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 27329686,
+          "bindFrameNs": 10850,
+          "numberNs": 26583416,
+          "colorNs": 21620,
+          "afterRecognitionToGestureNs": 515227,
+          "coordinationAndBridgeNs": 713800,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 27274843,
+          "bindFrameNs": 10149,
+          "numberNs": 26551386,
+          "colorNs": 22132,
+          "afterRecognitionToGestureNs": 492934,
+          "coordinationAndBridgeNs": 691176,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 27564116,
+          "bindFrameNs": 9528,
+          "numberNs": 26881165,
+          "colorNs": 25197,
+          "afterRecognitionToGestureNs": 445777,
+          "coordinationAndBridgeNs": 648226,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 27560890,
+          "bindFrameNs": 11151,
+          "numberNs": 26862399,
+          "colorNs": 21931,
+          "afterRecognitionToGestureNs": 453130,
+          "coordinationAndBridgeNs": 665409,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 27308737,
+          "bindFrameNs": 10099,
+          "numberNs": 26583366,
+          "colorNs": 23975,
+          "afterRecognitionToGestureNs": 476714,
+          "coordinationAndBridgeNs": 691297,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 47511293,
+          "bindFrameNs": 30117,
+          "numberNs": 46623087,
+          "colorNs": 25478,
+          "afterRecognitionToGestureNs": 512070,
+          "coordinationAndBridgeNs": 832611,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 28064424,
+          "bindFrameNs": 11662,
+          "numberNs": 27395279,
+          "colorNs": 23063,
+          "afterRecognitionToGestureNs": 435337,
+          "coordinationAndBridgeNs": 634420,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 27898523,
+          "bindFrameNs": 9858,
+          "numberNs": 27002813,
+          "colorNs": 28514,
+          "afterRecognitionToGestureNs": 611497,
+          "coordinationAndBridgeNs": 857338,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 28556347,
+          "bindFrameNs": 24436,
+          "numberNs": 27814385,
+          "colorNs": 56887,
+          "afterRecognitionToGestureNs": 366788,
+          "coordinationAndBridgeNs": 660639,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 27788777,
+          "bindFrameNs": 11913,
+          "numberNs": 27045332,
+          "colorNs": 23454,
+          "afterRecognitionToGestureNs": 475832,
+          "coordinationAndBridgeNs": 708078,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 26939003,
+          "bindFrameNs": 14287,
+          "numberNs": 26204916,
+          "colorNs": 37230,
+          "afterRecognitionToGestureNs": 450565,
+          "coordinationAndBridgeNs": 682570,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 27677207,
+          "bindFrameNs": 12564,
+          "numberNs": 26992914,
+          "colorNs": 28864,
+          "afterRecognitionToGestureNs": 416050,
+          "coordinationAndBridgeNs": 642865,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 26789463,
+          "bindFrameNs": 10099,
+          "numberNs": 26097664,
+          "colorNs": 21971,
+          "afterRecognitionToGestureNs": 462167,
+          "coordinationAndBridgeNs": 659729,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 27109323,
+          "bindFrameNs": 14147,
+          "numberNs": 26439446,
+          "colorNs": 28854,
+          "afterRecognitionToGestureNs": 409819,
+          "coordinationAndBridgeNs": 626876,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 27566861,
+          "bindFrameNs": 11011,
+          "numberNs": 26831031,
+          "colorNs": 28714,
+          "afterRecognitionToGestureNs": 466785,
+          "coordinationAndBridgeNs": 696105,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 26575191,
+          "bindFrameNs": 12403,
+          "numberNs": 25897149,
+          "colorNs": 21921,
+          "afterRecognitionToGestureNs": 437892,
+          "coordinationAndBridgeNs": 643718,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 27206946,
+          "bindFrameNs": 9818,
+          "numberNs": 26541317,
+          "colorNs": 27001,
+          "afterRecognitionToGestureNs": 421380,
+          "coordinationAndBridgeNs": 628810,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 27842518,
+          "bindFrameNs": 11842,
+          "numberNs": 27118350,
+          "colorNs": 27051,
+          "afterRecognitionToGestureNs": 458991,
+          "coordinationAndBridgeNs": 685275,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 27567813,
+          "bindFrameNs": 10569,
+          "numberNs": 26835810,
+          "colorNs": 25137,
+          "afterRecognitionToGestureNs": 487274,
+          "coordinationAndBridgeNs": 696297,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        }
+      ],
+      "reaction": {
+        "p50Ns": 27560890,
+        "p95Ns": 28556347
+      },
+      "cpuProcessMsIncludingWarmup": 660,
+      "memoryBefore": {
+        "nativeHeapBytes": 52136480,
+        "javaUsedBytes": 11839024
+      },
+      "memoryAfter": {
+        "nativeHeapBytes": 52163136,
+        "javaUsedBytes": 11970224
+      }
+    },
+    {
+      "round": 3,
+      "path": "script",
+      "samples": [
+        {
+          "reactionNs": 29244548,
+          "bindFrameNs": 12013,
+          "numberNs": 26456779,
+          "colorNs": 21831,
+          "afterRecognitionToGestureNs": 673122,
+          "coordinationAndBridgeNs": 2753925,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29391363,
+          "bindFrameNs": 11030,
+          "numberNs": 26471836,
+          "colorNs": 24997,
+          "afterRecognitionToGestureNs": 689583,
+          "coordinationAndBridgeNs": 2883500,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29722294,
+          "bindFrameNs": 12103,
+          "numberNs": 26820811,
+          "colorNs": 23333,
+          "afterRecognitionToGestureNs": 697529,
+          "coordinationAndBridgeNs": 2866047,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29672481,
+          "bindFrameNs": 11241,
+          "numberNs": 26634752,
+          "colorNs": 32190,
+          "afterRecognitionToGestureNs": 704512,
+          "coordinationAndBridgeNs": 2994298,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29372678,
+          "bindFrameNs": 13285,
+          "numberNs": 26612430,
+          "colorNs": 23123,
+          "afterRecognitionToGestureNs": 654347,
+          "coordinationAndBridgeNs": 2723840,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29381284,
+          "bindFrameNs": 10530,
+          "numberNs": 26658166,
+          "colorNs": 22212,
+          "afterRecognitionToGestureNs": 659968,
+          "coordinationAndBridgeNs": 2690376,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29086472,
+          "bindFrameNs": 12323,
+          "numberNs": 26346021,
+          "colorNs": 27151,
+          "afterRecognitionToGestureNs": 672622,
+          "coordinationAndBridgeNs": 2700977,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29335238,
+          "bindFrameNs": 12143,
+          "numberNs": 26633931,
+          "colorNs": 23033,
+          "afterRecognitionToGestureNs": 674916,
+          "coordinationAndBridgeNs": 2666131,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29001492,
+          "bindFrameNs": 15479,
+          "numberNs": 26165472,
+          "colorNs": 21540,
+          "afterRecognitionToGestureNs": 644078,
+          "coordinationAndBridgeNs": 2799001,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29361047,
+          "bindFrameNs": 11001,
+          "numberNs": 26657796,
+          "colorNs": 25518,
+          "afterRecognitionToGestureNs": 664657,
+          "coordinationAndBridgeNs": 2666732,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29579046,
+          "bindFrameNs": 11000,
+          "numberNs": 26804441,
+          "colorNs": 23193,
+          "afterRecognitionToGestureNs": 651703,
+          "coordinationAndBridgeNs": 2740412,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29429484,
+          "bindFrameNs": 11762,
+          "numberNs": 26607982,
+          "colorNs": 22903,
+          "afterRecognitionToGestureNs": 766648,
+          "coordinationAndBridgeNs": 2786837,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29429194,
+          "bindFrameNs": 18545,
+          "numberNs": 26494439,
+          "colorNs": 22753,
+          "afterRecognitionToGestureNs": 652774,
+          "coordinationAndBridgeNs": 2893457,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29224690,
+          "bindFrameNs": 11682,
+          "numberNs": 26418396,
+          "colorNs": 22703,
+          "afterRecognitionToGestureNs": 704421,
+          "coordinationAndBridgeNs": 2771909,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29191318,
+          "bindFrameNs": 12424,
+          "numberNs": 26425259,
+          "colorNs": 22963,
+          "afterRecognitionToGestureNs": 643266,
+          "coordinationAndBridgeNs": 2730672,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29558887,
+          "bindFrameNs": 11742,
+          "numberNs": 26648187,
+          "colorNs": 23053,
+          "afterRecognitionToGestureNs": 834265,
+          "coordinationAndBridgeNs": 2875905,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30323642,
+          "bindFrameNs": 13716,
+          "numberNs": 27196967,
+          "colorNs": 27672,
+          "afterRecognitionToGestureNs": 846067,
+          "coordinationAndBridgeNs": 3085287,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 40879353,
+          "bindFrameNs": 16290,
+          "numberNs": 37372645,
+          "colorNs": 31489,
+          "afterRecognitionToGestureNs": 838223,
+          "coordinationAndBridgeNs": 3458929,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 36667542,
+          "bindFrameNs": 16972,
+          "numberNs": 33699594,
+          "colorNs": 21270,
+          "afterRecognitionToGestureNs": 632336,
+          "coordinationAndBridgeNs": 2929706,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 28435230,
+          "bindFrameNs": 12003,
+          "numberNs": 25859218,
+          "colorNs": 28794,
+          "afterRecognitionToGestureNs": 637356,
+          "coordinationAndBridgeNs": 2535215,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        }
+      ],
+      "reaction": {
+        "p50Ns": 29381284,
+        "p95Ns": 36667542
+      },
+      "cpuProcessMsIncludingWarmup": 755,
+      "memoryBefore": {
+        "nativeHeapBytes": 52163552,
+        "javaUsedBytes": 11970224
+      },
+      "memoryAfter": {
+        "nativeHeapBytes": 52191904,
+        "javaUsedBytes": 13117104
+      }
+    },
+    {
+      "round": 3,
+      "path": "script-grouped",
+      "samples": [
+        {
+          "reactionNs": 28311438,
+          "bindFrameNs": 10931,
+          "numberNs": 25943255,
+          "colorNs": 23965,
+          "afterRecognitionToGestureNs": 1056572,
+          "coordinationAndBridgeNs": 2333287,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 28255903,
+          "bindFrameNs": 12333,
+          "numberNs": 25967681,
+          "colorNs": 33252,
+          "afterRecognitionToGestureNs": 1011297,
+          "coordinationAndBridgeNs": 2242637,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 28778714,
+          "bindFrameNs": 12373,
+          "numberNs": 26448663,
+          "colorNs": 28213,
+          "afterRecognitionToGestureNs": 1029711,
+          "coordinationAndBridgeNs": 2289465,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 28413890,
+          "bindFrameNs": 11852,
+          "numberNs": 26000412,
+          "colorNs": 41608,
+          "afterRecognitionToGestureNs": 1050681,
+          "coordinationAndBridgeNs": 2360018,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29215383,
+          "bindFrameNs": 12724,
+          "numberNs": 26780225,
+          "colorNs": 34124,
+          "afterRecognitionToGestureNs": 1026435,
+          "coordinationAndBridgeNs": 2388310,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29409127,
+          "bindFrameNs": 12353,
+          "numberNs": 27105877,
+          "colorNs": 28113,
+          "afterRecognitionToGestureNs": 1041784,
+          "coordinationAndBridgeNs": 2262784,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29726232,
+          "bindFrameNs": 11782,
+          "numberNs": 27278419,
+          "colorNs": 34695,
+          "afterRecognitionToGestureNs": 1170917,
+          "coordinationAndBridgeNs": 2401336,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30805586,
+          "bindFrameNs": 13455,
+          "numberNs": 28090013,
+          "colorNs": 45415,
+          "afterRecognitionToGestureNs": 1234095,
+          "coordinationAndBridgeNs": 2656703,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29217888,
+          "bindFrameNs": 11762,
+          "numberNs": 26852892,
+          "colorNs": 27061,
+          "afterRecognitionToGestureNs": 1082420,
+          "coordinationAndBridgeNs": 2326173,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29163075,
+          "bindFrameNs": 15800,
+          "numberNs": 26485723,
+          "colorNs": 30768,
+          "afterRecognitionToGestureNs": 1004524,
+          "coordinationAndBridgeNs": 2630784,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29285374,
+          "bindFrameNs": 11321,
+          "numberNs": 27090597,
+          "colorNs": 23343,
+          "afterRecognitionToGestureNs": 958448,
+          "coordinationAndBridgeNs": 2160113,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29170649,
+          "bindFrameNs": 10560,
+          "numberNs": 26889591,
+          "colorNs": 30067,
+          "afterRecognitionToGestureNs": 989436,
+          "coordinationAndBridgeNs": 2240431,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29181489,
+          "bindFrameNs": 11111,
+          "numberNs": 26879040,
+          "colorNs": 28202,
+          "afterRecognitionToGestureNs": 977013,
+          "coordinationAndBridgeNs": 2263136,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29678852,
+          "bindFrameNs": 15429,
+          "numberNs": 27139740,
+          "colorNs": 23654,
+          "afterRecognitionToGestureNs": 933491,
+          "coordinationAndBridgeNs": 2500029,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29728937,
+          "bindFrameNs": 11902,
+          "numberNs": 27441015,
+          "colorNs": 26310,
+          "afterRecognitionToGestureNs": 1045431,
+          "coordinationAndBridgeNs": 2249710,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29728265,
+          "bindFrameNs": 11302,
+          "numberNs": 27437758,
+          "colorNs": 30607,
+          "afterRecognitionToGestureNs": 975480,
+          "coordinationAndBridgeNs": 2248598,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29149409,
+          "bindFrameNs": 12032,
+          "numberNs": 26699795,
+          "colorNs": 25047,
+          "afterRecognitionToGestureNs": 1080868,
+          "coordinationAndBridgeNs": 2412535,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29460923,
+          "bindFrameNs": 17052,
+          "numberNs": 26946788,
+          "colorNs": 38191,
+          "afterRecognitionToGestureNs": 984036,
+          "coordinationAndBridgeNs": 2458892,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29067406,
+          "bindFrameNs": 11001,
+          "numberNs": 26811915,
+          "colorNs": 32851,
+          "afterRecognitionToGestureNs": 1008282,
+          "coordinationAndBridgeNs": 2211639,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29366236,
+          "bindFrameNs": 12163,
+          "numberNs": 27100867,
+          "colorNs": 25037,
+          "afterRecognitionToGestureNs": 963216,
+          "coordinationAndBridgeNs": 2228169,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        }
+      ],
+      "reaction": {
+        "p50Ns": 29215383,
+        "p95Ns": 29728937
+      },
+      "cpuProcessMsIncludingWarmup": 717,
+      "memoryBefore": {
+        "nativeHeapBytes": 52192160,
+        "javaUsedBytes": 13117104
+      },
+      "memoryAfter": {
+        "nativeHeapBytes": 52220032,
+        "javaUsedBytes": 14239408
+      }
+    },
+    {
+      "round": 4,
+      "path": "script",
+      "samples": [
+        {
+          "reactionNs": 29505718,
+          "bindFrameNs": 11041,
+          "numberNs": 27007883,
+          "colorNs": 23294,
+          "afterRecognitionToGestureNs": 600516,
+          "coordinationAndBridgeNs": 2463500,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 28870687,
+          "bindFrameNs": 11813,
+          "numberNs": 26335030,
+          "colorNs": 35336,
+          "afterRecognitionToGestureNs": 633849,
+          "coordinationAndBridgeNs": 2488508,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29034534,
+          "bindFrameNs": 12894,
+          "numberNs": 26315874,
+          "colorNs": 26610,
+          "afterRecognitionToGestureNs": 640561,
+          "coordinationAndBridgeNs": 2679156,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29312445,
+          "bindFrameNs": 11722,
+          "numberNs": 26774956,
+          "colorNs": 23153,
+          "afterRecognitionToGestureNs": 598763,
+          "coordinationAndBridgeNs": 2502614,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29281998,
+          "bindFrameNs": 11581,
+          "numberNs": 26375746,
+          "colorNs": 30858,
+          "afterRecognitionToGestureNs": 772789,
+          "coordinationAndBridgeNs": 2863813,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 28937272,
+          "bindFrameNs": 13255,
+          "numberNs": 26408698,
+          "colorNs": 24306,
+          "afterRecognitionToGestureNs": 623690,
+          "coordinationAndBridgeNs": 2491013,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 28968290,
+          "bindFrameNs": 22182,
+          "numberNs": 26377620,
+          "colorNs": 25397,
+          "afterRecognitionToGestureNs": 594536,
+          "coordinationAndBridgeNs": 2543091,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29720560,
+          "bindFrameNs": 12344,
+          "numberNs": 27132797,
+          "colorNs": 22563,
+          "afterRecognitionToGestureNs": 664746,
+          "coordinationAndBridgeNs": 2552856,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29148849,
+          "bindFrameNs": 11532,
+          "numberNs": 26331233,
+          "colorNs": 30267,
+          "afterRecognitionToGestureNs": 749075,
+          "coordinationAndBridgeNs": 2775817,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 28764257,
+          "bindFrameNs": 17803,
+          "numberNs": 26316966,
+          "colorNs": 22152,
+          "afterRecognitionToGestureNs": 583975,
+          "coordinationAndBridgeNs": 2407336,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29853490,
+          "bindFrameNs": 11862,
+          "numberNs": 27233646,
+          "colorNs": 23825,
+          "afterRecognitionToGestureNs": 613831,
+          "coordinationAndBridgeNs": 2584157,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29976040,
+          "bindFrameNs": 11542,
+          "numberNs": 27052306,
+          "colorNs": 34234,
+          "afterRecognitionToGestureNs": 842140,
+          "coordinationAndBridgeNs": 2877958,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29802214,
+          "bindFrameNs": 16351,
+          "numberNs": 27114893,
+          "colorNs": 24877,
+          "afterRecognitionToGestureNs": 638217,
+          "coordinationAndBridgeNs": 2646093,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29911269,
+          "bindFrameNs": 15529,
+          "numberNs": 26887126,
+          "colorNs": 27642,
+          "afterRecognitionToGestureNs": 814488,
+          "coordinationAndBridgeNs": 2980972,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29721793,
+          "bindFrameNs": 18575,
+          "numberNs": 27296724,
+          "colorNs": 22583,
+          "afterRecognitionToGestureNs": 580729,
+          "coordinationAndBridgeNs": 2383911,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30310057,
+          "bindFrameNs": 11542,
+          "numberNs": 27805138,
+          "colorNs": 25037,
+          "afterRecognitionToGestureNs": 584106,
+          "coordinationAndBridgeNs": 2468340,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 31736553,
+          "bindFrameNs": 11080,
+          "numberNs": 28532763,
+          "colorNs": 34084,
+          "afterRecognitionToGestureNs": 907803,
+          "coordinationAndBridgeNs": 3158626,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30532744,
+          "bindFrameNs": 21841,
+          "numberNs": 27341758,
+          "colorNs": 27652,
+          "afterRecognitionToGestureNs": 756209,
+          "coordinationAndBridgeNs": 3141493,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30873834,
+          "bindFrameNs": 20178,
+          "numberNs": 28138884,
+          "colorNs": 26159,
+          "afterRecognitionToGestureNs": 621616,
+          "coordinationAndBridgeNs": 2688613,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29215854,
+          "bindFrameNs": 11631,
+          "numberNs": 26753966,
+          "colorNs": 23204,
+          "afterRecognitionToGestureNs": 595267,
+          "coordinationAndBridgeNs": 2427053,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        }
+      ],
+      "reaction": {
+        "p50Ns": 29505718,
+        "p95Ns": 30873834
+      },
+      "cpuProcessMsIncludingWarmup": 729,
+      "memoryBefore": {
+        "nativeHeapBytes": 52219968,
+        "javaUsedBytes": 14239408
+      },
+      "memoryAfter": {
+        "nativeHeapBytes": 52248672,
+        "javaUsedBytes": 15394480
+      }
+    },
+    {
+      "round": 4,
+      "path": "script-grouped",
+      "samples": [
+        {
+          "reactionNs": 29862808,
+          "bindFrameNs": 11482,
+          "numberNs": 27757037,
+          "colorNs": 37931,
+          "afterRecognitionToGestureNs": 875963,
+          "coordinationAndBridgeNs": 2056358,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 28978118,
+          "bindFrameNs": 11362,
+          "numberNs": 26970542,
+          "colorNs": 22532,
+          "afterRecognitionToGestureNs": 877807,
+          "coordinationAndBridgeNs": 1973682,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 28499440,
+          "bindFrameNs": 11501,
+          "numberNs": 26385655,
+          "colorNs": 24516,
+          "afterRecognitionToGestureNs": 941927,
+          "coordinationAndBridgeNs": 2077768,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29196759,
+          "bindFrameNs": 14648,
+          "numberNs": 26923864,
+          "colorNs": 23955,
+          "afterRecognitionToGestureNs": 951185,
+          "coordinationAndBridgeNs": 2234292,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29296285,
+          "bindFrameNs": 11923,
+          "numberNs": 27242913,
+          "colorNs": 29465,
+          "afterRecognitionToGestureNs": 862949,
+          "coordinationAndBridgeNs": 2011984,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29036738,
+          "bindFrameNs": 12273,
+          "numberNs": 26688413,
+          "colorNs": 33704,
+          "afterRecognitionToGestureNs": 1100574,
+          "coordinationAndBridgeNs": 2302348,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 28571686,
+          "bindFrameNs": 16611,
+          "numberNs": 26472538,
+          "colorNs": 26640,
+          "afterRecognitionToGestureNs": 891633,
+          "coordinationAndBridgeNs": 2055897,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 30269009,
+          "bindFrameNs": 11431,
+          "numberNs": 27956692,
+          "colorNs": 26830,
+          "afterRecognitionToGestureNs": 924424,
+          "coordinationAndBridgeNs": 2274056,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29207699,
+          "bindFrameNs": 10801,
+          "numberNs": 27036737,
+          "colorNs": 25618,
+          "afterRecognitionToGestureNs": 1052464,
+          "coordinationAndBridgeNs": 2134543,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 28478571,
+          "bindFrameNs": 11481,
+          "numberNs": 26374985,
+          "colorNs": 23064,
+          "afterRecognitionToGestureNs": 882034,
+          "coordinationAndBridgeNs": 2069041,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 28827576,
+          "bindFrameNs": 17713,
+          "numberNs": 26569900,
+          "colorNs": 24185,
+          "afterRecognitionToGestureNs": 910979,
+          "coordinationAndBridgeNs": 2215778,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29290073,
+          "bindFrameNs": 10530,
+          "numberNs": 27213087,
+          "colorNs": 23394,
+          "afterRecognitionToGestureNs": 901020,
+          "coordinationAndBridgeNs": 2043062,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 28841201,
+          "bindFrameNs": 10770,
+          "numberNs": 26723749,
+          "colorNs": 34666,
+          "afterRecognitionToGestureNs": 911860,
+          "coordinationAndBridgeNs": 2072016,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 28642147,
+          "bindFrameNs": 13094,
+          "numberNs": 26563509,
+          "colorNs": 43942,
+          "afterRecognitionToGestureNs": 838252,
+          "coordinationAndBridgeNs": 2021602,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 28830732,
+          "bindFrameNs": 11321,
+          "numberNs": 26795584,
+          "colorNs": 53801,
+          "afterRecognitionToGestureNs": 858611,
+          "coordinationAndBridgeNs": 1970026,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 28968750,
+          "bindFrameNs": 10870,
+          "numberNs": 27034162,
+          "colorNs": 21480,
+          "afterRecognitionToGestureNs": 860975,
+          "coordinationAndBridgeNs": 1902238,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 28684007,
+          "bindFrameNs": 10921,
+          "numberNs": 26495832,
+          "colorNs": 23323,
+          "afterRecognitionToGestureNs": 983786,
+          "coordinationAndBridgeNs": 2153931,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 28883281,
+          "bindFrameNs": 15489,
+          "numberNs": 26857440,
+          "colorNs": 22772,
+          "afterRecognitionToGestureNs": 856327,
+          "coordinationAndBridgeNs": 1987580,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29069480,
+          "bindFrameNs": 11521,
+          "numberNs": 26998184,
+          "colorNs": 21450,
+          "afterRecognitionToGestureNs": 862629,
+          "coordinationAndBridgeNs": 2038325,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29227907,
+          "bindFrameNs": 11572,
+          "numberNs": 27032999,
+          "colorNs": 35717,
+          "afterRecognitionToGestureNs": 972675,
+          "coordinationAndBridgeNs": 2147619,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        }
+      ],
+      "reaction": {
+        "p50Ns": 28968750,
+        "p95Ns": 29862808
+      },
+      "cpuProcessMsIncludingWarmup": 758,
+      "memoryBefore": {
+        "nativeHeapBytes": 52248896,
+        "javaUsedBytes": 15394480
+      },
+      "memoryAfter": {
+        "nativeHeapBytes": 51916368,
+        "javaUsedBytes": 2900064
+      }
+    },
+    {
+      "round": 4,
+      "path": "scenario",
+      "samples": [
+        {
+          "reactionNs": 27668101,
+          "bindFrameNs": 11070,
+          "numberNs": 26927742,
+          "colorNs": 39805,
+          "afterRecognitionToGestureNs": 464311,
+          "coordinationAndBridgeNs": 689484,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 27522307,
+          "bindFrameNs": 10319,
+          "numberNs": 26716887,
+          "colorNs": 29375,
+          "afterRecognitionToGestureNs": 542738,
+          "coordinationAndBridgeNs": 765726,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 28186994,
+          "bindFrameNs": 13906,
+          "numberNs": 27424403,
+          "colorNs": 33302,
+          "afterRecognitionToGestureNs": 501551,
+          "coordinationAndBridgeNs": 715383,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 28877760,
+          "bindFrameNs": 10119,
+          "numberNs": 28187465,
+          "colorNs": 25709,
+          "afterRecognitionToGestureNs": 444934,
+          "coordinationAndBridgeNs": 654467,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 28738428,
+          "bindFrameNs": 11682,
+          "numberNs": 28036101,
+          "colorNs": 34685,
+          "afterRecognitionToGestureNs": 448140,
+          "coordinationAndBridgeNs": 655960,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 29163325,
+          "bindFrameNs": 9968,
+          "numberNs": 28523605,
+          "colorNs": 30146,
+          "afterRecognitionToGestureNs": 411502,
+          "coordinationAndBridgeNs": 599606,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 27163635,
+          "bindFrameNs": 9498,
+          "numberNs": 26372781,
+          "colorNs": 24325,
+          "afterRecognitionToGestureNs": 548379,
+          "coordinationAndBridgeNs": 757031,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 26921250,
+          "bindFrameNs": 14107,
+          "numberNs": 26187283,
+          "colorNs": 21150,
+          "afterRecognitionToGestureNs": 487204,
+          "coordinationAndBridgeNs": 698710,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 27607047,
+          "bindFrameNs": 9698,
+          "numberNs": 26921931,
+          "colorNs": 21961,
+          "afterRecognitionToGestureNs": 465133,
+          "coordinationAndBridgeNs": 653457,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 26743135,
+          "bindFrameNs": 10550,
+          "numberNs": 26087616,
+          "colorNs": 23854,
+          "afterRecognitionToGestureNs": 433463,
+          "coordinationAndBridgeNs": 621115,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 28174060,
+          "bindFrameNs": 9628,
+          "numberNs": 27476291,
+          "colorNs": 23113,
+          "afterRecognitionToGestureNs": 464712,
+          "coordinationAndBridgeNs": 665028,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 27483434,
+          "bindFrameNs": 10019,
+          "numberNs": 26730532,
+          "colorNs": 33804,
+          "afterRecognitionToGestureNs": 495950,
+          "coordinationAndBridgeNs": 709079,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 27454650,
+          "bindFrameNs": 10249,
+          "numberNs": 26778793,
+          "colorNs": 23824,
+          "afterRecognitionToGestureNs": 445496,
+          "coordinationAndBridgeNs": 641784,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 28198506,
+          "bindFrameNs": 9648,
+          "numberNs": 27539370,
+          "colorNs": 23945,
+          "afterRecognitionToGestureNs": 416822,
+          "coordinationAndBridgeNs": 625543,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 27856765,
+          "bindFrameNs": 11181,
+          "numberNs": 27165117,
+          "colorNs": 23595,
+          "afterRecognitionToGestureNs": 438723,
+          "coordinationAndBridgeNs": 656872,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 27650067,
+          "bindFrameNs": 13866,
+          "numberNs": 27028681,
+          "colorNs": 21670,
+          "afterRecognitionToGestureNs": 374142,
+          "coordinationAndBridgeNs": 585850,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 28173088,
+          "bindFrameNs": 10089,
+          "numberNs": 27504053,
+          "colorNs": 25097,
+          "afterRecognitionToGestureNs": 428524,
+          "coordinationAndBridgeNs": 633849,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 26893317,
+          "bindFrameNs": 12053,
+          "numberNs": 26236084,
+          "colorNs": 21640,
+          "afterRecognitionToGestureNs": 430498,
+          "coordinationAndBridgeNs": 623540,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 28128465,
+          "bindFrameNs": 9998,
+          "numberNs": 27461613,
+          "colorNs": 21991,
+          "afterRecognitionToGestureNs": 441128,
+          "coordinationAndBridgeNs": 634863,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        },
+        {
+          "reactionNs": 27530864,
+          "bindFrameNs": 14417,
+          "numberNs": 26888879,
+          "colorNs": 24366,
+          "afterRecognitionToGestureNs": 412083,
+          "coordinationAndBridgeNs": 603202,
+          "captures": 1,
+          "ocrCalls": 1,
+          "gestures": 1
+        }
+      ],
+      "reaction": {
+        "p50Ns": 27650067,
+        "p95Ns": 28877760
+      },
+      "cpuProcessMsIncludingWarmup": 648,
+      "memoryBefore": {
+        "nativeHeapBytes": 51916304,
+        "javaUsedBytes": 2900064
+      },
+      "memoryAfter": {
+        "nativeHeapBytes": 51943216,
+        "javaUsedBytes": 3064144
+      }
+    }
+  ],
+  "provenance": {
+    "recordedAtUtc": "2026-11-10T07:45:37.168558+00:00",
+    "head": "41e3d77b707639c693d71bb58b2c9d407fad6930",
+    "dirty": true,
+    "sourceSha256": {
+      "core/smart/processing/src/androidTest/java/com/buzbuz/smartautoclicker/core/processing/data/processor/__tests__/script_reaction_latency.integration.spec.kt": "3ad0cfdb361c90925c39514c2467c807198c56e8214bde547cc317598ad02daa",
+      "core/smart/processing/src/main/java/com/buzbuz/smartautoclicker/core/processing/data/processor/ScenarioProcessor.kt": "47ce6eab96ee05446f9b0617280bd4e6e98995295a0b2c2e5668b29cd6802e11",
+      "core/smart/processing/src/main/java/com/buzbuz/smartautoclicker/core/processing/data/processor/ConditionsVerifier.kt": "090d8aa3452a4e0146faf6714426a2d26bf0c0ca9fe295c75f20a9e81bc5350a",
+      "core/script/runtime/src/main/java/com/buzbuz/smartautoclicker/core/script/runtime/api/ScreenAutomationHost.kt": "2b075262eb79249034a68f2f5d308b5f9bbc992f624cc75ad57f01774f36048c",
+      "core/script/runtime/src/main/resources/klickr/api-v1.js": "71e162e6bd8eff2c33bb842493177d13abe0d24491014b250b68df5a24a6b1b2",
+      "core/script/runtime/src/main/java/com/buzbuz/smartautoclicker/core/script/runtime/QuickJsScriptRuntime.kt": "df32aad0f3758f0a3b86dfc4bf6afbc17e7bfd6dc673f5838b445d113e06f799",
+      "core/script/android/src/main/java/com/buzbuz/smartautoclicker/core/script/android/AndroidScreenAutomationBackend.kt": "0f40566582e1d91464d7cefec740590c85bb034346f784fda8377c757bed78cd",
+      "core/smart/detection/src/androidTest/assets/wall_calibration/confirmation_current.png": "67dec6d20462e94fdecb63f26d655d7953fc81b07f688b5fc4382d143abefe5d"
+    },
+    "command": "./gradlew :core:smart:processing:connectedFDroidDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.buzbuz.smartautoclicker.core.processing.data.processor.ScriptReactionLatencyBenchmark -Pandroid.testInstrumentationRunnerArguments.benchmark=true"
+  },
+  "limitations": [
+    "Available fixture bitmap; captures counts frame binding, not an OS capture.",
+    "Ends at a fake AndroidActionExecutor dispatch boundary; no gesture injected.",
+    "Does not include MediaProjection, game response, polling intervals, package startup or live farm.",
+    "Markers and detector assertions add instrumentation overhead to both paths; the script marker wrapper also parses each JSON request.",
+    "Process CPU and heap snapshots are observational; they include warmup and runtime setup, are not allocation or battery profiles.",
+    "Script diagnostics event recording and visible diagnostic UI were not exercised in this comparison.",
+    "QuickJS and the detector share one dedicated dispatcher in this isolated collection; production uses Dispatchers.Default for JS and a serial resource dispatcher for Android operations."
+  ],
+  "aggregate": {
+    "scenario": {
+      "reactionNs": {
+        "p50Ns": 28135262.5,
+        "p95Ns": 31373070
+      },
+      "bindFrameNs": {
+        "p50Ns": 10775.0,
+        "p95Ns": 16020
+      },
+      "numberNs": {
+        "p50Ns": 27366159.5,
+        "p95Ns": 30609628
+      },
+      "colorNs": {
+        "p50Ns": 25568.5,
+        "p95Ns": 43241
+      },
+      "afterRecognitionToGestureNs": {
+        "p50Ns": 482600.5,
+        "p95Ns": 548379
+      },
+      "coordinationAndBridgeNs": {
+        "p50Ns": 711439.5,
+        "p95Ns": 832611
+      },
+      "roundP50RangeNs": 1477752
+    },
+    "script": {
+      "reactionNs": {
+        "p50Ns": 30287835.0,
+        "p95Ns": 32523419
+      },
+      "bindFrameNs": {
+        "p50Ns": 12303.0,
+        "p95Ns": 21410
+      },
+      "numberNs": {
+        "p50Ns": 26780801.5,
+        "p95Ns": 28532763
+      },
+      "colorNs": {
+        "p50Ns": 23243.5,
+        "p95Ns": 33122
+      },
+      "afterRecognitionToGestureNs": {
+        "p50Ns": 810500.5,
+        "p95Ns": 1307733
+      },
+      "coordinationAndBridgeNs": {
+        "p50Ns": 3071277.5,
+        "p95Ns": 5391705
+      },
+      "roundP50RangeNs": 2645352
+    },
+    "script-grouped": {
+      "reactionNs": {
+        "p50Ns": 30081738.5,
+        "p95Ns": 31408076
+      },
+      "bindFrameNs": {
+        "p50Ns": 12042.0,
+        "p95Ns": 22572
+      },
+      "numberNs": {
+        "p50Ns": 27029968.5,
+        "p95Ns": 28331024
+      },
+      "colorNs": {
+        "p50Ns": 25733.5,
+        "p95Ns": 43481
+      },
+      "afterRecognitionToGestureNs": {
+        "p50Ns": 1146446.0,
+        "p95Ns": 1738060
+      },
+      "coordinationAndBridgeNs": {
+        "p50Ns": 2761831.5,
+        "p95Ns": 4091394
+      },
+      "roundP50RangeNs": 1726299
+    }
+  },
+  "acceptance": {
+    "criteriaFrom": "reaction-baseline-x86_64-api36.json",
+    "coordinationTargetMet": false,
+    "reactionTargetMet": false,
+    "reactionImprovementExceedsInitialRoundRange": false,
+    "recognizedSamplesPerPath": 100,
+    "gainAgainstCurrentMotorDemonstrated": false
+  }
+}

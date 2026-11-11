@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "recordedAtUtc": "2026-11-10T12:48:13.140410+00:00",
+  "api": 36,
+  "abi": "x86_64",
+  "variant": "fDroidDebug",
+  "apk": {
+    "file": "smartautoclicker-fDroid-x86_64-debug.apk",
+    "bytes": 40943157,
+    "sha256": "bdae1b6b04fdb69655c8ae3eadea8d2e1f2696dfecc45305cc434eb4e0131045"
+  },
+  "screenshots": [
+    {
+      "file": "docs/assets/script-mode/previa-recurso-retrato-api36.png",
+      "sha256": "c1f1152c3bdbbc1e00fbd3521977a91c75d21094b8d7451621ed28d5ef105ce6",
+      "fontScale": 1.0,
+      "nightMode": false,
+      "orientation": "portrait"
+    },
+    {
+      "file": "docs/assets/script-mode/previa-recurso-paisagem-api36.png",
+      "sha256": "38143b00ba826e9a4f782594708bc1c4ab6acde513f4005ce00484a2630fd915",
+      "fontScale": 1.3,
+      "nightMode": true,
+      "orientation": "landscape"
+    }
+  ],
+  "sourceSha256": {
+    "feature/script-config/src/main/java/com/buzbuz/smartautoclicker/feature/script/config/ScriptLibraryViewModel.kt": "532362f248fe7f85338813064579006a98dea36dcf7e86081f688a347be83a5f",
+    "feature/script-config/src/main/java/com/buzbuz/smartautoclicker/feature/script/config/ScriptLibraryActivity.kt": "7024125891de25aaf6b83785478067a89024e4426a07779fb996545c9acc2835",
+    "feature/script-config/src/main/res/layout/activity_script_library.xml": "5cc1528795c9c23398486a0b6490b121572417b63daf0c5a3f1fe1292b6a277c",
+    "feature/script-config/src/test/java/com/buzbuz/smartautoclicker/feature/script/config/__tests__/script_editor.integration.spec.kt": "4528ef9b3cc1d07403be4ed89b125e5415984b7f9cafa8022cd853bbeea5f7fa"
+  },
+  "observations": [
+    "Opened the existing imported farm revision 64f32342 without starting or modifying it.",
+    "Selecting images/batchTitle.png displays the image and its original 520 x 65 dimensions.",
+    "The selected resource and preview survive rotation, night mode and font scale changes.",
+    "Preview fits the available viewport and preserves image aspect ratio.",
+    "System font, night mode and rotation settings were restored after inspection."
+  ],
+  "automatedChecks": {
+    "command": "./gradlew testFDroidDebugUnitTest assembleFDroidDebug",
+    "result": "BUILD SUCCESSFUL in 47s",
+    "regression": "Odd 2049 x 64 PNG: bounded decoded preview, original dimensions and content, unchanged original bytes, selection restored after recreation and preview hidden when returning to code."
+  },
+  "limitations": [
+    "Manual native visual checks on API 36 x86_64 only. No game action or physical arm64 validation."
+  ]
+}

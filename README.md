@@ -55,6 +55,10 @@ conectado:
 mise run install-emulator
 ```
 
+A API, os pacotes e os exemplos do modo Script deste checkout estão no
+[guia do modo Script](docs/MODO-SCRIPT.md). A arquitetura e os testes estão na
+[documentação de desenvolvimento do modo Script](docs/DESENVOLVIMENTO-MODO-SCRIPT.md).
+
 O processo de publicação está documentado em
 [Como publicar uma versão](docs/RELEASES.md).
 

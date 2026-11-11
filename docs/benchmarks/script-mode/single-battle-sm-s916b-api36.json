@@ -1,0 +1,514 @@
+{
+  "date": "2026-11-10",
+  "device": {
+    "model": "SM-S916B",
+    "abi": "arm64-v8a",
+    "api": 36
+  },
+  "status": "single-battle-completed-without-intervention",
+  "packageSha256": "24633d8ff744e6040a76047249c190041b69ae6592f708ecb0c2d1b2ad66fd0a",
+  "packageFilesSha256": {
+    "battle.js": "45a275a36cbdab0ed27c41b47c08496e30fdff95900b62af378bee7ba0cfc132",
+    "entry.js": "851cfcb8dc006c24003dd978913b63ec5288a161238f737449f159529bcd7af7",
+    "manifest.json": "8f61ac2dba12f2f1c052b8a27bff03b5d1f0665431cc1907b01796e530277ceb"
+  },
+  "entrySource": "import { parameters, sleep } from \"klickr\";\nimport { runFarm } from \"./farm.js\";\nawait sleep(5000);\nawait runFarm({...await parameters(), maxBattles:1, improveWalls:false});\n",
+  "parameters": {
+    "maxBattles": 1,
+    "improveWalls": false
+  },
+  "panelPosition": {
+    "x": 1642,
+    "y": 0
+  },
+  "diagnostics": [
+    {
+      "kind": "stage",
+      "stage": "vila e saldos necessários",
+      "message": "Aguardando confirmação de vila e saldos necessários.",
+      "monotonicNanos": 91579783966000
+    },
+    {
+      "kind": "log",
+      "stage": "vila e saldos necessários",
+      "message": "Entrada na batalha 1; saldos lidos: {}.",
+      "monotonicNanos": 91579887743240
+    },
+    {
+      "kind": "stage",
+      "stage": "vila antes da batalha",
+      "message": "Aguardando confirmação de vila antes da batalha.",
+      "monotonicNanos": 91579888331834
+    },
+    {
+      "kind": "stage",
+      "stage": "abrir batalhas",
+      "message": "Aguardando confirmação de abrir batalhas.",
+      "monotonicNanos": 91579933090479
+    },
+    {
+      "kind": "stage",
+      "stage": "menu de batalhas aberto",
+      "message": "Aguardando confirmação de menu de batalhas aberto.",
+      "monotonicNanos": 91580048733604
+    },
+    {
+      "kind": "stage",
+      "stage": "procurar partida",
+      "message": "Aguardando confirmação de procurar partida.",
+      "monotonicNanos": 91580419833500
+    },
+    {
+      "kind": "stage",
+      "stage": "confirmar o exército atual",
+      "message": "Aguardando confirmação de confirmar o exército atual.",
+      "monotonicNanos": 91580538315635
+    },
+    {
+      "kind": "stage",
+      "stage": "oponente encontrado",
+      "message": "Aguardando confirmação de oponente encontrado.",
+      "monotonicNanos": 91580867974385
+    },
+    {
+      "kind": "stage",
+      "stage": "interface do ataque",
+      "message": "Aguardando confirmação de interface do ataque.",
+      "monotonicNanos": 91583542552197
+    },
+    {
+      "kind": "stage",
+      "stage": "interface do ataque",
+      "message": "Aguardando confirmação de interface do ataque.",
+      "monotonicNanos": 91584607356728
+    },
+    {
+      "kind": "stage",
+      "stage": "interface do ataque",
+      "message": "Aguardando confirmação de interface do ataque.",
+      "monotonicNanos": 91585134269488
+    },
+    {
+      "kind": "stage",
+      "stage": "interface do ataque",
+      "message": "Aguardando confirmação de interface do ataque.",
+      "monotonicNanos": 91585458175582
+    },
+    {
+      "kind": "stage",
+      "stage": "interface do ataque",
+      "message": "Aguardando confirmação de interface do ataque.",
+      "monotonicNanos": 91585676490269
+    },
+    {
+      "kind": "stage",
+      "stage": "interface do ataque",
+      "message": "Aguardando confirmação de interface do ataque.",
+      "monotonicNanos": 91586795843810
+    },
+    {
+      "kind": "stage",
+      "stage": "interface do ataque",
+      "message": "Aguardando confirmação de interface do ataque.",
+      "monotonicNanos": 91587633673237
+    },
+    {
+      "kind": "stage",
+      "stage": "interface do ataque",
+      "message": "Aguardando confirmação de interface do ataque.",
+      "monotonicNanos": 91588140779955
+    },
+    {
+      "kind": "stage",
+      "stage": "interface do ataque",
+      "message": "Aguardando confirmação de interface do ataque.",
+      "monotonicNanos": 91588333260372
+    },
+    {
+      "kind": "stage",
+      "stage": "interface do ataque",
+      "message": "Aguardando confirmação de interface do ataque.",
+      "monotonicNanos": 91588960840736
+    },
+    {
+      "kind": "stage",
+      "stage": "interface do ataque",
+      "message": "Aguardando confirmação de interface do ataque.",
+      "monotonicNanos": 91589153416205
+    },
+    {
+      "kind": "stage",
+      "stage": "interface do ataque",
+      "message": "Aguardando confirmação de interface do ataque.",
+      "monotonicNanos": 91590147915423
+    },
+    {
+      "kind": "stage",
+      "stage": "interface do ataque",
+      "message": "Aguardando confirmação de interface do ataque.",
+      "monotonicNanos": 91590544222663
+    },
+    {
+      "kind": "stage",
+      "stage": "interface do ataque",
+      "message": "Aguardando confirmação de interface do ataque.",
+      "monotonicNanos": 91591713855267
+    },
+    {
+      "kind": "stage",
+      "stage": "interface do ataque",
+      "message": "Aguardando confirmação de interface do ataque.",
+      "monotonicNanos": 91593678353912
+    },
+    {
+      "kind": "stage",
+      "stage": "interface do ataque",
+      "message": "Aguardando confirmação de interface do ataque.",
+      "monotonicNanos": 91594230789120
+    },
+    {
+      "kind": "stage",
+      "stage": "interface do ataque",
+      "message": "Aguardando confirmação de interface do ataque.",
+      "monotonicNanos": 91594723284484
+    },
+    {
+      "kind": "stage",
+      "stage": "interface do ataque",
+      "message": "Aguardando confirmação de interface do ataque.",
+      "monotonicNanos": 91596746337817
+    },
+    {
+      "kind": "stage",
+      "stage": "interface do ataque",
+      "message": "Aguardando confirmação de interface do ataque.",
+      "monotonicNanos": 91597483757608
+    },
+    {
+      "kind": "stage",
+      "stage": "interface do ataque",
+      "message": "Aguardando confirmação de interface do ataque.",
+      "monotonicNanos": 91598846349847
+    },
+    {
+      "kind": "stage",
+      "stage": "interface do ataque",
+      "message": "Aguardando confirmação de interface do ataque.",
+      "monotonicNanos": 91599305374066
+    },
+    {
+      "kind": "stage",
+      "stage": "interface do ataque",
+      "message": "Aguardando confirmação de interface do ataque.",
+      "monotonicNanos": 91600623691357
+    },
+    {
+      "kind": "stage",
+      "stage": "interface do ataque",
+      "message": "Aguardando confirmação de interface do ataque.",
+      "monotonicNanos": 91602483492554
+    },
+    {
+      "kind": "stage",
+      "stage": "interface do ataque",
+      "message": "Aguardando confirmação de interface do ataque.",
+      "monotonicNanos": 91604296758856
+    },
+    {
+      "kind": "stage",
+      "stage": "interface do ataque",
+      "message": "Aguardando confirmação de interface do ataque.",
+      "monotonicNanos": 91605210670314
+    },
+    {
+      "kind": "stage",
+      "stage": "interface do ataque",
+      "message": "Aguardando confirmação de interface do ataque.",
+      "monotonicNanos": 91605693113178
+    },
+    {
+      "kind": "stage",
+      "stage": "interface do ataque",
+      "message": "Aguardando confirmação de interface do ataque.",
+      "monotonicNanos": 91606206453594
+    },
+    {
+      "kind": "stage",
+      "stage": "interface do ataque",
+      "message": "Aguardando confirmação de interface do ataque.",
+      "monotonicNanos": 91606768615365
+    },
+    {
+      "kind": "stage",
+      "stage": "interface do ataque",
+      "message": "Aguardando confirmação de interface do ataque.",
+      "monotonicNanos": 91607387922500
+    },
+    {
+      "kind": "stage",
+      "stage": "interface do ataque",
+      "message": "Aguardando confirmação de interface do ataque.",
+      "monotonicNanos": 91607982808333
+    },
+    {
+      "kind": "stage",
+      "stage": "interface do ataque",
+      "message": "Aguardando confirmação de interface do ataque.",
+      "monotonicNanos": 91608565463646
+    },
+    {
+      "kind": "stage",
+      "stage": "interface do ataque",
+      "message": "Aguardando confirmação de interface do ataque.",
+      "monotonicNanos": 91609142333906
+    },
+    {
+      "kind": "stage",
+      "stage": "interface do ataque",
+      "message": "Aguardando confirmação de interface do ataque.",
+      "monotonicNanos": 91609715018906
+    },
+    {
+      "kind": "stage",
+      "stage": "interface do ataque",
+      "message": "Aguardando confirmação de interface do ataque.",
+      "monotonicNanos": 91610289686874
+    },
+    {
+      "kind": "stage",
+      "stage": "interface do ataque",
+      "message": "Aguardando confirmação de interface do ataque.",
+      "monotonicNanos": 91610861745207
+    },
+    {
+      "kind": "stage",
+      "stage": "interface do ataque",
+      "message": "Aguardando confirmação de interface do ataque.",
+      "monotonicNanos": 91611434964895
+    },
+    {
+      "kind": "stage",
+      "stage": "interface do ataque",
+      "message": "Aguardando confirmação de interface do ataque.",
+      "monotonicNanos": 91612003872551
+    },
+    {
+      "kind": "stage",
+      "stage": "interface do ataque",
+      "message": "Aguardando confirmação de interface do ataque.",
+      "monotonicNanos": 91612582563852
+    },
+    {
+      "kind": "stage",
+      "stage": "interface do ataque",
+      "message": "Aguardando confirmação de interface do ataque.",
+      "monotonicNanos": 91613202583644
+    },
+    {
+      "kind": "stage",
+      "stage": "interface do ataque",
+      "message": "Aguardando confirmação de interface do ataque.",
+      "monotonicNanos": 91613826470779
+    },
+    {
+      "kind": "stage",
+      "stage": "interface do ataque",
+      "message": "Aguardando confirmação de interface do ataque.",
+      "monotonicNanos": 91614400544529
+    },
+    {
+      "kind": "stage",
+      "stage": "interface do ataque",
+      "message": "Aguardando confirmação de interface do ataque.",
+      "monotonicNanos": 91614970395414
+    },
+    {
+      "kind": "stage",
+      "stage": "interface do ataque",
+      "message": "Aguardando confirmação de interface do ataque.",
+      "monotonicNanos": 91615543891091
+    },
+    {
+      "kind": "stage",
+      "stage": "interface do ataque",
+      "message": "Aguardando confirmação de interface do ataque.",
+      "monotonicNanos": 91616241199841
+    },
+    {
+      "kind": "stage",
+      "stage": "interface do ataque",
+      "message": "Aguardando confirmação de interface do ataque.",
+      "monotonicNanos": 91616930885674
+    },
+    {
+      "kind": "stage",
+      "stage": "interface do ataque",
+      "message": "Aguardando confirmação de interface do ataque.",
+      "monotonicNanos": 91617546714840
+    },
+    {
+      "kind": "stage",
+      "stage": "interface do ataque",
+      "message": "Aguardando confirmação de interface do ataque.",
+      "monotonicNanos": 91618162719736
+    },
+    {
+      "kind": "stage",
+      "stage": "interface do ataque",
+      "message": "Aguardando confirmação de interface do ataque.",
+      "monotonicNanos": 91618732851402
+    },
+    {
+      "kind": "stage",
+      "stage": "interface do ataque",
+      "message": "Aguardando confirmação de interface do ataque.",
+      "monotonicNanos": 91619298555048
+    },
+    {
+      "kind": "stage",
+      "stage": "interface do ataque",
+      "message": "Aguardando confirmação de interface do ataque.",
+      "monotonicNanos": 91619968702287
+    },
+    {
+      "kind": "stage",
+      "stage": "interface do ataque",
+      "message": "Aguardando confirmação de interface do ataque.",
+      "monotonicNanos": 91620551571089
+    },
+    {
+      "kind": "stage",
+      "stage": "interface do ataque",
+      "message": "Aguardando confirmação de interface do ataque.",
+      "monotonicNanos": 91621077977235
+    },
+    {
+      "kind": "stage",
+      "stage": "interface do ataque",
+      "message": "Aguardando confirmação de interface do ataque.",
+      "monotonicNanos": 91621712877495
+    },
+    {
+      "kind": "stage",
+      "stage": "interface do ataque",
+      "message": "Aguardando confirmação de interface do ataque.",
+      "monotonicNanos": 91622289581140
+    },
+    {
+      "kind": "stage",
+      "stage": "interface do ataque",
+      "message": "Aguardando confirmação de interface do ataque.",
+      "monotonicNanos": 91622906578901
+    },
+    {
+      "kind": "stage",
+      "stage": "interface do ataque",
+      "message": "Aguardando confirmação de interface do ataque.",
+      "monotonicNanos": 91623534546817
+    },
+    {
+      "kind": "stage",
+      "stage": "interface do ataque",
+      "message": "Aguardando confirmação de interface do ataque.",
+      "monotonicNanos": 91624103725827
+    },
+    {
+      "kind": "stage",
+      "stage": "interface do ataque",
+      "message": "Aguardando confirmação de interface do ataque.",
+      "monotonicNanos": 91624730705358
+    },
+    {
+      "kind": "stage",
+      "stage": "interface do ataque",
+      "message": "Aguardando confirmação de interface do ataque.",
+      "monotonicNanos": 91625310390566
+    },
+    {
+      "kind": "stage",
+      "stage": "interface do ataque",
+      "message": "Aguardando confirmação de interface do ataque.",
+      "monotonicNanos": 91625877761608
+    },
+    {
+      "kind": "stage",
+      "stage": "interface do ataque",
+      "message": "Aguardando confirmação de interface do ataque.",
+      "monotonicNanos": 91626452407701
+    },
+    {
+      "kind": "stage",
+      "stage": "interface do ataque",
+      "message": "Aguardando confirmação de interface do ataque.",
+      "monotonicNanos": 91626969923274
+    },
+    {
+      "kind": "stage",
+      "stage": "confirmar a retirada",
+      "message": "Aguardando confirmação de confirmar a retirada.",
+      "monotonicNanos": 91627625922076
+    },
+    {
+      "kind": "stage",
+      "stage": "resultado da batalha",
+      "message": "Aguardando confirmação de resultado da batalha.",
+      "monotonicNanos": 91627851208534
+    },
+    {
+      "kind": "stage",
+      "stage": "voltar do resultado à vila",
+      "message": "Aguardando confirmação de voltar do resultado à vila.",
+      "monotonicNanos": 91628986151450
+    },
+    {
+      "kind": "stage",
+      "stage": "vila após a batalha",
+      "message": "Aguardando confirmação de vila após a batalha.",
+      "monotonicNanos": 91632148610668
+    },
+    {
+      "kind": "log",
+      "stage": "vila após a batalha",
+      "message": "Batalha concluída e retorno à vila confirmado.",
+      "monotonicNanos": 91632230844626
+    },
+    {
+      "kind": "stage",
+      "stage": "vila e saldos necessários",
+      "message": "Aguardando confirmação de vila e saldos necessários.",
+      "monotonicNanos": 91632231853897
+    },
+    {
+      "kind": "stop",
+      "stage": "vila e saldos necessários",
+      "message": "Limite de 1 batalha(s) atingido. Muros confirmados: 0.",
+      "monotonicNanos": 91632310457282
+    }
+  ],
+  "manualInterventionDuringBattle": false,
+  "setup": "Moved controls before entering the game. Closed stopped overlay after terminal diagnostics.",
+  "balancesBefore": {
+    "gold": 15167477,
+    "elixir": 21974775,
+    "darkElixir": 187932,
+    "gems": 210
+  },
+  "balancesAfter": {
+    "gold": 15572103,
+    "elixir": 22442480,
+    "darkElixir": 191228,
+    "gems": 210
+  },
+  "searchGoldCost": 1700,
+  "wallUpgrades": 0,
+  "limits": [
+    "Battle-only bounded package; complete farm with walls not proven.",
+    "Upper-right controls cover balance regions; placement is not suitable for wall decisions.",
+    "This is functional evidence, not a latency comparison.",
+    "Final destruction percentage and loot/bonus breakdown were not separately captured."
+  ],
+  "sha256": {
+    "docs/assets/script-mode/batalha-concluida-sm-s916b.png": "8c0a4d3dc30afe7dd2570c9ff2f3753bfc0f2ccdc20b9a4785542a3ce36c487c",
+    "smartautoclicker/build/outputs/apk/fDroid/debug/smartautoclicker-fDroid-arm64-v8a-debug.apk": "0673233d793ba3b0ba1e17708ee23de032af55ffeda90755b9da66403022a8e4"
+  }
+}

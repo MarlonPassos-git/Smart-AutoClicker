@@ -46,6 +46,8 @@ interface ImageDetector : AutoCloseable {
      * All following calls to [detectImage] methods will be verified against this bitmap.
      *
      * @param screenBitmap the content of the screen as a bitmap.
+     * @param metadata the original application identifier supplied by AppComponentsProvider.originalAppId,
+     * required by the native decoder throughout the process lifetime; do not replace it with a frame label.
      */
     fun setScreenBitmap(screenBitmap: Bitmap, metadata: String)
 

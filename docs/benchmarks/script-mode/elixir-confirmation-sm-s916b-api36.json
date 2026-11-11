@@ -1,0 +1,75 @@
+{
+  "date": "2026-11-10",
+  "device": {
+    "model": "SM-S916B",
+    "abi": "arm64-v8a",
+    "api": 36
+  },
+  "status": "recognized-physically-without-payment",
+  "diagnostics": [
+    {
+      "kind": "stage",
+      "stage": "construtor livre",
+      "message": "Aguardando confirmação de construtor livre.",
+      "monotonicNanos": 94474259583386
+    },
+    {
+      "kind": "stage",
+      "stage": "muro elegível no setor 1",
+      "message": "Aguardando confirmação de muro elegível no setor 1.",
+      "monotonicNanos": 94475512121250
+    },
+    {
+      "kind": "stage",
+      "stage": "muro selecionado, preços e reservas",
+      "message": "Aguardando confirmação de muro selecionado, preços e reservas.",
+      "monotonicNanos": 94475788215833
+    },
+    {
+      "kind": "log",
+      "stage": "muro selecionado, preços e reservas",
+      "message": "{\"kind\":\"dry_wall_selection\",\"results\":{\"wallTitle\":{\"frame\":7,\"status\":\"found\",\"confidence\":0.9649739861488342,\"x\":1046,\"y\":721,\"width\":150,\"height\":42},\"selected16\":{\"frame\":7,\"status\":\"found\",\"confidence\":100,\"x\":1254,\"y\":719,\"width\":259,\"height\":48},\"goldCost\":{\"frame\":7,\"status\":\"found\",\"confidence\":99.8046875,\"x\":1266,\"y\":776,\"width\":131,\"height\":28,\"number\":2000000},\"elixirCost\":{\"frame\":7,\"status\":\"found\",\"confidence\":99.72098541259766,\"x\":1476,\"y\":776,\"width\":132,\"height\":28,\"number\":2000000},\"more\":{\"frame\":7,\"status\":\"found\",\"confidence\":0.8651399612426758,\"x\":1062,\"y\":847,\"width\":155,\"height\":165},\"goldAvailable1\":{\"frame\":7,\"status\":\"found\",\"confidence\":0.9892519970951343,\"x\":1231,\"y\":770,\"width\":3,\"height\":3},\"goldAvailable2\":{\"frame\":7,\"status\":\"found\",\"confidence\":0.9538126361655773,\"x\":1289,\"y\":770,\"width\":3,\"height\":3},\"goldInsufficient1\":{\"frame\":7,\"status\":\"not_found\",\"confidence\":0.6929557007988381},\"goldInsufficient2\":{\"frame\":7,\"status\":\"not_found\",\"confidence\":0.7071895424836602},\"elixirAvailable1\":{\"frame\":7,\"status\":\"found\",\"confidence\":0.9578794480755265,\"x\":1441,\"y\":770,\"width\":3,\"height\":3},\"elixirAvailable2\":{\"frame\":7,\"status\":\"found\",\"confidence\":0.9737109658678287,\"x\":1498,\"y\":770,\"width\":3,\"height\":3},\"elixirInsufficient1\":{\"frame\":7,\"status\":\"not_found\",\"confidence\":0.687436456063907},\"elixirInsufficient2\":{\"frame\":7,\"status\":\"not_found\",\"confidence\":0.6896151053013799}}}",
+      "monotonicNanos": 94476078416406
+    },
+    {
+      "kind": "stage",
+      "stage": "inspecionar confirmação sem pagamento",
+      "message": "Aguardando confirmação de inspecionar confirmação sem pagamento.",
+      "monotonicNanos": 94476146686145
+    },
+    {
+      "kind": "log",
+      "stage": "inspecionar confirmação sem pagamento",
+      "message": "{\"kind\":\"dry_elixir_confirmation\",\"verified\":true,\"results\":{\"singleTitle\":{\"frame\":9,\"status\":\"found\",\"confidence\":1,\"x\":1160,\"y\":74,\"width\":780,\"height\":65},\"elixirConfirm\":{\"frame\":9,\"status\":\"found\",\"confidence\":0.9999690055847168,\"x\":1670,\"y\":954,\"width\":60,\"height\":65},\"singleConfirmCost\":{\"frame\":9,\"status\":\"found\",\"confidence\":99.66517639160156,\"x\":1522,\"y\":941,\"width\":195,\"height\":34,\"number\":2000000},\"confirmGreen1\":{\"frame\":9,\"status\":\"found\",\"confidence\":0.9442265795206972,\"x\":1475,\"y\":929,\"width\":3,\"height\":3},\"confirmGreen2\":{\"frame\":9,\"status\":\"found\",\"confidence\":0.9433551198257081,\"x\":1553,\"y\":933,\"width\":3,\"height\":3}}}",
+      "monotonicNanos": 94476320614166
+    },
+    {
+      "kind": "stop",
+      "stage": "inspecionar confirmação sem pagamento",
+      "message": "Inspeção encerrada antes do pagamento; nenhuma melhoria autorizada pelo roteiro.",
+      "monotonicNanos": 94476320951979
+    }
+  ],
+  "scriptVariant": "Read-only confirmation inspection: appended inspectOnly to the wall module, opened elixir confirmation and stopped without dispatching the final confirmation tap.",
+  "entrySource": "import { sleep, log, stop } from \"klickr\";\nimport { inspectOnly } from \"./walls.js\";\nimport { all, number, snapshot, waitSnapshot, position, tapStep, act } from \"./screen.js\";\nawait sleep(5000);\nconst selected = await inspectOnly({goldReserve: 0, elixirReserve: 0});\nawait log(JSON.stringify({kind:\"dry_wall_selection\", results:selected.results}));\nif (!await act(selected, [tapStep(position(selected, \"elixirPay\"))])) await stop(\"Seleção invalidada; inspeção encerrada sem pagamento.\");\nconst names = [\"singleTitle\", \"elixirConfirm\", \"singleConfirmCost\", \"confirmGreen1\", \"confirmGreen2\"];\nconst checked = await waitSnapshot(\"inspecionar confirmação sem pagamento\", names,\n    current => all(current, [\"singleTitle\", \"elixirConfirm\", \"confirmGreen1\", \"confirmGreen2\"]) && number(current.results.singleConfirmCost) === 2000000,\n    {timeoutMs:5000,intervalMs:100,required:false});\nconst current = checked ?? await snapshot(names);\nawait log(JSON.stringify({kind:\"dry_elixir_confirmation\", verified:checked !== null, results:current.results}));\nawait stop(\"Inspeção encerrada antes do pagamento; nenhuma melhoria autorizada pelo roteiro.\");\n",
+  "packageSha256": "ba251f7b9d77a9dce7bce0fd4fcc2dd57bff636b21c232999377866a96f7c754",
+  "balancesBefore": {
+    "gold": 15572103,
+    "elixir": 22442480,
+    "gems": 210
+  },
+  "balancesAtConfirmation": {
+    "gold": 15572103,
+    "elixir": 22442480,
+    "gems": 210
+  },
+  "wallUpgrades": 0,
+  "sha256": {
+    "docs/assets/script-mode/confirmacao-elixir-sem-pagar-sm-s916b.png": "83fd869cd78185dcd3cc80bb9cd00ec001d2bc7862157086b8b1b66bfe334ee2",
+    "core/smart/detection/src/androidTest/assets/wall_calibration/wall_16_elixir_confirmation.png": "382c39a0ac2a805f7dfd64f65e8e28aca17c0c4545e5807918a41c3e92469ab9"
+  },
+  "limits": [
+    "Confirms recognition and navigation; no physical elixir payment or upgrade verification was performed.",
+    "The companion native test also rejects the gold currency on this elixir screen."
+  ]
+}

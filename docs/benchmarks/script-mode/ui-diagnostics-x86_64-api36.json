@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "recordedAtUtc": "2026-11-10T10:33:13.584731+00:00",
+  "device": "emulator-5582",
+  "api": 36,
+  "abi": "x86_64",
+  "viewportPixels": [
+    1080,
+    2400
+  ],
+  "theme": "light",
+  "fontScale": 1.0,
+  "checks": [
+    "Detailed pane opens inside the overlay window and shows operation timings.",
+    "Pause leaves the controls visible and the session paused.",
+    "Resuming the earlier QA script without resumeWhen fails revalidation and releases MediaProjection.",
+    "The updated shared-thread APK executes four observations and reports the deliberate error at entry.js:8:16.",
+    "Error details include explicit source location and provider stack; dumpsys media_projection reports null after failure."
+  ],
+  "limitations": [
+    "Manual visual check; UI rendering performance and real gesture injection were not measured.",
+    "The first two screenshots use the earlier diagnostics APK; the localized-error screenshot uses the shared-thread APK.",
+    "Only the owned emulator Settings screen was observed; no game automation was executed."
+  ],
+  "screenshots": [
+    {
+      "file": "docs/assets/script-mode/diagnostico-aberto-api36.png",
+      "sha256": "61012ea6e342f1b2f5195c9a236289c9de3d6aa39265fd03f42e678ab3e7da95",
+      "apkSha256": "a373b17ae25da31694d5fa991a9770a1df4449eca289923fb50a9ab72b49b0de"
+    },
+    {
+      "file": "docs/assets/script-mode/diagnostico-pausado-api36.png",
+      "sha256": "3947e514df210177c62e562301ee0344eb505d1db583cf26aaff4c9f9b83294c",
+      "apkSha256": "a373b17ae25da31694d5fa991a9770a1df4449eca289923fb50a9ab72b49b0de"
+    },
+    {
+      "file": "docs/assets/script-mode/erro-localizado-api36.png",
+      "sha256": "d1bd22305be6c7b4b4abb85e3310f455cc4f5f4fbbe79deb88f4514f64918b6d",
+      "apkSha256": "7d4626e9b7f735b4cf36475cb862c8d0011074b50f123d6d5c671480a0af9eba"
+    }
+  ],
+  "fixtureArchiveSha256": "7400d8897a6f1ba7817e30a1ce6f1207b2af0e09f015d0bcd503a99f11ff2725",
+  "fixtureFiles": {
+    "manifest.json": "{\"formatVersion\": 1, \"apiVersion\": 1, \"id\": \"diagnostics-location-qa\", \"name\": \"Verifica\\u00e7\\u00e3o de erro localizado\", \"scriptVersion\": \"1\", \"entry\": \"entry.js\"}",
+    "entry.js": "import { stage, observe, sleep, log } from 'klickr';\nawait stage('localizacao', 'Conferindo erro com arquivo e linha');\nfor (let n = 0; n < 4; n++) {\n  const frame = await observe();\n  await log('Observação ' + n + ': ' + frame.width + 'x' + frame.height);\n  await sleep(1000);\n}\nthrow new Error('Fim controlado da verificação');\n"
+  }
+}
