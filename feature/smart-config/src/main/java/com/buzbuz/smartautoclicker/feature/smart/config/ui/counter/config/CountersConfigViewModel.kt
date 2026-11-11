@@ -98,6 +98,11 @@ class CountersConfigViewModel @Inject constructor(
         }
     }
 
+    /** Applies a validated question edit, e.g. after saving the question dialog. */
+    fun updateQuestionCounter(counter: Counter) {
+        if (counter.isComplete()) editionRepository.updateCounter(counter)
+    }
+
     fun setStartingValue(item: CounterUiItem, value: Double) {
         editionRepository.updateCounter(
             item.counter.copy(defaultValue = value)

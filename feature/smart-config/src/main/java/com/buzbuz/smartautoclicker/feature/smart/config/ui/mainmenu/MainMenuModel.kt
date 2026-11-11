@@ -28,6 +28,7 @@ import com.buzbuz.smartautoclicker.core.common.revenue.domain.model.UserBillingS
 
 import com.buzbuz.smartautoclicker.core.common.tutorial.domain.TutorialRepository
 import com.buzbuz.smartautoclicker.core.common.tutorial.domain.model.Tip
+import com.buzbuz.smartautoclicker.core.domain.model.counter.resolveCounterInitialValues
 import com.buzbuz.smartautoclicker.core.processing.domain.SmartProcessingRepository
 import com.buzbuz.smartautoclicker.core.processing.domain.model.DetectionState
 import com.buzbuz.smartautoclicker.core.smart.debugging.domain.DebuggingRepository
@@ -78,6 +79,10 @@ class MainMenuModel @Inject constructor(
         )
 
     private var paywallResultJob: Job? = null
+    private var startJob: Job? = null
+    private val _startQuestions = MutableStateFlow<StartQuestionsRequest?>(null)
+    val startQuestions: StateFlow<StartQuestionsRequest?> = _startQuestions
+
 
     /** Tells if the paywall is currently displayed. */
     private val _paywallIsVisible: MutableStateFlow<Boolean> = MutableStateFlow(false)
@@ -146,6 +151,7 @@ class MainMenuModel @Inject constructor(
 
     /** Start/Stop the detection. */
     fun toggleDetection(context: Context) {
+        if (startJob?.isActive == true || _startQuestions.value != null || _paywallIsVisible.value) return
         when {
             isDetecting.value -> stopDetection()
             shouldStartPaywall() -> startPaywall(context)
@@ -181,14 +187,49 @@ class MainMenuModel @Inject constructor(
     }
 
     private fun startDetection(context: Context) {
-        viewModelScope.launch {
-            smartProcessingRepository.startDetection(
-                context = context,
-                autoStopDuration = revenueRepository.consumeTrial(),
-                liveDebugging = debuggingRepository.isDebugViewEnabled(),
-                generateReport = debuggingRepository.isDebugReportEnabled(),
-            )
+        startJob = viewModelScope.launch {
+            val id = smartProcessingRepository.scenarioId.value
+            val counters = smartProcessingRepository.getStartCounters()
+            if (id != smartProcessingRepository.scenarioId.value) return@launch
+            if (counters.any { it.startQuestion != null }) {
+                if (id == null) return@launch
+                val store = RecentStartAnswers(context)
+                _startQuestions.value = StartQuestionsRequest(id.databaseId, counters, store.read(id.databaseId, counters))
+            } else {
+                launchDetection(context, emptyMap())
+            }
         }
+    }
+
+    /** Cancel discards only this draft. Example: call from the form's Cancel button. */
+    fun cancelStartQuestions() {
+        _startQuestions.value = null
+    }
+
+    /** Confirms one whole answer set; e.g. `confirmStartQuestions(context, answers)` from Iniciar. */
+    fun confirmStartQuestions(context: Context, answers: Map<String, Double>) {
+        val request = _startQuestions.value ?: return
+        if (request.scenarioId != smartProcessingRepository.scenarioId.value?.databaseId) {
+            _startQuestions.value = null
+            return
+        }
+        require(answers.keys == request.counters.filter { it.startQuestion != null }.map { it.counterName }.toSet()) {
+            "answers: expected one value for every declared question"
+        }
+        resolveCounterInitialValues(request.counters, answers)
+        _startQuestions.value = null
+        RecentStartAnswers(context).write(request.scenarioId, request.counters, answers)
+        startJob = viewModelScope.launch { launchDetection(context, answers) }
+    }
+
+    private suspend fun launchDetection(context: Context, answers: Map<String, Double>) {
+        smartProcessingRepository.startDetection(
+            context = context,
+            autoStopDuration = revenueRepository.consumeTrial(),
+            liveDebugging = debuggingRepository.isDebugViewEnabled(),
+            generateReport = debuggingRepository.isDebugReportEnabled(),
+            initialAnswers = answers,
+        )
     }
 
     fun startScenarioEdition(onEditionStarted: () -> Unit) {

@@ -134,6 +134,19 @@ class MainMenu(private val onStopClicked: () -> Unit) : OverlayMenu() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.CREATED) {
                 launch { viewModel.paywallIsVisible.collect(::updateVisibilityForPaywall) }
+                launch {
+                    viewModel.startQuestions.collect { request ->
+                        if (request != null) overlayManager.navigateTo(
+                            context = context,
+                            newOverlay = com.buzbuz.smartautoclicker.feature.smart.config.ui.counter.questions.StartQuestionsDialog(
+                                request,
+                                onConfirmed = { answers -> viewModel.confirmStartQuestions(context, answers) },
+                                onCancelled = viewModel::cancelStartQuestions,
+                            ),
+                            hideCurrent = false,
+                        )
+                    }
+                }
             }
         }
 

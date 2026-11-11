@@ -44,4 +44,4 @@ internal const val GESTURE_FINGER_MOTION_TABLE = "gesture_finger_motion_table"
 internal const val END_CONDITION_TABLE = "end_condition_table"
 
 /** Current version of the database. */
-const val DATABASE_VERSION = 28
+const val DATABASE_VERSION = 29

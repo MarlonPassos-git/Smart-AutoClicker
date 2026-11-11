@@ -51,6 +51,7 @@ class CountersConfigAdapter(
     private val onCounterClicked: (CounterUiItem) -> Unit,
     private val onStartingValueChange: (CounterUiItem, Double) -> Unit,
     private val onCancelReplace: () -> Unit,
+    private val onQuestionClick: (CounterUiItem) -> Unit,
 ) : ListAdapter<CounterUiItem, CountersConfigViewHolder>(CounterDiffCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CountersConfigViewHolder =
@@ -63,6 +64,7 @@ class CountersConfigAdapter(
             onCounterClicked = onCounterClicked,
             onStartingValueChange = onStartingValueChange,
             onCancelReplace = onCancelReplace,
+            onQuestionClick = onQuestionClick,
         )
 
     override fun onBindViewHolder(holder: CountersConfigViewHolder, position: Int) {
@@ -77,6 +79,7 @@ private object CounterDiffCallback : DiffUtil.ItemCallback<CounterUiItem>() {
 
     // Exclude user input derived values to avoid blinking while editing
     override fun areContentsTheSame(oldItem: CounterUiItem, newItem: CounterUiItem): Boolean =
+        oldItem.counter.startQuestion == newItem.counter.startQuestion &&
         oldItem.isExpanded == newItem.isExpanded &&
         oldItem.selectedForReplacement == newItem.selectedForReplacement &&
         oldItem.setByButtonText == newItem.setByButtonText &&
@@ -96,6 +99,7 @@ class CountersConfigViewHolder(
     onCounterClicked: (CounterUiItem) -> Unit,
     onStartingValueChange: (CounterUiItem, Double) -> Unit,
     onCancelReplace: () -> Unit,
+    onQuestionClick: (CounterUiItem) -> Unit,
 ) : RecyclerView.ViewHolder(binding.root) {
 
     private var item: CounterUiItem? = null
@@ -106,6 +110,7 @@ class CountersConfigViewHolder(
             buttonExpandCollapse.setOnClickListener { item?.let(onExpandCollapse) }
             writtenByButton.setOnClickListener { item?.let(onSetByClick) }
             readByButton.setOnClickListener { item?.let(onReadByClick) }
+            questionButton.setOnClickListener { item?.let(onQuestionClick) }
             deleteButton.setOnClickListener { item?.let(onDeleteClick) }
             replaceByText.setOnClickListener { onCancelReplace() }
 
@@ -130,6 +135,7 @@ class CountersConfigViewHolder(
 
             if (newItem.isExpanded) {
                 buttonExpandCollapse.setIconResource(R.drawable.ic_chevron_up)
+                questionButton.visibility = View.VISIBLE
                 layoutStartingValue.root.visibility = View.VISIBLE
                 writtenByButton.visibility = View.VISIBLE
                 readByButton.visibility = View.VISIBLE
@@ -139,6 +145,7 @@ class CountersConfigViewHolder(
                 layoutStartingValue.setText(startingValueText, InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL)
             } else {
                 buttonExpandCollapse.setIconResource(R.drawable.ic_chevron_down)
+                questionButton.visibility = View.GONE
                 layoutStartingValue.root.visibility = View.GONE
                 writtenByButton.visibility = View.GONE
                 readByButton.visibility = View.GONE

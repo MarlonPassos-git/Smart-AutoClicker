@@ -1,7 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="dropdown_item_number_format_quantity">Quantidade disponível (xN)</string>
-    <string name="dropdown_item_number_format_quantity_helper">Lê a primeira quantidade positiva da esquerda para a direita, como x29. Ignora x0.</string>
     <string name="dropdown_condition_value_number">Valor numérico reconhecido</string>
     <string name="dropdown_condition_value_number_desc">Usa o valor de uma condição numérica satisfeita neste evento.</string>
+    <string name="dropdown_item_number_format_quantity">Quantidade disponível (xN)</string>
+    <string name="dropdown_item_number_format_quantity_helper">Lê a primeira quantidade positiva da esquerda para a direita, como x29. Ignora x0.</string>
+    <string name="start_questions_title">Configurar execução</string>
+    <string name="start_questions_start">Iniciar</string>
+    <string name="start_questions_cancel">Cancelar</string>
+    <string name="start_questions_save">Salvar</string>
+    <string name="start_questions_edit">Pergunta de início</string>
+    <string name="start_questions_enabled">Perguntar a cada início</string>
+    <string name="start_questions_label">Título da pergunta</string>
+    <string name="start_questions_description">Descrição (opcional)</string>
+    <string name="start_questions_order">Ordem (0 ou maior)</string>
+    <string name="start_questions_default">Valor padrão</string>
+    <string name="start_questions_minimum">Mínimo (opcional)</string>
+    <string name="start_questions_maximum">Máximo (opcional)</string>
+    <string name="start_questions_options">Uma opção por linha: valor = rótulo</string>
+    <string name="start_questions_visible_counter">Mostrar se o contador (opcional)</string>
+    <string name="start_questions_visible_value">Tiver o valor</string>
+    <string name="start_questions_invalid_visibility">Contador “%1$s”: informe o nome de outro contador.</string>
+    <string name="start_questions_number">Número</string>
+    <string name="start_questions_boolean">Sim/não (0 ou 1)</string>
+    <string name="start_questions_choice">Escolha única</string>
+    <string name="start_questions_yes">Sim</string>
+    <string name="start_questions_no">Não</string>
+    <string name="start_questions_invalid_number">Valor “%1$s”: informe um número finito.</string>
+    <string name="start_questions_invalid_answer">Valor “%1$s”: esperado %2$s.</string>
+    <string name="start_questions_range">número entre %1$s e %2$s</string>
+    <string name="start_questions_required">Informe um título para a pergunta.</string>
+    <string name="start_questions_invalid_order">Valor “%1$s”: informe um inteiro de 0 a 2147483647.</string>
+    <string name="start_questions_invalid_limits">Mínimo deve ser menor ou igual ao máximo.</string>
+    <string name="start_questions_invalid_options">Use uma opção por linha: número = rótulo, com valores distintos.</string>
 </resources>

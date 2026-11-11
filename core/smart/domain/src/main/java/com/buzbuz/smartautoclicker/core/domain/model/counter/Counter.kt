@@ -27,8 +27,9 @@ data class Counter(
     val counterName: String,
     val defaultValue: Double,
     val scenarioId: Identifier,
+    val startQuestion: CounterStartQuestion? = null,
 ): Completable {
 
     override fun isComplete(): Boolean =
-        counterName.isNotBlank()
+        counterName.isNotBlank() && defaultValue.isFinite() && (startQuestion?.isValid(defaultValue) != false)
 }

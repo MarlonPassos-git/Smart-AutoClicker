@@ -91,7 +91,17 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/button_expand_collapse"
-            app:layout_constraintBottom_toTopOf="@id/written_by_button"/>
+            app:layout_constraintBottom_toTopOf="@id/question_button"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/question_button"
+            style="@style/AppTheme.Widget.IconButtonFilledTonal"
+            android:layout_width="0dp" android:layout_height="wrap_content"
+            android:text="@string/start_questions_edit"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/layout_starting_value"
+            app:layout_constraintBottom_toTopOf="@id/written_by_button" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/written_by_button"
@@ -103,7 +113,7 @@
             android:layout_marginStart="-4dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toStartOf="@id/read_by_button"
-            app:layout_constraintTop_toBottomOf="@id/layout_starting_value"
+            app:layout_constraintTop_toBottomOf="@id/question_button"
             app:layout_constraintBottom_toTopOf="@id/delete_button"
             app:icon="@drawable/ic_write"
             android:maxLines="1"

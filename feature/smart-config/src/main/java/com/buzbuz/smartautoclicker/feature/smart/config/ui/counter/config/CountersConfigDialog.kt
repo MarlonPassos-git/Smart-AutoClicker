@@ -81,6 +81,15 @@ class CountersConfigDialog : OverlayDialog(R.style.ScenarioConfigTheme) {
                 onDeleteClick = ::onDeleteClicked,
                 onCounterClicked = ::onCounterClicked,
                 onCancelReplace = viewModel::cancelReplacement,
+                onQuestionClick = { item ->
+                    overlayManager.navigateTo(
+                        context = context,
+                        newOverlay = com.buzbuz.smartautoclicker.feature.smart.config.ui.counter.questions.CounterQuestionDialog(
+                            item.counter, viewModel::updateQuestionCounter,
+                        ),
+                        hideCurrent = false,
+                    )
+                },
             )
             layoutLoadableList.apply {
                 list.adapter = countersAdapter

@@ -45,8 +45,8 @@ object DeserializerFactory {
             databaseVersion < VERSION_ADVANCED_AUTOMATION_UPDATE -> CompatV13Deserializer()
             databaseVersion < VERSION_COUNTER_TYPE_UPDATE -> CompatV20Deserializer()
             databaseVersion < VERSION_GESTURE_UPDATE -> CompatV24Deserializer()
-            databaseVersion < VERSION_UP_TO_DATE -> CompatDeserializer(preserveConditionFields = true)
-            databaseVersion == VERSION_UP_TO_DATE -> KotlinDeserializer()
+            databaseVersion < VERSION_NATIVE_BACKUP -> CompatDeserializer(preserveConditionFields = true)
+            databaseVersion <= VERSION_UP_TO_DATE -> KotlinDeserializer()
 
             else -> {
                 Log.w(TAG, "Json object version not supported, maximum=$VERSION_UP_TO_DATE, actual=$databaseVersion")
@@ -56,6 +56,8 @@ object DeserializerFactory {
 
     /** Maximum json object version supported. */
     private const val VERSION_UP_TO_DATE = DATABASE_VERSION
+    /** First native fork shape after joining historical schema lineages. */
+    private const val VERSION_NATIVE_BACKUP = 28
     /** Multitouch gesture version. */
     private const val VERSION_GESTURE_UPDATE = 24
     /** Number & Text detection update. */

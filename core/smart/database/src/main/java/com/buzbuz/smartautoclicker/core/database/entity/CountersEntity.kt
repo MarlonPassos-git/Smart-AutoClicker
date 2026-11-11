@@ -20,6 +20,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
+import androidx.room.TypeConverters
 import com.buzbuz.smartautoclicker.core.database.COUNTERS_TABLE
 import kotlinx.serialization.Serializable
 
@@ -40,4 +41,6 @@ data class CountersEntity(
     @ColumnInfo(name= "counterName") val name: String,
     @ColumnInfo(name = "scenarioId") val scenarioId: Long,
     @ColumnInfo(name = "startingValue") val startingValue: Double,
+    @TypeConverters(CounterQuestionConverters::class)
+    @ColumnInfo(name = "startQuestion", defaultValue = "NULL") val startQuestion: CounterQuestionEntity? = null,
 )

@@ -34,6 +34,8 @@ import com.buzbuz.smartautoclicker.core.base.identifier.Identifier
 import com.buzbuz.smartautoclicker.core.domain.IRepository
 import com.buzbuz.smartautoclicker.core.domain.model.action.Action
 import com.buzbuz.smartautoclicker.core.domain.model.condition.ScreenCondition
+import com.buzbuz.smartautoclicker.core.domain.model.counter.Counter
+import com.buzbuz.smartautoclicker.core.domain.model.counter.resolveCounterInitialValues
 import com.buzbuz.smartautoclicker.core.domain.model.event.ScreenEvent
 import com.buzbuz.smartautoclicker.core.domain.model.scenario.Scenario
 import com.buzbuz.smartautoclicker.core.processing.data.DetectorEngine
@@ -156,12 +158,23 @@ internal class SmartProcessingRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun startDetection(context: Context, liveDebugging: Boolean, generateReport: Boolean, autoStopDuration: Duration?) {
+    override suspend fun getStartCounters(): List<Counter> =
+        scenarioId.value?.databaseId?.let { scenarioRepository.getCounters(it) } ?: emptyList()
+
+    override suspend fun startDetection(
+        context: Context,
+        liveDebugging: Boolean,
+        generateReport: Boolean,
+        autoStopDuration: Duration?,
+        initialAnswers: Map<String, Double>,
+    ) {
         val id = scenarioId.value?.databaseId ?: return
         val scenario = scenarioRepository.getScenario(id) ?: return
         val events = scenarioRepository.getScreenEvents(id)
         val triggerEvents = scenarioRepository.getTriggerEvents(id)
-        val counters = scenarioRepository.getCounters(id)
+        val counters = resolveCounterInitialValues(
+            scenarioRepository.getCounters(id), initialAnswers,
+        )
 
         detectorEngine.startDetection(
             context = context,

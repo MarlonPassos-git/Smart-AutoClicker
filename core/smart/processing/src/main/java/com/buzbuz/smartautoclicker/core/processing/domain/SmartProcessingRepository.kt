@@ -22,6 +22,7 @@ import com.buzbuz.smartautoclicker.core.base.Dumpable
 import com.buzbuz.smartautoclicker.core.base.identifier.Identifier
 import com.buzbuz.smartautoclicker.core.domain.model.action.Action
 import com.buzbuz.smartautoclicker.core.domain.model.condition.ScreenCondition
+import com.buzbuz.smartautoclicker.core.domain.model.counter.Counter
 import com.buzbuz.smartautoclicker.core.domain.model.event.ScreenEvent
 import com.buzbuz.smartautoclicker.core.domain.model.scenario.Scenario
 import com.buzbuz.smartautoclicker.core.processing.domain.model.DetectionState
@@ -74,6 +75,9 @@ interface SmartProcessingRepository : Dumpable {
      */
     fun startScreenRecord(resultCode: Int, data: Intent)
 
+    /** Returns the current persisted counter definitions, e.g. before presenting start questions. */
+    suspend fun getStartCounters(): List<Counter>
+
     /**
      * Start the processing for the current [Scenario].
      * Ignored if the state is different from [DetectionState.RECORDING].
@@ -82,8 +86,16 @@ interface SmartProcessingRepository : Dumpable {
      * @param liveDebugging true if the session should generate live debugging events.
      * @param generateReport true if the session should generate a debugging report.
      * @param autoStopDuration the duration after which the detection will be stopped.
+     * @param initialAnswers confirmed question values for this run; saved defaults remain unchanged.
+     * Example: `startDetection(context, false, true, initialAnswers = mapOf("target" to 75.0))`.
      */
-    suspend fun startDetection(context: Context, liveDebugging: Boolean, generateReport: Boolean, autoStopDuration: Duration? = null)
+    suspend fun startDetection(
+        context: Context,
+        liveDebugging: Boolean,
+        generateReport: Boolean,
+        autoStopDuration: Duration? = null,
+        initialAnswers: Map<String, Double> = emptyMap(),
+    )
 
     /**
      * Stop the processing for the current [Scenario].

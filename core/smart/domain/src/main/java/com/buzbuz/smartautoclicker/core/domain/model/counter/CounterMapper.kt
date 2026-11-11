@@ -27,6 +27,7 @@ internal fun Counter.toEntity(): CountersEntity =
         name = counterName,
         scenarioId = scenarioId.databaseId,
         startingValue = defaultValue,
+        startQuestion = startQuestion?.toEntity(),
     )
 
 internal fun ComparisonOperation.toEntity(): CounterComparisonOperation =
@@ -72,6 +73,7 @@ internal fun CountersEntity.toDomain(): Counter =
         counterName = name,
         scenarioId = Identifier(scenarioId, asTemporary = false),
         defaultValue = startingValue,
+        startQuestion = startQuestion?.toDomain(),
     )
 
 internal fun CounterComparisonOperation.toDomain(): ComparisonOperation =
@@ -99,3 +101,15 @@ internal fun getDomainCounterOperationValue(
             CounterOperationValue.Number(numberValue ?: 0.0)
         }
 }
+private fun CounterStartQuestion.toEntity() = com.buzbuz.smartautoclicker.core.database.entity.CounterQuestionEntity(
+    title, description, order,
+    com.buzbuz.smartautoclicker.core.database.entity.CounterQuestionType.valueOf(type.name),
+    minimum, maximum, options.map { com.buzbuz.smartautoclicker.core.database.entity.CounterQuestionOptionEntity(it.label, it.value) },
+    visibleWhen?.let { com.buzbuz.smartautoclicker.core.database.entity.CounterQuestionVisibilityEntity(it.counterName, it.value) },
+)
+
+private fun com.buzbuz.smartautoclicker.core.database.entity.CounterQuestionEntity.toDomain() = CounterStartQuestion(
+    title, description, order, CounterStartQuestion.Type.valueOf(type.name), minimum, maximum,
+    options.map { CounterStartQuestion.Option(it.label, it.value) },
+    visibleWhen?.let { CounterStartQuestion.Visibility(it.counterName, it.value) },
+)
