@@ -12,6 +12,7 @@ googleProtobufGradlePlugin = "0.10.0"
 googleServices = "4.5.0"
 java = "21"
 kotlin = "2.4.21"
+quickjs = "1.0.18"
 kotlinxCoroutines = "1.11.0"
 kotlinxCoroutinesPlayServices = "1.11.0"
 ksp = "2.3.9"
@@ -65,6 +66,7 @@ espressoCore = "3.7.0"
 
 
 [libraries]
+quickjs = { module = "io.github.dokar3:quickjs-kt", version.ref = "quickjs" }
 
 # Plugin dependencies for build-logic
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }

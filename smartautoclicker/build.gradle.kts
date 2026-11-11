@@ -178,10 +178,13 @@ dependencies {
     implementation(project(":core:dumb"))
     implementation(project(":core:smart:debugging"))
     implementation(project(":core:smart:detection"))
+    implementation(project(":core:smart:detection-models"))
+    implementation(project(":core:script:android"))
     implementation(project(":core:smart:domain"))
     implementation(project(":core:smart:processing"))
 
     implementation(project(":feature:backup"))
+    implementation(project(":feature:script-config"))
     implementation(project(":feature:notifications"))
     implementation(project(":feature:quick-settings-tile"))
     implementation(project(":feature:revenue"))

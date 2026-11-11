@@ -26,6 +26,11 @@ android {
     namespace = "com.buzbuz.smartautoclicker.core.processing"
 }
 
+extensions.configure<com.android.build.api.dsl.LibraryExtension> {
+    sourceSets.getByName("androidTest").assets.srcDir(rootProject.file("core/smart/detection/src/androidTest/assets"))
+    sourceSets.getByName("androidTest").resources.srcDir(rootProject.file("examples/scripts"))
+}
+
 dependencies {
     implementation(libs.kotlinx.coroutines.core)
 
@@ -37,4 +42,9 @@ dependencies {
     implementation(project(":core:smart:detection"))
     implementation(project(":core:smart:detection-models"))
     implementation(project(":core:smart:domain"))
+    androidTestImplementation(project(":core:script:android"))
+    androidTestImplementation(project(":core:smart:database"))
+    androidTestImplementation(libs.androidx.test.runner)
+    androidTestImplementation(libs.androidx.test.ext.junit)
+    androidTestImplementation(libs.kotlinx.serialization.json)
 }
