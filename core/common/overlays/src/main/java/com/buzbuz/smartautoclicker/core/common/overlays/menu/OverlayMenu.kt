@@ -503,14 +503,17 @@ abstract class OverlayMenu(
         !resizeController.isAnimating && !animations.showAnimationIsRunning
                 && !animations.hideAnimationIsRunning && menuBackground.width > 0
 
-    private fun forceWindowResize() {
+    /** Matches the touch window to measured content after a non-animated layout change, e.g. a compact status row. */
+    protected fun forceWindowResize(forceContentMeasure: Boolean = false) {
         Log.d(TAG, "Force window resize")
-        onNewWindowSize(resizeController.measureMenuSize())
+        onNewWindowSize(resizeController.measureMenuSize(forceContentMeasure))
     }
 
     private fun onNewWindowSize(size: Size) {
         menuLayoutParams.width = size.width
         menuLayoutParams.height = size.height
+        // A restored position can fit the old window but hide controls after measurement or expansion.
+        menuLayoutParams.fitMenuOnScreen(displayConfigManager.displayConfig.sizePx)
 
         if (lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
             Log.d(TAG, "Updating menu window size: ${size.width}/${size.height}")
@@ -570,11 +573,9 @@ abstract class OverlayMenu(
 
     /** Safe setter for the position of the overlay menu ensuring it will not be displayed outside the screen. */
     private fun updateMenuPosition(position: Point) {
-        val displaySize = displayConfigManager.displayConfig.sizePx
-        if (displaySize.x < menuLayout.width || displaySize.y < menuLayout.height) return
-
-        menuLayoutParams.x = position.x.coerceIn(0, displaySize.x - menuLayout.width)
-        menuLayoutParams.y = position.y.coerceIn(0, displaySize.y - menuLayout.height)
+        menuLayoutParams.x = position.x
+        menuLayoutParams.y = position.y
+        menuLayoutParams.fitMenuOnScreen(displayConfigManager.displayConfig.sizePx)
 
         if (lifecycle.currentState.isAtLeast(Lifecycle.State.CREATED)) {
             Log.d(TAG, "Updating menu window position: ${menuLayoutParams.x}/${menuLayoutParams.y}")
@@ -584,7 +585,7 @@ abstract class OverlayMenu(
 
     private fun loadMenuPosition(orientation: Int) {
         val savedPosition = positionDataSource.loadMenuPosition(orientation)
-        if (savedPosition != null && savedPosition.x != 0 && savedPosition.y != 0) {
+        if (savedPosition != null) {
             updateMenuPosition(savedPosition)
         } else {
             menuLayout.doWhenMeasured {

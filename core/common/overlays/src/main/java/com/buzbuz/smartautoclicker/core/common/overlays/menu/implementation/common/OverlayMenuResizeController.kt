@@ -22,6 +22,7 @@ import android.util.Size
 import android.view.View
 import android.view.View.MeasureSpec
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import androidx.core.view.children
 import androidx.core.view.isGone
 import androidx.core.view.marginEnd
@@ -124,17 +125,19 @@ internal class OverlayMenuResizeController(
         resizedContainer.layoutTransition?.removeTransitionListener(transitionListener)
     }
 
-    fun measureMenuSize(): Size {
+    fun measureMenuSize(forceContentMeasure: Boolean = false): Size {
+        if (forceContentMeasure) resizedContainer.forceLayout()
         resizedContainer.measure(
             MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED),
             MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED),
         )
 
-        // Get the height of all children + the padding.
+        // Rows occupy their tallest child's height; columns occupy the sum.
         // Use measuredHeight as fallback for views that are now visible but not yet laid out (height == 0).
-        val itemsHeight = resizedContainer.children.fold(0) { acc, child ->
-            acc + (if (child.isGone) 0 else maxOf(child.height, child.measuredHeight))
-        } + resizedContainer.paddingTop + resizedContainer.paddingBottom
+        val heights = resizedContainer.children.filterNot { it.isGone }.map { maxOf(it.height, it.measuredHeight) }.toList()
+        val contentHeight = if (resizedContainer is LinearLayout && resizedContainer.orientation == LinearLayout.HORIZONTAL)
+            heights.maxOrNull() ?: 0 else heights.sum()
+        val itemsHeight = contentHeight + resizedContainer.paddingTop + resizedContainer.paddingBottom
 
         val firstChild = (backgroundViewGroup.getChildAt(0) as? ViewGroup)
         if (firstChild == null || firstChild.id == resizedContainer.id) {
@@ -143,13 +146,19 @@ internal class OverlayMenuResizeController(
 
         // The menu items can be displayed next to other views (such as a debug panel) that can be bigger than them.
         // Measured size is used as views that have just been made visible are not laid out yet.
+        // Status rows can opt out of an expanded measurement cached before a constrained window layout.
+        // Keep the normal measurement path for scrolling content so its reading position is preserved.
+        if (forceContentMeasure) firstChild.forceLayout()
         firstChild.measure(
             MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED),
             MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED),
         )
 
         return Size(
-            maxOf(firstChild.visibleHorizontalContentSpan(), firstChild.measuredWidth),
+            // Centered children still have offsets from the old window until its next layout.
+            // An explicit content measurement must use the new width, otherwise that stale span prevents shrinking.
+            if (forceContentMeasure) firstChild.measuredWidth
+            else maxOf(firstChild.visibleHorizontalContentSpan(), firstChild.measuredWidth),
             maxOf(itemsHeight, firstChild.measuredHeight),
         )
     }
