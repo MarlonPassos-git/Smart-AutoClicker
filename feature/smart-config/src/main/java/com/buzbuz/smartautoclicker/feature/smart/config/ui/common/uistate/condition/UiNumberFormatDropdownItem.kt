@@ -33,12 +33,17 @@ sealed class UiNumberFormatDropdownItem(title: Int, helperText: Int) : DropdownI
         R.string.dropdown_item_number_format_comma_decimal,
         R.string.dropdown_item_number_format_comma_decimal_helper,
     )
+    data object PositiveQuantity : UiNumberFormatDropdownItem(
+        R.string.dropdown_item_number_format_quantity,
+        R.string.dropdown_item_number_format_quantity_helper,
+    )
 }
 
 internal fun allNumberFormatDropdownItems(): List<UiNumberFormatDropdownItem> = listOf(
     UiNumberFormatDropdownItem.Auto,
     UiNumberFormatDropdownItem.DotDecimal,
     UiNumberFormatDropdownItem.CommaDecimal,
+    UiNumberFormatDropdownItem.PositiveQuantity,
 )
 
 internal fun NumberFormatType.toDropdownItem(): UiNumberFormatDropdownItem =
@@ -46,6 +51,7 @@ internal fun NumberFormatType.toDropdownItem(): UiNumberFormatDropdownItem =
         NumberFormatType.AUTO -> UiNumberFormatDropdownItem.Auto
         NumberFormatType.DOT_DECIMAL -> UiNumberFormatDropdownItem.DotDecimal
         NumberFormatType.COMMA_DECIMAL -> UiNumberFormatDropdownItem.CommaDecimal
+        NumberFormatType.POSITIVE_QUANTITY -> UiNumberFormatDropdownItem.PositiveQuantity
     }
 
 internal fun UiNumberFormatDropdownItem.toNumberFormatType(): NumberFormatType =
@@ -53,4 +59,5 @@ internal fun UiNumberFormatDropdownItem.toNumberFormatType(): NumberFormatType =
         UiNumberFormatDropdownItem.Auto -> NumberFormatType.AUTO
         UiNumberFormatDropdownItem.DotDecimal -> NumberFormatType.DOT_DECIMAL
         UiNumberFormatDropdownItem.CommaDecimal -> NumberFormatType.COMMA_DECIMAL
+        UiNumberFormatDropdownItem.PositiveQuantity -> NumberFormatType.POSITIVE_QUANTITY
     }

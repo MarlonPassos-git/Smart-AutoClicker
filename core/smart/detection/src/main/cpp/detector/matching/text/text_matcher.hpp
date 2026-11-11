@@ -34,6 +34,7 @@ namespace smartautoclicker {
         AUTO        = 0,
         DOT_DECIMAL = 1,
         COMMA_DECIMAL = 2,
+        POSITIVE_QUANTITY = 3,
     };
 
     /**
@@ -67,11 +68,12 @@ namespace smartautoclicker {
          * @param text The text to check.
          * @return true if it is a number, false otherwise.
          */
-        static bool isNumber(const std::string& text);
+        static bool isNumber(const std::string& text, NumberFormat format = NumberFormat::AUTO);
 
         /**
-         * Parses a string into a double according to the given number format.
+         * Parses the entire string into a double according to the given number format.
          * AUTO infers the format from the structure of the string.
+         * An optional trailing percent sign is ignored: "75%" yields 75, not 0.75.
          * @param text The text to parse.
          * @param format How to interpret decimal and thousands separators.
          * @return The double value, or std::numeric_limits<double>::lowest() on failure.
@@ -90,6 +92,12 @@ namespace smartautoclicker {
                 const ScreenImage& screenImage,
                 const cv::Rect& detectionArea,
                 const std::string& recognitionModelId);
+
+        /** Read quantity labels in overlapping windows so a wide strip doesn't shrink small digits. */
+        std::vector<TextRecognizerResult> recognizeQuantities(
+                const ScreenImage& screenImage,
+                const cv::Rect& detectionArea,
+                int threshold);
 
         /**
          * Calculates the similarity between two strings.

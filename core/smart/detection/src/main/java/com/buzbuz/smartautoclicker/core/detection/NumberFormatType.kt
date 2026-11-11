@@ -16,9 +16,10 @@
  */
 package com.buzbuz.smartautoclicker.core.detection
 
-/** Ordinals must match the C++ NumberFormat enum (AUTO=0, DOT_DECIMAL=1, COMMA_DECIMAL=2). */
+/** Ordinals match C++ NumberFormat: AUTO=0, DOT_DECIMAL=1, COMMA_DECIMAL=2, POSITIVE_QUANTITY=3. */
 enum class NumberFormatType {
     AUTO,
     DOT_DECIMAL,
     COMMA_DECIMAL,
+    POSITIVE_QUANTITY,
 }

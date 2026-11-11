@@ -222,6 +222,7 @@ enum class NumberFormatType {
     DOT_DECIMAL,
     /** Comma is the decimal separator, dot is the thousands separator (e.g. 1.234,56). */
     COMMA_DECIMAL,
+    POSITIVE_QUANTITY,
 }
 
 

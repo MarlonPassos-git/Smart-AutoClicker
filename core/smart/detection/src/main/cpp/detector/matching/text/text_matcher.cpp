@@ -18,6 +18,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/imgproc/imgproc_c.h>
 #include <cctype>
+#include <cmath>
 #include <algorithm>
 #include <limits>
 
@@ -26,6 +27,23 @@
 #include "../../../utils/roi.h"
 
 using namespace smartautoclicker;
+
+namespace {
+std::string quantityDigits(const std::string& text) {
+    std::string quantity = text;
+    quantity.erase(std::remove(quantity.begin(), quantity.end(), ' '), quantity.end());
+    if (quantity.rfind("×", 0) == 0) quantity.erase(0, 2);
+    else if (!quantity.empty() && (quantity.front() == 'x' || quantity.front() == 'X')) quantity.erase(0, 1);
+    else return {};
+    // Narrow quantity labels commonly recognize a one as I/l and a zero as O.
+    for (char& c : quantity) {
+        if (c == 'I' || c == 'l') c = '1';
+        else if (c == 'O' || c == 'o') c = '0';
+    }
+    if (quantity.empty() || !std::all_of(quantity.begin(), quantity.end(), [](unsigned char c) { return std::isdigit(c); })) return {};
+    return quantity;
+}
+}
 
 bool TextMatcher::init(const std::string& detectionModelPath, const std::map<std::string, std::string>& recognitionModels) {
     if (!recognitionModels.empty()) {
@@ -109,18 +127,24 @@ TextMatchingResult* TextMatcher::matchNumber(
     }
 
     // Recognize the text in the detectionArea
-    auto recognizerResults = recognizeText(screenImage, detectionArea, defaultRecognitionModelId);
+    auto recognizerResults = numberFormat == NumberFormat::POSITIVE_QUANTITY
+            ? recognizeQuantities(screenImage, detectionArea, threshold)
+            : recognizeText(screenImage, detectionArea, defaultRecognitionModelId);
 
     // Parse results and find matching candidate, if any
+    int leftmostQuantity = std::numeric_limits<int>::max();
     for (const auto& recognizerResult: recognizerResults) {
-        if (!isNumber(recognizerResult.text)) continue;
+        if (!isNumber(recognizerResult.text, numberFormat)) continue;
 
         float score = recognizerResult.confidence * 100;
         auto recognizedNumber = stringToDouble(recognizerResult.text, numberFormat);
+        if (recognizedNumber == std::numeric_limits<double>::lowest()) continue;
         LOGD("TextMatcher", "Score=%f; recognized=%f", score, recognizedNumber);
 
-        // Score is below the best confidence, skip
-        if (score < currentMatchingResult.getResultConfidence()) continue;
+        if (numberFormat == NumberFormat::POSITIVE_QUANTITY) {
+            if (recognizedNumber <= 0 || score < threshold || recognizerResult.boundingBox.x >= leftmostQuantity) continue;
+            leftmostQuantity = recognizerResult.boundingBox.x;
+        } else if (score < currentMatchingResult.getResultConfidence()) continue;
 
         currentMatchingResult.updateResults(
                 detectionArea,
@@ -134,6 +158,37 @@ TextMatchingResult* TextMatcher::matchNumber(
     }
 
     return &currentMatchingResult;
+}
+
+std::vector<TextRecognizerResult> TextMatcher::recognizeQuantities(
+        const ScreenImage& screenImage, const cv::Rect& detectionArea, int threshold) {
+    constexpr int coreWidth = 600;
+    constexpr int contextWidth = 100;
+    for (int coreLeft = 0; coreLeft < detectionArea.width; coreLeft += coreWidth) {
+        const int coreRight = std::min(coreLeft + coreWidth, detectionArea.width);
+        const int cropLeft = std::max(0, coreLeft - contextWidth);
+        const int cropRight = std::min(detectionArea.width, coreRight + contextWidth);
+        const cv::Rect window(detectionArea.x + cropLeft, detectionArea.y,
+                              cropRight - cropLeft, detectionArea.height);
+        auto results = recognizeText(screenImage, window, defaultRecognitionModelId);
+        std::vector<TextRecognizerResult> candidates;
+        bool hasPositiveQuantity = false;
+        for (auto& result : results) {
+            result.boundingBox.x += cropLeft;
+            const int centerX = result.boundingBox.x + result.boundingBox.width / 2;
+            // Each core owns its labels. Context keeps labels at a core edge whole.
+            if (centerX < coreLeft || centerX >= coreRight) continue;
+            if (isNumber(result.text, NumberFormat::POSITIVE_QUANTITY)
+                    && stringToDouble(result.text, NumberFormat::POSITIVE_QUANTITY) > 0
+                    && result.confidence * 100 >= threshold) {
+                hasPositiveQuantity = true;
+            }
+            candidates.push_back(result);
+        }
+        // Subsequent windows cannot contain an earlier card.
+        if (hasPositiveQuantity) return candidates;
+    }
+    return {};
 }
 
 bool TextMatcher::isRoiValidForMatching(const cv::Rect& screenRoi, const cv::Rect& roi) {
@@ -262,17 +317,28 @@ char TextMatcher::normalizeChar(char c) {
     return c;
 }
 
-bool TextMatcher::isNumber(const std::string& text) {
+bool TextMatcher::isNumber(const std::string& text, NumberFormat format) {
     if (text.empty()) return false;
 
+    if (format == NumberFormat::POSITIVE_QUANTITY) {
+        return !quantityDigits(text).empty();
+    }
+
     bool hasDigit = false;
+    bool hasPercentSuffix = false;
     for (char c : text) {
+        if (c == ' ') continue;
+        if (hasPercentSuffix) return false;
         if (std::isdigit(static_cast<unsigned char>(c))) {
             hasDigit = true;
             continue;
         }
 
-        if (c == '.' || c == ',' || c == ' ' || c == '-' || c == '+') continue;
+        if (c == '%' && hasDigit) {
+            hasPercentSuffix = true;
+            continue;
+        }
+        if (c == '.' || c == ',' || c == '-' || c == '+') continue;
 
         return false;
     }
@@ -284,6 +350,12 @@ double TextMatcher::stringToDouble(const std::string& text, NumberFormat format)
     std::string s = text;
     // Remove spaces
     s.erase(std::remove(s.begin(), s.end(), ' '), s.end());
+    if (format == NumberFormat::POSITIVE_QUANTITY) {
+        s = quantityDigits(text);
+        if (s.empty()) return std::numeric_limits<double>::lowest();
+    }
+    // Numeric conditions compare the displayed amount: "75%" means 75, not 0.75.
+    if (!s.empty() && s.back() == '%') s.pop_back();
 
     char decimalSep;
     char thousandsSep;
@@ -329,7 +401,14 @@ double TextMatcher::stringToDouble(const std::string& text, NumberFormat format)
     }
 
     try {
-        return std::stod(sanitized);
+        size_t parsedLength = 0;
+        const double value = std::stod(sanitized, &parsedLength);
+        // OCR can insert a sign inside a number. A prefix such as "13" from
+        // "13-173842" must not satisfy a condition comparing the full amount.
+        if (parsedLength != sanitized.size() || !std::isfinite(value)) {
+            return std::numeric_limits<double>::lowest();
+        }
+        return value;
     } catch (...) {
         return std::numeric_limits<double>::lowest();
     }

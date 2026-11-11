@@ -24,4 +24,6 @@ enum class NumberFormatType {
     DOT_DECIMAL,
     /** Comma is the decimal separator, dot is the thousands separator (e.g. 1.234,56). */
     COMMA_DECIMAL,
+    /** The leftmost positive integer prefixed by x, X or ×; depleted x0 labels are ignored. */
+    POSITIVE_QUANTITY,
 }

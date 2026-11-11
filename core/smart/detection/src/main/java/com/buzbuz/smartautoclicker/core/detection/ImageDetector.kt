@@ -106,12 +106,14 @@ interface ImageDetector : AutoCloseable {
     /**
      * Detect if a number is visible in the provided area.
      * [setScreenBitmap] must have been called first with the content of the screen.
+     * Values use the displayed unit: for example, a trailing percent sign in "75%" yields 75.0.
      *
      * @param detectionArea the area to search for the number.
      * @param threshold the allowed error threshold allowed for the condition.
      *
      * @return the numeric value detected, or Double.MIN_VALUE if none.
      */
+    // POSITIVE_QUANTITY selects the leftmost xN label with N > 0; other formats prefer confidence.
     fun detectNumber(
         detectionArea: Rect,
         threshold: Int,

@@ -301,6 +301,7 @@ private fun DbNumberFormatType?.toDomain(): NumberFormatType =
     when (this) {
         DbNumberFormatType.DOT_DECIMAL -> NumberFormatType.DOT_DECIMAL
         DbNumberFormatType.COMMA_DECIMAL -> NumberFormatType.COMMA_DECIMAL
+        DbNumberFormatType.POSITIVE_QUANTITY -> NumberFormatType.POSITIVE_QUANTITY
         DbNumberFormatType.AUTO, null -> NumberFormatType.AUTO
     }
 
@@ -309,6 +310,7 @@ private fun NumberFormatType.toEntity(): DbNumberFormatType =
         NumberFormatType.AUTO -> DbNumberFormatType.AUTO
         NumberFormatType.DOT_DECIMAL -> DbNumberFormatType.DOT_DECIMAL
         NumberFormatType.COMMA_DECIMAL -> DbNumberFormatType.COMMA_DECIMAL
+        NumberFormatType.POSITIVE_QUANTITY -> DbNumberFormatType.POSITIVE_QUANTITY
     }
 
 private fun ConditionEntity.getTextAlphabet(): OCRAlphabet =

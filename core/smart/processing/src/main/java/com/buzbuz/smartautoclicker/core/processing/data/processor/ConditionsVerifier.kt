@@ -326,4 +326,5 @@ private fun DomainNumberFormatType.toDetectionNumberFormatType(): DetectionNumbe
         DomainNumberFormatType.AUTO -> DetectionNumberFormatType.AUTO
         DomainNumberFormatType.DOT_DECIMAL -> DetectionNumberFormatType.DOT_DECIMAL
         DomainNumberFormatType.COMMA_DECIMAL -> DetectionNumberFormatType.COMMA_DECIMAL
+        DomainNumberFormatType.POSITIVE_QUANTITY -> DetectionNumberFormatType.POSITIVE_QUANTITY
     }
