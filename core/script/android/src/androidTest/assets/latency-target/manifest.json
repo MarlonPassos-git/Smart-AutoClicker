@@ -1,0 +1,38 @@
+{
+  "formatVersion": 1,
+  "apiVersion": 1,
+  "id": "latency-target",
+  "name": "Medição estrita no alvo",
+  "scriptVersion": "2",
+  "entry": "entry.js",
+  "parameters": {
+    "round": {
+      "type": "number",
+      "label": "Rodada",
+      "default": 1,
+      "min": 1,
+      "max": 1000
+    },
+    "startDelayMs": {
+      "type": "number",
+      "label": "Espera inicial (ms)",
+      "default": 5000,
+      "min": 0,
+      "max": 60000
+    }
+  },
+  "resources": {
+    "signature": {
+      "type": "color",
+      "argb": -14412227
+    },
+    "green": {
+      "type": "color",
+      "argb": -16711936
+    },
+    "blue": {
+      "type": "color",
+      "argb": -16776961
+    }
+  }
+}

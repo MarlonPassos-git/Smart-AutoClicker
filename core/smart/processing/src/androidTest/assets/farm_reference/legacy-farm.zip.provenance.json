@@ -1,0 +1,9 @@
+{
+  "sourceArtifact": "farm-parametrizado.zip",
+  "sha256": "2c3a4a61f52795044c351931cb0b4e9f2b4b574d0c7dbd65173b8d64b45675f7",
+  "databaseVersion": 29,
+  "width": 2340,
+  "height": 1080,
+  "events": 323,
+  "purpose": "Referência imutável do farm anterior para comparação do motor; não importar no banco do usuário."
+}
