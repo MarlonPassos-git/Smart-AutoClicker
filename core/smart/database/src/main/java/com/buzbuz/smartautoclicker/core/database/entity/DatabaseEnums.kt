@@ -161,8 +161,8 @@ enum class CounterOperationValueType {
 }
 
 /**
- * The coordinate of a detected screen condition to use as operand when the [CounterOperationValueType] is
- * [CounterOperationValueType.CONDITION]. All values are in pixels, relative to the screen.
+ * The detected value to use when [CounterOperationValueType] is [CounterOperationValueType.CONDITION].
+ * Coordinate values are screen pixels; [CONDITION_NUMBER] is the finite OCR amount.
  */
 enum class CounterOperationConditionPositionType {
     /** The bottom edge of the detected condition area. */
@@ -177,6 +177,8 @@ enum class CounterOperationConditionPositionType {
     CONDITION_RIGHT,
     /** The top edge of the detected condition area. */
     CONDITION_TOP,
+    /** Numeric OCR result of a fulfilled number condition, rather than a pixel coordinate. */
+    CONDITION_NUMBER,
 }
 
 

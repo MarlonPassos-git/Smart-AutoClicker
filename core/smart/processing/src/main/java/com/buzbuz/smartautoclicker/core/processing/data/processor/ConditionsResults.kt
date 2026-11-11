@@ -17,6 +17,7 @@
 package com.buzbuz.smartautoclicker.core.processing.data.processor
 
 import com.buzbuz.smartautoclicker.core.domain.model.counter.CounterOperationValue
+import com.buzbuz.smartautoclicker.core.domain.model.condition.ScreenCondition
 import com.buzbuz.smartautoclicker.core.processing.domain.model.ProcessedConditionResult
 
 
@@ -35,15 +36,20 @@ internal class ConditionsResults {
                 as ProcessedConditionResult.Screen?
 
     /**
-     * Get the coordinate of a detected screen condition, as defined by [value].
+     * Get a detected coordinate or the recognized numeric value, as defined by [value].
      *
-     * @return the coordinate in pixels, or null if the condition hasn't been processed or detected.
+     * @return pixels or the finite OCR amount; null if the requested detection isn't available.
      */
-    fun getDetectedConditionCoordinate(value: CounterOperationValue.Condition): Double? {
+    fun getDetectedConditionValue(value: CounterOperationValue.Condition): Double? {
         val result = _results.values.find { result ->
             result is ProcessedConditionResult.Screen && result.condition.id == value.conditionId
         } as ProcessedConditionResult.Screen? ?: return null
         if (!result.haveBeenDetected) return null
+
+        if (value.positionType == CounterOperationValue.Condition.PositionType.CONDITION_NUMBER) {
+            if (!result.isFulfilled || result.condition !is ScreenCondition.Number) return null
+            return result.numberDetected?.takeIf { it.isFinite() }
+        }
 
         val center = result.position ?: return null
         val size = result.size ?: return null
@@ -55,6 +61,7 @@ internal class ConditionsResults {
             CounterOperationValue.Condition.PositionType.CONDITION_RIGHT -> center.x + size.x / 2
             CounterOperationValue.Condition.PositionType.CONDITION_TOP -> center.y - size.y / 2
             CounterOperationValue.Condition.PositionType.CONDITION_BOTTOM -> center.y + size.y / 2
+            CounterOperationValue.Condition.PositionType.CONDITION_NUMBER -> return null
         }
 
         return coordinate.toDouble()

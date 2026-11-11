@@ -52,6 +52,10 @@ sealed class UiConditionPositionTypeDropdownItem(
         R.string.dropdown_condition_position_type_item_center_y,
         R.string.dropdown_condition_position_type_item_center_y_desc,
     )
+    data object Number : UiConditionPositionTypeDropdownItem(
+        R.string.dropdown_condition_value_number,
+        R.string.dropdown_condition_value_number_desc,
+    )
 }
 
 internal fun allConditionPositionTypeDropdownItems(): List<UiConditionPositionTypeDropdownItem> = listOf(
@@ -61,6 +65,7 @@ internal fun allConditionPositionTypeDropdownItems(): List<UiConditionPositionTy
     UiConditionPositionTypeDropdownItem.Right,
     UiConditionPositionTypeDropdownItem.Top,
     UiConditionPositionTypeDropdownItem.Bottom,
+    UiConditionPositionTypeDropdownItem.Number,
 )
 
 internal fun CounterOperationValue.Condition.PositionType.toDropdownItem(): UiConditionPositionTypeDropdownItem =
@@ -71,6 +76,7 @@ internal fun CounterOperationValue.Condition.PositionType.toDropdownItem(): UiCo
         CounterOperationValue.Condition.PositionType.CONDITION_TOP -> UiConditionPositionTypeDropdownItem.Top
         CounterOperationValue.Condition.PositionType.CONDITION_BOTTOM -> UiConditionPositionTypeDropdownItem.Bottom
         CounterOperationValue.Condition.PositionType.CONDITION_CENTER_Y -> UiConditionPositionTypeDropdownItem.CenterY
+        CounterOperationValue.Condition.PositionType.CONDITION_NUMBER -> UiConditionPositionTypeDropdownItem.Number
     }
 
 internal fun UiConditionPositionTypeDropdownItem.toPositionType(): CounterOperationValue.Condition.PositionType =
@@ -81,4 +87,5 @@ internal fun UiConditionPositionTypeDropdownItem.toPositionType(): CounterOperat
         UiConditionPositionTypeDropdownItem.Top -> CounterOperationValue.Condition.PositionType.CONDITION_TOP
         UiConditionPositionTypeDropdownItem.Bottom -> CounterOperationValue.Condition.PositionType.CONDITION_BOTTOM
         UiConditionPositionTypeDropdownItem.CenterY -> CounterOperationValue.Condition.PositionType.CONDITION_CENTER_Y
+        UiConditionPositionTypeDropdownItem.Number -> CounterOperationValue.Condition.PositionType.CONDITION_NUMBER
     }

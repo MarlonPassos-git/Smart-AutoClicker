@@ -43,6 +43,8 @@ sealed class CounterOperationValue : Completable {
             CONDITION_LEFT,
             CONDITION_RIGHT,
             CONDITION_TOP,
+            /** The numeric value recognized by a fulfilled number condition in this event. */
+            CONDITION_NUMBER,
         }
     }
 }

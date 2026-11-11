@@ -41,6 +41,7 @@ sealed class ProcessedConditionResult {
         val confidenceRate: Double,
         val position: Point?,
         val size: Point?,
+        val numberDetected: Double? = null,
     ) : ProcessedConditionResult()
 
     /**

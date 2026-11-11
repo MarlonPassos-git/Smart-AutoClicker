@@ -53,6 +53,7 @@ internal fun CounterOperationValue.Condition.PositionType.toEntity(): CounterOpe
         CounterOperationValue.Condition.PositionType.CONDITION_LEFT -> CounterOperationConditionPositionType.CONDITION_LEFT
         CounterOperationValue.Condition.PositionType.CONDITION_RIGHT -> CounterOperationConditionPositionType.CONDITION_RIGHT
         CounterOperationValue.Condition.PositionType.CONDITION_TOP -> CounterOperationConditionPositionType.CONDITION_TOP
+        CounterOperationValue.Condition.PositionType.CONDITION_NUMBER -> CounterOperationConditionPositionType.CONDITION_NUMBER
     }
 
 internal fun CounterOperationConditionPositionType.toDomain(): CounterOperationValue.Condition.PositionType =
@@ -63,6 +64,7 @@ internal fun CounterOperationConditionPositionType.toDomain(): CounterOperationV
         CounterOperationConditionPositionType.CONDITION_LEFT -> CounterOperationValue.Condition.PositionType.CONDITION_LEFT
         CounterOperationConditionPositionType.CONDITION_RIGHT -> CounterOperationValue.Condition.PositionType.CONDITION_RIGHT
         CounterOperationConditionPositionType.CONDITION_TOP -> CounterOperationValue.Condition.PositionType.CONDITION_TOP
+        CounterOperationConditionPositionType.CONDITION_NUMBER -> CounterOperationValue.Condition.PositionType.CONDITION_NUMBER
     }
 
 internal fun CountersEntity.toDomain(): Counter =

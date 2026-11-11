@@ -348,7 +348,7 @@ internal class ActionExecutor(
         val operandValue = when (val operationValue = changeCounter.operationValue) {
             is CounterOperationValue.Counter -> processingState.getCounterValue(operationValue.counterName) ?: 0.0
             is CounterOperationValue.Number -> operationValue.value
-            is CounterOperationValue.Condition -> results?.getDetectedConditionCoordinate(operationValue) ?: return
+            is CounterOperationValue.Condition -> results?.getDetectedConditionValue(operationValue) ?: return
         }
 
         processingState.setCounterValue(
