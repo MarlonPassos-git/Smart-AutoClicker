@@ -42,6 +42,7 @@ import com.buzbuz.smartautoclicker.core.domain.model.condition.ScreenCondition
 import com.buzbuz.smartautoclicker.core.domain.model.event.ScreenEvent
 import com.buzbuz.smartautoclicker.core.domain.model.event.TriggerEvent
 import com.buzbuz.smartautoclicker.core.domain.model.scenario.Scenario
+import com.buzbuz.smartautoclicker.core.processing.data.processor.ProcessingPause
 import com.buzbuz.smartautoclicker.core.processing.data.processor.ScenarioProcessor
 import com.buzbuz.smartautoclicker.core.processing.data.scaling.ScalingManager
 import com.buzbuz.smartautoclicker.core.processing.data.scaling.ScreenConditionScalingInfo
@@ -88,6 +89,7 @@ class DetectorEngine @Inject constructor(
 ) {
 
     /** Process the events conditions to detect them on the screen. */
+    private var processingPause: ProcessingPause? = null
     private var scenarioProcessor: ScenarioProcessor? = null
     /** Detect the condition images on the screen image. */
     private var imageDetector: ImageDetector? = null
@@ -262,7 +264,12 @@ class DetectorEngine @Inject constructor(
             }
 
             // Instantiate the processor and initialize its detection state.
+            val pause = ProcessingPause()
+            processingPause = pause
             scenarioProcessor = ScenarioProcessor(
+                pause = pause,
+                currentTimeMs = pause::now,
+                captureForResume = { displayRecorder.acquireLatestBitmap() },
                 processingTag = appComponentsProvider.originalAppId,
                 imageDetector = detector,
                 scalingManager = scalingManager,
@@ -287,7 +294,7 @@ class DetectorEngine @Inject constructor(
      * As we now have different screen metrics, we need to stop and start the virtual display with the correct one.
      */
     private fun onScreenOrientationChanged() {
-        if (_state.value != DetectorState.DETECTING && _state.value != DetectorState.RECORDING) return
+        if (_state.value != DetectorState.DETECTING && _state.value != DetectorState.PAUSED && _state.value != DetectorState.RECORDING) return
 
         Log.d(TAG, "onOrientationChanged")
 
@@ -317,6 +324,20 @@ class DetectorEngine @Inject constructor(
         }
     }
 
+    /** Freezes the current processor at its next action checkpoint; e.g. `engine.pauseDetection()`. */
+    internal fun pauseDetection() {
+        if (_state.value != DetectorState.DETECTING) return
+        processingPause?.pause()
+        _state.value = DetectorState.PAUSED
+    }
+
+    /** Resumes the retained action sequence, requiring a fresh frame before its next effect. */
+    internal fun resumeDetection() {
+        if (_state.value != DetectorState.PAUSED) return
+        _state.value = DetectorState.DETECTING
+        processingPause?.resume()
+    }
+
     /**
      * Stop the screen detection started with [startDetection].
      *
@@ -325,7 +346,7 @@ class DetectorEngine @Inject constructor(
      * release the [DetectorEngine] resources.
      */
     internal fun stopDetection() {
-        if (_state.value != DetectorState.DETECTING) {
+        if (_state.value != DetectorState.DETECTING && _state.value != DetectorState.PAUSED) {
             Log.w(TAG, "stopDetection: detection is not started.")
             return
         }
@@ -340,6 +361,7 @@ class DetectorEngine @Inject constructor(
             imageDetector = null
             scenarioProcessor?.onScenarioEnd()
             scenarioProcessor = null
+            processingPause = null
             debuggingListener.onSessionEnded()
 
             scalingManager.stopScaling()
@@ -363,7 +385,7 @@ class DetectorEngine @Inject constructor(
      */
     internal fun stopScreenRecord() {
         if (processingScope == null || recordingStopJob?.isActive == true) return
-        if (_state.value == DetectorState.DETECTING) stopDetection()
+        if (_state.value == DetectorState.DETECTING || _state.value == DetectorState.PAUSED) stopDetection()
         stopRecording()
     }
 
@@ -394,6 +416,7 @@ class DetectorEngine @Inject constructor(
                 imageDetector = null
                 scenarioProcessor?.onScenarioEnd()
                 scenarioProcessor = null
+            processingPause = null
                 debuggingListener.onSessionEnded()
                 scalingManager.stopScaling()
                 bitmapRepository.clearCache()
@@ -416,6 +439,7 @@ class DetectorEngine @Inject constructor(
 
         var processingDurationNs: Long
         while (processingJob?.isActive == true && !orientationChangeRequested) {
+            processingPause?.checkpoint()
             displayRecorder.acquireLatestBitmap()?.let { screenFrame ->
                 processingDurationNs = measureNanoTime {
                     scenarioProcessor?.process(screenFrame)
@@ -510,6 +534,8 @@ internal enum class DetectorState {
     RECORDING,
     /** The screen is being recorded and the detection is running. */
     DETECTING,
+    /** Processor and counters retained, pending effects suspended. */
+    PAUSED,
     /** The native lib can't be loaded and the detection can't be used. */
     ERROR_NATIVE_DETECTOR_LIB_NOT_FOUND,
     /** The text detection models required for this scenario are not found. */

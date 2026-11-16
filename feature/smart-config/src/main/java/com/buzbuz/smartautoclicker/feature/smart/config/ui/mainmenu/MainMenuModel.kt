@@ -99,7 +99,7 @@ class MainMenuModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
     private val isMediaProjectionStarted: StateFlow<Boolean> = smartProcessingRepository.detectionState
-        .map { it == DetectionState.RECORDING || it == DetectionState.DETECTING }
+        .map { it == DetectionState.RECORDING || it == DetectionState.DETECTING || it == DetectionState.PAUSED }
         .stateIn(viewModelScope, SharingStarted.Eagerly, true)
 
     /** The condition being configured by the user. */
@@ -121,14 +121,15 @@ class MainMenuModel @Inject constructor(
 
     /** The state of the menu. Null until all values are known. */
     val uiState: StateFlow<MainMenuUiState?> = combine(
-        isDetecting,
+        smartProcessingRepository.detectionState,
         isStartButtonEnabled,
         isMediaProjectionStarted,
         debuggingRepository.isLiveDebugging,
-    ) { isDetecting, isStartEnabled, isProjectionStarted, isLiveDebugging ->
+    ) { detectionState, isStartEnabled, isProjectionStarted, isLiveDebugging ->
         MainMenuUiState(
-            isDetecting = isDetecting,
-            isPlayButtonEnabled = isStartEnabled,
+            isDetecting = detectionState == DetectionState.DETECTING,
+            isPaused = detectionState == DetectionState.PAUSED,
+            isPlayButtonEnabled = isStartEnabled || detectionState == DetectionState.PAUSED,
             isProjectionErrorVisible = !isProjectionStarted,
             isDebugPanelVisible = isLiveDebugging,
         )
@@ -149,11 +150,12 @@ class MainMenuModel @Inject constructor(
         revenueRepository.loadAdIfNeeded(context)
     }
 
-    /** Start/Stop the detection. */
+    /** Starts, pauses or resumes the retained processor. */
     fun toggleDetection(context: Context) {
         if (startJob?.isActive == true || _startQuestions.value != null || _paywallIsVisible.value) return
         when {
-            isDetecting.value -> stopDetection()
+            uiState.value?.isPaused == true -> smartProcessingRepository.resumeDetection()
+            isDetecting.value -> smartProcessingRepository.pauseDetection()
             shouldStartPaywall() -> startPaywall(context)
             else -> startDetection(context)
         }
@@ -161,7 +163,7 @@ class MainMenuModel @Inject constructor(
 
     /** Stop the detection. Returns true if it was started, false if not. */
     fun stopDetection(): Boolean {
-        if (!isDetecting.value) return false
+        if (!isDetecting.value && uiState.value?.isPaused != true) return false
 
         smartProcessingRepository.stopDetection()
         return true

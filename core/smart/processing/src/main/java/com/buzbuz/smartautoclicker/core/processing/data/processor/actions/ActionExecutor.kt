@@ -47,6 +47,7 @@ import com.buzbuz.smartautoclicker.core.domain.model.event.Event
 import com.buzbuz.smartautoclicker.core.processing.data.processor.ConditionsResults
 import com.buzbuz.smartautoclicker.core.processing.data.processor.state.ProcessingState
 
+import com.buzbuz.smartautoclicker.core.processing.data.processor.ProcessingPause
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
@@ -68,7 +69,14 @@ internal class ActionExecutor(
     private val unblockWorkaroundEnabled: Boolean = false,
     private val areaClickRandom: Random = Random.Default,
     private val currentTimeMs: () -> Long = System::currentTimeMillis,
+    private val pause: ProcessingPause? = null,
 ) {
+
+    private var beforeEffect: suspend () -> Unit = {}
+
+    private suspend fun waitActive(durationMs: Long) {
+        if (pause == null) delay(durationMs) else pause.wait(durationMs)
+    }
 
     init { androidExecutor.resetState() }
 
@@ -81,6 +89,12 @@ internal class ActionExecutor(
 
     suspend fun onScenarioLoopFinished() {
         if (!unblockWorkaroundEnabled) return
+        pause?.let { control ->
+            val generation = control.observedGeneration
+            control.checkpoint()
+            // The next frame must reauthorize any workaround touch after a pause.
+            if (generation != control.generation) return
+        }
 
         // The unblock gesture continues nothing, so the system would cancel the held pointer to dispatch it.
         if (androidExecutor.getHeldPointer() != null) return
@@ -104,19 +118,30 @@ internal class ActionExecutor(
         event: Event,
         results: ConditionsResults? = null,
         onHoldDurationElapsed: suspend () -> Unit = {},
+        refreshResults: suspend () -> ConditionsResults? = { results },
     ) {
+        var currentResults = results
+        var generation = pause?.observedGeneration ?: 0L
+        beforeEffect = {
+            pause?.checkpoint()
+            if (generation != pause?.generation && pause != null) {
+                currentResults = refreshResults()
+                generation = pause.generation
+            }
+        }
         event.actions.forEach { action ->
+            beforeEffect()
             if (isHeldDurationElapsed()) onHoldDurationElapsed()
 
             when (action) {
                 is AreaClick -> executeAreaClick(action)
                 is Zoom -> executeZoom(action)
-                is Click -> executeClick(event, action, results)
-                is Gesture -> executeGesture(event, action, results)
+                is Click -> executeClick(event, action, currentResults)
+                is Gesture -> executeGesture(event, action, currentResults)
                 is Pause -> executePause(action, onHoldDurationElapsed)
                 is Intent -> executeIntent(action)
                 is ToggleEvent -> executeToggleEvent(action)
-                is ChangeCounter -> executeChangeCounter(action, results)
+                is ChangeCounter -> executeChangeCounter(action, currentResults)
                 is Notification -> executeNotification(event, action)
                 is SystemAction -> executeSystemAction(action)
                 is SetText -> executeSetText(action)
@@ -181,8 +206,9 @@ internal class ActionExecutor(
             random = areaClickRandom,
         )
         positions.forEachIndexed { index, position ->
+            beforeEffect()
             dispatchAreaClick(position, areaClick.pressDurationMs)
-            if (index != positions.lastIndex) delay(areaClick.intervalMs)
+            if (index != positions.lastIndex) waitActive(areaClick.intervalMs)
         }
     }
 
@@ -270,13 +296,13 @@ internal class ActionExecutor(
         val holdRemainingMs = getHeldDurationRemainingMs()
 
         if (holdRemainingMs == null || holdRemainingMs >= pauseDurationMs) {
-            delay(pauseDurationMs.milliseconds)
+            waitActive(pauseDurationMs)
             return
         }
 
-        delay(holdRemainingMs.milliseconds)
+        waitActive(holdRemainingMs)
         onHoldDurationElapsed()
-        delay((pauseDurationMs - holdRemainingMs).milliseconds)
+        waitActive(pauseDurationMs - holdRemainingMs)
     }
 
     /**
@@ -299,12 +325,12 @@ internal class ActionExecutor(
             withContext(Dispatchers.Main) {
                 androidExecutor.sendBroadcast(androidIntent)
             }
-            delay(INTENT_BROADCAST_DELAY.milliseconds)
+            waitActive(INTENT_BROADCAST_DELAY)
         } else {
             withContext(Dispatchers.Main) {
                 androidExecutor.startActivity(androidIntent)
             }
-            delay(INTENT_START_ACTIVITY_DELAY.milliseconds)
+            waitActive(INTENT_START_ACTIVITY_DELAY)
         }
     }
 

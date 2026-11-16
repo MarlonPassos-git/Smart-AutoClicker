@@ -29,12 +29,13 @@ interface ITimersState {
 
 internal class TimersState(
     private val triggerEvents: List<TriggerEvent>,
+    private val currentTimeMs: () -> Long = System::currentTimeMillis,
 ): ITimersState {
 
     private val idToTimerEnd: MutableMap<Long, Long> = mutableMapOf()
 
     fun onProcessingStarted() {
-        val startTimeMs = System.currentTimeMillis()
+        val startTimeMs = currentTimeMs()
 
         triggerEvents.forEach { triggerEvent ->
             if (!triggerEvent.enabledOnStart) return@forEach
@@ -55,7 +56,7 @@ internal class TimersState(
         idToTimerEnd[conditionId]
 
     override fun setTimerStartToNow(condition: TriggerCondition.OnTimerReached) {
-        idToTimerEnd[condition.getValidId()] = condition.getEndTimeMs(System.currentTimeMillis())
+        idToTimerEnd[condition.getValidId()] = condition.getEndTimeMs(currentTimeMs())
     }
 
     override fun setTimerToDisabled(conditionId: Long) {

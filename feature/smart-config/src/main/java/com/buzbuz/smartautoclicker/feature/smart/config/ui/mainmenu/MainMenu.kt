@@ -264,13 +264,15 @@ class MainMenu(private val onStopClicked: () -> Unit) : OverlayMenu() {
         if (previousUiState == uiState) return
         currentUiState = uiState
 
+        viewBinding.btnPlay.contentDescription = context.getString(
+            if (uiState.isDetecting) R.string.smart_pause_detection else if (uiState.isPaused) R.string.smart_resume_detection else R.string.smart_start_detection)
         setMenuItemViewEnabled(viewBinding.btnPlay, uiState.isPlayButtonEnabled)
         viewBinding.errorBadge.isVisible = uiState.isProjectionErrorVisible
 
         when {
             previousUiState == null -> {
-                viewBinding.btnStop.isVisible = !uiState.isDetecting
-                viewBinding.btnClickList.isVisible = !uiState.isDetecting
+                viewBinding.btnStop.isVisible = true
+                viewBinding.btnClickList.isVisible = !uiState.isDetecting && !uiState.isPaused
                 viewBinding.layoutDebug.isVisible = uiState.isDebugPanelVisible
                 if (uiState.isDetecting) playPauseButtonController.toState2(false)
                 else playPauseButtonController.toState1(false)
@@ -278,11 +280,11 @@ class MainMenu(private val onStopClicked: () -> Unit) : OverlayMenu() {
 
             // The debug panel visibility must be changed in the same animation than the menu items, or the window
             // resize will be computed on an outdated layout.
-            previousUiState.isDetecting != uiState.isDetecting -> animateLayoutChanges {
+            previousUiState.isDetecting != uiState.isDetecting || previousUiState.isPaused != uiState.isPaused -> animateLayoutChanges {
                 setMenuItemsVisibility(
                     mapOf(
-                        viewBinding.btnStop to !uiState.isDetecting,
-                        viewBinding.btnClickList to !uiState.isDetecting,
+                        viewBinding.btnStop to true,
+                        viewBinding.btnClickList to (!uiState.isDetecting && !uiState.isPaused),
                         viewBinding.layoutDebug to uiState.isDebugPanelVisible,
                     )
                 )

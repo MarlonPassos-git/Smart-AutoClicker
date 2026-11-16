@@ -52,6 +52,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -324,7 +325,9 @@ class LocalService(
         if (stopping || calibrationDriver != null) return
         scriptDriver?.let { it.resume(); return }
         serviceScope.launch {
-            if (state.isSmartLoaded && !smartProcessingRepository.isRunning()) {
+            if (state.isSmartLoaded && smartProcessingRepository.detectionState.first() == DetectionState.PAUSED) {
+                smartProcessingRepository.resumeDetection()
+            } else if (state.isSmartLoaded && !smartProcessingRepository.isRunning()) {
                 if (shouldStartPaywall()) startPaywall()
                 else startSmartScenario()
             } else if (!state.isSmartLoaded && !dumbEngine.isRunning.value) {
@@ -339,7 +342,7 @@ class LocalService(
         serviceScope.launch {
             when {
                 dumbEngine.isRunning.value -> dumbEngine.stopDumbScenario()
-                smartProcessingRepository.isRunning() -> smartProcessingRepository.stopDetection()
+                smartProcessingRepository.isRunning() -> smartProcessingRepository.pauseDetection()
             }
         }
     }

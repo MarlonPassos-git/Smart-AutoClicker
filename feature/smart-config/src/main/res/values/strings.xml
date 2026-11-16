@@ -686,4 +686,7 @@
     <string name="content_desc_open_event_list">Open the event list</string>
     <string name="content_desc_application_icon">The icon of the application to start.</string>
 
+    <string name="smart_pause_detection">Pausar automação</string>
+    <string name="smart_resume_detection">Retomar automação</string>
+    <string name="smart_start_detection">Iniciar automação</string>
 </resources>

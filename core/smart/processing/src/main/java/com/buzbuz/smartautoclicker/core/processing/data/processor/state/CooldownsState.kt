@@ -35,14 +35,18 @@ interface ICooldownsState {
     fun isCooldownRunning(event: Event): Boolean
 }
 
-internal class CooldownsState : ICooldownsState {
+internal class CooldownsState(private val currentTimeMs: () -> Long = System::currentTimeMillis) : ICooldownsState {
 
     /** Map of event ids to their cooldown end timestamps in ms. */
     private val activeCooldowns: MutableMap<Long, Long> = mutableMapOf()
 
     override fun startCooldownIfNeeded(event: Event, startTimeMs: Long, minDurationMs: Long) {
         val durationMs = max((event as? ScreenEvent)?.cooldownMs ?: 0L, minDurationMs)
-        activeCooldowns[event.id.databaseId] = max(1, startTimeMs + durationMs)
+        if (durationMs <= 0L) {
+            activeCooldowns.remove(event.id.databaseId)
+            return
+        }
+        activeCooldowns[event.id.databaseId] = startTimeMs + durationMs
     }
 
     override fun removeCooldown(event: Event) {
@@ -52,7 +56,7 @@ internal class CooldownsState : ICooldownsState {
     override fun isCooldownRunning(event: Event): Boolean {
         val activeCooldownEnd = activeCooldowns[event.id.databaseId] ?: return false // No cooldown found
 
-        if (System.currentTimeMillis() < activeCooldownEnd) return true // Cooldown is running
+        if (currentTimeMs() < activeCooldownEnd) return true // Cooldown is running
 
         activeCooldowns.remove(event.id.databaseId)
         return false // Cooldown has ended

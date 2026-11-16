@@ -62,7 +62,9 @@ internal class ScenarioProcessor(
     counters: List<Counter>,
     androidExecutor: AndroidActionExecutor,
     unblockWorkaroundEnabled: Boolean = false,
-    currentTimeMs: () -> Long = System::currentTimeMillis,
+    private val currentTimeMs: () -> Long = System::currentTimeMillis,
+    private val pause: ProcessingPause? = null,
+    private val captureForResume: suspend () -> Bitmap? = { null },
     private val bitmapSupplier: suspend (String, Int, Int) -> Bitmap?,
     private val onStopRequested: () -> Unit,
     private val progressListener: SmartProcessingListener?,
@@ -71,6 +73,7 @@ internal class ScenarioProcessor(
         triggerEvents = triggerEvents,
         counters = counters,
         progressListener = progressListener,
+        currentTimeMs = currentTimeMs,
     ),
     private val conditionsVerifier: ConditionsVerifier = ConditionsVerifier(
         state = processingState,
@@ -78,6 +81,7 @@ internal class ScenarioProcessor(
         scalingManager = scalingManager,
         bitmapSupplier = bitmapSupplier,
         progressListener = progressListener,
+        currentTimeMs = currentTimeMs,
     ),
     private val actionExecutor: ActionExecutor = ActionExecutor(
         androidExecutor = androidExecutor,
@@ -85,8 +89,35 @@ internal class ScenarioProcessor(
         randomize = randomize,
         unblockWorkaroundEnabled = unblockWorkaroundEnabled,
         currentTimeMs = currentTimeMs,
+        pause = pause,
     ),
 ) {
+
+    private var retainedFrame: Bitmap? = null
+
+    init {
+        pause?.onPause = {
+            releaseHeldEvent(HoldReleaseReason.Interrupted)
+            retainedFrame?.let { imageDetector.releaseScreenBitmap(it) }
+            retainedFrame = null
+        }
+    }
+
+    private suspend fun refreshAfterPause(event: Event, previous: ConditionsResults): ConditionsResults {
+        retainedFrame?.let { imageDetector.releaseScreenBitmap(it) }
+        retainedFrame = null
+        val fresh = checkNotNull(captureForResume()) { "Não foi possível capturar a tela ao retomar." }
+        imageDetector.setScreenBitmap(fresh, processingTag)
+        retainedFrame = fresh
+        if (event !is ScreenEvent) return previous
+        val results = verifyConditions(event)
+        if (results.fulfilled != true) {
+            Log.w(TAG, "Resume refused: event ${event.name} no longer matches the screen")
+            onStopRequested()
+            throw kotlinx.coroutines.CancellationException("A tela mudou durante a pausa; confira o cenário antes de iniciar novamente.")
+        }
+        return results
+    }
 
     /** The last held event notified to the [progressListener]. */
     private var notifiedHeldEvent: Event? = null
@@ -184,6 +215,8 @@ internal class ScenarioProcessor(
     private suspend fun processScreenEvents(screenFrame: Bitmap) {
         // Set the current screen image
         imageDetector.setScreenBitmap(screenFrame, processingTag)
+        retainedFrame = screenFrame
+        val generation = pause?.generation
 
         try {
             // First, if there is a screen event that keep a gesture held, verify it
@@ -205,7 +238,7 @@ internal class ScenarioProcessor(
                 val results = verifyConditions(screenEvent)
                 if (results.fulfilled == true) {
                     executeEventActions(screenEvent, results)
-                    if (!screenEvent.keepDetecting) break
+                    if (!screenEvent.keepDetecting || generation != pause?.generation) break
                 }
 
                 // Stop processing if requested
@@ -213,7 +246,8 @@ internal class ScenarioProcessor(
             }
         } finally {
             // We are done processing this frame, release it
-            imageDetector.releaseScreenBitmap(screenFrame)
+            retainedFrame?.let { imageDetector.releaseScreenBitmap(it) }
+            retainedFrame = null
         }
     }
 
@@ -252,7 +286,7 @@ internal class ScenarioProcessor(
 
         val previousHeldEvent = actionExecutor.getHeldEvent()
         var isPreviousHoldReleased = false
-        val executionStartTimeMs = System.currentTimeMillis()
+        val executionStartTimeMs = currentTimeMs()
 
         // The system may have dropped the held pointer since the last notification: notify it before this event
         // holds again, or a new hold by the same event would be seen as the continuation of the lost one.
@@ -260,6 +294,7 @@ internal class ScenarioProcessor(
 
         actionExecutor.executeActions(
             event = event,
+            refreshResults = { refreshAfterPause(event, results) },
             results = results,
             onHoldDurationElapsed = {
                 // Released while still held: its cooldown is started by the release, not by the loss of its hold
@@ -345,7 +380,7 @@ internal class ScenarioProcessor(
     }
 
     /** Cooldown of an event holding a finger starts once it is released. */
-    private fun startHeldEventCooldown(heldEvent: Event, startTimeMs: Long = System.currentTimeMillis()) {
+    private fun startHeldEventCooldown(heldEvent: Event, startTimeMs: Long = currentTimeMs()) {
         if (heldEvent is ScreenEvent) processingState.startCooldownIfNeeded(heldEvent, startTimeMs)
     }
 
@@ -357,7 +392,7 @@ internal class ScenarioProcessor(
         Log.d(TAG, "Held event ${heldEvent.name} finger has been lifted by the user")
         processingState.startCooldownIfNeeded(
             event = heldEvent,
-            startTimeMs = System.currentTimeMillis(),
+            startTimeMs = currentTimeMs(),
             minDurationMs = INTERRUPTED_HOLD_COOLDOWN_MS,
         )
     }

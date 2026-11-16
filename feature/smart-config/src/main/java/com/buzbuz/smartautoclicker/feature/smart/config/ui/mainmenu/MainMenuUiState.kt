@@ -26,6 +26,7 @@ package com.buzbuz.smartautoclicker.feature.smart.config.ui.mainmenu
  */
 data class MainMenuUiState(
     val isDetecting: Boolean,
+    val isPaused: Boolean = false,
     val isPlayButtonEnabled: Boolean,
     val isProjectionErrorVisible: Boolean,
     val isDebugPanelVisible: Boolean,

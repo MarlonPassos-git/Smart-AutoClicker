@@ -195,6 +195,10 @@ internal class SmartProcessingRepositoryImpl @Inject constructor(
         }
     }
 
+    override fun pauseDetection() = detectorEngine.pauseDetection()
+
+    override fun resumeDetection() = detectorEngine.resumeDetection()
+
     override fun stopDetection() {
         detectorEngine.stopDetection()
         autoStopJob?.cancel()

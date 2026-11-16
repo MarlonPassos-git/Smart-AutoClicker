@@ -30,11 +30,12 @@ internal class ProcessingState(
     triggerEvents: List<TriggerEvent>,
     counters: List<Counter>,
     private val progressListener: SmartProcessingListener?,
+    currentTimeMs: () -> Long = System::currentTimeMillis,
     private val eventsState: EventsState = EventsState(screenEvents, triggerEvents),
     private val broadcastsState: BroadcastsState = BroadcastsState(triggerEvents),
     private val countersState: CountersState = CountersState(counters, progressListener),
-    private val timersState: TimersState = TimersState(triggerEvents),
-    private val cooldownState: CooldownsState = CooldownsState(),
+    private val timersState: TimersState = TimersState(triggerEvents, currentTimeMs),
+    private val cooldownState: CooldownsState = CooldownsState(currentTimeMs),
 ) : IBroadcastsState by broadcastsState, ICountersState by countersState, ITimersState by timersState,
     IEventsState by eventsState, ICooldownsState by cooldownState {
 

@@ -103,6 +103,12 @@ interface SmartProcessingRepository : Dumpable {
      */
     fun stopDetection()
 
+    /** Retains counters/actions while suspending effects, e.g. `repository.pauseDetection()`. */
+    fun pauseDetection()
+
+    /** Resumes after a fresh observation, e.g. `repository.resumeDetection()`. */
+    fun resumeDetection()
+
     /**
      * Stop the processing for the current [Scenario].
      * Ignored if the state is [DetectionState.INACTIVE]. Also stops the processing if the state is

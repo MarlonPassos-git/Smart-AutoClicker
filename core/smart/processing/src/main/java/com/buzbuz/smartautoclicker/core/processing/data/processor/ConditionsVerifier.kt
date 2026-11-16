@@ -49,6 +49,7 @@ internal class ConditionsVerifier(
     private val scalingManager: ScalingManager,
     private val bitmapSupplier: suspend (String, Int, Int) -> Bitmap?,
     private val progressListener: SmartProcessingListener? = null,
+    private val currentTimeMs: () -> Long = System::currentTimeMillis,
 ) {
 
     /** List of results for the last call to verifyConditions. */
@@ -62,7 +63,7 @@ internal class ConditionsVerifier(
 
     suspend fun verifyConditions(@ConditionOperator operator: Int, conditions: List<Condition>): ConditionsResults {
         verificationResults.reset()
-        currentVerificationTsMs = System.currentTimeMillis()
+        currentVerificationTsMs = currentTimeMs()
 
         var verificationResult: ProcessedConditionResult
         for (condition in conditions) {

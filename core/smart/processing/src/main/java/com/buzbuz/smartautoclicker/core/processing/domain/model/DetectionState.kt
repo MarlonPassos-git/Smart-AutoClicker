@@ -26,6 +26,8 @@ enum class DetectionState {
     RECORDING,
     /** The screen is being recorded and the detection is running. */
     DETECTING,
+    /** Scenario retained with automation waits and effects suspended. */
+    PAUSED,
     /** The native lib is not found and the detector can't work. */
     ERROR_NO_NATIVE_LIB,
     /** The OCR models required by the scenario can't be found. */
@@ -37,6 +39,7 @@ enum class DetectionState {
 internal fun DetectorState.toDetectionState(): DetectionState? = when (this) {
     DetectorState.CREATED -> DetectionState.INACTIVE
     DetectorState.RECORDING -> DetectionState.RECORDING
+    DetectorState.PAUSED -> DetectionState.PAUSED
     DetectorState.DETECTING -> DetectionState.DETECTING
     DetectorState.TRANSITIONING -> null // Return null to avoid notifying state change when transitioning
     DetectorState.ERROR_NATIVE_DETECTOR_LIB_NOT_FOUND -> DetectionState.ERROR_NO_NATIVE_LIB
