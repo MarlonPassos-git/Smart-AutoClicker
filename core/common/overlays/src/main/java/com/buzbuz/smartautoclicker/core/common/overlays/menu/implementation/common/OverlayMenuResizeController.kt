@@ -118,6 +118,13 @@ internal class OverlayMenuResizeController(
 
         // Execute layout changes that will cause a resize
         layoutChanges()
+
+        // Running and paused Smart menus have the same visible items. Without a
+        // layout transition, no end callback will restore the window or unlock input.
+        if (runningTransitions.isEmpty() && resizedContainer.layoutTransition?.isRunning != true) {
+            windowResizer(measureMenuSize())
+            isAnimating = false
+        }
     }
 
     /** Release this controller. */
