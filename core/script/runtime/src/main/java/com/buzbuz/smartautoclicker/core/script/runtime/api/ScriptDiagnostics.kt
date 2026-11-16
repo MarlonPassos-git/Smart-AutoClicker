@@ -5,8 +5,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 /** Bounded history with a separate latest stage/message for the execution controls. */
-class ScriptDiagnostics(private val capacity: Int = 200) {
+class ScriptDiagnostics(private val capacity: Int = 200, private val onRecord: (ScriptDiagnostic) -> Unit = {}) {
+    /** Keeps operation traces available to the durable sink even when the viewer is closed. */
+    var isPersistenceEnabled: Boolean = false
     private val events = ArrayDeque<ScriptDiagnostic>()
+    private val mutableProgress = MutableStateFlow<String?>(null)
+    val progress = mutableProgress.asStateFlow()
     private val mutableLatest = MutableStateFlow<ScriptDiagnostic?>(null)
     val latest = mutableLatest.asStateFlow()
     private val mutableRevision = MutableStateFlow(0L)
@@ -25,8 +29,10 @@ class ScriptDiagnostics(private val capacity: Int = 200) {
         if (events.size == capacity) events.removeFirst()
         events.addLast(event)
         // Operation traces belong in the detailed viewer; they must not replace the current stage/wait message.
+        if (event.kind == "progress") mutableProgress.value = event.message
         if (event.kind != "operation") mutableLatest.value = event
         mutableRevision.value += 1
+        onRecord(event)
     }
 
     /** Returns a stable snapshot for the diagnostic viewer. */

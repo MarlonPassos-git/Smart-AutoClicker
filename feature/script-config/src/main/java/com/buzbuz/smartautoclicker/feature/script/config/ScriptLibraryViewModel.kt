@@ -8,6 +8,7 @@ import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.buzbuz.smartautoclicker.core.script.android.ScriptRunLogs
 import com.buzbuz.smartautoclicker.core.script.packages.ScriptPackageRepository
 import com.buzbuz.smartautoclicker.core.script.packages.StoredScriptPackage
 import com.buzbuz.smartautoclicker.core.script.runtime.QuickJsScriptRuntime
@@ -53,12 +54,32 @@ class ScriptLibraryViewModel(application: Application, private val savedState: S
 
     init { refresh() }
 
+    /** Resolves the consent request's immutable revision, e.g. `model.executionPackage(pending.first)`. */
+    suspend fun executionPackage(storageId: String): StoredScriptPackage = io {
+        repository.listPackages().first { it.storageId == storageId }
+    }
+
+    /** Records denied consent or launch failures before the service exists; e.g. `model.recordStartFailure(id, reason)`. */
+    fun recordStartFailure(storageId: String?, reason: String, failure: Throwable? = null) = viewModelScope.launch {
+        try {
+            io {
+                val logs = ScriptRunLogs.open(getApplication())
+                logs.start(JsonObject(ScriptRunLogs.environment(getApplication()) + buildJsonObject {
+                    put("revision", storageId); put("phase", "start")
+                })).finish(if (failure == null) "STOPPED" else "FAILED", reason, failure)
+            }
+        } catch (logFailure: Exception) {
+            android.util.Log.e("ScriptRunLogs", "Não foi possível registrar a tentativa de início", logFailure)
+        }
+    }
+
     /** Refreshes the script library, e.g. after returning from an import. */
     fun refresh() = work {
-        val packages = io { repository.listPackages() }
+        val packages = io { repository.listLatestPackages() }
         mutableState.update { it.copy(packages = packages) }
         val selectedId = savedState.get<String>("selected") ?: return@work
-        val selected = packages.find { it.storageId == selectedId } ?: return@work
+        val selected = packages.find { it.storageId == selectedId }
+            ?: io { repository.listPackages().find { it.storageId == selectedId } } ?: return@work
         val restoredDraft = savedState.get<String>("draft")
         load(selected, savedState["path"])
         restoredDraft?.let { draft ->
@@ -88,14 +109,34 @@ class ScriptLibraryViewModel(application: Application, private val savedState: S
     }
 
     /** Persists the exact saved revision/answers while Android's projection consent screen is open. */
-    fun prepareRun(answers: JsonObject) {
+    fun prepareRun(answers: JsonObject, newRound: Boolean = false) {
         val selected = checkNotNull(state.value.selected)
         check(!state.value.dirty) { "Salve o rascunho antes de iniciar" }
         val validated = selected.manifest.answers(answers).toString()
+        savedState["runSetup"] = false
+        savedState["runNewRound"] = newRound
         savedState["runId"] = selected.storageId
         savedState["runAnswers"] = validated
         if (selected.manifest.parameters.isNotEmpty()) recentValues.edit().putString(selected.manifest.id, validated).apply()
     }
+
+    /** Prepares setup without changing saved farm answers or round progress; e.g. `model.prepareSetup()`. */
+    fun prepareSetup() {
+        val selected = checkNotNull(state.value.selected)
+        check(!state.value.dirty && selected.manifest.setup != null) { "Salve o pacote e declare uma configuração antes de iniciar." }
+        savedState["runId"] = selected.storageId
+        savedState["runAnswers"] = "{}"
+        savedState["runNewRound"] = false
+        savedState["runSetup"] = true
+    }
+
+    /** Reads configuration for start selection, e.g. `model.configuration()` after setup. */
+    suspend fun configuration(): JsonObject? = withContext(Dispatchers.IO) {
+        state.value.selected?.let { repository.executionStates().readConfiguration(it.manifest.id) }
+    }
+
+    /** Retains setup intent across capture consent, e.g. `model.pendingSetup()`. */
+    fun pendingSetup(): Boolean = savedState["runSetup"] ?: false
 
     /** Restores compatible recent answers; changed definitions fall back to the package defaults. */
     fun recentAnswers(): JsonObject {
@@ -115,6 +156,31 @@ class ScriptLibraryViewModel(application: Application, private val savedState: S
         return id to (savedState.get<String>("runAnswers") ?: "{}")
     }
 
+    /** Reads the bounded progress record for the reviewed package, e.g. before offering Continue/New. */
+    suspend fun unfinishedRound(): JsonObject? = withContext(Dispatchers.IO) {
+        val selected = state.value.selected ?: return@withContext null
+        if (!selected.manifest.document.containsKey("executionState")) return@withContext null
+        repository.executionStates().read(selected.manifest.id)?.takeUnless { it.getValue("completed").jsonPrimitive.boolean }
+    }
+
+    /** Records an explicitly selected recovery answer only if the reviewed checkpoint is unchanged. */
+    suspend fun resolveRecovery(expected: JsonObject, choice: String) = withContext(Dispatchers.IO) {
+        val selected = checkNotNull(state.value.selected)
+        val states = repository.executionStates()
+        states.acquire(selected.manifest.id).use { owner ->
+            check(states.read(selected.manifest.id) == expected) { "O progresso mudou; reabra a rodada antes de resolver a pendência." }
+            val checkpoint = expected.getValue("state").jsonObject
+            val recovery = checkpoint.getValue("recovery").jsonObject
+            val choices = recovery.getValue("choices").jsonArray
+            require(choices.any { it.jsonObject["id"]?.jsonPrimitive?.content == choice }) { "recovery.choice=$choice; expected a declared recovery option" }
+            val answered = JsonObject(recovery + ("answer" to JsonPrimitive(choice)))
+            owner.write(JsonObject(expected + ("state" to JsonObject(checkpoint + ("recovery" to answered)))))
+        }
+    }
+
+    /** Reads the explicit launch disposition across permission screens and rotation. */
+    fun pendingNewRound(): Boolean = savedState["runNewRound"] ?: false
+
     /** Keeps calibration metadata across permission dialogs/rotation without changing package contents. */
     fun prepareCalibration(name: String, image: Boolean) {
         val current = state.value
@@ -132,6 +198,8 @@ class ScriptLibraryViewModel(application: Application, private val savedState: S
 
     /** Clears a consumed or cancelled Android consent request. */
     fun clearPendingRun() {
+        savedState.remove<Boolean>("runSetup")
+        savedState.remove<Boolean>("runNewRound")
         savedState.remove<String>("runId")
         savedState.remove<String>("runAnswers")
         savedState.remove<String>("calibrationId")
@@ -164,7 +232,7 @@ class ScriptLibraryViewModel(application: Application, private val savedState: S
             }
             repository.importPackage(ByteArrayInputStream(bytes.toByteArray()))
         }
-        val packages = io { repository.listPackages() }
+        val packages = io { repository.listLatestPackages() }
         mutableState.update { it.copy(packages = packages) }
         load(stored)
     }
@@ -174,7 +242,7 @@ class ScriptLibraryViewModel(application: Application, private val savedState: S
         val stored = io {
             repository.importPackage(checkNotNull(getApplication<Application>().contentResolver.openInputStream(uri)) { "Não foi possível abrir o pacote" })
         }
-        val packages = io { repository.listPackages() }
+        val packages = io { repository.listLatestPackages() }
         mutableState.update { it.copy(packages = packages) }
         load(stored)
     }
@@ -186,6 +254,15 @@ class ScriptLibraryViewModel(application: Application, private val savedState: S
             checkNotNull(getApplication<Application>().contentResolver.openOutputStream(uri)) { "Não foi possível abrir o destino" }) }
     }
 
+    /** Exports recent run evidence to a user-selected document, e.g. `model.exportHistory(uri)`. */
+    fun exportHistory(uri: Uri) = work {
+        io {
+            ScriptRunLogs.open(getApplication()).exportZip(
+                checkNotNull(getApplication<Application>().contentResolver.openOutputStream(uri)) { "Não foi possível abrir o destino do histórico" })
+        }
+        mutableState.update { it.copy(message = "Histórico exportado") }
+    }
+
     /** Validates JavaScript syntax without invoking Android operations. */
     fun validate() = work { validateDraft(); mutableState.update { it.copy(message = "Sintaxe válida") } }
 
@@ -195,7 +272,7 @@ class ScriptLibraryViewModel(application: Application, private val savedState: S
         val current = state.value
         val stored = io { repository.saveRevision(checkNotNull(current.selected).storageId,
             mapOf(checkNotNull(current.path) to current.draft.toByteArray())) }
-        val packages = io { repository.listPackages() }
+        val packages = io { repository.listLatestPackages() }
         mutableState.update { it.copy(packages = packages) }
         load(stored, current.path)
     }

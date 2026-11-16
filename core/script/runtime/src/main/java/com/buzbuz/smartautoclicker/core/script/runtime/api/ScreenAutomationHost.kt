@@ -29,7 +29,12 @@ class ScreenAutomationHost(
     initialResumeQuery: JsonObject? = null,
     private val referenceProfile: ScreenProfile? = null,
     private val detailedDiagnostics: () -> Boolean = { false },
+    private val executionState: ScriptExecutionState? = null,
 ) : SessionAutomationHost {
+    private var operationCheckpoint: (suspend () -> Unit)? = null
+
+    override fun setOperationCheckpoint(checkpoint: suspend () -> Unit) { operationCheckpoint = checkpoint }
+
     private var sequence = 0L
     private var frame: Long? = null
     private var size: ScreenSize? = null
@@ -73,6 +78,7 @@ class ScreenAutomationHost(
             "observe" -> observe()
             "read" -> read(request)
             "readAll" -> readAll(request)
+            "readText" -> readText(request)
             "profile" -> {
                 requireFrame(request)
                 val profile = checkNotNull(referenceProfile) { "screen: no calibrated reference profile in this package" }
@@ -96,7 +102,17 @@ class ScreenAutomationHost(
                 invalidateObservations()
                 success()
             }
-            "sleep" -> { delay(request.duration()); success() }
+            "sleep" -> {
+                var remaining = request.duration()
+                while (remaining > 0) {
+                    operationCheckpoint?.invoke()
+                    val quantum = minOf(remaining, 20L)
+                    delay(quantum)
+                    remaining -= quantum
+                }
+                operationCheckpoint?.invoke()
+                success()
+            }
             "zoom" -> {
                 if (request.containsKey("frame")) requireFrame(request)
                 val directionName = request.string("direction")
@@ -118,6 +134,24 @@ class ScreenAutomationHost(
                 put("activeNanos", (pausedAt ?: monotonicNanos()) - pausedNanos)
                 frame?.let { put("frame", it) }
             }
+            "loadState" -> buildJsonObject {
+                put("value", checkNotNull(executionState) { "executionState: not enabled for this package" }.read() ?: kotlinx.serialization.json.JsonNull)
+            }
+            "saveState" -> {
+                val state = request["value"] as? JsonObject ?: error("saveState.value: expected a JSON object")
+                val completed = request["completed"]?.jsonPrimitive?.booleanOrNull
+                    ?: error("saveState.completed: expected a boolean")
+                checkNotNull(executionState) { "executionState: not enabled for this package" }.write(state, completed)
+                success()
+            }
+            "loadConfiguration" -> buildJsonObject {
+                put("value", checkNotNull(executionState) { "executionState: not enabled for this package" }.readConfiguration() ?: kotlinx.serialization.json.JsonNull)
+            }
+            "saveConfiguration" -> {
+                val value = request["value"] as? JsonObject ?: error("saveConfiguration.value: expected a JSON object")
+                checkNotNull(executionState) { "executionState: not enabled for this package" }.writeConfiguration(value)
+                success()
+            }
             "parameters" -> buildJsonObject { put("values", startParameters) }
             "resumeWhen" -> {
                 resumeQuery = request["query"] as? JsonObject
@@ -130,7 +164,7 @@ class ScreenAutomationHost(
                 onDiagnostic(ScriptDiagnostic("stop", stage, reason, monotonicNanos()))
                 throw ScriptStopRequested(reason)
             }
-            "stage", "log" -> {
+            "stage", "log", "progress" -> {
                 val message = request.string("message")
                 require(message.length <= 4096) { "message.length=${message.length}; expected at most 4096 characters" }
                 if (operation == "stage") {
@@ -197,6 +231,34 @@ class ScreenAutomationHost(
     private suspend fun read(request: JsonObject): JsonObject {
         requireFrame(request)
         return recognize(recognitionQuery(request))
+    }
+
+    private suspend fun readText(request: JsonObject): JsonObject {
+        requireFrame(request)
+        val region = recognitionQuery(JsonObject(request + ("kind" to JsonPrimitive("number")))).region
+        require((region.right - region.left).toLong() * (region.bottom - region.top) <= 1048576) {
+            "readText.region=$region; expected at most 1048576 pixels per read"
+        }
+        val model = request.string("model")
+        require(model.matches(Regex("[A-Z_]{1,32}"))) { "readText.model=$model; expected an OCR alphabet identifier" }
+        val maximum = request.int("maxResults")
+        require(maximum in 1..64) { "readText.maxResults=$maximum; expected 1..64" }
+        val blocks = backend.readText(region, model, request.int("threshold"), maximum)
+        check(blocks.size <= maximum) { "OCR exceeded result limit" }
+        return buildJsonObject {
+            put("frame", checkNotNull(frame))
+            put("truncated", blocks.size == maximum)
+            put("blocks", JsonArray(blocks.map { block ->
+                check(block.text.length <= 1024 && block.confidence.isFinite() && block.confidence in 0.0..100.0) { "Invalid OCR block" }
+                buildJsonObject {
+                    put("text", block.text)
+                    put("confidence", block.confidence)
+                    put("left", block.bounds.left); put("top", block.bounds.top)
+                    put("right", block.bounds.right); put("bottom", block.bounds.bottom)
+                    put("frame", checkNotNull(frame))
+                }
+            }))
+        }
     }
 
     private suspend fun readAll(request: JsonObject): JsonObject {

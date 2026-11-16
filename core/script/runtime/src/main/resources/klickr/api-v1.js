@@ -18,6 +18,11 @@ export async function read(observation, query) {
     return Object.freeze(await call("read", { ...query, frame: observation.frame }));
 }
 
+export async function readText(observation, { region, model = "LATIN", threshold = 80, maxResults = 64 }) {
+    const result = await call("readText", { frame: observation.frame, region, model, threshold, maxResults });
+    return Object.freeze({ ...result, blocks: Object.freeze(result.blocks.map(Object.freeze)) });
+}
+
 export async function readAll(observation, queries) {
     const result = await call("readAll", { queries, frame: observation.frame });
     return Object.freeze(result.results.map(Object.freeze));
@@ -59,12 +64,32 @@ export async function sleep(durationMs) {
     return call("sleep", { durationMs });
 }
 
+export async function loadState() {
+    return (await call("loadState")).value;
+}
+
+export async function saveState(value, { completed = false } = {}) {
+    return call("saveState", { value, completed });
+}
+
+export async function loadConfiguration() {
+    return (await call("loadConfiguration")).value;
+}
+
+export async function saveConfiguration(value) {
+    return call("saveConfiguration", { value });
+}
+
 export async function parameters() {
     return Object.freeze((await call("parameters")).values);
 }
 
 export async function stage(name, message = "") {
     return call("stage", { name, message });
+}
+
+export async function progress(message) {
+    return call("progress", { message });
 }
 
 export async function log(message) {

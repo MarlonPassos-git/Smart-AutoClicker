@@ -1,5 +1,7 @@
 package com.buzbuz.smartautoclicker.core.script.runtime.api
 
+data class ScreenText(val text: String, val confidence: Double, val bounds: ScreenRegion)
+
 data class ScreenSize(val width: Int, val height: Int)
 data class ScreenPoint(val x: Int, val y: Int)
 data class ScreenTapStep(val position: ScreenPoint, val pressMs: Long, val afterMs: Long)
@@ -38,6 +40,9 @@ interface ScreenAutomationBackend {
     suspend fun capture(): ScreenSize
     /** Reads the currently captured image without taking another capture. */
     suspend fun recognize(query: RecognitionQuery): ScreenRecognition
+    /** Reads bounded OCR blocks from the current observation, e.g. `readText(region, "LATIN", 80, 32)`. */
+    suspend fun readText(region: ScreenRegion, model: String, threshold: Int, maxResults: Int): List<ScreenText> =
+        throw UnsupportedOperationException("Free-text OCR is unavailable")
     /** Dispatches a tap and returns when it completes, e.g. `tap(ScreenPoint(20, 30), 50)`. */
     suspend fun tap(position: ScreenPoint, durationMs: Long)
     /** Runs a bounded sequence without a pause between its taps; cancellation still stops pending taps. */

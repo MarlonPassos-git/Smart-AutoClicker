@@ -22,6 +22,9 @@ class ScriptPackageRepository(private val root: File) {
         check(root.isDirectory || root.mkdirs()) { "Cannot create script package directory" }
     }
 
+    /** Private progress storage is a sibling of immutable revisions, e.g. `repository.executionStates()`. */
+    fun executionStates(): ScriptExecutionStateRepository = ScriptExecutionStateRepository(File(root.parentFile, "execution-state"))
+
     /** Consumes/closes a ZIP and publishes only a fully validated revision.
      * Example: `repository.importPackage(contentResolver.openInputStream(uri)!!)`. Existing revisions stay intact.
      */
@@ -87,6 +90,15 @@ class ScriptPackageRepository(private val root: File) {
         .filter { it.isDirectory && it.name.matches(storageIdPattern) }
         .sortedBy { it.name }
         .map { StoredScriptPackage(it.name, validateContents(it)) }
+
+    /** Lists the latest imported/saved revision per package without deleting older progress-compatible revisions.
+     * Example: `repository.listLatestPackages()` for the home screen and library.
+     */
+    @Synchronized
+    fun listLatestPackages(): List<StoredScriptPackage> = listPackages()
+        .sortedWith(compareByDescending<StoredScriptPackage> { directory(it.storageId).lastModified() }.thenBy { it.storageId })
+        .distinctBy { it.manifest.id }
+        .sortedBy { it.manifest.name.lowercase() }
 
     /** Loads a fixed code snapshot. Example: `session.run(repository.program(id), host)`. */
     @Synchronized
@@ -179,6 +191,9 @@ class ScriptPackageRepository(private val root: File) {
         require(manifestFile.isFile && manifestFile.length() <= MAX_SOURCE_BYTES) { "manifest.json: expected a file of at most $MAX_SOURCE_BYTES bytes" }
         val manifest = ScriptManifest.parse(decodeUtf8(manifestFile.readBytes(), "manifest.json"))
         require(File(directory, manifest.entry).isFile) { "entry=${manifest.entry}; expected an existing JavaScript source" }
+        manifest.setup?.let { setup ->
+            require(File(directory, setup.entry).isFile) { "setup.entry=${setup.entry}; expected an existing JavaScript source" }
+        }
         directory.walkTopDown().filter { it.isFile && it.extension == "js" }.forEach {
             require(it.length() <= MAX_SOURCE_BYTES) { "source=${it.name}; expected at most $MAX_SOURCE_BYTES bytes" }
             decodeUtf8(it.readBytes(), it.name)
@@ -215,7 +230,7 @@ class ScriptPackageRepository(private val root: File) {
                     }) { "resources.$name.alternatives: expected 1..64 nonempty strings up to 256 characters" }
                 }
                 "color" -> resource.integer("argb")
-                "number" -> require(resource.text("format") in setOf("AUTO", "DOT_DECIMAL", "COMMA_DECIMAL", "POSITIVE_QUANTITY")) {
+                "number" -> require(resource.text("format") in setOf("AUTO", "DOT_DECIMAL", "COMMA_DECIMAL", "POSITIVE_QUANTITY", "WHITE_INTEGER_LINE")) {
                     "resources.$name.format=${resource["format"]}; expected a supported number format"
                 }
                 else -> throw IllegalArgumentException("resources.$name.type=$type; expected image, text, color or number")

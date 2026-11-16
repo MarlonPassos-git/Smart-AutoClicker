@@ -72,7 +72,7 @@ class ScriptRunOverlay(private val controller: ScriptRunController, private val 
                 try {
                     coroutineScope {
                         launch {
-                            combine(controller.status, controller.diagnostics.latest) { status, event -> status to event }
+                            combine(controller.status, controller.diagnostics.latest, controller.diagnostics.progress) { status, event, _ -> status to event }
                                 .collect { (status, event) -> renderState(status, event) }
                         }
                         launch {
@@ -127,11 +127,13 @@ class ScriptRunOverlay(private val controller: ScriptRunController, private val 
         binding.state.maxLines = if (compact) 1 else 3
         val padding = ((if (compact) 4 else 12) * viewContext.resources.displayMetrics.density).toInt()
         binding.state.setPadding(padding, padding, padding, padding)
-        binding.state.text = if (compact) message ?: label
-            else listOfNotNull(label, message).joinToString("\n")
+        val progress = controller.diagnostics.progress.value
+        binding.state.maxLines = if (progress != null && !compact) 5 else 3
+        binding.state.text = if (compact) progress ?: message ?: label
+            else listOfNotNull(progress, label, message?.takeUnless { it == progress }).joinToString("\n")
         val toggleHint = if (canToggleControls) viewContext.getString(
             if (compact) R.string.script_controls_expand else R.string.script_controls_collapse) else null
-        binding.state.contentDescription = listOfNotNull(label, message, toggleHint).joinToString("\n")
+        binding.state.contentDescription = listOfNotNull(progress, label, message, toggleHint).joinToString("\n")
         setMenuItemViewEnabled(binding.btnPlay, status.state == ScriptSessionState.RUNNING || status.state == ScriptSessionState.PAUSED)
         val paused = status.state == ScriptSessionState.PAUSED
         binding.btnPlay.setImageResource(if (paused) com.buzbuz.smartautoclicker.core.ui.R.drawable.ic_play_arrow else com.buzbuz.smartautoclicker.core.ui.R.drawable.ic_pause)

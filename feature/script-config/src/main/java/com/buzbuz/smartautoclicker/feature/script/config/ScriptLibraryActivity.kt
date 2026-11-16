@@ -24,6 +24,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.withResumed
 import com.buzbuz.smartautoclicker.core.script.packages.StoredScriptPackage
 import com.buzbuz.smartautoclicker.feature.script.config.databinding.ActivityScriptLibraryBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -50,24 +51,44 @@ class ScriptLibraryActivity : AppCompatActivity() {
     private var fileNames = emptyList<String>()
     private var pendingEditorPosition: IntArray? = null
     private val projectionRequest = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        val newRound = model.pendingNewRound()
+        val setup = model.pendingSetup()
         val pending = model.pendingRun()
         val calibration = model.pendingCalibration()
         model.clearPendingRun()
         if (result.resultCode != RESULT_OK || result.data == null || (pending == null && calibration == null)) {
+            model.recordStartFailure(pending?.first ?: calibration?.storageId, getString(R.string.script_projection_denied))
             Toast.makeText(this, R.string.script_projection_denied, Toast.LENGTH_LONG).show()
         } else {
-            try {
-                val service = serviceConnection.getLocalService()
-                val accepted = if (calibration != null) service?.startScriptCalibration(result.resultCode, result.data!!,
-                    calibration.storageId, calibration.name, calibration.image) == true
-                else service?.startScript(result.resultCode, result.data!!, pending!!.first, pending.second) == true
-                if (accepted) finishAffinity()
-                else Toast.makeText(this, R.string.script_start_failed, Toast.LENGTH_LONG).show()
-            } catch (failure: Exception) { Toast.makeText(this, failure.message, Toast.LENGTH_LONG).show() }
+            lifecycleScope.launch {
+                try {
+                    val revision = (pending?.first ?: calibration?.storageId)?.let { model.executionPackage(it) }
+                    lifecycle.withResumed {
+                        val service = checkNotNull(serviceConnection.getLocalService()) { getString(R.string.script_start_failed) }
+                        ScriptTargetAppLauncher(this@ScriptLibraryActivity).open(revision?.manifest?.targetPackage)
+                        val accepted = if (calibration != null) {
+                            service.startScriptCalibration(result.resultCode, result.data!!, calibration.storageId, calibration.name, calibration.image)
+                        } else {
+                            service.startScript(result.resultCode, result.data!!, pending!!.first, pending.second, newRound, setup)
+                        }
+                        if (accepted) finishAffinity()
+                        else {
+                            model.recordStartFailure(pending?.first ?: calibration?.storageId, getString(R.string.script_start_failed))
+                            Toast.makeText(this@ScriptLibraryActivity, R.string.script_start_failed, Toast.LENGTH_LONG).show()
+                        }
+                    }
+                } catch (cancelled: kotlinx.coroutines.CancellationException) {
+                    throw cancelled
+                } catch (failure: Exception) {
+                    model.recordStartFailure(pending?.first ?: calibration?.storageId, failure.message ?: getString(R.string.script_start_failed), failure)
+                    Toast.makeText(this@ScriptLibraryActivity, failure.message, Toast.LENGTH_LONG).show()
+                }
+            }
         }
     }
     private val importDocument = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri -> uri?.let { model.importPackage(it) } }
     private val exportDocument = registerForActivityResult(ActivityResultContracts.CreateDocument("application/zip")) { uri -> uri?.let { model.exportPackage(it) } }
+    private val exportHistory = registerForActivityResult(ActivityResultContracts.CreateDocument("application/zip")) { uri -> uri?.let { model.exportHistory(it) } }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -82,6 +103,10 @@ class ScriptLibraryActivity : AppCompatActivity() {
             insets
         }
         binding.toolbar.setNavigationOnClickListener { onBackPressedDispatcher.onBackPressed() }
+        binding.toolbar.menu.add(R.string.script_export_history).setOnMenuItemClickListener {
+            if (!model.state.value.busy) exportHistory.launch("klickr-historico.zip")
+            true
+        }
         onBackPressedDispatcher.addCallback(this) {
             if (model.state.value.selected == null || model.state.value.busy) finish()
             else confirmDiscard { model.closeEditor() }
@@ -103,7 +128,7 @@ class ScriptLibraryActivity : AppCompatActivity() {
                 val answers = kotlinx.serialization.json.Json.parseToJsonElement(result.getString("answers")!!)
                     as kotlinx.serialization.json.JsonObject
                 model.clearPendingRun()
-                model.prepareRun(answers)
+                model.prepareRun(answers, result.getBoolean("newRound"))
                 requestExecutionPermissions()
             }
         }
@@ -119,9 +144,15 @@ class ScriptLibraryActivity : AppCompatActivity() {
         binding.calibrate.setOnClickListener {
             model.state.value.selected?.let { ScriptCalibrationDialog.show(this, it.storageId) }
         }
+        binding.setup.setOnClickListener { offerSetup() }
         binding.start.setOnClickListener {
-            val selected = model.state.value.selected ?: return@setOnClickListener
-            ScriptStartParametersDialog.show(this, selected.manifest, selected.storageId, model.recentAnswers())
+            offerRoundStart()
+        }
+        if (savedInstanceState == null && (intent.getBooleanExtra("startFromHome", false) || intent.getBooleanExtra("setupFromHome", false))) {
+            lifecycleScope.launch {
+                model.state.first { !it.busy && it.selected?.storageId == intent.getStringExtra("selected") }
+                if (intent.getBooleanExtra("setupFromHome", false)) offerSetup() else offerRoundStart()
+            }
         }
         binding.editor.setHorizontallyScrolling(true)
         binding.editor.doAfterTextChanged { text ->
@@ -152,6 +183,96 @@ class ScriptLibraryActivity : AppCompatActivity() {
         super.onSaveInstanceState(outState)
     }
 
+    private fun offerSetup() {
+        val selected = model.state.value.selected ?: return
+        val setup = selected.manifest.setup ?: return
+        MaterialAlertDialogBuilder(this).setTitle(setup.label)
+            .setMessage(setup.description ?: getString(R.string.script_setup_description))
+            .setNegativeButton(R.string.script_cancel, null)
+            .setPositiveButton(R.string.script_continue) { _, _ ->
+                model.clearPendingRun()
+                model.prepareSetup()
+                requestExecutionPermissions()
+            }.show()
+    }
+
+    private fun showStartForm(selected: StoredScriptPackage, newRound: Boolean = false) {
+        lifecycleScope.launch {
+            try {
+                val configuration = model.configuration()
+                if (model.state.value.selected?.storageId != selected.storageId) return@launch
+                if (selected.manifest.parameters.values.any { it.type == "selection" }) {
+                    com.buzbuz.smartautoclicker.core.script.packages.configurationItems(configuration)
+                }
+                ScriptStartParametersDialog.show(this@ScriptLibraryActivity, selected.manifest, selected.storageId,
+                    model.recentAnswers(), newRound, configuration)
+            } catch (failure: Exception) {
+                MaterialAlertDialogBuilder(this@ScriptLibraryActivity).setTitle(R.string.script_setup_required)
+                    .setMessage(failure.message).setNegativeButton(R.string.script_cancel, null)
+                    .apply { selected.manifest.setup?.let { setup -> setPositiveButton(setup.label) { _, _ -> offerSetup() } } }.show()
+            }
+        }
+    }
+
+    private fun offerRoundStart() {
+        val selected = model.state.value.selected ?: return
+        lifecycleScope.launch {
+            val result = runCatching { model.unfinishedRound() }
+            if (model.state.value.selected?.storageId != selected.storageId) return@launch
+            val previous = result.getOrNull()
+            if (previous == null && result.isSuccess) {
+                showStartForm(selected)
+                return@launch
+            }
+            val compatible = previous?.get("revision")?.let { (it as? kotlinx.serialization.json.JsonPrimitive)?.content } == selected.storageId
+            MaterialAlertDialogBuilder(this@ScriptLibraryActivity)
+                .setTitle(R.string.script_saved_round)
+                .setMessage(buildString {
+                    append(if (result.isFailure) getString(R.string.script_invalid_round)
+                        else if (!compatible) getString(R.string.script_incompatible_round) else getString(R.string.script_continue_round_description))
+                    (previous?.get("interruptionReason") as? kotlinx.serialization.json.JsonPrimitive)?.content?.let { append("\n\n").append(it.take(4096)) }
+                    val state = previous?.get("state") as? kotlinx.serialization.json.JsonObject
+                    (state?.get("details") as? kotlinx.serialization.json.JsonArray)?.take(64)?.forEach { value ->
+                        (value as? kotlinx.serialization.json.JsonPrimitive)?.content?.let { append("\n").append(it.take(512)) }
+                    }
+                })
+                .setNegativeButton(R.string.script_cancel, null)
+                .setNeutralButton(R.string.script_new_round) { _, _ ->
+                    showStartForm(selected, newRound = true)
+                }.apply {
+                    if (compatible) setPositiveButton(R.string.script_continue_round) { _, _ ->
+                        val answers = previous!!.getValue("answers") as kotlinx.serialization.json.JsonObject
+                        continueSavedRound(previous, answers)
+                    }
+                }.show()
+        }
+    }
+
+    private fun continueSavedRound(previous: kotlinx.serialization.json.JsonObject, answers: kotlinx.serialization.json.JsonObject) {
+        val checkpoint = previous["state"] as? kotlinx.serialization.json.JsonObject
+        val recovery = checkpoint?.get("recovery") as? kotlinx.serialization.json.JsonObject
+        val choices = recovery?.get("choices") as? kotlinx.serialization.json.JsonArray
+        if (recovery == null || choices.isNullOrEmpty()) {
+            model.prepareRun(answers)
+            requestExecutionPermissions()
+            return
+        }
+        val definitions = choices.take(8).mapNotNull { it as? kotlinx.serialization.json.JsonObject }
+        val labels = definitions.map { (it["label"] as? kotlinx.serialization.json.JsonPrimitive)?.content.orEmpty().take(256) }.toTypedArray()
+        MaterialAlertDialogBuilder(this).setTitle(R.string.script_recovery_pending)
+            .setMessage((recovery["message"] as? kotlinx.serialization.json.JsonPrimitive)?.content?.take(4096))
+            .setItems(labels) { _, index ->
+                lifecycleScope.launch {
+                    runCatching {
+                        val choice = (definitions[index].getValue("id") as kotlinx.serialization.json.JsonPrimitive).content
+                        model.resolveRecovery(previous, choice)
+                        model.prepareRun(answers)
+                        requestExecutionPermissions()
+                    }.onFailure { Toast.makeText(this@ScriptLibraryActivity, it.message, Toast.LENGTH_LONG).show() }
+                }
+            }.setNegativeButton(R.string.script_cancel, null).show()
+    }
+
     private fun requestExecutionPermissions() {
         permissionController.startPermissionsUiFlow(this, listOf(
             PermissionOverlay(), PermissionAccessibilityService(appComponents.klickrServiceComponentName,
@@ -161,7 +282,10 @@ class ScriptLibraryActivity : AppCompatActivity() {
             val intent = if (Build.VERSION.SDK_INT >= 35) manager.createScreenCaptureIntent(MediaProjectionConfig.createConfigForDefaultDisplay())
                 else manager.createScreenCaptureIntent()
             projectionRequest.launch(intent)
-        }, onMandatoryDenied = { model.clearPendingRun() })
+        }, onMandatoryDenied = {
+            model.recordStartFailure(model.pendingRun()?.first ?: model.pendingCalibration()?.storageId, "Permissão obrigatória negada antes de iniciar")
+            model.clearPendingRun()
+        })
     }
 
     private fun render(state: ScriptLibraryState) = with(binding) {
@@ -206,6 +330,9 @@ class ScriptLibraryActivity : AppCompatActivity() {
         validate.isEnabled = state.editable && !state.busy
         exportPackage.isEnabled = !state.busy
         start.isEnabled = state.selected != null && !state.dirty && !state.busy
+        setup.isVisible = state.selected?.manifest?.setup != null
+        setup.text = state.selected?.manifest?.setup?.label
+        setup.isEnabled = state.selected != null && !state.dirty && !state.busy
         calibrate.isEnabled = state.selected != null && !state.dirty && !state.busy
     }
 

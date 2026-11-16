@@ -35,6 +35,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.ConcatAdapter
 
 import com.buzbuz.smartautoclicker.R
 import com.buzbuz.smartautoclicker.core.base.extensions.applySafeContentInsets
@@ -48,6 +49,10 @@ import com.buzbuz.smartautoclicker.feature.backup.ui.BackupDialogFragment.Compan
 import com.buzbuz.smartautoclicker.scenarios.migration.ConditionsMigrationFragment
 import com.buzbuz.smartautoclicker.scenarios.creation.ScenarioCreationDialog
 import com.buzbuz.smartautoclicker.scenarios.list.adapter.ScenarioAdapter
+import com.buzbuz.smartautoclicker.feature.script.config.ScriptHomeAdapter
+import com.buzbuz.smartautoclicker.core.script.packages.ScriptPackageRepository
+import com.buzbuz.smartautoclicker.core.script.packages.StoredScriptPackage
+import com.buzbuz.smartautoclicker.feature.script.config.ScriptLibraryActivity
 import com.buzbuz.smartautoclicker.scenarios.list.copy.ScenarioCopyDialog
 import com.buzbuz.smartautoclicker.scenarios.list.copy.ScenarioCopyDialog.Companion.FRAGMENT_TAG_COPY_DIALOG
 import com.buzbuz.smartautoclicker.scenarios.list.model.ScenarioListUiState
@@ -60,6 +65,9 @@ import com.google.android.material.shape.MaterialShapeDrawable
 import dagger.hilt.android.AndroidEntryPoint
 
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.io.File
 
 /**
  * Fragment displaying the list of click scenario and the creation dialog.
@@ -83,6 +91,17 @@ class ScenarioListFragment : Fragment() {
     private lateinit var viewBinding: FragmentScenariosBinding
     /** Adapter displaying the click scenarios as a list. */
     private lateinit var scenariosAdapter: ScenarioAdapter
+    private var homeScripts: List<StoredScriptPackage> = emptyList()
+    private val scriptsAdapter = ScriptHomeAdapter(
+        onStart = { script ->
+            startActivity(Intent(requireContext(), ScriptLibraryActivity::class.java)
+                .putExtra("selected", script.storageId).putExtra("startFromHome", true))
+        },
+        onSetup = { script ->
+            startActivity(Intent(requireContext(), ScriptLibraryActivity::class.java)
+                .putExtra("selected", script.storageId).putExtra("setupFromHome", true))
+        },
+    )
 
 
     /** The current dialog being displayed. Null if not displayed. */
@@ -114,7 +133,7 @@ class ScenarioListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         viewBinding.apply {
-            list.adapter = scenariosAdapter
+            list.adapter = ConcatAdapter(scriptsAdapter, scenariosAdapter)
 
             emptyCreateButton.setOnClickListener { onCreateClicked() }
             add.setOnClickListener { onCreateClicked() }
@@ -138,6 +157,17 @@ class ScenarioListFragment : Fragment() {
                 launch { scenarioListViewModel.uiState.collect(::updateUiState) }
                 launch { scenarioListViewModel.needsConditionMigration.collect(::onConditionMigrationRequired) }
             }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val packageRoot = File(requireContext().filesDir, "scripts/packages")
+        viewLifecycleOwner.lifecycleScope.launch {
+            val result = withContext(Dispatchers.IO) { runCatching { ScriptPackageRepository(packageRoot).listLatestPackages() } }
+            result.onSuccess { homeScripts = it }
+                .onFailure { android.widget.Toast.makeText(requireContext(), it.message, android.widget.Toast.LENGTH_LONG).show() }
+            updateUiState(scenarioListViewModel.uiState.value)
         }
     }
 
@@ -220,9 +250,10 @@ class ScenarioListFragment : Fragment() {
      * Will update the list/empty view according to the current click scenarios
      */
     private fun updateScenarioList(uiState: ScenarioListUiState) {
+        scriptsAdapter.submitList(if (uiState.type == ScenarioListUiState.Type.SELECTION) homeScripts else emptyList())
         viewBinding.apply {
             loading.visibility = View.GONE
-            if (uiState.listContent.isEmpty() && uiState.type == ScenarioListUiState.Type.SELECTION) {
+            if (uiState.listContent.isEmpty() && homeScripts.isEmpty() && uiState.type == ScenarioListUiState.Type.SELECTION) {
                 list.visibility = View.GONE
                 add.visibility = View.GONE
                 layoutEmpty.visibility = View.VISIBLE

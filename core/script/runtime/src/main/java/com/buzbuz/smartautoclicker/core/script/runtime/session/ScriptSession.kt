@@ -23,6 +23,8 @@ enum class ScriptSessionState {
 data class ScriptSessionStatus(val state: ScriptSessionState, val failure: Throwable? = null, val reason: String? = null)
 
 interface SessionAutomationHost : ScriptHost {
+    /** Allows long waits to cooperate without discarding the suspended JS continuation. */
+    fun setOperationCheckpoint(checkpoint: suspend () -> Unit) {}
     /** Suspends operation deadlines while paused; session/diagnostic clocks keep advancing. */
     suspend fun pauseOperationClock() {}
     /** Restarts operation deadlines after a successful screen revalidation. */
@@ -59,6 +61,7 @@ class ScriptSession(
         try {
             coordinator.withSession { access ->
                 try {
+                    host.setOperationCheckpoint { checkpoint(host) }
                     runtime.validate(snapshot)
                     currentCoroutineContext().ensureActive()
                     transition(ScriptSessionState.PREPARING, ScriptSessionState.RUNNING)

@@ -15,7 +15,7 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
-import kotlinx.coroutines.withTimeout
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.math.roundToInt
 
 sealed interface AndroidScriptResource {
@@ -41,14 +41,14 @@ class AndroidScreenAutomationBackend(
 
     override suspend fun capture(): ScreenSize {
         invalidateObservation()
-        val bitmap = withTimeout(2000) {
+        val bitmap = withTimeoutOrNull(2000) {
             var captured = captureBitmap()
             while (captured == null) {
                 delay(5)
                 captured = captureBitmap()
             }
             captured
-        }
+        } ?: error("Não foi possível capturar uma imagem da tela em 2 segundos. Verifique a autorização de captura e inicie novamente.")
         detector.setScreenBitmap(bitmap, processingTag)
         currentBitmap = bitmap
         return ScreenSize(bitmap.width, bitmap.height)
@@ -97,6 +97,15 @@ class AndroidScreenAutomationBackend(
             if (result.isDetected) ScreenPoint(result.position.x, result.position.y) else null,
             if (status == RecognitionStatus.FOUND) result.numberDetected else null,
             if (status == RecognitionStatus.FOUND && result.size.x > 0 && result.size.y > 0) ScreenSize(result.size.x, result.size.y) else null)
+    }
+
+    override suspend fun readText(region: ScreenRegion, model: String, threshold: Int, maxResults: Int): List<ScreenText> {
+        checkNotNull(currentBitmap) { "No script observation; capture before OCR" }
+        ensureOcrModels(setOf(model))
+        currentCoroutineContext().ensureActive()
+        return detector.readText(model, Rect(region.left, region.top, region.right, region.bottom), threshold, maxResults).map {
+            ScreenText(it.text, it.confidence, ScreenRegion(it.bounds.left, it.bounds.top, it.bounds.right, it.bounds.bottom))
+        }.also { currentCoroutineContext().ensureActive() }
     }
 
     override suspend fun tap(position: ScreenPoint, durationMs: Long) {

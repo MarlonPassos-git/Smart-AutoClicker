@@ -1,4 +1,5 @@
 <resources>
+    <string name="script_export_history">Exportar histórico</string>
     <string name="script_start">Iniciar</string>
     <string name="script_start_parameters">Parâmetros de início</string>
     <string name="script_start_failed">Não foi possível iniciar. Confira as permissões e aguarde a sessão anterior terminar.</string>
@@ -55,4 +56,14 @@
     <string name="script_calibration_target">Abra a tela alvo e toque em selecionar área. Recurso: %1$s.</string>
     <string name="script_calibration_select">Ajuste a área de %1$s e confirme para salvar.</string>
     <string name="script_calibration_failed">Não foi possível salvar: %1$s. Ajuste a área e tente novamente.</string>
+    <string name="script_saved_round">Rodada salva</string>
+    <string name="script_continue_round">Continuar rodada</string>
+    <string name="script_new_round">Nova rodada</string>
+    <string name="script_continue_round_description">Continuar mantém as vilas concluídas, os ataques confirmados e os parâmetros originais. Nova rodada substitui o progresso quando for iniciada.</string>
+    <string name="script_invalid_round">O registro de progresso está inválido. Ele foi preservado. Nova rodada permite substituí-lo ao iniciar.</string>
+    <string name="script_incompatible_round">O progresso pertence a outra revisão. Abra a revisão original para continuar ou escolha Nova rodada.</string>
+    <string name="script_recovery_pending">Resolver pendência</string>
+    <string name="script_setup">Configurar</string>
+    <string name="script_setup_required">Configuração necessária</string>
+    <string name="script_setup_description">Abra o aplicativo alvo e execute a configuração. O cadastro anterior só será substituído após concluir. O progresso das execuções e os parâmetros salvos serão preservados.</string>
 </resources>

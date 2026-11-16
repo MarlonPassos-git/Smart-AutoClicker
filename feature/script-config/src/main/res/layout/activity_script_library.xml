@@ -36,6 +36,9 @@
             <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal">
                 <com.google.android.material.button.MaterialButton android:id="@+id/start" android:layout_width="wrap_content"
                     android:layout_height="wrap_content" android:minHeight="48dp" android:text="@string/script_start" />
+                <com.google.android.material.button.MaterialButton android:id="@+id/setup" style="?attr/materialButtonOutlinedStyle"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="8dp"
+                    android:minHeight="48dp" android:visibility="gone" android:text="@string/script_setup" />
                 <com.google.android.material.button.MaterialButton android:id="@+id/save" android:layout_width="wrap_content"
                     android:layout_height="wrap_content" android:layout_marginStart="8dp" android:minHeight="48dp" android:text="@string/script_save" />
                 <com.google.android.material.button.MaterialButton android:id="@+id/validate" style="?attr/materialButtonOutlinedStyle"

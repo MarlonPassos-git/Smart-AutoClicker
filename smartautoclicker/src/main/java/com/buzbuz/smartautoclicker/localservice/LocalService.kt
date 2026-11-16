@@ -233,7 +233,7 @@ class LocalService(
         if (retained.isNotEmpty()) writer.println(retained)
     }
 
-    override fun startScript(resultCode: Int, data: Intent, storageId: String, answersJson: String): Boolean {
+    override fun startScript(resultCode: Int, data: Intent, storageId: String, answersJson: String, newRound: Boolean, setup: Boolean): Boolean {
         val factory = createScriptDriver ?: return false
         if (!claimResources(isSmart = true)) return false
         try {
@@ -245,7 +245,7 @@ class LocalService(
             startJob = serviceScope.launch {
                 overlayManager.navigateTo(context,
                     com.buzbuz.smartautoclicker.feature.script.config.ScriptRunOverlay(driver) { stopScenario() })
-                driver.start(serviceScope, resultCode, data, storageId, answersJson)
+                driver.start(serviceScope, resultCode, data, storageId, answersJson, newRound, setup)
                 scriptStatusJob = driver.status.onEach { status ->
                     notificationController.updateNotification(context,
                         status.state == com.buzbuz.smartautoclicker.core.script.runtime.session.ScriptSessionState.RUNNING,
