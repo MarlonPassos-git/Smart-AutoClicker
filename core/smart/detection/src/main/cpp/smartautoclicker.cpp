@@ -249,3 +249,35 @@ extern "C" {
         delete detector;
     }
 }
+
+extern "C" JNIEXPORT jobjectArray JNICALL Java_com_buzbuz_smartautoclicker_core_detection_NativeDetector_readTextNative(
+        JNIEnv* env, jobject self, jstring model, jint x, jint y, jint width, jint height, jint threshold, jint maxResults) {
+    auto detector = getDetectorFromJavaRef(env, self);
+    if (!detector) return nullptr;
+    const char* modelChars = env->GetStringUTFChars(model, nullptr);
+    if (!modelChars) return nullptr;
+    std::vector<TextRecognizerResult> results;
+    try { results = detector->readText(cv::Rect(x, y, width, height), modelChars, threshold, maxResults); }
+    catch (...) { throwRuntimeException(env, "Invalid free-text recognition arguments"); }
+    env->ReleaseStringUTFChars(model, modelChars);
+    if (env->ExceptionCheck()) return nullptr;
+    jclass stringClass = env->FindClass("java/lang/String");
+    if (!stringClass) return nullptr;
+    jobjectArray output = env->NewObjectArray(results.size() * 6, stringClass, nullptr);
+    env->DeleteLocalRef(stringClass);
+    if (!output) return nullptr;
+    int index = 0;
+    for (const auto& result : results) {
+        std::vector<std::string> fields = {result.text, std::to_string(result.confidence * 100),
+            std::to_string(result.boundingBox.x), std::to_string(result.boundingBox.y),
+            std::to_string(result.boundingBox.width), std::to_string(result.boundingBox.height)};
+        for (const auto& field : fields) {
+            jstring value = env->NewStringUTF(field.c_str());
+            if (!value) return nullptr;
+            env->SetObjectArrayElement(output, index++, value);
+            env->DeleteLocalRef(value);
+            if (env->ExceptionCheck()) return nullptr;
+        }
+    }
+    return output;
+}

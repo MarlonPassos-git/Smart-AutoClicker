@@ -16,10 +16,12 @@
  */
 package com.buzbuz.smartautoclicker.core.detection
 
-/** Ordinals match C++ NumberFormat: AUTO=0, DOT_DECIMAL=1, COMMA_DECIMAL=2, POSITIVE_QUANTITY=3. */
+/** Ordinals match C++ NumberFormat: AUTO=0, DOT_DECIMAL=1, COMMA_DECIMAL=2, POSITIVE_QUANTITY=3, WHITE_INTEGER_LINE=4. */
 enum class NumberFormatType {
     AUTO,
     DOT_DECIMAL,
     COMMA_DECIMAL,
     POSITIVE_QUANTITY,
+    /** Single line of white digits and grouping spaces; e.g. a resource balance. */
+    WHITE_INTEGER_LINE,
 }

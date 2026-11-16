@@ -169,6 +169,22 @@ class NativeDetector private constructor() : ImageDetector {
         }
     }
 
+    override fun readText(model: String, area: Rect, threshold: Int, maxResults: Int): List<RecognizedText> {
+        check(!isClosed) { "Detector is closed" }
+        require(threshold in 0..100 && maxResults in 1..64) { "threshold=$threshold, maxResults=$maxResults; expected 0..100 and 1..64" }
+        require(area.left >= 0 && area.top >= 0 && area.width() > 0 && area.height() > 0 &&
+            area.right <= screenDimensions.x && area.bottom <= screenDimensions.y) { "area=$area; expected bounds inside $screenDimensions" }
+        val fields = checkNotNull(readTextNative(model, area.left, area.top, area.width(), area.height(), threshold, maxResults))
+        check(fields.size % 6 == 0 && fields.size <= maxResults * 6) { "Invalid native OCR response" }
+        return fields.toList().chunked(6).map { item ->
+            val left = item[2].toInt()
+            val top = item[3].toInt()
+            RecognizedText(item[0], item[1].toDouble(), Rect(left, top, left + item[4].toInt(), top + item[5].toInt()))
+        }
+    }
+
+    private external fun readTextNative(model: String, x: Int, y: Int, width: Int, height: Int, threshold: Int, maxResults: Int): Array<String>?
+
     override fun detectNumber(detectionArea: Rect, threshold: Int, numberFormatType: NumberFormatType): DetectionResult {
         if (isClosed) return DetectionResult()
 

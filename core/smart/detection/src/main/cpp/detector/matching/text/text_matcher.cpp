@@ -29,6 +29,22 @@
 using namespace smartautoclicker;
 
 namespace {
+std::string whiteIntegerDigits(std::string text) {
+    text.erase(std::remove(text.begin(), text.end(), ' '), text.end());
+    std::string digits;
+    for (size_t index = 0; index < text.size(); ++index) {
+        const unsigned char c = text[index];
+        if (std::isdigit(c)) { digits += c; continue; }
+        // A grouping gap can decode as a dash. Accept separators only before a complete
+        // three-digit group; a leading sign or decimal fraction is never an integer balance.
+        if (digits.empty() || (c != '-' && c != '.' && c != ',')) return {};
+        if (index + 3 >= text.size()) return {};
+        for (size_t next = index + 1; next <= index + 3; ++next)
+            if (!std::isdigit(static_cast<unsigned char>(text[next]))) return {};
+        if (index + 4 < text.size() && text[index + 4] != '-' && text[index + 4] != '.' && text[index + 4] != ',') return {};
+    }
+    return digits;
+}
 std::string quantityDigits(const std::string& text) {
     std::string quantity = text;
     quantity.erase(std::remove(quantity.begin(), quantity.end(), ' '), quantity.end());
@@ -127,9 +143,11 @@ TextMatchingResult* TextMatcher::matchNumber(
     }
 
     // Recognize the text in the detectionArea
-    auto recognizerResults = numberFormat == NumberFormat::POSITIVE_QUANTITY
-            ? recognizeQuantities(screenImage, detectionArea, threshold)
-            : recognizeText(screenImage, detectionArea, defaultRecognitionModelId);
+    auto recognizerResults = numberFormat == NumberFormat::WHITE_INTEGER_LINE
+            ? recognizeWhiteIntegerLine(screenImage, detectionArea)
+            : numberFormat == NumberFormat::POSITIVE_QUANTITY
+                ? recognizeQuantities(screenImage, detectionArea, threshold)
+                : recognizeText(screenImage, detectionArea, defaultRecognitionModelId);
 
     // Parse results and find matching candidate, if any
     int leftmostQuantity = std::numeric_limits<int>::max();
@@ -158,6 +176,29 @@ TextMatchingResult* TextMatcher::matchNumber(
     }
 
     return &currentMatchingResult;
+}
+
+std::vector<TextRecognizerResult> TextMatcher::recognizeWhiteIntegerLine(
+        const ScreenImage& screenImage, const cv::Rect& detectionArea) {
+    const cv::Mat rgba = screenImage.cropColor(detectionArea);
+    cv::Mat rgb;
+    cv::cvtColor(rgba, rgb, cv::COLOR_RGBA2RGB);
+    // This opt-in format is for white integer displays on darker or colored backgrounds.
+    // DBNet can omit or fragment the same six-digit balance as individual digits change.
+    cv::Mat mask;
+    cv::inRange(rgb, cv::Scalar(245, 245, 245), cv::Scalar(255, 255, 255), mask);
+    std::vector<cv::Point> foreground;
+    cv::findNonZero(mask, foreground);
+    if (foreground.empty()) return {};
+    const cv::Rect glyphs = cv::boundingRect(foreground);
+    const int padding = 3;
+    const int left = std::max(0, glyphs.x - padding);
+    const int top = std::max(0, glyphs.y - padding);
+    const int right = std::min(rgb.cols, glyphs.x + glyphs.width + padding);
+    const int bottom = std::min(rgb.rows, glyphs.y + glyphs.height + padding);
+    const cv::Rect line(left, top, right - left, bottom - top);
+    auto results = textRecognizer->recognizeText(defaultRecognitionModelId, {TextDetectorResult(line, rgb(line))});
+    return results;
 }
 
 std::vector<TextRecognizerResult> TextMatcher::recognizeQuantities(
@@ -323,6 +364,7 @@ bool TextMatcher::isNumber(const std::string& text, NumberFormat format) {
     if (format == NumberFormat::POSITIVE_QUANTITY) {
         return !quantityDigits(text).empty();
     }
+    if (format == NumberFormat::WHITE_INTEGER_LINE) return !whiteIntegerDigits(text).empty();
 
     bool hasDigit = false;
     bool hasPercentSuffix = false;
@@ -350,6 +392,10 @@ double TextMatcher::stringToDouble(const std::string& text, NumberFormat format)
     std::string s = text;
     // Remove spaces
     s.erase(std::remove(s.begin(), s.end(), ' '), s.end());
+    if (format == NumberFormat::WHITE_INTEGER_LINE) {
+        s = whiteIntegerDigits(text);
+        if (s.empty()) return std::numeric_limits<double>::lowest();
+    }
     if (format == NumberFormat::POSITIVE_QUANTITY) {
         s = quantityDigits(text);
         if (s.empty()) return std::numeric_limits<double>::lowest();
@@ -412,4 +458,21 @@ double TextMatcher::stringToDouble(const std::string& text, NumberFormat format)
     } catch (...) {
         return std::numeric_limits<double>::lowest();
     }
+}
+
+std::vector<TextRecognizerResult> TextMatcher::readText(const ScreenImage& image, const cv::Rect& roi,
+        const std::string& model, int threshold, int maxResults) {
+    if (!isInitialized() || !isRoiValidForMatching(image.getRoi(), roi) ||
+        threshold < 0 || threshold > 100 || maxResults < 1 || maxResults > 64) return {};
+    auto results = recognizeText(image, roi, model);
+    results.erase(std::remove_if(results.begin(), results.end(), [threshold](const auto& result) {
+        return result.text.empty() || result.text.size() > 1024 || !std::isfinite(result.confidence) ||
+               result.confidence * 100 < threshold;
+    }), results.end());
+    std::stable_sort(results.begin(), results.end(), [](const auto& a, const auto& b) {
+        return a.boundingBox.y == b.boundingBox.y ? a.boundingBox.x < b.boundingBox.x : a.boundingBox.y < b.boundingBox.y;
+    });
+    if (results.size() > static_cast<size_t>(maxResults)) results.resize(maxResults);
+    for (auto& result : results) { result.boundingBox.x += roi.x; result.boundingBox.y += roi.y; }
+    return results;
 }

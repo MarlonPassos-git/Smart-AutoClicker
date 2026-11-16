@@ -122,9 +122,17 @@ interface ImageDetector : AutoCloseable {
         numberFormatType: NumberFormatType = NumberFormatType.AUTO,
     ): DetectionResult
 
+    /** Reads up to 64 OCR blocks from the current screen, with absolute bounds and OCR confidence.
+     * Example: `detector.readText("LATIN", Rect(0, 0, 400, 200), 80, 32)` on the detector thread.
+     */
+    fun readText(model: String, area: Rect, threshold: Int, maxResults: Int): List<RecognizedText> =
+        throw UnsupportedOperationException("Free-text OCR is unavailable in this detector")
+
     /** Release the resources of the screen image set with [setScreenBitmap]. */
     fun releaseScreenBitmap(screenBitmap: Bitmap)
 }
 
 /** The minimum detection quality for the algorithm. */
 const val DETECTION_QUALITY_MIN = 400L
+
+data class RecognizedText(val text: String, val confidence: Double, val bounds: Rect)

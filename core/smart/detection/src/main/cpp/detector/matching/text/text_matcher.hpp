@@ -35,6 +35,7 @@ namespace smartautoclicker {
         DOT_DECIMAL = 1,
         COMMA_DECIMAL = 2,
         POSITIVE_QUANTITY = 3,
+        WHITE_INTEGER_LINE = 4,
     };
 
     /**
@@ -93,6 +94,10 @@ namespace smartautoclicker {
                 const cv::Rect& detectionArea,
                 const std::string& recognitionModelId);
 
+        /** Recognize a calibrated single line of white digits directly, without text localization. */
+        std::vector<TextRecognizerResult> recognizeWhiteIntegerLine(
+                const ScreenImage& screenImage, const cv::Rect& detectionArea);
+
         /** Read quantity labels in overlapping windows so a wide strip doesn't shrink small digits. */
         std::vector<TextRecognizerResult> recognizeQuantities(
                 const ScreenImage& screenImage,
@@ -134,6 +139,10 @@ namespace smartautoclicker {
         static char normalizeChar(char c);
 
     public:
+        /** Bounded free-text results in absolute screen coordinates, ordered top-to-bottom. */
+        std::vector<TextRecognizerResult> readText(const ScreenImage& image, const cv::Rect& roi,
+                const std::string& model, int threshold, int maxResults);
+
         /** Resets the matcher state for a new search. */
         void clearResults();
 

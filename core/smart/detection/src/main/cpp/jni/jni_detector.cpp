@@ -25,6 +25,7 @@ static jfieldID detectorNativePtrFieldId;
 static jclass runtimeExceptionClass;
 
 extern "C" {
+    JNIEXPORT jobjectArray JNICALL Java_com_buzbuz_smartautoclicker_core_detection_NativeDetector_readTextNative(JNIEnv*, jobject, jstring, jint, jint, jint, jint, jint, jint);
     // Forward declarations of JNI methods from smartautoclicker.cpp
     JNIEXPORT jlong JNICALL Java_com_buzbuz_smartautoclicker_core_detection_NativeDetector_newDetector(JNIEnv *env, jobject self);
     JNIEXPORT void JNICALL Java_com_buzbuz_smartautoclicker_core_detection_NativeDetector_deleteDetector(JNIEnv *env, jobject self);
@@ -45,6 +46,7 @@ static const JNINativeMethod methods[] = {
         {"detectImageNative", "(Landroid/graphics/Bitmap;IIIIIII)[D", (void*)Java_com_buzbuz_smartautoclicker_core_detection_NativeDetector_detectImageNative},
         {"detectColorNative", "(IIIIII)[D", (void*)Java_com_buzbuz_smartautoclicker_core_detection_NativeDetector_detectColorNative},
         {"detectTextNative", "([Ljava/lang/String;Ljava/lang/String;IIIII)[D", (void*)Java_com_buzbuz_smartautoclicker_core_detection_NativeDetector_detectTextNative},
+        {"readTextNative", "(Ljava/lang/String;IIIIII)[Ljava/lang/String;", (void*)Java_com_buzbuz_smartautoclicker_core_detection_NativeDetector_readTextNative},
         {"detectNumberNative", "(IIIIII)[D", (void*)Java_com_buzbuz_smartautoclicker_core_detection_NativeDetector_detectNumberNative},
         {"releaseScreenImage", "(Landroid/graphics/Bitmap;)V", (void*)Java_com_buzbuz_smartautoclicker_core_detection_NativeDetector_releaseScreenImage}
 };

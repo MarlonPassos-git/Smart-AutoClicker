@@ -67,6 +67,8 @@ namespace smartautoclicker {
                 const cv::Rect &roi,
                 int threshold);
 
+        std::vector<TextRecognizerResult> readText(const cv::Rect& roi, const std::string& model, int threshold, int maxResults);
+
         TextMatchingResult* detectNumber(const cv::Rect& roi, int threshold, NumberFormat numberFormat);
     };
 }
