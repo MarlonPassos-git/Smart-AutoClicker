@@ -2,10 +2,16 @@
   "formatVersion": 1,
   "apiVersion": 1,
   "id": "farm-walls-level16-sm-s916b",
-  "name": "Farm e muros nível 16 — Samsung 2340×1080",
-  "scriptVersion": "1.0.0",
+  "name": "Farm — vilas e muros nível 16",
+  "scriptVersion": "3.0.0",
   "entry": "entry.js",
+  "targetPackage": "com.supercell.clashofclans",
   "parameters": {
+    "villages": {
+      "type": "selection",
+      "label": "Vilas para farmar",
+      "default": []
+    },
     "finishMode": {
       "type": "choice",
       "label": "Finalizar a partida quando",
@@ -31,25 +37,30 @@
     "wallTrigger": {
       "type": "choice",
       "label": "Quando melhorar muros",
+      "default": "qualquer depósito de ouro ou elixir cheio",
+      "choices": [
+        "ouro cheio",
+        "elixir cheio",
+        "qualquer depósito de ouro ou elixir cheio",
+        "ambos cheios",
+        "saldo disponível"
+      ],
+      "visibleWhen": {
+        "improveWalls": true
+      }
+    },
+    "stopFarm": {
+      "type": "choice",
+      "label": "Concluir a vila e passar para a próxima quando",
       "default": "qualquer depósito cheio",
       "choices": [
         "ouro cheio",
         "elixir cheio",
+        "elixir negro cheio",
         "qualquer depósito cheio",
+        "todos cheios",
         "ambos cheios",
-        "saldo disponível"
-      ]
-    },
-    "stopFarm": {
-      "type": "choice",
-      "label": "Parar o farm quando",
-      "default": "nunca",
-      "choices": [
-        "nunca",
-        "ouro cheio",
-        "elixir cheio",
-        "qualquer depósito cheio",
-        "ambos cheios"
+        "nunca"
       ]
     },
     "goldReserve": {
@@ -57,42 +68,20 @@
       "label": "Reserva de ouro para muros",
       "default": 0,
       "min": 0,
-      "max": 1000000000000
+      "max": 1000000000000,
+      "visibleWhen": {
+        "improveWalls": true
+      }
     },
     "elixirReserve": {
       "type": "number",
       "label": "Reserva de elixir para muros",
       "default": 0,
       "min": 0,
-      "max": 1000000000000
-    },
-    "goldMinimum": {
-      "type": "number",
-      "label": "Parar se o ouro chegar a (0 desativa)",
-      "default": 0,
-      "min": 0,
-      "max": 1000000000000
-    },
-    "elixirMinimum": {
-      "type": "number",
-      "label": "Parar se o elixir chegar a (0 desativa)",
-      "default": 0,
-      "min": 0,
-      "max": 1000000000000
-    },
-    "goldCapacity": {
-      "type": "number",
-      "label": "Capacidade dos depósitos de ouro",
-      "default": 30500000,
-      "min": 1,
-      "max": 1000000000000
-    },
-    "elixirCapacity": {
-      "type": "number",
-      "label": "Capacidade dos depósitos de elixir",
-      "default": 29000000,
-      "min": 1,
-      "max": 1000000000000
+      "max": 1000000000000,
+      "visibleWhen": {
+        "improveWalls": true
+      }
     },
     "resourcePriority": {
       "type": "choice",
@@ -101,18 +90,24 @@
       "choices": [
         "ouro",
         "elixir"
-      ]
+      ],
+      "visibleWhen": {
+        "improveWalls": true
+      }
     },
     "maxWallBatch": {
       "type": "number",
       "label": "Máximo de muros por lote",
       "default": 50,
       "min": 1,
-      "max": 50
+      "max": 50,
+      "visibleWhen": {
+        "improveWalls": true
+      }
     },
     "maxBattles": {
       "type": "number",
-      "label": "Máximo de batalhas (0 não limita)",
+      "label": "Máximo de batalhas por vila (0 não limita)",
       "default": 0,
       "min": 0,
       "max": 10000
@@ -445,6 +440,23 @@
       "model": "LATIN",
       "alternatives": [
         "Voltar"
+      ]
+    },
+    "accountSettingsTitle": {
+      "type": "text",
+      "model": "LATIN",
+      "alternatives": [
+        "Configurações",
+        "ConfiguRaces",
+        "ConfiguRares"
+      ]
+    },
+    "accountSelectorTitle": {
+      "type": "text",
+      "model": "LATIN",
+      "alternatives": [
+        "TROCAR DE ID",
+        "TROCARDEID"
       ]
     }
   },
@@ -853,6 +865,102 @@
         "top": 850,
         "right": 1340,
         "bottom": 1020
+      },
+      "accountTabs": {
+        "left": 400,
+        "top": 0,
+        "right": 1920,
+        "bottom": 145
+      },
+      "accountSettingsTitle": {
+        "left": 1600,
+        "top": 30,
+        "right": 1840,
+        "bottom": 145
+      },
+      "accountIdentity": {
+        "left": 1040,
+        "top": 150,
+        "right": 1420,
+        "bottom": 255
+      },
+      "accountSelectorTitle": {
+        "left": 1450,
+        "top": 50,
+        "right": 2050,
+        "bottom": 180
+      },
+      "accountList": {
+        "left": 1140,
+        "top": 200,
+        "right": 2310,
+        "bottom": 1040
+      },
+      "accountPopup": {
+        "left": 650,
+        "top": 200,
+        "right": 1690,
+        "bottom": 1000
+      },
+      "goldCapacity": {
+        "left": 1730,
+        "top": 95,
+        "right": 2260,
+        "bottom": 240
+      },
+      "elixirCapacity": {
+        "left": 1730,
+        "top": 170,
+        "right": 2260,
+        "bottom": 315
+      },
+      "goldCapacityNumber": {
+        "left": 2017,
+        "top": 112,
+        "right": 2225,
+        "bottom": 153
+      },
+      "elixirCapacityNumber": {
+        "left": 2017,
+        "top": 187,
+        "right": 2225,
+        "bottom": 228
+      },
+      "darkBalance": {
+        "left": 1980,
+        "top": 175,
+        "right": 2180,
+        "bottom": 235
+      },
+      "darkCapacity": {
+        "left": 1730,
+        "top": 245,
+        "right": 2260,
+        "bottom": 390
+      },
+      "darkCapacityNumber": {
+        "left": 2070,
+        "top": 262,
+        "right": 2225,
+        "bottom": 303
+      },
+      "goldCapacityLabel": {
+        "left": 1905,
+        "top": 110,
+        "right": 2016,
+        "bottom": 154
+      },
+      "elixirCapacityLabel": {
+        "left": 1905,
+        "top": 185,
+        "right": 2016,
+        "bottom": 229
+      },
+      "darkCapacityLabel": {
+        "left": 1960,
+        "top": 260,
+        "right": 2070,
+        "bottom": 306
       }
     },
     "positions": {
@@ -1039,7 +1147,84 @@
       "spellDeploy12": {
         "x": 1638,
         "y": 375
+      },
+      "accountSettingsOpen": {
+        "x": 180,
+        "y": 120
+      },
+      "accountSettingsClose": {
+        "x": 1885,
+        "y": 85
+      },
+      "accountSelectorOpen": {
+        "x": 1475,
+        "y": 205
+      },
+      "accountSelectorClose": {
+        "x": 173,
+        "y": 90
+      },
+      "accountScrollFrom": {
+        "x": 1850,
+        "y": 800
+      },
+      "accountScrollTo": {
+        "x": 1850,
+        "y": 400
+      },
+      "goldCapacityOpen": {
+        "x": 2100,
+        "y": 50
+      },
+      "elixirCapacityOpen": {
+        "x": 2100,
+        "y": 130
+      },
+      "accountTooltipClose": {
+        "x": 1800,
+        "y": 80
+      },
+      "darkCapacityOpen": {
+        "x": 2100,
+        "y": 205
       }
     }
+  },
+  "executionState": {
+    "version": 1
+  },
+  "parameterRules": [
+    {
+      "when": {
+        "villages": {
+          "minItems": 2
+        }
+      },
+      "forceFalse": "improveWalls",
+      "message": "Melhorar muros fica desativado quando há mais de uma vila selecionada."
+    },
+    {
+      "when": {
+        "villages": {
+          "minItems": 2
+        }
+      },
+      "requireAny": [
+        {
+          "parameter": "maxBattles",
+          "greaterThan": 0
+        },
+        {
+          "parameter": "stopFarm",
+          "notEquals": "nunca"
+        }
+      ],
+      "message": "Selecionar várias vilas exige limite de ataques ou condição de parada por recursos."
+    }
+  ],
+  "setup": {
+    "entry": "setup.js",
+    "label": "Configurar vilas",
+    "description": "Abra o jogo na vila. A configuração visita as contas conectadas e salva as capacidades de ouro, elixir e elixir negro. Não inicia ataques. Uma falha preserva o cadastro anterior; o progresso do farm permanece salvo."
   }
 }

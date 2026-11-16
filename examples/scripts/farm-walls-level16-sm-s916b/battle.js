@@ -10,12 +10,18 @@ const hasVillage = current => villageNames.some(name => found(current.results[na
 const statusNames = options => [...resultNames, "exitConfirm", "battle", "destruction",
     ...(options.finishMode === "saque total" ? ["goldLoot", "elixirLoot"] : [])];
 
-export async function openBattle() {
+export function requireAccountGeneration(current, expected) {
+    if (expected !== undefined && current.frame.resumeGeneration !== expected) {
+        throw new Error("Pausa durante a entrada no ataque; confirme novamente a conta continuando a rodada.");
+    }
+}
+
+export async function openBattle(expectedGeneration) {
     let opened = false;
     for (let attempt = 0; attempt < 3; attempt++) {
         const village = await waitSnapshot("vila antes da batalha", villageNames, hasVillage);
         await guard(found(village.results.village) ? "village" : "villageText", village);
-        await transition("abrir batalhas", villageNames, hasVillage, current => [tapStep(position(current, "attackOpen"))]);
+        await transition("abrir batalhas", villageNames, hasVillage, current => { requireAccountGeneration(current, expectedGeneration); return [tapStep(position(current, "attackOpen"))]; });
         // The game can ignore an opening tap; retry only after freshly recognizing the village again.
         const menu = await waitSnapshot("menu de batalhas aberto", ["search", "searchText"], current =>
             found(current.results.search) || found(current.results.searchText), { timeoutMs: 3000, intervalMs: 100, required: false });
@@ -23,9 +29,9 @@ export async function openBattle() {
     }
     if (!opened) await stop("O menu de batalhas não abriu após três tentativas confirmadas na vila.");
     await transition("procurar partida", ["search", "searchText"], current =>
-        found(current.results.search) || found(current.results.searchText), current => [tapStep(position(current, "searchOpen"))]);
+        found(current.results.search) || found(current.results.searchText), current => { requireAccountGeneration(current, expectedGeneration); return [tapStep(position(current, "searchOpen"))]; });
     await transition("confirmar o exército atual", ["attack"], current => found(current.results.attack),
-        current => [tapStep(position(current, "attackConfirm"))]);
+        current => { requireAccountGeneration(current, expectedGeneration); return [tapStep(position(current, "attackConfirm"))]; });
     const opponent = await waitSnapshot("oponente encontrado", ["opponent", "battle"], current => found(current.results.opponent), { timeoutMs: 60000 });
     await guard("battle", opponent);
     const center = position(opponent, "zoomCenter");
