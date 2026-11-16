@@ -62,6 +62,7 @@ class MainMenuModelTest {
 
     private val testDispatcher = UnconfinedTestDispatcher()
 
+    private val detectionState = MutableStateFlow(DetectionState.RECORDING)
     private val userBillingState = MutableStateFlow(UserBillingState.AD_REQUESTED)
     private val paywallFinished = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
 
@@ -73,7 +74,7 @@ class MainMenuModelTest {
     }
     private val mockSmartProcessingRepository: SmartProcessingRepository = mockk(relaxed = true) {
         every { scenarioId } returns MutableStateFlow(null)
-        every { detectionState } returns flowOf(DetectionState.RECORDING)
+        every { detectionState } returns this@MainMenuModelTest.detectionState
         every { canStartDetection } returns flowOf(true)
     }
     private val mockEditionRepository: EditionRepository = mockk(relaxed = true) {
@@ -110,6 +111,23 @@ class MainMenuModelTest {
     fun tearDown() {
         unmockkStatic(REVENUE_NAVIGATOR_FILE)
         Dispatchers.resetMain()
+    }
+
+    @Test
+    fun pauseAndResumeUseTheRetainedProcessorWithoutPaywallOrStartQuestionsAndStopRemainsSeparate() {
+        detectionState.value = DetectionState.DETECTING
+        viewModel.toggleDetection(mockContext)
+        verify(exactly = 1) { mockSmartProcessingRepository.pauseDetection() }
+        verify(exactly = 0) { mockSmartProcessingRepository.stopDetection() }
+        detectionState.value = DetectionState.PAUSED
+        org.junit.Assert.assertTrue(viewModel.uiState.value!!.isPaused)
+        org.junit.Assert.assertTrue(viewModel.uiState.value!!.isPlayButtonEnabled)
+        viewModel.toggleDetection(mockContext)
+        verify(exactly = 1) { mockSmartProcessingRepository.resumeDetection() }
+        coVerify(exactly = 0) { mockSmartProcessingRepository.getStartCounters() }
+        verify(exactly = 0) { mockRevenueNavigator.startPaywallActivity(any()) }
+        org.junit.Assert.assertTrue(viewModel.stopDetection())
+        verify(exactly = 1) { mockSmartProcessingRepository.stopDetection() }
     }
 
     @Test

@@ -149,6 +149,27 @@ class DetectorEngineDetectionOrientationTests {
      * after the frame is released and the loop exits cleanly via the flag.
      */
     @Test
+    fun `pause retains detector and processor across orientation change and stop releases them`() = runTest {
+        val (engine, orientationListener) = startDetectionAndCaptureOrientationListener()
+        engine.pauseDetection()
+        advanceTimeBy(25)
+        assertEquals(DetectorState.PAUSED, engine.state.value)
+        verify(exactly = 0) { mockImageDetector.close() }
+        orientationListener(mockContext)
+        advanceTimeBy(ADVANCE_MS)
+        assertEquals(DetectorState.PAUSED, engine.state.value)
+        engine.resumeDetection()
+        advanceTimeBy(1)
+        assertEquals(DetectorState.DETECTING, engine.state.value)
+        verify(exactly = 1) { mockImageDetector.init() }
+        engine.pauseDetection()
+        advanceTimeBy(25)
+        stopDetection(engine)
+        assertEquals(DetectorState.RECORDING, engine.state.value)
+        verify(exactly = 1) { mockImageDetector.close() }
+    }
+
+    @Test
     fun `in-progress frame completes before display is resized on orientation change`() = runTest {
         // Replace the null stub with a channel so we control exactly when each frame is delivered.
         val frameChannel = Channel<Bitmap?>(capacity = Channel.UNLIMITED)

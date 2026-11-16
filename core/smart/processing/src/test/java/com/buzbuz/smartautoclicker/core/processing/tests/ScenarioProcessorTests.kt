@@ -64,7 +64,11 @@ import com.buzbuz.smartautoclicker.core.processing.utils.anyNotNull
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -198,6 +202,7 @@ class ScenarioProcessorTests {
         events: List<ScreenEvent>,
         triggerEvent: List<TriggerEvent>,
         counters: List<Counter> = emptyList(),
+        pause: com.buzbuz.smartautoclicker.core.processing.data.processor.ProcessingPause? = null,
     ) : ScenarioProcessor {
         val processor = ScenarioProcessor(
             processingTag = "",
@@ -209,7 +214,9 @@ class ScenarioProcessorTests {
             counters = counters,
             bitmapSupplier = mockBitmapSupplier::getBitmap,
             androidExecutor = mockAndroidExecutor,
-            currentTimeMs = { currentTimeMs() },
+            currentTimeMs = { pause?.now() ?: currentTimeMs() },
+            pause = pause,
+            captureForResume = { mockScreenBitmap },
             onStopRequested = mockEndListener::onStopRequested,
             progressListener = mockProgressListener,
         )
@@ -286,6 +293,52 @@ class ScenarioProcessorTests {
     @After
     fun tearDown() {
         Dispatchers.resetMain()
+    }
+
+    @Test
+    fun pauseRetainsTheActionPositionAndRequiresANewScreenBeforeItsNextClick() = runTest {
+        val pause = com.buzbuz.smartautoclicker.core.processing.data.processor.ProcessingPause { testScheduler.currentTime }
+        val condition = createHeldTestCondition(isDetected = true)
+        val event = newEvent(conditions = listOf(condition), actions = listOf(
+            newDefaultClickAction(),
+            Pause(id = Identifier(databaseId = 2), eventId = Identifier(databaseId = 1), priority = 1, pauseDuration = 1000L),
+            newDefaultClickAction().copy(id = Identifier(databaseId = 3), priority = 2),
+        ))
+        scenarioProcessor = createNewScenarioProcessor(listOf(event), emptyList(), pause = pause)
+        val job = launch { scenarioProcessor.process(mockScreenBitmap) }
+        advanceTimeBy(100)
+        pause.pause()
+        runCurrent()
+        advanceTimeBy(10000)
+        verify(mockAndroidExecutor, times(1)).dispatchBuiltGesture(anyNotNull())
+        pause.resume()
+        advanceUntilIdle()
+        job.join()
+        verify(mockAndroidExecutor, times(2)).dispatchBuiltGesture(anyNotNull())
+        verify(mockImageDetector, times(2)).setScreenBitmap(mockScreenBitmap, "")
+        verify(mockEndListener, never()).onStopRequested()
+    }
+
+    @Test
+    fun resumeOnADifferentScreenStopsWithoutRepeatingTheAlreadyExecutedClick() = runTest {
+        val pause = com.buzbuz.smartautoclicker.core.processing.data.processor.ProcessingPause { testScheduler.currentTime }
+        val condition = createHeldTestCondition(isDetected = true)
+        val event = newEvent(conditions = listOf(condition), actions = listOf(
+            newDefaultClickAction(),
+            Pause(id = Identifier(databaseId = 2), eventId = Identifier(databaseId = 1), priority = 1, pauseDuration = 1000L),
+            newDefaultClickAction().copy(id = Identifier(databaseId = 3), priority = 2),
+        ))
+        scenarioProcessor = createNewScenarioProcessor(listOf(event), emptyList(), pause = pause)
+        val job = launch { scenarioProcessor.process(mockScreenBitmap) }
+        advanceTimeBy(100)
+        pause.pause()
+        runCurrent()
+        mockWhen(mockImageDetector.detectImage(anyNotNull(), anyInt(), anyInt(), anyNotNull(), anyInt())).thenReturn(TEST_DETECTION_KO)
+        pause.resume()
+        advanceUntilIdle()
+        job.join()
+        verify(mockAndroidExecutor, times(1)).dispatchBuiltGesture(anyNotNull())
+        verify(mockEndListener).onStopRequested()
     }
 
     @Test
