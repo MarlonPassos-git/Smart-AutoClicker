@@ -1,4 +1,6 @@
 export const queries = {
+  "accountSettingsTitle": { "kind": "text", "reference": "accountSettingsTitle", "region": "accountSettingsTitle", "threshold": 85 },
+  "accountSelectorTitle": { "kind": "text", "reference": "accountSelectorTitle", "region": "accountSelectorTitle", "threshold": 85 },
   "resultText": { "kind": "text", "reference": "resultText", "region": "resultText", "threshold": 80 },
   "village": {
     "kind": "image",
@@ -397,4 +399,12 @@ export const queries = {
     "threshold": 7
   }
 };
+queries.darkBalance = { kind: "number", reference: "decimal", region: "darkBalance", threshold: 80 };
 export const heroReferences = ["hero1", "hero2", "hero3", "hero4", "hero5", "hero6", "hero7", "hero8", "hero9"];
+
+// Star rewards are resolved before village actions, including when resuming on an open chest.
+queries.starBonusTitle = { kind: "image", reference: "starBonusTitle", region: "starBonusTitle", threshold: 12 };
+queries.starBonusClaim = { kind: "text", reference: "starBonusClaim", region: "starBonusClaim", threshold: 80 };
+queries.chestRoll = { kind: "image", reference: "chestRoll", region: "chestRoll", threshold: 20 };
+queries.chestContinue = { kind: "text", reference: "chestContinue", region: "chestContinue", threshold: 80 };
+queries.chestRewardNote = { kind: "image", reference: "chestRewardNote", region: "chestRewardNote", threshold: 12 };

@@ -1,7 +1,9 @@
-import { zoom, sleep, now, log, stop } from "klickr";
+import { zoom, sleep, now, log, stop, stage } from "klickr";
 import { heroReferences } from "./profile.js";
 import { found, number, snapshot, waitSnapshot, guard, position, tapStep, act, transition } from "./screen.js";
 import { battleFinished, nextBurst } from "./policy.js";
+import { confirmVillage } from "./villages.js";
+import { readSpellCards } from "./spells.js";
 
 const resultNames = ["result", "resultText"];
 const hasResult = current => resultNames.some(name => found(current.results[name]));
@@ -10,12 +12,18 @@ const hasVillage = current => villageNames.some(name => found(current.results[na
 const statusNames = options => [...resultNames, "exitConfirm", "battle", "destruction",
     ...(options.finishMode === "saque total" ? ["goldLoot", "elixirLoot"] : [])];
 
-export async function openBattle() {
+export function requireAccountGeneration(current, expected) {
+    if (expected !== undefined && current.frame.resumeGeneration !== expected) {
+        throw new Error("Pausa durante a entrada no ataque; confirme novamente a conta continuando a rodada.");
+    }
+}
+
+export async function openBattle(expectedGeneration) {
     let opened = false;
     for (let attempt = 0; attempt < 3; attempt++) {
         const village = await waitSnapshot("vila antes da batalha", villageNames, hasVillage);
         await guard(found(village.results.village) ? "village" : "villageText", village);
-        await transition("abrir batalhas", villageNames, hasVillage, current => [tapStep(position(current, "attackOpen"))]);
+        await transition("abrir batalhas", villageNames, hasVillage, current => { requireAccountGeneration(current, expectedGeneration); return [tapStep(position(current, "attackOpen"))]; });
         // The game can ignore an opening tap; retry only after freshly recognizing the village again.
         const menu = await waitSnapshot("menu de batalhas aberto", ["search", "searchText"], current =>
             found(current.results.search) || found(current.results.searchText), { timeoutMs: 3000, intervalMs: 100, required: false });
@@ -23,10 +31,12 @@ export async function openBattle() {
     }
     if (!opened) await stop("O menu de batalhas não abriu após três tentativas confirmadas na vila.");
     await transition("procurar partida", ["search", "searchText"], current =>
-        found(current.results.search) || found(current.results.searchText), current => [tapStep(position(current, "searchOpen"))]);
+        found(current.results.search) || found(current.results.searchText), current => { requireAccountGeneration(current, expectedGeneration); return [tapStep(position(current, "searchOpen"))]; });
     await transition("confirmar o exército atual", ["attack"], current => found(current.results.attack),
-        current => [tapStep(position(current, "attackConfirm"))]);
-    const opponent = await waitSnapshot("oponente encontrado", ["opponent", "battle"], current => found(current.results.opponent), { timeoutMs: 60000 });
+        current => { requireAccountGeneration(current, expectedGeneration); return [tapStep(position(current, "attackConfirm"))]; });
+    // CV19 matchmaking can remain in clouds for over a minute. Wait without sending
+    // gestures or counting a battle until the opponent controls are recognized.
+    const opponent = await waitSnapshot("oponente encontrado", ["opponent", "battle"], current => found(current.results.opponent), { timeoutMs: 180000, intervalMs: 200 });
     await guard("battle", opponent);
     const center = position(opponent, "zoomCenter");
     await zoom({ x: center.x, y: center.y }, "out", 400, 350);
@@ -57,7 +67,7 @@ async function checkpoint(options, extra = []) {
     return { current, finished: false };
 }
 
-async function deployTroops(options) {
+async function deployTroops(options, spellLayout) {
     let attempted = 0;
     let cursor = 0;
     let previous = null;
@@ -70,9 +80,11 @@ async function deployTroops(options) {
         const current = checked.current;
         const quantity = current.results.troops;
         const amount = number(quantity);
-        const boundaries = heroReferences.map(name => current.results[name]).filter(found).map(result => result.x - (result.width ?? 0) / 2);
+        const heroes = heroReferences.map(name => current.results[name]).filter(found);
+        const boundaries = heroes.map(result => result.x - (result.width ?? 0) / 2);
         if (boundaries.length === 0) await stop("Não reconheci o limite entre tropas e heróis na barra calibrada.");
         const boundary = Math.min(...boundaries);
+        spellLayout.leftRatio = Math.max(...heroes.map(result => result.x + (result.width ?? 0) / 2)) / current.frame.width;
         if (!Number.isSafeInteger(amount) || amount <= 0) {
             unreadable++;
             if (attempted === 0 && await now() >= initialDeadline) await stop("Não consegui ler a barra inicial de tropas.");
@@ -80,7 +92,7 @@ async function deployTroops(options) {
             await sleep(200);
             continue;
         }
-        if (quantity.x >= boundary) return false;
+        if (quantity.x >= boundary) { spellLayout.expected = true; return false; }
         unreadable = 0;
         if (previous && quantity.x <= previous.x + 60 && amount >= previous.amount) noProgress++;
         else noProgress = 0;
@@ -129,25 +141,68 @@ async function deployHeroes(options) {
     return false;
 }
 
-async function deploySpells(options) {
+async function deploySpells(options, layout) {
     let attempted = 0;
-    while (attempted < 96) {
-        const checked = await checkpoint(options, ["spell"]);
+    let unreadable = 0;
+    let noProgress = 0;
+    let previous = null;
+    const slots = [];
+    const sameSlot = (a, b) => Math.abs(a.xRatio - b.xRatio) <= 60 / 2340;
+    while (true) {
+        const checked = await checkpoint(options);
         if (checked.finished) return true;
         const current = checked.current;
-        if (!found(current.results.spell)) return false;
-        // Reselect from this frame in every block, including after pause or a changed card.
-        const steps = [tapStep(current.results.spell, 150, 250)];
-        for (let offset = 0; offset < 2; offset++) {
-            steps.push(tapStep(position(current, `spellDeploy${(attempted + offset) % 12 + 1}`), 120, 150));
+        let cards;
+        try { cards = await readSpellCards(current, layout.leftRatio, slots); }
+        catch (error) {
+            if (error.code !== "stale_observation") throw error;
+            previous = null; noProgress = 0; continue;
         }
-        if (await act(current, steps)) attempted += 2;
+        for (const card of cards) {
+            const slot = slots.find(slot => sameSlot(slot, card));
+            if (slot) slot.quantity = card.quantity;
+            else slots.push({ xRatio: card.xRatio, quantity: card.quantity });
+        }
+        await log(JSON.stringify({ event: "spell_counters_observed", cards: cards.map(({quantity, xRatio}) => ({quantity, xRatio})), slots }));
+        const missing = slots.some(slot => slot.quantity > 0 && !cards.some(card => sameSlot(slot, card)));
+        if (missing || (cards.length === 0 && (layout.expected || attempted > 0))) {
+            if (++unreadable >= 3) await stop("Quantidade de feitiço ilegível em três observações; não foi considerada zero.");
+            await sleep(200); continue;
+        }
+        if (previous && previous.generation === current.frame.resumeGeneration) {
+            const updated = cards.find(card => sameSlot(card, previous));
+            if (!updated) {
+                if (++unreadable >= 3) await stop("Não confirmei o contador do último feitiço; lançamento interrompido.");
+                await sleep(200); continue;
+            }
+            noProgress = updated.quantity >= previous.quantity ? noProgress + 1 : 0;
+            if (noProgress >= 3) await stop("A quantidade de feitiços não diminuiu após três tentativas; confira os alvos permitidos.");
+        } else noProgress = 0;
+        unreadable = 0;
+        const card = cards.find(card => card.quantity > 0);
+        if (!card) {
+            await log(JSON.stringify({ event: "spell_deployment_completed", attempted, counters: cards.map(card => card.quantity) }));
+            return false;
+        }
+        const count = Math.min(card.quantity, 2, 600 - attempted);
+        if (count <= 0) await stop("Limite de 600 tentativas de lançamento de feitiços atingido.");
+        await stage("lançar feitiços", `Card com ${card.quantity} feitiço(s); lançando ${count} e conferindo o contador.`);
+        // Selection and casts use this observation; odd quantities never produce an extra cast.
+        const selection = { ...card.at, y: current.calibration.regions.troops.bottom + Math.round(10 * current.frame.width / 2340) };
+        const steps = [tapStep(selection, 65, 60)];
+        for (let offset = 0; offset < count; offset++) steps.push(tapStep(position(current, `spellDeploy${(attempted + offset) % 12 + 1}`), 100, 150));
+        if (await act(current, steps)) {
+            attempted += count;
+            previous = { ...card, generation: current.frame.resumeGeneration };
+            await log(JSON.stringify({ event: "spell_cast_attempt", quantityBefore: card.quantity, count, attempted }));
+        } else { previous = null; noProgress = 0; }
     }
-    await stop("O card de feitiço permaneceu disponível após 96 tentativas; confira a barra.");
 }
 
 export async function runBattle(options) {
-    if (!await deployTroops(options) && !await deployHeroes(options) && !await deploySpells(options)) {
+    const spellLayout = {};
+    // Spells follow troops before heroes, so their counters are consumed earlier while the battle goal remains authoritative.
+    if (!await deployTroops(options, spellLayout) && !await deploySpells(options, spellLayout) && !await deployHeroes(options)) {
         const deadline = await now() + 240000;
         while (await now() < deadline) {
             if ((await checkpoint(options)).finished) break;
@@ -158,7 +213,7 @@ export async function runBattle(options) {
         current => [tapStep(position(current, "resultReturn"))], { timeoutMs: 10000 });
     // The game's returning clouds and animated balances must settle before resource decisions.
     await sleep(3000);
-    const village = await waitSnapshot("vila após a batalha", villageNames, hasVillage, { timeoutMs: 30000, intervalMs: 100 });
+    const village = await confirmVillage();
     await guard(found(village.results.village) ? "village" : "villageText", village);
     await log("Batalha concluída e retorno à vila confirmado.");
 }

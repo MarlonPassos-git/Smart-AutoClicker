@@ -118,6 +118,34 @@
     "images/elixirConfirm.png": {
       "sha256": "ebcd5f3af60fa987a023c9652b568aa38df331da21b603d650e5e41a6690b750",
       "source": "scripts/research/profiles/walls-sm-s916b/elixir-confirm.png"
+    },
+    "images/chest-roll.png": {
+      "sha256": "0545c4f0f41255328dcb60c95df20cbb364ab8276650486b5dcb9d60831c902b",
+      "source": "SM-S916B, Clash 19.32.4, captura de 16/11/2026; recorte sem retoque (998,908)-(1052,975) do indicador de tentativas do baú"
+    },
+    "images/star-bonus-title.png": {
+      "sha256": "21907695a9524f912658fd0ded092ba0fe765732f82f7f5483effca7aaf549f5",
+      "source": "SM-S916B, Clash 19.32.4, captura de 16/11/2026; recorte sem retoque (800, 195, 1540, 255)"
+    },
+    "images/chest-reward-note.png": {
+      "sha256": "93643650c5470fac086863aae89185db977144d8bc5bc265e694bb117fd92c94",
+      "source": "SM-S916B, Clash 19.32.4, captura de 16/11/2026; recorte sem retoque (730, 815, 1560, 875)"
+    },
+    "images/spell-zero.png": {
+      "sha256": "8ab13b02a5c15d39913c18bdc67ec85fbf87be3874dc35c7368ed876326e7009",
+      "source": "core/smart/detection/src/androidTest/assets/quantity_calibration/quantity_zero.png; recorte sem retoque (50,10)-(95,42), somente o contador x0, sem retrato de unidade ou feitiço"
+    },
+    "images/spell-zero-cv19.png": {
+      "sha256": "aa5e4f9d2cd1e2af3bafa3300ed287e6e287bd9dc7b85b135a36b21237b8af7b",
+      "source": "SM-S916B, Clash 19.32.4, 16/11/2026; recorte sem retoque (950,929)-(1000,959) do contador x0 de Fúria esgotada; sem retrato"
+    },
+    "images/spell-one.png": {
+      "sha256": "02237ecc7cbf87bc22d2b05d661fe1f3ba2a60f33c46f5fa64125c1cdc45e8aa",
+      "source": "SM-S916B, Clash 19.32.4, 16/11/2026; recorte sem retoque (1078,922)-(1118,949) do contador x1 de Gelo selecionado; somente glifos, sem retrato"
+    },
+    "images/spell-eleven.png": {
+      "sha256": "0858ce18036876206f8427bc61b4e8662865815eda445617bfe558caa3935d41",
+      "source": "SM-S916B, Clash 19.32.4, 16/11/2026; recorte sem retoque (1314,927)-(1362,956) do contador x11; somente glifos, sem retrato"
     }
   }
 }
