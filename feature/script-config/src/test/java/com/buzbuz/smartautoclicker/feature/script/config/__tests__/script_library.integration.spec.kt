@@ -34,6 +34,34 @@ class ScriptLibraryIntegrationTest {
     @After fun resetDispatcher() { Dispatchers.resetMain() }
 
     @Test(timeout = 15000)
+    fun failedStartupCanBeExportedWithoutStartingTheService() = runBlocking {
+        val application = mockk<Application>(relaxed = true)
+        every { application.filesDir } returns temporary.root
+        val resolver = mockk<android.content.ContentResolver>()
+        every { application.contentResolver } returns resolver
+        val uri = android.net.Uri.parse("content://documents/history.zip")
+        val exported = java.io.ByteArrayOutputStream()
+        every { resolver.openOutputStream(uri) } returns exported
+        val model = ScriptLibraryViewModel(application, SavedStateHandle())
+        idle(model)
+        model.recordStartFailure("reviewed-revision", "Aplicativo ausente", IllegalStateException("Aplicativo ausente")).join()
+        model.exportHistory(uri)
+        withTimeout(10000) { model.state.first { !it.busy } }
+        assertEquals("Histórico exportado", model.state.value.message)
+        val entries = mutableMapOf<String, String>()
+        java.util.zip.ZipInputStream(java.io.ByteArrayInputStream(exported.toByteArray())).use { zip ->
+            while (true) {
+                val entry = zip.nextEntry ?: break
+                entries[entry.name] = zip.readBytes().toString(Charsets.UTF_8)
+            }
+        }
+        val summary = Json.parseToJsonElement(entries.filterKeys { it.endsWith("summary.json") }.values.single()).jsonObject
+        assertEquals(JsonPrimitive("FAILED"), summary["status"])
+        assertEquals(JsonPrimitive("reviewed-revision"), summary["revision"])
+        assertEquals(JsonPrimitive("start"), summary["phase"])
+    }
+
+    @Test(timeout = 15000)
     fun syntaxValidationReportsTheSourceFileAndLineWhileKeepingTheDraft() = runBlocking {
         val application = mockk<Application>(relaxed = true)
         every { application.filesDir } returns temporary.root
@@ -139,7 +167,11 @@ class ScriptLibraryIntegrationTest {
         idle(model)
         assertEquals("Editado", model.state.value.selected!!.manifest.name)
         assertTrue(previousId != model.state.value.selected!!.storageId)
-        assertTrue(model.state.value.packages.any { it.storageId == previousId && it.manifest.name == "Original" })
+        assertEquals(listOf(model.state.value.selected!!.storageId), model.state.value.packages.map { it.storageId })
+        val original = ScriptLibraryViewModel(application, SavedStateHandle(mapOf("selected" to previousId)))
+        idle(original)
+        assertEquals("Original", original.state.value.selected!!.manifest.name)
+        assertEquals("Editado", original.state.value.packages.single().manifest.name)
         assertTrue(!model.state.value.dirty)
     }
 

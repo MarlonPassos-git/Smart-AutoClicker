@@ -37,6 +37,84 @@ class ScriptEditorIntegrationTest {
     @Before fun inject() { hilt.inject() }
 
     @Test(timeout = 20000)
+    fun savedVillageSelectionDisablesWallsAndSurvivesRotationWithoutRestoringAnEmptySelection() = runBlocking {
+        val controller = Robolectric.buildActivity(ScriptLibraryActivity::class.java).setup()
+        var activity = controller.get()
+        try {
+            idle(ViewModelProvider(activity)[ScriptLibraryViewModel::class.java])
+            val manifest = ScriptManifest.parse("""{"formatVersion":1,"apiVersion":1,"id":"selection","name":"Farm","scriptVersion":"3","entry":"entry.js",
+                "executionState":{"version":1},"setup":{"entry":"setup.js","label":"Configurar vilas"},
+                "parameters":{"villages":{"type":"selection","label":"Vilas para farmar","default":[]},
+                    "walls":{"type":"boolean","label":"Melhorar muros","default":true},
+                    "reserve":{"type":"number","label":"Reserva","default":0,"visibleWhen":{"walls":true}}},
+                "parameterRules":[{"when":{"villages":{"minItems":2}},"forceFalse":"walls","message":"Muros exigem uma vila."}]}""")
+            val configuration = Json.parseToJsonElement("""{"formatVersion":1,"items":[
+                {"id":"#TAG001","label":"Marlon ¹"},{"id":"#TAG002","label":"Marlon ²"}]}""").jsonObject
+            ScriptStartParametersDialog.show(activity, manifest, "reviewed", configuration = configuration)
+            shadowOf(Looper.getMainLooper()).idle()
+            var dialog = ShadowDialog.getLatestDialog() as AlertDialog
+            var views = descendants(dialog.window!!.decorView)
+            val walls = views.filterIsInstance<MaterialSwitch>().single()
+            assertTrue(!walls.isChecked && !walls.isEnabled)
+            assertTrue(views.filterIsInstance<com.google.android.material.textfield.TextInputLayout>().single().visibility == View.GONE)
+            views.filterIsInstance<com.google.android.material.checkbox.MaterialCheckBox>().forEach { it.isChecked = false }
+            controller.recreate()
+            activity = controller.get()
+            shadowOf(Looper.getMainLooper()).idle()
+            dialog = ShadowDialog.getLatestDialog() as AlertDialog
+            views = descendants(dialog.window!!.decorView)
+            val villages = views.filterIsInstance<com.google.android.material.checkbox.MaterialCheckBox>()
+            assertTrue(villages.none { it.isChecked })
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick()
+            assertTrue(dialog.isShowing)
+            villages.last().isChecked = true
+            var result: android.os.Bundle? = null
+            activity.supportFragmentManager.setFragmentResultListener(ScriptStartParametersDialog.RESULT, activity) { _, answer -> result = answer }
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick()
+            val answers = Json.parseToJsonElement(result!!.getString("answers")!!).jsonObject
+            assertEquals(JsonArray(listOf(JsonPrimitive("#TAG002"))), answers.getValue("villages"))
+            assertEquals(JsonPrimitive(false), answers.getValue("walls"))
+        } finally { controller.pause().stop().destroy() }
+    }
+
+    @Test(timeout = 20000)
+    fun homeLaunchOpensTheSelectedScriptsStartFormWithoutStartingAutomation() = runBlocking<Unit> {
+        val application = androidx.test.core.app.ApplicationProvider.getApplicationContext<android.app.Application>()
+        val repository = com.buzbuz.smartautoclicker.core.script.packages.ScriptPackageRepository(
+            java.io.File(application.filesDir, "scripts/packages"))
+        val bytes = java.io.ByteArrayOutputStream()
+        java.util.zip.ZipOutputStream(bytes).use { zip ->
+            val files = mapOf(
+                "manifest.json" to """{"formatVersion":1,"apiVersion":1,"id":"home-form","name":"Farm V2","scriptVersion":"2","entry":"entry.js",
+                    "parameters":{"multivillage":{"type":"boolean","label":"Multivilas","default":true}}}""",
+                "entry.js" to "throw new Error('Opening the home form must not execute JavaScript');",
+            )
+            files.forEach { (name, text) ->
+                zip.putNextEntry(java.util.zip.ZipEntry(name)); zip.write(text.toByteArray()); zip.closeEntry()
+            }
+        }
+        val stored = repository.importPackage(java.io.ByteArrayInputStream(bytes.toByteArray()))
+        val intent = android.content.Intent(application, ScriptLibraryActivity::class.java)
+            .putExtra("selected", stored.storageId).putExtra("startFromHome", true)
+        val controller = Robolectric.buildActivity(ScriptLibraryActivity::class.java, intent).setup()
+        try {
+            val model = ViewModelProvider(controller.get())[ScriptLibraryViewModel::class.java]
+            idle(model)
+            withTimeout(10000) {
+                while (ShadowDialog.getLatestDialog()?.isShowing != true) {
+                    shadowOf(Looper.getMainLooper()).idle(); delay(1)
+                }
+            }
+            val dialog = ShadowDialog.getLatestDialog() as AlertDialog
+            val multivillage = descendants(dialog.window!!.decorView).filterIsInstance<MaterialSwitch>().single()
+            assertEquals("Multivilas", multivillage.text.toString())
+            assertTrue(multivillage.isChecked)
+            assertTrue(model.pendingRun() == null)
+            dialog.getButton(AlertDialog.BUTTON_NEGATIVE).performClick()
+        } finally { controller.pause().stop().destroy() }
+    }
+
+    @Test(timeout = 20000)
     fun selectingAnImageShowsABoundedPreviewAndOriginalDimensionsAcrossRecreation() = runBlocking {
         val controller = Robolectric.buildActivity(ScriptLibraryActivity::class.java).setup()
         try {
@@ -197,6 +275,40 @@ class ScriptEditorIntegrationTest {
             shadowOf(Looper.getMainLooper()).idle()
             dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick()
             assertEquals(buildJsonObject { put("limit", 3.0); put("enabled", false); put("currency", "elixir") }, supplied)
+        } finally { controller.pause().stop().destroy() }
+    }
+
+    @Test(timeout = 20000)
+    fun conditionalFormClearsExclusionExplainsItAndKeepsItAcrossRotation() = runBlocking {
+        val controller = Robolectric.buildActivity(ScriptLibraryActivity::class.java).setup()
+        try {
+            val activity = controller.get()
+            idle(ViewModelProvider(activity)[ScriptLibraryViewModel::class.java])
+            val manifest = ScriptManifest.parse("""{"formatVersion":1,"apiVersion":1,"id":"conditional","name":"Exemplo","scriptVersion":"1","entry":"entry.js",
+                "parameters":{"multiple":{"type":"boolean","label":"Multivilas","default":false},
+                "walls":{"type":"boolean","label":"Melhorar muros","default":true}},
+                "parameterRules":[{"when":{"multiple":true},"forceFalse":"walls","message":"Muros indisponíveis em Multivilas."}]}""")
+            ScriptStartParametersDialog.show(activity, manifest, "reviewed")
+            shadowOf(Looper.getMainLooper()).idle()
+            fun inputs(): Map<String, MaterialSwitch> = descendants((ShadowDialog.getLatestDialog() as AlertDialog).window!!.decorView)
+                .filterIsInstance<MaterialSwitch>().associateBy { it.text.toString() }
+            inputs().getValue("Multivilas").isChecked = true
+            assertEquals(false, inputs().getValue("Melhorar muros").isChecked)
+            assertEquals(false, inputs().getValue("Melhorar muros").isEnabled)
+            assertTrue(descendants((ShadowDialog.getLatestDialog() as AlertDialog).window!!.decorView)
+                .filterIsInstance<android.widget.TextView>().any { it.text == "Muros indisponíveis em Multivilas." && it.visibility == View.VISIBLE })
+            controller.recreate()
+            shadowOf(Looper.getMainLooper()).idle()
+            assertEquals(false, inputs().getValue("Melhorar muros").isEnabled)
+            inputs().getValue("Multivilas").isChecked = false
+            assertEquals(true, inputs().getValue("Melhorar muros").isEnabled)
+            assertEquals(false, inputs().getValue("Melhorar muros").isChecked)
+            var supplied: JsonObject? = null
+            controller.get().supportFragmentManager.setFragmentResultListener(ScriptStartParametersDialog.RESULT, controller.get()) { _, result ->
+                supplied = Json.parseToJsonElement(result.getString("answers")!!).jsonObject
+            }
+            (ShadowDialog.getLatestDialog() as AlertDialog).getButton(AlertDialog.BUTTON_POSITIVE).performClick()
+            assertEquals(buildJsonObject { put("multiple", false); put("walls", false) }, supplied)
         } finally { controller.pause().stop().destroy() }
     }
 

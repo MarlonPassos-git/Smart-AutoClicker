@@ -1,6 +1,8 @@
 package com.buzbuz.smartautoclicker.core.script.runtime
 
 import com.buzbuz.smartautoclicker.core.script.runtime.api.*
+import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.cancelAndJoin
@@ -19,6 +21,53 @@ import org.junit.Assert.fail
 import org.junit.Test
 
 class ScreenAutomationHostTest {
+    @Test
+    @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
+    fun longSleepExposesCheckpointsAndKeepsItsRemainingWaitAcrossASuspension() = kotlinx.coroutines.test.runTest {
+        val backend = FakeBackend()
+        val host = ScreenAutomationHost(backend, { true })
+        val suspended = CompletableDeferred<Unit>()
+        val resume = CompletableDeferred<Unit>()
+        var checkpoints = 0
+        host.setOperationCheckpoint {
+            checkpoints++
+            if (checkpoints == 2) { suspended.complete(Unit); resume.await() }
+        }
+        var completed = false
+        val job = launch { host.call("""{"apiVersion":1,"operation":"sleep","durationMs":1000}"""); completed = true }
+        advanceTimeBy(20)
+        runCurrent()
+        suspended.await()
+        advanceTimeBy(10000)
+        assertFalse(completed)
+        resume.complete(Unit)
+        advanceTimeBy(979)
+        assertFalse(completed)
+        advanceTimeBy(1)
+        runCurrent()
+        assertTrue(completed)
+        job.join()
+    }
+
+    @Test
+    fun freeTextIsBoundedAndCannotReuseAnObservationAfterPause() = runBlocking {
+        val backend = FakeBackend()
+        val host = ScreenAutomationHost(backend, { true })
+        val frame = Json.parseToJsonElement(host.call(observe)).jsonObject.getValue("frame").jsonPrimitive.long
+        fun query(maximum: Int = 32) = buildJsonObject {
+            put("apiVersion", 1); put("operation", "readText"); put("frame", frame)
+            put("model", "LATIN"); put("threshold", 85); put("maxResults", maximum)
+            put("region", buildJsonObject { put("left", 0); put("top", 0); put("right", 100); put("bottom", 100) })
+        }.toString()
+        val result = Json.parseToJsonElement(host.call(query())).jsonObject
+        assertEquals("#TAG0001", result.getValue("blocks").jsonArray.single().jsonObject.getValue("text").jsonPrimitive.content)
+        assertEquals(frame, result.getValue("blocks").jsonArray.single().jsonObject.getValue("frame").jsonPrimitive.long)
+        assertFalse(result.getValue("truncated").jsonPrimitive.boolean)
+        try { host.call(query(65)); fail("Unbounded OCR must fail") } catch (_: IllegalArgumentException) {}
+        host.invalidateObservations()
+        try { host.call(query()); fail("Old OCR frame must fail") } catch (failure: ScriptApiException) { assertEquals("stale_observation", failure.code) }
+    }
+
     @Test
     fun detailedTimingsAreOptInAndDoNotReplaceTheStageOrExportParameterAnswers() = runBlocking {
         val clock = AtomicLong()
@@ -188,6 +237,8 @@ class ScreenAutomationHostTest {
             onRead()
             return ScreenRecognition(RecognitionStatus.FOUND, 0.95, number = number)
         }
+        override suspend fun readText(region: ScreenRegion, model: String, threshold: Int, maxResults: Int) =
+            listOf(ScreenText("#TAG0001", 98.0, ScreenRegion(10, 10, 80, 40)))
         override suspend fun tap(position: ScreenPoint, durationMs: Long) { taps++ }
         override suspend fun tapSequence(steps: List<ScreenTapStep>) { steps.forEach { tap(it.position, it.pressMs) } }
         override suspend fun swipe(from: ScreenPoint, to: ScreenPoint, durationMs: Long) {}

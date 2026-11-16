@@ -16,6 +16,20 @@ class ScriptPackageIntegrationTest {
     @get:Rule val temporary = TemporaryFolder()
 
     @Test
+    fun latestLibraryShowsOneRevisionPerPackageAndKeepsOldSnapshotsLoadable() {
+        val root = temporary.newFolder("library")
+        val repository = ScriptPackageRepository(root)
+        val original = repository.importPackage(archive())
+        val edited = repository.saveRevision(original.storageId, mapOf("entry.js" to "const edited = true;".toByteArray()))
+        java.io.File(root, original.storageId).setLastModified(1000)
+        java.io.File(root, edited.storageId).setLastModified(2000)
+        val other = repository.importPackage(archive(manifest = manifest().replace("\"id\":\"example\"", "\"id\":\"other\"")))
+        assertEquals(setOf(edited.storageId, other.storageId), repository.listLatestPackages().map { it.storageId }.toSet())
+        assertEquals("throw new Error('must not execute during import');", repository.program(original.storageId).sources["entry.js"])
+        assertEquals(3, repository.listPackages().size)
+    }
+
+    @Test
     fun savingEditsCreatesANewRevisionAndPreservesTheRunningSnapshot() {
         val repository = ScriptPackageRepository(temporary.newFolder("repository"))
         val original = repository.importPackage(archive())
