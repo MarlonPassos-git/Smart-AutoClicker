@@ -1,0 +1,115 @@
+{
+  "date": "2026-11-16",
+  "scriptVersion": "3.4.2",
+  "balanceStrategyFrom": "farm-cv19-balances-3.4.1.json",
+  "opponentWaitMs": 180000,
+  "matchmakingRegressions": [
+    "Busca de 70 segundos conclui a batalha sem gestos durante as nuvens.",
+    "Busca que excede três minutos interrompe sem lançar tropas."
+  ],
+  "checks": {
+    "unitTests": 1863,
+    "unitFailures": 0,
+    "nativeTestsBeforeJavaScriptOnlyChange": 27,
+    "nativeFailures": 0,
+    "build": "./gradlew testFDroidDebugUnitTest assembleFDroidDebug",
+    "result": "BUILD SUCCESSFUL"
+  },
+  "live": {
+    "runId": "5d955975-4990-499a-b2c4-a901755d893b",
+    "status": "COMPLETED",
+    "maxBattlesPerVillage": 8,
+    "stopFarm": "qualquer depósito cheio",
+    "improveWalls": false,
+    "villages": [
+      {
+        "name": "MarlonPassoz",
+        "attacks": 8,
+        "status": "completed",
+        "reason": "Limite de 8 batalha(s) atingido. Muros confirmados: 0."
+      },
+      {
+        "name": "MarlonFull",
+        "attacks": 0,
+        "status": "completed",
+        "reason": "Limite de recursos atingido (qualquer depósito cheio). Batalhas: 0; muros confirmados: 0."
+      }
+    ],
+    "balanceFailures": 0,
+    "opponentTimeouts": 0,
+    "spells": {
+      "castAttempts": 88,
+      "completedZeroChecks": 8,
+      "completedCounters": [
+        [
+          0
+        ],
+        [
+          0
+        ],
+        [
+          0
+        ],
+        [
+          0
+        ],
+        [
+          0
+        ],
+        [
+          0
+        ],
+        [
+          0
+        ],
+        [
+          0
+        ]
+      ]
+    }
+  },
+  "package": {
+    "path": "build/script-examples/farm-walls-sm-s916b-3.4.2-cv19.zip",
+    "sha256": "e2131bb0a19cd24be6da8ed50899a1b1540d5ed94675fb869fdc511085a0f470"
+  },
+  "continuousValidation": {
+    "runId": "81c1806a-14a8-4152-af71-9e75b5b9138d",
+    "status": "COMPLETED",
+    "maxBattlesPerVillage": 0.0,
+    "stopFarm": "qualquer depósito cheio",
+    "improveWalls": false,
+    "villages": [
+      {
+        "name": "MarlonFull",
+        "attacks": 0,
+        "status": "completed",
+        "reason": "Limite de recursos atingido (qualquer depósito cheio). Batalhas: 0; muros confirmados: 0."
+      },
+      {
+        "name": "MarlonPassoz",
+        "attacks": 3,
+        "status": "completed",
+        "reason": "Limite de recursos atingido (qualquer depósito cheio). Batalhas: 3; muros confirmados: 0."
+      }
+    ],
+    "balanceFailures": 0,
+    "castAttempts": 33,
+    "completedZeroChecks": 3
+  },
+  "configurationLeftOnDevice": {
+    "villages": [
+      "#82GRC2U8U",
+      "#GCY20PCPL"
+    ],
+    "finishMode": "destruição",
+    "targetDestruction": 50.0,
+    "improveWalls": false,
+    "wallTrigger": "qualquer depósito de ouro ou elixir cheio",
+    "stopFarm": "qualquer depósito cheio",
+    "goldReserve": 0.0,
+    "elixirReserve": 0.0,
+    "resourcePriority": "ouro",
+    "maxWallBatch": 50.0,
+    "maxBattles": 0.0
+  }
+}

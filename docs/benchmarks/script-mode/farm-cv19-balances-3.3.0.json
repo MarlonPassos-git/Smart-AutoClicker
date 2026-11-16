@@ -1,0 +1,61 @@
+{
+  "date": "2026-11-16",
+  "scriptVersion": "3.3.0",
+  "reportedRun": {
+    "runId": "0aa72a0b-0778-4fbf-a69c-c3c179938d42",
+    "scriptVersion": "3.2.6",
+    "attacksConfirmedBeforeFailure": 6,
+    "recognizedVillage": true,
+    "gold": 17212483,
+    "elixir": 20383010,
+    "unreadableResource": "dark",
+    "actualDarkBalance": 337221
+  },
+  "corrections": [
+    "Cada saldo exige concordância em dois recortes distintos; um empate ou apenas uma leitura não autoriza o próximo ataque.",
+    "Se o recorte principal e uma alternativa concordam, a leitura conclui sem executar as demais. Caso contrário, usa dezesseis recortes e aceita a contagem única com mais concordâncias, desde que tenha pelo menos duas.",
+    "Ausência de leitura continua indefinida; não é convertida para zero. A falha informa os recursos sem concordância e se a vila foi reconhecida.",
+    "Sem melhoria de muros, o limite de batalhas já confirmado encerra a vila sem uma leitura de saldo desnecessária."
+  ],
+  "regressions": {
+    "nativeBalances": [
+      276010,
+      337221
+    ],
+    "nativeCompleteBar": {
+      "gold": 17212483,
+      "elixir": 20383010,
+      "dark": 337221
+    },
+    "consensusRejects": [
+      "leitura única",
+      "empate",
+      "valor inválido"
+    ],
+    "confirmedFiniteLimitDoesNotObserveAgain": true
+  },
+  "checks": {
+    "unitTests": 1861,
+    "unitFailures": 0,
+    "nativeTests": 26,
+    "nativeFailures": 0,
+    "build": "./gradlew testFDroidDebugUnitTest assembleFDroidDebug"
+  },
+  "live": {
+    "runId": "412613a1-5945-43e5-9f12-29fb990b4a45",
+    "status": "STOPPED",
+    "maxBattlesPerVillage": 8,
+    "stopFarm": "qualquer depósito cheio",
+    "improveWalls": false,
+    "attacksPerVillage": {
+      "#GCY20PCPL": 6,
+      "#82GRC2U8U": 0
+    },
+    "reason": "Saldo dark=368812 teve apenas uma leitura válida; nenhuma concordância, sem autorizar o próximo ataque."
+  },
+  "package": {
+    "path": "build/script-examples/farm-walls-sm-s916b-3.3.0-cv19.zip",
+    "sha256": "38b10a35f683ed3dd02bb9f15039f32bf60933e6787477823b5cedbef31d9c90"
+  },
+  "followUp": "Reconhecimento direto da linha de inteiros brancos em 3.4.0, com regressão adicional para 368812."
+}

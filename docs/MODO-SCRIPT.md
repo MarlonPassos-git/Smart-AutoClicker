@@ -4,11 +4,13 @@ O modo Script executa JavaScript no próprio Android e mantém seus pacotes sepa
 
 ## Criar, importar e executar
 
-1. Na lista de cenários, abra o menu e escolha **Scripts**.
+Os scripts importados aparecem diretamente na tela inicial. Toque no cartão ou no botão de iniciar para abrir os parâmetros da revisão exibida. A biblioteca mostra uma entrada por pacote; revisões anteriores continuam guardadas para preservar execuções e progresso.
+
+1. Para importar ou editar um pacote, abra o menu da lista de cenários e escolha **Scripts**.
 2. Use **Criar script** ou **Importar ZIP**. O manifesto fica na raiz do ZIP.
 3. Revise os arquivos. Selecionar um PNG mostra uma prévia e suas dimensões originais. O editor aceita JavaScript e JSON, mostra números de linha e preserva o rascunho durante a rotação. **Salvar** cria outra revisão; **Validar** compila sem executar operações Android.
 4. Em **Capturar recurso**, informe um nome, escolha imagem com região ou somente região e autorize a captura. Abra a tela alvo, ajuste a área e confirme. O aplicativo salva outra revisão e volta ao editor. Cancelar conserva a revisão anterior.
-5. Toque em **Iniciar**, revise os parâmetros e conceda as permissões solicitadas. A execução usa a revisão salva e as respostas conferidas.
+5. Toque em **Iniciar**, revise os parâmetros e conceda as permissões solicitadas. A execução usa a revisão salva e as respostas conferidas. Se o pacote declarar `targetPackage`, o aplicativo alvo abre automaticamente após a autorização da captura; isso também vale para configurar vilas e capturar recursos.
 6. No controle flutuante, acompanhe a etapa, pause, retome ou pare. O diagnóstico mostra as mensagens retidas e a causa do encerramento.
 
 Captura de tela, sobreposição e acessibilidade precisam estar disponíveis. Texto e números também exigem os modelos OCR correspondentes instalados. A execução usa arquivos e módulos locais; não precisa de computador conectado, Node, npm ou serviços de nuvem.
@@ -79,7 +81,7 @@ As regiões usam limites esquerdo/superior inclusivos e direito/inferior exclusi
 | Cor média | `{"type":"color","argb":-1}` |
 | Formato numérico | `{"type":"number","format":"COMMA_DECIMAL"}` |
 
-Números aceitam `AUTO`, `DOT_DECIMAL`, `COMMA_DECIMAL` e `POSITIVE_QUANTITY`. O último reconhece quantidades positivas com prefixo `x`, preservando a posição da leitura. Texto procura as alternativas esperadas; não extrai texto arbitrário da tela.
+Números aceitam `AUTO`, `DOT_DECIMAL`, `COMMA_DECIMAL`, `POSITIVE_QUANTITY` e `WHITE_INTEGER_LINE`. `POSITIVE_QUANTITY` reconhece quantidades positivas com prefixo `x`, preservando a posição da leitura. `WHITE_INTEGER_LINE` é destinado a um campo calibrado com uma única linha de inteiros não negativos em branco, sobre fundo escuro ou colorido. Ele reconhece diretamente a linha, aceita zero e separadores de grupos de três dígitos; exige um APK que inclua esse formato. O recurso de texto procura alternativas esperadas. Para extrair blocos de texto livre da observação, use `readText()`.
 
 ### Parâmetros
 
@@ -185,9 +187,9 @@ if (outcome.status === "found" && outcome.name === "dialog") {
 - `resumeWhen(query)`: declara a condição que precisa ser reconhecida em uma captura nova ao retomar.
 - `stop(message)`: encerra a sessão com motivo explícito e impede os comandos seguintes.
 
-O histórico conserva até 200 eventos em memória. O formato interno usa JSON com `kind`, `stage`, `message` e `monotonicNanos`; a interface mostra texto legível. Erros preservam arquivo, linha, coluna, causa e pilha quando fornecidos pelo interpretador. O diagnóstico termina com a sessão; não há checkpoint persistente, depurador por instrução ou inspeção de todas as variáveis locais.
+O painel conserva até 200 eventos em memória. Além dele, o celular salva um histórico privado das últimas 20 execuções, com revisão, horário, etapas, operações, resultado, motivo de parada e erro com pilha. Cada execução retém os dois segmentos mais recentes de até 512 KiB cada e o último checkpoint, quando o pacote oferece progresso persistente. Não há depurador por instrução nem inspeção de todas as variáveis locais.
 
-Abra **Diagnóstico detalhado** no controle flutuante para registrar também as operações iniciadas, seus tempos e resultados. Fechar o painel ou ocultar o controle desativa esse detalhamento. A etapa e a mensagem de espera continuam nos controles principais. O histórico visível atualiza até cinco vezes por segundo e formata as linhas conforme aparecem no painel. A lista acompanha os eventos novos quando está no fim; ao consultar eventos anteriores, sua posição de leitura é preservada.
+Abra **Diagnóstico detalhado** no controle flutuante para consultar as operações, seus tempos e resultados. O registro persistente continua quando o painel está fechado. A etapa e a mensagem de espera continuam nos controles principais. O histórico visível atualiza até cinco vezes por segundo e formata as linhas conforme aparecem no painel. A lista acompanha os eventos novos quando está no fim; ao consultar eventos anteriores, sua posição de leitura é preservada.
 
 Eventos de operação acrescentam `operation`, `durationNanos`, `outcome` e `details`. O resultado da chamada (`outcome`) e o status do reconhecimento são distintos: uma operação pode concluir normalmente com `invalid_reading`. Os detalhes incluem frame, referência, região e leitura numérica quando disponíveis; lotes resumem as contagens e até oito números. Perfis são resumidos por dimensões e quantidade de regiões/posições. Na operação `parameters`, o detalhamento automático registra a quantidade de parâmetros, preservando as respostas fora desses metadados. O conteúdo de `log` continua sob controle do autor.
 
@@ -195,7 +197,7 @@ Eventos de operação acrescentam `operation`, `durationNanos`, `outcome` e `det
 
 O [exemplo genérico](../examples/scripts/generic-recovery/manifest.json) demonstra condição, repetição limitada, espera, recuperação de diálogo e confirmação após ação. Capture `ready`, `completed` e `closeDialog` no aplicativo alvo. O padrão apenas observa; o parâmetro **Permitir cliques** habilita a ação.
 
-O [farm/muros](../examples/scripts/farm-walls-sm-s916b/manifest.json) usa o perfil Samsung 2340×1080 em português, com imagens da calibração de 09/11/2026. Inclui modos de encerramento, lançamento por quantidade, heróis, feitiços, volta à vila, reservas, prioridade/troca de moeda, lotes e conferência da melhoria. Inicie com a vila visível. Resolução, idioma, enquadramento, níveis e referências precisam corresponder ao perfil. Os testes determinísticos e de reconhecimento não comprovam uma execução completa deste script no jogo.
+O [farm/muros](../examples/scripts/farm-walls-sm-s916b/manifest.json) usa o perfil Samsung 2340×1080 em português, com imagens da calibração de 09/11/2026. Inclui modos de encerramento, lançamento por quantidade, heróis, feitiços, volta à vila, reservas, prioridade/troca de moeda, lotes e conferência da melhoria. O pacote abre o Clash of Clans automaticamente. A vila precisa estar acessível para o reconhecimento prosseguir; telas de atualização, login ou carregamento podem exigir intervenção. Resolução, idioma, enquadramento, níveis e referências precisam corresponder ao perfil. Os testes determinísticos e de reconhecimento não comprovam uma execução completa deste script no jogo.
 
 Para preparar os ZIPs no computador, com destinos novos:
 
@@ -207,3 +209,73 @@ python3 scripts/package_script_example.py examples/scripts/farm-walls-sm-s916b b
 Transfira o ZIP ao Android e use **Importar ZIP**. O empacotador não executa JavaScript e recusa substituir arquivos existentes. O aplicativo faz a validação do formato ao importar.
 
 A [documentação de desenvolvimento](DESENVOLVIMENTO-MODO-SCRIPT.md) descreve módulos, extensão da API e verificações.
+
+## Rodadas recuperáveis e regras condicionais
+
+O manifesto pode declarar `"executionState": {"version": 1}` para habilitar um checkpoint privado por `id` do script. `loadState()` lê esse objeto; `saveState(objeto, {completed: false})` grava atomicamente até 256 KiB. O estado fica separado do pacote e das respostas recentes. Uma execução mantém a posse exclusiva do registro. Exportar o ZIP não inclui o progresso.
+
+Na biblioteca, uma rodada incompleta oferece **Continuar rodada** e **Nova rodada**. Continuar exige a mesma revisão imutável e conserva as respostas originais. Outra revisão, uma calibração ou um registro inválido exige a escolha explícita de uma nova rodada. Cancelar conserva o registro. Não há migração automática de progresso entre versões.
+
+O script define a versão e o conteúdo do seu estado. Grave a tentativa antes de efeitos externos e a confirmação depois de observar o resultado. Um fechamento entre esses pontos pode deixar resultado incerto. Para pedir uma resolução explícita no próximo início, o checkpoint pode incluir:
+
+```json
+{"version":1,"recovery":{"message":"Confira o resultado antes de continuar.","choices":[{"id":"confirmed","label":"Confirmar resultado"},{"id":"not-performed","label":"Confirmar que não ocorreu"}]}}
+```
+
+A biblioteca grava a escolha em `recovery.answer`, sem interpretar o domínio do script. O script deve validar e consumir essa resposta. Checkpoints não garantem execução exatamente uma vez no aplicativo externo.
+
+Regras opcionais `parameterRules` complementam a validação individual. Este formato delimitado não implementa JSON Schema:
+
+```json
+[
+  {"when":{"multiple":true},"forceFalse":"walls","message":"Muros indisponíveis neste modo."},
+  {"when":{"multiple":true},"requireAny":[{"parameter":"limit","greaterThan":0},{"parameter":"stop","notEquals":"nunca"}],"message":"Escolha limite ou condição de parada."}
+]
+```
+
+`when` compara parâmetros booleanos declarados ou a quantidade de itens de uma seleção, como `{"villages":{"minItems":2}}`. `forceFalse` desmarca e bloqueia um parâmetro booleano, com explicação visível; desligar a condição não o reativa. `requireAny` exige ao menos uma comparação `equals`, `notEquals` ou `greaterThan`. A validação final rejeita respostas incompatíveis mesmo fora da interface. Pacotes sem regras mantêm o comportamento anterior.
+
+### Texto livre e progresso
+
+```js
+import { observe, readText, progress } from "klickr";
+const frame = await observe();
+const text = await readText(frame, {
+  region: {left: 100, top: 100, right: 500, bottom: 300},
+  model: "LATIN", threshold: 85, maxResults: 32
+});
+await progress("Vila 1/2 · 3/10 ataques");
+```
+
+`readText()` retorna `frame`, `blocks` e `truncated`. Cada bloco contém `text`, confiança OCR de 0 a 100, limites absolutos e o vínculo ao frame. A região admite até 1.048.576 pixels e o resultado, até 64 blocos com 1.024 caracteres cada. `truncated` é conservador: verdadeiro quando o limite é alcançado. Uma pausa invalida esses blocos para efeitos posteriores; observe novamente. O OCR roda na thread do detector, com os modelos instalados, e não expõe acesso ao Android ou ao filesystem.
+
+`progress()` mantém uma mensagem separada das etapas transitórias, visível também no painel compacto. Use `log()` para os motivos e detalhes por item. O histórico continua limitado; não há arquivo ilimitado de rodadas.
+
+O menu Smart também separa Pausar/Retomar de Parar. Pausar mantém o processador, os contadores e a posição na sequência; suspende esperas e libera ponteiros. Retomar captura novamente e verifica as condições do evento antes do próximo efeito. Uma tela incompatível encerra o processamento. Um gesto já despachado pode terminar antes da pausa.
+
+## Configuração independente
+
+Pacotes podem declarar `"setup":{"entry":"setup.js","label":"Configurar vilas"}` junto com `executionState`. A biblioteca e o card da tela inicial mostram essa ação separada de **Iniciar**. Ela executa o arquivo declarado sem abrir as perguntas do farm e sem alterar respostas recentes ou progresso de rodadas.
+
+`loadConfiguration()` lê o cadastro privado do pacote. `saveConfiguration(objeto)` grava atomicamente até 256 KiB e só pode ser usado pela entrada de configuração. O arquivo fica separado do checkpoint, isolado por `id`; novas rodadas e revisões não o apagam. Exportar ZIP não inclui esse cadastro. O script deve validar sua versão e compatibilidade com o perfil antes de usá-lo.
+
+O parâmetro `{"type":"selection","label":"Vilas para farmar","default":[]}` apresenta os itens de `configuration.items`, que devem ter `id` único e `label` não vazio, em um cadastro com `formatVersion: 1`. A resposta é uma lista de IDs únicos. Antes de iniciar, o app exige ao menos um item ainda disponível no cadastro. Condições `visibleWhen`, como `{"improveWalls":true}`, escondem opções que dependem de um booleano desativado; as respostas continuam passando pela validação normal.
+
+Nos exemplos de farm V3, **Configurar vilas** salva tags e capacidades dos três recursos. **Iniciar** oferece a seleção das vilas e a condição de conclusão. Várias vilas desativam muros. Os saldos são lidos durante o farm; as capacidades não são digitadas. Atualize a configuração depois de ampliar depósitos ou alterar as contas conectadas. Rodadas da V2 permanecem associadas à revisão original; a V3 exige uma nova rodada e sua configuração inicial.
+
+A [validação do farm V3 no Samsung](benchmarks/script-mode/farm-round-v3-sm-s916b.json) concluiu uma batalha em cada vila, confirmou a troca automática de conta e encerrou a rodada, com muros desativados. O teste usou limite de uma batalha por vila e parada por recursos em **Nunca**; não foi uma execução contínua até encher depósitos.
+
+
+### Abrir o aplicativo e exportar o histórico
+
+O campo opcional `"targetPackage":"com.supercell.clashofclans"` no manifesto identifica o aplicativo Android que deve abrir. Pacotes antigos, sem esse campo, continuam usando o aplicativo que estiver visível. Se o aplicativo declarado estiver ausente ou desabilitado, a execução não começa e a tentativa fica registrada. A autorização de captura do Android continua necessária. A preparação aguarda até 30 segundos pela orientação calibrada; o próprio script continua responsável por reconhecer a tela antes de agir.
+
+Na **Biblioteca de scripts**, abra o menu **⋮ → Exportar histórico** e escolha onde salvar `klickr-historico.zip`. O ZIP contém uma pasta por execução:
+
+- `summary.json`: identificação da revisão, dispositivo, horários, resultado (`COMPLETED`, `STOPPED`, `FAILED` ou `INTERRUPTED`), motivo e erro.
+- `checkpoint.json`: último progresso salvo pelo script. O campo `answers` do envelope é omitido; o próprio progresso pode conter opções copiadas pelo script. No farm, conserva a vila atual, ataques confirmados e ataque pendente. Uma pendência representa uma tentativa sem confirmação, não um ataque concluído.
+- `events.previous.jsonl` e `events.jsonl`: eventos em ordem, com etapa, operação, resultado e metadados limitados. O segundo arquivo é o mais recente. Saldos e confiança de leitura ajudam a investigar falhas; imagens da tela e código-fonte não são incluídos automaticamente.
+
+As gravações de eventos usam uma fila de até 512 itens, fora da execução de gestos; eventual descarte aparece em `droppedEvents`. Checkpoints e resumos são salvos atomicamente. Um encerramento abrupto pode perder os últimos eventos ainda na fila ou deixar a última linha incompleta. O próximo início ou a exportação identifica execuções de outro processo que ficaram sem encerramento. Em Android 11 ou superior, acrescenta a causa do fim do processo quando o sistema ainda disponibiliza esse registro, incluindo indicação de crash Java ou nativo. Sem essa evidência, registra `INTERRUPTED` sem afirmar que houve crash. Um travamento sem encerramento do processo permanece em execução até ser interrompido.
+
+Os arquivos ficam no armazenamento privado `files/scripts/execution-logs/`, sobrevivem ao fechamento do aplicativo e às atualizações, e são removidos ao limpar os dados ou desinstalar. A retenção é automática: até 20 execuções encerradas/recentes, aproximadamente 26 MiB no total com os limites padrão. Textos e checkpoints escritos pelo script podem conter nomes de vilas e outros dados próprios da automação; revise o ZIP antes de compartilhar.

@@ -1,0 +1,488 @@
+{
+  "date": "2026-11-16",
+  "device": "SM-S916B",
+  "gameVersion": "19.32.4",
+  "scriptVersion": "3.2.4",
+  "result": "Configuração concluída duas vezes; versão 3.2.4 completou três ataques por vila, com troca automática e todos os feitiços consumidos e confirmados em zero nos seis ataques.",
+  "corrections": [
+    "Leitura da aba Configurações a 84,9% era rejeitada pelo corte genérico de 85%; somente essa aba passa a usar 80%. A tag mantém confiança mínima de 95% e duas observações.",
+    "Novos recortes separam rótulo Máx. e valor da capacidade no quadro CV19. Produção por hora e tesouro ficam fora do campo numérico.",
+    "A capacidade exige maioria nos recortes e duas observações concordantes. Os recortes anteriores permanecem disponíveis como alternativa."
+  ],
+  "setup": {
+    "runs": [
+      {
+        "runId": "aab4cfa9-25b7-45cf-aa50-6817dbe71398",
+        "revision": "9e9be1cf-4569-4eeb-9aeb-0d6bb38ae2fd",
+        "status": "COMPLETED",
+        "reason": null,
+        "startedAt": "2026-11-16T15:55:35.566353Z",
+        "endedAt": "2026-11-16T15:57:18.889730Z",
+        "droppedEvents": 0
+      },
+      {
+        "runId": "b191cbe0-0e32-4e24-94e6-a827dcb177c0",
+        "revision": "9e9be1cf-4569-4eeb-9aeb-0d6bb38ae2fd",
+        "status": "COMPLETED",
+        "reason": null,
+        "startedAt": "2026-11-16T15:58:35.039364Z",
+        "endedAt": "2026-11-16T16:00:15.465602Z",
+        "droppedEvents": 0
+      }
+    ],
+    "sameItemsOnBothRuns": true,
+    "initialVillageRestored": true,
+    "previousRoundUnchanged": true,
+    "catalog": {
+      "formatVersion": 1,
+      "profile": "sm-s916b-2340x1080-v1",
+      "updatedAt": "2026-11-16T16:00:15.311Z",
+      "items": [
+        {
+          "id": "#82GRC2U8U",
+          "key": "MarlonPassoz",
+          "name": "MarlonPassoz",
+          "label": "MarlonPassoz",
+          "capacities": {
+            "goldCapacity": 31000000,
+            "elixirCapacity": 31000000,
+            "darkCapacity": 500000
+          }
+        },
+        {
+          "id": "#GCY20PCPL",
+          "key": "MarlonFull",
+          "name": "MarlonFull",
+          "label": "MarlonFull",
+          "capacities": {
+            "goldCapacity": 25000000,
+            "elixirCapacity": 25000000,
+            "darkCapacity": 410000
+          }
+        }
+      ]
+    }
+  },
+  "checks": {
+    "unitTests": 1856,
+    "unitFailures": 0,
+    "nativeTests": 24,
+    "nativeFailures": 0,
+    "build": "./gradlew testFDroidDebugUnitTest assembleFDroidDebug",
+    "native": "./gradlew :core:script:android:connectedFDroidDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.buzbuz.smartautoclicker.core.script.android.NativeScriptResourcesIntegrationTest"
+  },
+  "fixtures": "../../../core/script/android/src/androidTest/assets/farm_cv19/provenance.json",
+  "farmBeforeSpellCorrection": {
+    "status": "COMPLETED",
+    "runId": "8cf39594-9ac8-4d1d-b1c1-18a7597e0f08",
+    "revision": "f776013a-e2f9-47d0-9aab-6a17df09c7fb",
+    "parameters": {
+      "villages": [
+        "#82GRC2U8U",
+        "#GCY20PCPL"
+      ],
+      "finishMode": "destruição",
+      "targetDestruction": 50.0,
+      "improveWalls": false,
+      "wallTrigger": "qualquer depósito de ouro ou elixir cheio",
+      "stopFarm": "nunca",
+      "goldReserve": 0.0,
+      "elixirReserve": 0.0,
+      "resourcePriority": "ouro",
+      "maxWallBatch": 50.0,
+      "maxBattles": 3.0
+    },
+    "requestedAttacksPerVillage": 3,
+    "startedAt": "2026-11-16T16:12:27.225259Z",
+    "endedAt": "2026-11-16T16:20:48.494682Z",
+    "droppedEvents": 0,
+    "attacksPerVillage": {
+      "#82GRC2U8U": 3,
+      "#GCY20PCPL": 3
+    },
+    "limitation": "Navegação e contagem concluídas; o reconhecimento do retrato perdeu o feitiço selecionado após dois lançamentos, deixando nove de onze. Esta rodada não valida o consumo corrigido."
+  },
+  "spellCorrections": [
+    "Seleção pelo contador à direita dos heróis, independente do retrato, tipo e nível do feitiço.",
+    "Blocos de até duas unidades, sem toque excedente para quantidades ímpares; redução confirmada antes de continuar.",
+    "Cabeçalho conhecido ausente recebe janela própria de OCR; zero cinza precisa de texto ou glifos explicitamente reconhecidos.",
+    "Três leituras ausentes ou tentativas sem redução encerram com erro; a meta de batalha tem prioridade.",
+    "Contadores x11, x1 e x0 recebem referências somente dos glifos; nenhum retrato do feitiço é exigido. A referência x11 impede omissão inicial ou leitura incorreta como x1."
+  ],
+  "intermediateSpellRuns": [
+    {
+      "runId": "fad10b71-b418-4923-9c75-d93f670d62b2",
+      "revision": "f0554db2-587a-40da-a06b-ade72fc422ae",
+      "scriptVersion": "3.2.0",
+      "status": "STOPPED",
+      "reason": "Quantidade de feitiço ilegível em três observações; não foi considerada zero.",
+      "castsConfirmedByResult": {
+        "Fúria": 3,
+        "Gelo": 2
+      },
+      "remaining": {
+        "Fúria": 0,
+        "Gelo": 3
+      },
+      "correction": "Recorte real adicionado como regressão nativa, janela centrada no slot conhecido e referência do glifo x0 do CV19.",
+      "battleEndedNaturally": true,
+      "manualReturnAfterFailure": true
+    },
+    {
+      "runId": "a51d18ac-c283-48ac-bda9-9ba1656df6d2",
+      "revision": "aff4b619-e084-48fa-b413-0572b9a9ebff",
+      "scriptVersion": "3.2.1",
+      "status": "STOPPED",
+      "reason": "Quantidade de feitiço ilegível em três observações; não foi considerada zero.",
+      "castsConfirmedByResult": {
+        "Fúria": 2,
+        "Gelo": 0
+      },
+      "remaining": {
+        "Fúria": 1,
+        "Gelo": 5
+      },
+      "correction": "Regressão nativa passou a reproduzir o limite observado de 867 px; largura alternativa de 100 ou 60 px recupera x1, que desaparecia em 110 px. Teste inclui margens de oito pixels no limite dos heróis.",
+      "battleEndedNaturally": true,
+      "manualReturnAfterFailure": true
+    },
+    {
+      "runId": "ca83d67f-ffcb-418f-8417-7cd19c4d7d9a",
+      "revision": "8daaaeae-454f-4a10-8da8-51857a438456",
+      "scriptVersion": "3.2.2",
+      "status": "STOPPED",
+      "completedAttacks": 1,
+      "firstAttackSpellCounters": [
+        0,
+        0
+      ],
+      "secondAttackCastsConfirmedByResult": {
+        "Fúria": 3,
+        "Gelo": 4
+      },
+      "remaining": {
+        "Fúria": 0,
+        "Gelo": 1
+      },
+      "correction": "Referência dos glifos x1, sem retrato, na posição previamente observada; só usada quando a última quantidade conhecida permite chegar a um em um bloco de até dois lançamentos.",
+      "battleEndedNaturally": true,
+      "manualReturnAfterFailure": true
+    },
+    {
+      "runId": "f6b24951-1e37-4cb3-8db1-4eda3e2b20b9",
+      "revision": "b037a234-87b3-4e1a-9f37-5c568288a037",
+      "scriptVersion": "3.2.3",
+      "status": "STOPPED",
+      "completedAttacksPerVillage": {
+        "#GCY20PCPL": 3,
+        "#82GRC2U8U": 2
+      },
+      "mixedSpellsConfirmedZeroOnThreeAttacks": true,
+      "reason": "Interrompido pelo agente após observar 11 feitiços não usados na segunda vila. A terceira busca foi cancelada antes de lançar tropas.",
+      "correction": "Referência do contador x11 sem retrato confirma a leitura inicial com quatro heróis e máquina de cerco. OCR podia omitir x11 ou transformá-lo em x1 com confiança alta.",
+      "nativeRegressionIncludesHeroBoundaryOffsets": [
+        -8,
+        0,
+        8
+      ]
+    }
+  ],
+  "package": {
+    "path": "build/script-examples/farm-walls-sm-s916b-3.2.4-cv19.zip",
+    "sha256": "7f54e5464400a25a600c0c1b9087245957a13747e40246ef686fecbb32c10af1",
+    "importedUsing": "Importar ZIP"
+  },
+  "farm": {
+    "runId": "e98e93fe-63f9-47b2-a5c4-649d48ac43f3",
+    "revision": "1a9483b4-1abf-4dbd-ba5e-8897003ae5ee",
+    "status": "COMPLETED",
+    "startedAt": "2026-11-16T17:47:49.042184Z",
+    "endedAt": "2026-11-16T17:53:07.045174Z",
+    "droppedEvents": 0,
+    "parameters": {
+      "villages": [
+        "#82GRC2U8U",
+        "#GCY20PCPL"
+      ],
+      "finishMode": "destruição",
+      "targetDestruction": 50.0,
+      "improveWalls": false,
+      "wallTrigger": "qualquer depósito de ouro ou elixir cheio",
+      "stopFarm": "nunca",
+      "goldReserve": 0.0,
+      "elixirReserve": 0.0,
+      "resourcePriority": "ouro",
+      "maxWallBatch": 50.0,
+      "maxBattles": 3.0
+    },
+    "requestedAttacksPerVillage": 3,
+    "checkpointCompleted": true,
+    "attacksPerVillage": {
+      "#82GRC2U8U": 3,
+      "#GCY20PCPL": 3
+    },
+    "manualInterventionsDuringRun": 0,
+    "attacks": [
+      {
+        "village": "#82GRC2U8U",
+        "battle": 1,
+        "startedAt": "2026-11-16T17:48:04.775310Z",
+        "observedSpellCounters": [
+          [
+            11
+          ],
+          [
+            9
+          ],
+          [
+            7
+          ],
+          [
+            5
+          ],
+          [
+            3
+          ],
+          [
+            1
+          ],
+          [
+            0
+          ]
+        ],
+        "spellCasts": 11,
+        "finalSpellCounters": [
+          0
+        ],
+        "firstSpellCounterAt": "2026-11-16T17:48:24.641867Z",
+        "spellsVerifiedEmptyAt": "2026-11-16T17:48:31.292955Z",
+        "villageConfirmedAt": "2026-11-16T17:48:49.413646Z",
+        "returnObservedAt": "2026-11-16T17:48:52.159851+00:00",
+        "roundTripMs": 44638
+      },
+      {
+        "village": "#82GRC2U8U",
+        "battle": 2,
+        "startedAt": "2026-11-16T17:48:51.631001Z",
+        "observedSpellCounters": [
+          [
+            11
+          ],
+          [
+            9
+          ],
+          [
+            7
+          ],
+          [
+            5
+          ],
+          [
+            3
+          ],
+          [
+            1
+          ],
+          [
+            0
+          ]
+        ],
+        "spellCasts": 11,
+        "finalSpellCounters": [
+          0
+        ],
+        "firstSpellCounterAt": "2026-11-16T17:49:11.368904Z",
+        "spellsVerifiedEmptyAt": "2026-11-16T17:49:17.522275Z",
+        "villageConfirmedAt": null,
+        "returnObservedAt": "2026-11-16T17:49:33.428045+00:00"
+      },
+      {
+        "village": "#82GRC2U8U",
+        "battle": 3,
+        "startedAt": null,
+        "observedSpellCounters": [
+          [
+            11
+          ],
+          [
+            9
+          ],
+          [
+            7
+          ],
+          [
+            5
+          ],
+          [
+            3
+          ],
+          [
+            1
+          ],
+          [
+            0
+          ]
+        ],
+        "spellCasts": 11,
+        "finalSpellCounters": [
+          0
+        ],
+        "firstSpellCounterAt": "2026-11-16T17:49:48.065232Z",
+        "spellsVerifiedEmptyAt": "2026-11-16T17:49:54.366282Z",
+        "villageConfirmedAt": "2026-11-16T17:50:15.302379Z",
+        "returnObservedAt": "2026-11-16T17:50:17.805245+00:00"
+      },
+      {
+        "village": "#GCY20PCPL",
+        "battle": 1,
+        "startedAt": "2026-11-16T17:50:44.137370Z",
+        "observedSpellCounters": [
+          [
+            3,
+            5
+          ],
+          [
+            1,
+            5
+          ],
+          [
+            0,
+            5
+          ],
+          [
+            0,
+            3
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            0
+          ]
+        ],
+        "spellCasts": 8,
+        "finalSpellCounters": [
+          0,
+          0
+        ],
+        "firstSpellCounterAt": "2026-11-16T17:50:56.996865Z",
+        "spellsVerifiedEmptyAt": "2026-11-16T17:51:04.209775Z",
+        "villageConfirmedAt": "2026-11-16T17:51:21.020650Z",
+        "returnObservedAt": "2026-11-16T17:51:21.310551+00:00",
+        "roundTripMs": 36883
+      },
+      {
+        "village": "#GCY20PCPL",
+        "battle": 2,
+        "startedAt": "2026-11-16T17:51:22.561347Z",
+        "observedSpellCounters": [
+          [
+            3
+          ],
+          [
+            1,
+            5
+          ],
+          [
+            0,
+            5
+          ],
+          [
+            0,
+            3
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            0
+          ]
+        ],
+        "spellCasts": 8,
+        "finalSpellCounters": [
+          0,
+          0
+        ],
+        "firstSpellCounterAt": "2026-11-16T17:51:36.680666Z",
+        "spellsVerifiedEmptyAt": "2026-11-16T17:51:44.262263Z",
+        "villageConfirmedAt": "2026-11-16T17:52:03.966166Z",
+        "returnObservedAt": "2026-11-16T17:52:05.893120+00:00",
+        "roundTripMs": 41405
+      },
+      {
+        "village": "#GCY20PCPL",
+        "battle": 3,
+        "startedAt": "2026-11-16T17:52:05.565800Z",
+        "observedSpellCounters": [
+          [
+            3,
+            5
+          ],
+          [
+            1,
+            5
+          ],
+          [
+            0,
+            5
+          ],
+          [
+            0,
+            3
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            0
+          ]
+        ],
+        "spellCasts": 8,
+        "finalSpellCounters": [
+          0,
+          0
+        ],
+        "firstSpellCounterAt": "2026-11-16T17:52:20.495817Z",
+        "spellsVerifiedEmptyAt": "2026-11-16T17:52:28.065979Z",
+        "villageConfirmedAt": "2026-11-16T17:53:05.205091Z",
+        "returnObservedAt": "2026-11-16T17:53:06.304132+00:00",
+        "roundTripMs": 59639
+      }
+    ],
+    "totalSpellCasts": 57,
+    "allSpellCountersVerifiedZero": true,
+    "originalArmyRestored": {
+      "village": "#GCY20PCPL",
+      "savedFormation": "farm",
+      "troopCount": 29,
+      "spells": {
+        "Terremoto": 11
+      },
+      "existingSavedFormationsModified": false
+    },
+    "catalogUnchanged": true,
+    "timestampEvidence": "Horários exatos ficam nulos quando a rotação dos logs removeu o evento; returnObservedAt vem do monitor do checkpoint persistido.",
+    "spellCompositions": {
+      "#82GRC2U8U": {
+        "Terremoto": 11
+      },
+      "#GCY20PCPL": {
+        "Fúria": 3,
+        "Gelo": 5
+      }
+    }
+  },
+  "limitations": [
+    "Validação física de feitiços cobre Terremoto, Fúria e Gelo; não representa teste individual de todos os feitiços do jogo ou de suas restrições de alvo.",
+    "Muros desativados na rodada multivilas; melhoria de muros não foi revalidada no CV19.",
+    "O resgate integral de um novo bônus de estrelas ainda aguarda disponibilidade física; há testes determinísticos e reconhecimento nativo dos recortes, e Continuar já foi confirmado no aparelho.",
+    "Perfil permanece específico a SM-S916B, português e 2340×1080. A meta da batalha continua tendo prioridade sobre lançamentos restantes."
+  ],
+  "followUpRegression": "farm-cv19-spell-counter-3.2.5.json"
+}

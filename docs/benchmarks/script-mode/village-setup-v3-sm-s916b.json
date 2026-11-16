@@ -1,0 +1,107 @@
+{
+  "date": "2026-11-14",
+  "device": "SM-S916B",
+  "resolution": [
+    2340,
+    1080
+  ],
+  "setupRevision": "9e105c33-4325-417d-817c-17b350671064",
+  "reviewedRevision": "aceef9c2-0781-4135-a120-6fac301c58c5",
+  "configuration": {
+    "formatVersion": 1,
+    "profile": "sm-s916b-2340x1080-v1",
+    "updatedAt": "2026-11-14T19:06:35.742Z",
+    "items": [
+      {
+        "id": "#GCY20PCPL",
+        "key": "MarlonFull",
+        "name": "MarlonFull",
+        "label": "MarlonFull",
+        "capacities": {
+          "goldCapacity": 25000000,
+          "elixirCapacity": 25000000,
+          "darkCapacity": 410000
+        }
+      },
+      {
+        "id": "#82GRC2U8U",
+        "key": "MarlonPassoz",
+        "name": "MarlonPassoz",
+        "label": "MarlonPassoz",
+        "capacities": {
+          "goldCapacity": 31000000,
+          "elixirCapacity": 30500000,
+          "darkCapacity": 500000
+        }
+      }
+    ]
+  },
+  "configurationRetainedAfterReopening": true,
+  "previousRound": {
+    "existed": true,
+    "unchanged": true
+  },
+  "attacksStarted": 0,
+  "setupRestoredInitialVillage": true,
+  "verification": {
+    "localTests": {
+      "tests": 1836,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 193
+    },
+    "commands": [
+      "./gradlew testFDroidDebugUnitTest assembleFDroidDebug",
+      ":core:script:android:assembleFDroidDebugAndroidTest",
+      ":feature:script-config:testFDroidDebugUnitTest"
+    ],
+    "nativeTests": {
+      "passed": 2,
+      "class": "NativeScriptResourcesIntegrationTest",
+      "methods": [
+        "freeTextApiReadsRealAccountRowsTagsAndCapacityAndRejectsOldFrames",
+        "darkElixirBalanceIsReadFromTheCurrentSamsungResourceBar"
+      ]
+    },
+    "visual": [
+      "Tela inicial em paisagem: ação de configuração separada do início.",
+      "Duas vilas e tags visíveis no formulário; muros desativados.",
+      "Formulário em retrato conserva seleção após rotação.",
+      "As configurações de orientação do aparelho foram restauradas."
+    ],
+    "offerRegression": {
+      "goldBalance": 38000000,
+      "goldCapacity": 25000000,
+      "expectedFull": true,
+      "capacityUnchanged": true
+    }
+  },
+  "apiInvestigation": {
+    "poc": "/home/marlonpassos/projects/clash_bases/scripts/poc-defense/",
+    "officialApiProbeStatus": 403,
+    "villageExportInspected": true,
+    "exportContainsResourceBalancesOrCapacities": false,
+    "networkIntegrationAdded": false
+  },
+  "limits": [
+    "A configuração inicial deste registro não incluiu ataques; a rodada posterior está em farm-round-v3-sm-s916b.json.",
+    "Cadastro específico do perfil Samsung em português; reconfigurar após ampliar depósitos ou alterar contas.",
+    "O progresso V2 foi preservado; iniciar V3 exige Nova rodada."
+  ],
+  "artifacts": {
+    "build/script-examples/farm-v3.zip": {
+      "bytes": 322595,
+      "sha256": "724fbabf4e25e64676a60399579225fdff5a9e886311799139e406242423575b"
+    },
+    "build/script-examples/farm-v3-muros16.zip": {
+      "bytes": 315246,
+      "sha256": "15e056319036a4332dead0ff8a52b9bed98f78759a3f25fc80686525e7b7ec37"
+    },
+    "smartautoclicker/build/outputs/apk/fDroid/debug/smartautoclicker-fDroid-arm64-v8a-debug.apk": {
+      "bytes": 36492088,
+      "sha256": "86eb2c4a05ffe44d1dfe08a565e4ca86d498f54e1b09dc780db759f66bbde8b8"
+    }
+  },
+  "followUpFarmValidation": "farm-round-v3-sm-s916b.json"
+}

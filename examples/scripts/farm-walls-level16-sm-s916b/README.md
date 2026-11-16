@@ -13,3 +13,17 @@ O painel estreito corrigido foi conferido em `(0,245)` durante a inspeção de m
 A [repetição com o painel estreito corrigido](../../../docs/benchmarks/script-mode/single-battle-narrow-controls-sm-s916b-api36.json), em `(0,245)`, concluiu busca, lançamento, retirada, resultado e retorno confirmado à vila sem intervenção durante a batalha. A sessão parou no limite de uma batalha, com melhorias desativadas. Essa execução valida a posição no ataque; o percurso completo com muros e o ganho físico de latência continuam pendentes.
 
 A validação posterior concluiu duas batalhas e três melhorias na mesma sessão, sem intervenção, com melhoria por saldo disponível, painel em `(0,245)`, reservas de 13 milhões de ouro e 19 milhões de elixir e lotes de até dois muros. Ao não encontrar muro nos quatro setores, a rotina volta ao farm sem pagar; o ciclo reavalia as melhorias após os ataques e preserva as reservas. O teste parou no limite de duas batalhas. As evidências e limitações estão em [validação do ciclo](../../../docs/benchmarks/script-mode/farm-wall-cycle-sm-s916b-api36.json). Execução indefinida e desempenho continuam sem aceite final.
+
+## Configurar vilas e farmar
+
+Use **Configurar vilas** antes do primeiro farm. Essa ação visita as contas conectadas, confirma suas tags, lê as capacidades de ouro, elixir e elixir negro e retorna à vila inicial. Não inicia ataques. O cadastro fica privado no aparelho e só é substituído depois que toda a configuração termina; uma falha preserva o anterior.
+
+Em **Iniciar**, selecione as vilas salvas e a condição para concluir cada uma: ouro cheio, elixir cheio, elixir negro cheio, qualquer depósito cheio, todos cheios ou ambos os depósitos de ouro/elixir cheios. **Nunca** desativa a conclusão por recursos; em várias vilas, exige limite positivo de batalhas. O mesmo limite vale para cada vila. Selecionar mais de uma desmarca e bloqueia **Melhorar muros**. As opções de muros só aparecem quando essa melhoria está ligada.
+
+Não há capacidades nem quantidades de recursos para digitar. O farm usa a capacidade salva de cada conta e lê os saldos atuais na tela. Saldo igual ou superior à capacidade conta como depósito cheio, inclusive quando uma oferta permite ultrapassar o limite. Para muros, o gatilho de qualquer depósito considera apenas ouro e elixir. Após ampliar depósitos, adicionar contas ou mudar a calibração, execute **Configurar vilas** novamente. Uma nova rodada reutiliza o cadastro; não visita todas as contas para descobri-las outra vez.
+
+A rodada começa na vila aberta, se ela estiver selecionada, e segue pelas demais selecionadas. Nomes localizam itens do seletor; a tag completa confirma a identidade, inclusive com nomes parecidos. Contas removidas, desconectadas ou ambíguas interrompem o fluxo. A linha de login não é selecionada. Depois de concluir todas as vilas selecionadas, a execução encerra.
+
+`configuration.js` coordena o cadastro; `villages.js` concentra descoberta, troca e capacidades; `round.js` mantém a fila e o checkpoint. A contagem avança após confirmar o retorno da batalha. **Continuar rodada** mantém parâmetros, capacidades da rodada e contagem; **Nova rodada** substitui apenas o progresso, preservando o cadastro. Uma batalha interrompida e de resultado incerto exige resolução explícita, sem repetição automática.
+
+O perfil continua específico ao Samsung, português e 2340×1080. Mudanças no seletor, tags, avisos ou regiões exigem recalibração. Os testes determinísticos não substituem a validação no jogo.

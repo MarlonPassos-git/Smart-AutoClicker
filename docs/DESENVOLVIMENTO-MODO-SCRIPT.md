@@ -183,7 +183,7 @@ Os três relatórios dessa fase incluem `sourceSnapshots` dos fontes listados, c
 
 ### Diagnóstico e configuração de threads da produção
 
-O painel detalhado habilita tempos, resultados e metadados limitados das operações. Fechar ou ocultar o painel desativa a coleta detalhada; a etapa/mensagem principal usa o último evento do script. A interface atualiza o histórico aberto até cinco vezes por segundo e usa RecyclerView para formatar apenas as linhas visíveis. Um teste de integração também cobre a expansão da janela: o texto precisa ficar visível dentro do overlay ao abrir o painel.
+O serviço registra tempos, resultados e metadados limitados das operações no histórico persistente, inclusive com o painel fechado; o painel detalhado permite consultá-los. No uso isolado de `PackageScriptExecution`, sem o serviço, a coleta de operações continua opcional; a etapa/mensagem principal usa o último evento do script. A interface atualiza o histórico aberto até cinco vezes por segundo e usa RecyclerView para formatar apenas as linhas visíveis. Um teste de integração também cobre a expansão da janela: o texto precisa ficar visível dentro do overlay ao abrir o painel.
 
 Editor e painel usam a localização fornecida por `ScriptExecutionException`. O painel apresenta também `scriptStack` e a cadeia de causas Kotlin. O teste de sintaxe do editor executa o QuickJS real com JNI de JVM; a substituição do artefato fica restrita às configurações de teste local, assim como nos módulos do núcleo. Os APKs usam o artefato Android.
 
@@ -335,4 +335,126 @@ Selecionar um PNG nos detalhes mostra a imagem e suas dimensões originais. A de
 
 ## Extensões futuras
 
-Após validar estabilidade e ganho de latência: perfil de consumo, biblioteca reutilizável de rotinas, ferramentas de autoria/diagnóstico mais completas e novas operações versionadas. Checkpoints persistentes, depurador por instrução, marketplace e sincronização em nuvem ficam fora da API 1 atual. O foco desta entrega é latência; otimização de bateria permanece uma etapa posterior.
+Após validar estabilidade e ganho de latência: perfil de consumo, biblioteca reutilizável de rotinas, ferramentas de autoria/diagnóstico mais completas e novas operações versionadas. Depurador por instrução, marketplace e sincronização em nuvem ficam fora da API 1 atual. O checkpoint privado e limitado descrito abaixo foi acrescentado para rodadas recuperáveis. O foco desta entrega é latência; otimização de bateria permanece uma etapa posterior.
+
+## Rodadas multivilas e pausa real
+
+A versão 2 dos exemplos de farm mantém as regras do jogo em JavaScript: `round.js` coordena uma fila finita; `villages.js` descobre itens, confirma tags e troca contas. A descoberta visita também ocorrências sobrepostas da lista antes de deduplicar por identidade confirmada. Nomes que apontem para tags diferentes ou tags associadas a nomes divergentes são tratados como ambiguidade.
+
+`ScriptParameterRule` implementa condições booleanas `when`, exclusão `forceFalse` e exigência `requireAny`, sem introduzir um interpretador de JSON Schema. O formulário normaliza exclusões; `ScriptManifest.answers()` valida o conjunto antes de qualquer execução.
+
+`ScriptExecutionStateRepository` guarda um único envelope de formato 1 por identificador do pacote, fora das revisões imutáveis. O envelope contém revisão, respostas, estado do script, conclusão e datas. A gravação usa arquivo temporário, fsync e rename; um file lock impede dois donos. Leitura inválida não apaga o registro. Continuar exige a mesma revisão e respostas; a escolha explícita de Nova rodada permite substituir o estado. Reimportação ou calibração não migra progresso.
+
+A tentativa é gravada antes da batalha e a confirmação, depois do retorno observado. O script preserva uma tentativa incerta e solicita resolução por `recovery.choices`, consumindo `recovery.answer` antes de continuar. Isso evita repetição automática de ataques incertos, mas não cria uma transação com o jogo nem promete execução exatamente uma vez.
+
+A leitura livre passa por `ScreenAutomationHost.readText`, `AndroidScreenAutomationBackend` e o reconhecedor nativo existente. Regiões e quantidades são limitadas; resultados carregam a observação. As tags exigem leitura completa, confiança mínima de 95% e duas observações concordantes. O seletor usa nomes apenas para localizar itens; a tag é conferida antes de atacar. A autorização do ataque também fica vinculada à geração de retomada: uma pausa entre a conferência da conta e a entrada na batalha interrompe essa tentativa antes de novos gestos e exige reconciliação do registro.
+
+Na calibração do Samsung, o OCR devolveu `CoNfiguRaces` para a aba Configurações e `TROCARDEID` sem espaços. Essas variantes foram delimitadas aos respectivos títulos; não alteram a leitura das tags. O teste nativo inclui o recorte real do título do seletor. O botão Batalha pode permanecer visível atrás do perfil: a confirmação da vila exclui os títulos do perfil e do seletor, e a troca exige uma segunda observação da vila carregada. Fechar o seletor primeiro devolve às configurações; o script confirma essa transição antes de fechar o perfil.
+
+O recorte real da capacidade revelou `Mäx.231.000.000` para uma tela de 31 milhões: o texto do aviso se sobrepõe ao saldo do fundo. O script confirma o rótulo separadamente e lê apenas os dígitos numa região calibrada, como texto inteiro, aceitando pontos, vírgulas, espaços, dois-pontos e hífens internos reconhecidos como separadores de milhares, com confiança mínima de 85%, maioria estrita de ao menos dois recortes válidos entre seis variações calibradas dos dígitos e duas observações concordantes em até dez segundos. O perfil aceita no máximo oito dígitos e exige recalibração se a leitura exceder esse campo. O teste nativo exige 31.000.000, 30.500.000 e 25.000.000 nos respectivos recortes reais; leitura inválida não vira zero.
+
+`ProcessingPause` conserva o processador Smart e fornece um relógio ativo a temporizadores, cooldowns e esperas. Pontos cooperativos suspendem novas ações e liberam ponteiros. Ao retomar uma sequência de evento visual, o processador troca o frame retido e confere novamente as condições antes do próximo efeito. Parar continua cancelando o trabalho e liberando recursos. O modo Script também subdivide `sleep()` em pontos cooperativos sem perder sua continuação.
+
+Na preparação do serviço, o aplicativo aguarda até 30 segundos pela proporção calibrada antes de criar a captura. Isso permite sair da biblioteca em retrato para um alvo em paisagem sem usar um perfil incompatível. Mudanças de orientação após o início continuam interrompendo o modo Script.
+
+O [registro de validação](benchmarks/script-mode/multivillage-v2-validation.json) separa os testes JVM, a instrumentação com recortes no emulador e as observações do Samsung. A [pausa durante batalha](assets/script-mode/multivilas-pausa-sm-s916b.png) e o [diálogo de continuação](assets/script-mode/multivilas-continuacao-sm-s916b.png) foram capturados no aparelho. A primeira vila foi concluída com um ataque; a parada durante a troca e a continuação preservaram essa conclusão. O resultado completo da rodada e as limitações restantes estão no registro; os adaptadores de teste não substituem essa evidência.
+
+## Cadastro de vilas na versão 3
+
+A entrada opcional `setup` usa o mesmo runtime, controle de captura e exclusão de recursos da execução normal. `PackageScriptExecution` executa a entrada declarada sem ler ou alterar o checkpoint existente; uma configuração não pode chamar `saveState`, e um farm não pode chamar `saveConfiguration`. A posse exclusiva do mesmo identificador cobre ambos os fluxos. O cadastro é um JSON separado em `execution-state/configuration/<id>.json`, limitado a 256 KiB, com fsync e rename. Ele não é incluído no ZIP nem nas respostas recentes.
+
+A UI conhece apenas itens genéricos com `id`/`label`. `ScriptManifest.validateSelections` rejeita listas vazias ou IDs ausentes antes de iniciar. A regra `when` aceita `minItems` de 1 a 64 em parâmetros `selection`; `forceFalse` desmarca muros quando há duas ou mais vilas. `visibleWhen` depende de parâmetros booleanos declarados. O script preserva a interpretação do jogo e valida o perfil, as tags, a unicidade e as capacidades dos três recursos.
+
+`configuration.js` só publica o cadastro depois que `discoverVillages` termina as leituras e restaura a conta inicial. A fila do farm copia as vilas selecionadas e suas capacidades; uma retomada mantém essa fotografia. A descoberta não faz parte de uma nova rodada. O gatilho de qualquer recurso inclui elixir negro; o gatilho de muros considera ouro e elixir.
+
+Foi inspecionado no Samsung o JSON copiado em Configurações → Mais configurações → Exportação de dados. A amostra trouxe tag, timestamp, níveis das construções e unidades e temporizadores, sem saldos nem capacidades de recursos, inclusive nos objetos internos. Essa exportação pode complementar o cadastro, mas não está integrada ao runtime. A POC local do Clash Bases usa uma credencial de desenvolvedor no servidor; a consulta realizada nesta revisão recebeu HTTP 403. Nenhuma credencial foi copiada para o aplicativo e nenhuma integração de rede foi adicionada sem dados confirmados para o farm.
+
+Na configuração V3, a leitura isolada do rótulo também foi calibrada com recursos comprados acima da capacidade: o recorte real retornou `Max$` com confiança de 61,8%, embora o número 25.000.000 tivesse mais de 92%. Quando a leitura ampla não confirma o rótulo, o script tenta três recortes dele; uma leitura com pelo menos 85% basta, ou são exigidos dois recortes com pelo menos 60%. Os números mantêm confiança mínima de 85%, maioria entre recortes e confirmação em duas observações. O prazo por recurso é de dez segundos. As novas amostras e os hashes estão em `core/smart/detection/src/androidTest/assets/multivillage/setup-capacities.provenance.json`.
+
+A regra de depósito cheio usa `saldo >= capacidade`, incluindo recursos recebidos por ofertas. O teste de regressão usa 38 milhões de ouro para capacidade de 25 milhões e confirma que o saldo excedente não altera o cadastro. Elixir negro acima da capacidade também é coberto.
+
+O [registro da configuração V3](benchmarks/script-mode/village-setup-v3-sm-s916b.json) reúne o build, os 1.836 testes locais, os dois testes nativos e a configuração completa no Samsung, sem ataques. As duas contas foram visitadas, as seis capacidades foram salvas e a vila inicial foi restaurada. O checkpoint anterior permaneceu idêntico ao backup. A reabertura em outra revisão carregou o mesmo cadastro. Foram conferidos a [conclusão](assets/script-mode/vilas-v3-configuracao-concluida-sm-s916b.png), a [seleção das contas](assets/script-mode/vilas-v3-selecao-sm-s916b.png) e o [formulário em retrato](assets/script-mode/vilas-v3-selecao-retrato-sm-s916b.png). A rodada posterior com ataques reais está documentada abaixo.
+
+### Rodada V3 com ataques e troca de conta
+
+O [teste no Samsung](benchmarks/script-mode/farm-round-v3-sm-s916b.json) concluiu uma batalha em cada uma das duas vilas cadastradas, com muros desativados, meta de 50% de destruição e limite de uma batalha por vila. A parada por recursos ficou em **Nunca** para exercitar ataques mesmo com os depósitos acima da capacidade por ofertas. Após cada retorno à vila, o checkpoint registrou um ataque confirmado. A troca para a segunda conta, sua identificação e o encerramento final ocorreram sem intervenção depois de iniciar a continuação; nenhuma vila foi repetida e nenhuma melhoria de muro foi feita.
+
+A tentativa inicial parou antes de atacar porque o Clash permaneceu no carregamento por mais de 45 segundos. O jogo foi reiniciado e o aviso de boas-vindas foi fechado antes de continuar a mesma rodada. O teste posterior durou cerca de 172 segundos. As capturas mostram o [primeiro ataque](assets/script-mode/farm-v3-vila1-ataque-sm-s916b.png), o [segundo ataque](assets/script-mode/farm-v3-vila2-ataque-sm-s916b.png) e a [rodada concluída](assets/script-mode/farm-v3-concluido-sm-s916b.png). O cadastro de vilas permaneceu inalterado. Esse teste finito não mede confiabilidade de execução contínua nem substitui a validação das condições por recursos.
+
+
+### Histórico persistente e abertura do aplicativo alvo
+
+`targetPackage` é opcional no manifesto. A biblioteca resolve a revisão que recebeu a autorização de captura e abre o launcher declarado enquanto a Activity está visível (`RESUMED`). O serviço continua responsável pela captura e aguarda a orientação calibrada. A declaração `<queries>` cobre atividades launcher, sem a permissão `QUERY_ALL_PACKAGES`. Uma falha de abertura ou consentimento negado gera um registro de tentativa, sem executar o script.
+
+`ScriptRunLogRepository` grava em `files/scripts/execution-logs/<UUID>/`. O resumo durável começa antes da captura; cada evento vai por uma fila limitada de 512 itens para uma coroutine de I/O. Falha na escrita cancela a execução e fica visível como erro. Cada sessão conserva dois segmentos de até 512 KiB e o último checkpoint de até 256 KiB; a retenção padrão é de 20 sessões. Resumos e checkpoints usam arquivo temporário, `fsync` e substituição por rename. A cópia do checkpoint antecede o retorno de `saveState`, preservando a relação entre uma tentativa registrada e o próximo gesto. A exportação remove apenas o campo `answers` do envelope; o conteúdo de `state` continua definido pelo script.
+
+Ao iniciar outra sessão ou exportar, `ScriptRunLogs` reconcilia registros `RUNNING` pertencentes a outro processo. A evidência de `ApplicationExitInfo`, disponível a partir da API 30 e limitada pela retenção do sistema, pode identificar crash Java, nativo, ANR ou outra causa. Ausência de um registro terminal só produz `INTERRUPTED`; não comprova crash nem permite inventar o resultado de um ataque. Não há monitoramento contínuo de travamentos sem término do processo. Logs são locais e só saem do aparelho pela exportação solicitada pelo usuário.
+
+O timeout de aquisição de bitmap é uma falha de captura explícita; cancelamento externo continua sendo cancelamento. Os testes de integração cobrem esse resultado, encerramento por rotação, operações com o painel fechado, cópia de checkpoint, rotação/retenção dos arquivos, recuperação de processo e exportação.
+
+### Farm 3.1 na interface do CV19
+
+O [registro no Samsung com Clash 19.32.4](benchmarks/script-mode/farm-cv19-sm-s916b.json) documenta a falha na identificação do adversário: o texto **Próxima** começa em `y=759`, enquanto a região anterior começava em `y=760` e tinha exatamente as dimensões do template. A região ganhou margem de 16 pixels sem relaxar o limiar de reconhecimento. A regressão nativa falhou com o perfil anterior e passou com o recorte real deslocado também em oito pixels.
+
+`rewards.js` trata o bônus de estrelas antes de liberar ações na vila. Reconhece o título e **Resgatar**, exige o indicador de uma tentativa disponível antes de cada toque no baú, confirma **Continuar** e verifica o retorno à vila. As ações usam o frame observado e a guarda de retomada. Há limites de 45 segundos, três tentativas de resgate/confirmação e 12 tentativas de toque no baú; uma falha impede o próximo ataque. A sequência observada teve quatro toques, mas o fluxo depende dos estados reconhecidos. Um início com baú aberto ou com a recompensa de depósito temporário revelada também é tratado. Nenhum item recebido é ativado pelo script.
+
+`confirmVillage` centraliza essa recuperação, os avisos de entrega já conhecidos e a confirmação da vila fora das configurações/seletor. O farm usa essa mesma confirmação antes de ler saldos e ao retornar da batalha, preservando a fila e o cadastro existentes. As imagens novas são recortes sem retoque com hashes em `provenance.json`; as amostras nativas ficam em `core/script/android/src/androidTest/assets/farm_cv19/`.
+
+Foram concluídos dois ataques finitos sem intervenção durante o combate, com muros desativados e meta de 50%. O segundo começou com a recompensa do baú revelada e confirmou **Continuar** automaticamente antes de atacar. O resgate inicial e os quatro toques desse baú foram observados manualmente para calibração; a sequência completa automática está coberta por testes determinísticos e pelo reconhecimento nativo dos recortes, mas ainda aguarda outro bônus disponível para validação física integral. Naquela coleta inicial, a troca entre vilas e os muros ainda não tinham sido revalidados no CV19.
+
+### Configuração de vilas no CV19, versão 3.1.1
+
+A validação da configuração encontrou duas falhas adicionais. Na aba ainda não selecionada, o OCR do Samsung devolveu `CoNfiguRacoes` com 84,927139% de confiança: o reconhecimento do título funcionava, mas a navegação descartava o bloco por exigir 85%. A leitura livre usa agora 80% somente nessa aba; a tag continua exigindo 95% e duas observações concordantes.
+
+O quadro de recursos do CV19 deslocou o rótulo **Máx.** para a esquerda e mudou o campo numérico. `readCapacity` tenta um par de recortes do CV19 e, quando não o confirma, o par anterior. Cada alternativa precisa confirmar seu próprio rótulo e seu próprio número; produção por hora e tesouro não fornecem a capacidade. Permanecem a maioria dos recortes, o limite de oito dígitos e a confirmação em duas observações.
+
+O [registro de sincronização e farm](benchmarks/script-mode/farm-sync-cv19-sm-s916b.json) reúne as falhas reproduzidas, as regressões e os resultados no aparelho. Duas configurações completas terminaram sem intervenção, salvaram as mesmas seis capacidades e restauraram a conta inicial. A capacidade de elixir de MarlonPassoz passou de 30.500.000 no cadastro antigo para os 31.000.000 observados no jogo. O checkpoint anterior permaneceu idêntico nas duas configurações.
+
+
+### Feitiços sem referência de retrato, versão 3.2.4
+
+O reconhecimento anterior perdia o card depois da seleção e abandonava a etapa com feitiços restantes. `spells.js` lê os contadores à direita do último herói observado, em janelas estreitas no cabeçalho da barra. Isso preserva os `x1` que o OCR perdia ao incluir a arte dos frascos. A regressão nativa usa uma barra com tipos distintos e um card selecionado; não consulta a imagem do feitiço.
+
+O lançamento usa no máximo duas unidades por observação, respeita quantidades ímpares e verifica a redução antes de continuar. Um cabeçalho conhecido que desaparece recebe leituras centradas no próprio slot em larguras alternativas, pois a borda selecionada muda a segmentação do OCR. Slots já observados são acompanhados até o zero; há referências contendo somente os glifos `x11`, `x1` e do `x0` cinza, pois o OCR pode omiti-lo. Ausência de texto não confirma consumo. Três leituras ausentes ou três tentativas sem redução encerram com motivo explícito; há limite de 600 tentativas. A ordem é tropas, feitiços e heróis, preservando a prioridade de resultado, retirada e meta de batalha em cada bloco.
+
+Os contadores independem de tipo e nível. As posições de lançamento continuam sendo as do perfil: feitiços que dependem de um alvo específico precisam de uma estratégia de alvo compatível. A validação de tipos diferentes não comprova todos os alvos possíveis do jogo. O pacote de nível 16 permanece na implementação anterior.
+
+
+A rodada final da versão 3.2.4 terminou com três ataques por vila e troca automática, sem intervenção durante os seis ataques. Na MarlonPassoz, cada ataque consumiu os 11 Terremotos; na MarlonFull, cada um consumiu três Fúrias e cinco Gelos. Os seis ataques confirmaram os contadores em zero antes de lançar os heróis: 57 lançamentos no total. A formação original “farm” da MarlonFull foi restaurada ao final, sem editar as formações salvas; o cadastro de vilas permaneceu idêntico. O [registro de sincronização e farm](benchmarks/script-mode/farm-sync-cv19-sm-s916b.json) inclui horários, sequências de contadores, revisões, falhas intermediárias e limites da validação. Passaram os 1.856 testes locais, os 24 testes nativos e o build FDroid debug.
+
+
+### Correção de falsos contadores e conferências repetidas, versão 3.2.5
+
+Uma execução posterior à rodada de validação da 3.2.4 aceitou um número `5` do campo como outro card. A leitura de feitiços passa a exigir o prefixo `x`, `X` ou `×`; números soltos continuam disponíveis no parser genérico, mas não autorizam um card. A confirmação visual de `x11` passa a ocorrer durante o lançamento, incluindo a posição observada, e a seleção toca dentro do card para evitar que um cabeçalho recortado aponte para sua borda. A regressão de campo falhou antes da correção; outra cobre o cabeçalho cortado.
+
+A identidade continua sendo conferida antes do primeiro ataque da vila. Ataques consecutivos reaproveitam essa autorização enquanto `resumeGeneration` permanecer igual; pausa/retomada, troca e reinício exigem nova conferência. A entrada na batalha mantém a guarda da geração. A conferência duplicada de uma vila já identificada também foi removida. O [registro da correção](benchmarks/script-mode/farm-cv19-spell-counter-3.2.5.json) separa o erro reportado, os testes e a pendência de leitura do saldo de elixir negro.
+
+
+A 3.2.5 concluiu nova rodada de três ataques por vila com 11 tentativas de lançamento em cada ataque. Cinco ataques confirmaram zero; um atingiu a meta logo após o último lançamento e encerrou antes dessa conferência. Não houve abertura do perfil nos quatro intervalos entre ataques consecutivos da mesma vila. A 3.2.6 reduz a altura do recorte do saldo de elixir negro: a região anterior rejeitava `276010`, enquanto o novo recorte reconhece o valor com 99,34% sem baixar o limiar. A regressão usa o recorte real e mantém a falha antes da correção. Passaram 1.859 testes locais e 25 testes nativos, além do build FDroid debug.
+
+O teste físico final da 3.2.6 terminou com **qualquer depósito cheio** ativado e limite de uma batalha na MarlonFull. Leu `303462` de elixir negro antes do ataque, consumiu os 11 feitiços, confirmou zero e retornou à vila, concluindo o limite de uma batalha.
+
+
+### Saldos com concordância entre recortes, versão 3.3
+
+A 3.2.6 completou seis ataques da execução do usuário, mas o novo saldo `337221` voltou a falhar no recorte único. Os logs distinguiam a vila reconhecida e os saldos válidos de ouro/elixir, enquanto o erro exibido juntava todos os casos como falta de confirmação da vila. O [registro da 3.3](benchmarks/script-mode/farm-cv19-balances-3.3.0.json) documenta essa regressão.
+
+`readResourceBalance` exige concordância em pelo menos dois recortes distintos de um mesmo frame. Primeiro verifica a leitura principal e uma alternativa; quando não concordam, completa dezesseis recortes, aceita apenas uma contagem com maior frequência e pelo menos duas concordâncias e rejeita empates. Não reutiliza saldo anterior nem transforma leitura ausente em zero. A vila é reconhecida separadamente, e uma falha informa quais recursos ficaram ilegíveis. O limite de ataques já confirmado encerra uma vila sem nova leitura quando os muros estão desligados; o fluxo de muros mantém sua prioridade anterior.
+
+As regressões nativas incluem os dois saldos que falharam (`276010` e `337221`) e os três recursos da barra real depois do sexto ataque. Os testes locais cobrem empate, leitura única, valores inválidos, zero válido e a conclusão de um limite sem capturar a tela novamente.
+
+
+### Leitura direta de linhas numéricas como recuperação, versão 3.4.1
+
+A rodada prolongada da 3.3 encontrou outro saldo ilegível (`368812`). O motor passa a oferecer `WHITE_INTEGER_LINE`, um formato optativo para linhas calibradas de inteiros brancos. Ele localiza os glifos claros dentro da área, reconhece a linha diretamente e trata separadores de grupos de milhares que o modelo pode devolver como hífen. Sinais negativos, frações e percentuais não fazem parte desse formato. Os formatos anteriores mantêm o comportamento original.
+
+O farm preserva o método normal e seus recortes concordantes. Quando ele não obtém concordância, tenta a linha direta em recortes distintos, com a mesma exigência de ao menos duas leituras concordantes. A 3.4.0 tentou usar apenas a linha direta nos recortes alternativos e falhou no ouro `19861435`; a 3.4.1 combina os métodos e inclui a barra completa desse caso na regressão. O [registro da correção](benchmarks/script-mode/farm-cv19-balances-3.4.1.json) preserva as falhas intermediárias e os resultados da validação física. O APK precisa ser atualizado junto com o pacote para disponibilizar o novo formato.
+
+
+### Busca de oponentes no CV19, versão 3.4.2
+
+A 3.4.1 confirmou cinco ataques na MarlonFull, concluiu a vila por depósito cheio e confirmou mais três na MarlonPassoz, sem falhas de saldo. O método de linha direta recuperou `299292` com 16 recortes concordantes. A rodada parou depois porque a busca de oponentes ultrapassou 60 segundos; o adversário apareceu após a interrupção. Esse ataque pendente terminou sem tropas lançadas e não faz parte dos oito ataques confirmados.
+
+A 3.4.2 amplia a espera para três minutos, sem gestos durante as nuvens e mantendo a confirmação visual antes de lançar tropas. Dois testes cobrem uma busca de 70 segundos e a interrupção sem tropas quando o novo prazo expira. Os 1.863 testes locais e o build FDroid debug passaram. O [registro da 3.4.2](benchmarks/script-mode/farm-cv19-balances-3.4.2.json) contém a rodada física posterior e seus resultados.
+
+A rodada física da 3.4.2 concluiu oito ataques consecutivos na MarlonPassoz, com 88 lançamentos e oito confirmações de contador de feitiço zerado. Em seguida trocou para MarlonFull e concluiu a conta por depósito cheio, sem atacá-la. Restaurado o limite zero, outra execução concluiu mais três ataques na MarlonPassoz e encerrou ambas as vilas pela condição de depósitos cheios. As duas execuções terminaram como `COMPLETED`, sem falhas de saldos ou de busca. O limite zero permaneceu salvo, com ambas as vilas selecionadas e muros desativados.

@@ -1,0 +1,28 @@
+{
+  "formatVersion": 1,
+  "revision": "390d731f-692e-4434-96a3-a8b6cc6ed95f",
+  "answers": {},
+  "state": {
+    "checked": [
+      {
+        "id": "#GCY20PCPL",
+        "name": "MarlonFull",
+        "capacities": {
+          "goldCapacity": 25000000,
+          "elixirCapacity": 25000000
+        }
+      },
+      {
+        "id": "#82GRC2U8U",
+        "name": "MarlonPassoz",
+        "capacities": {
+          "goldCapacity": 31000000,
+          "elixirCapacity": 30500000
+        }
+      }
+    ]
+  },
+  "completed": true,
+  "createdAt": "2026-11-14T17:40:16.855396Z",
+  "updatedAt": "2026-11-14T17:40:51.727631Z"
+}

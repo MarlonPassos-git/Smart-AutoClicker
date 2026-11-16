@@ -1,0 +1,132 @@
+{
+  "date": "2026-11-16",
+  "scriptVersion": "3.2.5",
+  "reportedFailure": {
+    "runId": "65d0c4ba-d0eb-4f97-a834-8e2740fdb1f9",
+    "scriptVersion": "3.2.4",
+    "reason": "Quantidade de feitiço ilegível em três observações; não foi considerada zero.",
+    "phantomCard": {
+      "quantity": 5,
+      "xRatio": 0.5495726495726496
+    },
+    "correction": "Leitura de card exige prefixo x, X ou ×. Glifo x11 é conferido durante o lançamento e o toque seleciona o interior do card, afastado da borda superior."
+  },
+  "navigationChange": "Ataques consecutivos conservam a identidade confirmada na mesma geração de execução. Pausa/retomada, troca e reinício exigem nova confirmação; removida conferência duplicada quando a vila já era a esperada.",
+  "checks": {
+    "unitTests": 1859,
+    "unitFailures": 0,
+    "nativeTests": 24,
+    "nativeFailures": 0,
+    "build": "testFDroidDebugUnitTest assembleFDroidDebug"
+  },
+  "live": {
+    "processInstance": "168837e0-238c-4ef1-96e2-52d12dfd0120",
+    "pid": 22690,
+    "appPackage": "com.buzbuz.smartautoclicker.debug",
+    "device": "samsung SM-S916B",
+    "androidSdk": 36,
+    "appVersion": "4.0.0-beta05",
+    "revision": "89d16012-c099-4e4f-bd94-580230bfd7b5",
+    "packageId": "farm-walls-sm-s916b",
+    "scriptVersion": "3.2.5",
+    "entry": "entry.js",
+    "setup": false,
+    "newRound": true,
+    "targetPackage": "com.supercell.clashofclans",
+    "formatVersion": 1,
+    "runId": "f4968f79-7614-47c2-ae43-9095d7641066",
+    "status": "COMPLETED",
+    "startedAt": "2026-11-16T18:24:38.507573Z",
+    "startedAtMillis": 1794853478507,
+    "endedAt": "2026-11-16T18:29:56.736200Z",
+    "droppedEvents": 0,
+    "attacksPerVillage": {
+      "#GCY20PCPL": 3,
+      "#82GRC2U8U": 3
+    },
+    "spellCastAttempts": [
+      11,
+      11,
+      11,
+      11,
+      11,
+      11
+    ],
+    "spellZeroConfirmations": 5,
+    "note": "Uma batalha atingiu a meta após o último lançamento e saiu antes da conferência final de zero.",
+    "profileOpensBetweenConsecutiveAttacks": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "stopFarm": "nunca",
+    "maxBattles": 3
+  },
+  "remainingIssue": {
+    "runId": "d595dd89-e39c-440d-a57d-8c2636dd21e1",
+    "condition": "qualquer depósito cheio",
+    "failure": "Saldo de elixir negro ilegível; bloqueou a entrada na batalha.",
+    "testCondition": "nunca, com limite de três batalhas por vila",
+    "status": "Resolvido; teste físico concluído com a condição ativada."
+  },
+  "package": {
+    "path": "build/script-examples/farm-walls-sm-s916b-3.2.5-cv19-fixed.zip",
+    "sha256": "e1dff4183d27cb0b9c17a7cf880b95c44c9cf3f6a04a2f88a4a7916699e05822"
+  },
+  "resourceBalanceCorrection": {
+    "scriptVersion": "3.2.6",
+    "change": "Região darkBalance de y=175..235 para y=180..230, preservando a largura e o limiar de 80%.",
+    "regressionValue": 276010,
+    "nativeConfidencePercent": 99.3408203125,
+    "unitTests": 1859,
+    "nativeTests": 25,
+    "liveRunId": "55562067-2419-4c06-8a07-df9a3532c5c5",
+    "live": {
+      "processInstance": "168837e0-238c-4ef1-96e2-52d12dfd0120",
+      "pid": 22690,
+      "appPackage": "com.buzbuz.smartautoclicker.debug",
+      "device": "samsung SM-S916B",
+      "androidSdk": 36,
+      "appVersion": "4.0.0-beta05",
+      "revision": "73379490-32bc-463f-90cb-31bd83a112cf",
+      "packageId": "farm-walls-sm-s916b",
+      "scriptVersion": "3.2.6",
+      "entry": "entry.js",
+      "setup": false,
+      "newRound": false,
+      "targetPackage": "com.supercell.clashofclans",
+      "formatVersion": 1,
+      "runId": "55562067-2419-4c06-8a07-df9a3532c5c5",
+      "status": "COMPLETED",
+      "startedAt": "2026-11-16T18:37:05.754183Z",
+      "startedAtMillis": 1794854225754,
+      "endedAt": "2026-11-16T18:38:25.923185Z",
+      "droppedEvents": 0,
+      "parameters": {
+        "villages": [
+          "#GCY20PCPL"
+        ],
+        "finishMode": "destruição",
+        "targetDestruction": 50.0,
+        "improveWalls": false,
+        "wallTrigger": "qualquer depósito de ouro ou elixir cheio",
+        "stopFarm": "qualquer depósito cheio",
+        "goldReserve": 0.0,
+        "elixirReserve": 0.0,
+        "resourcePriority": "ouro",
+        "maxWallBatch": 50.0,
+        "maxBattles": 1.0
+      },
+      "attacks": 1,
+      "spellCasts": 11,
+      "finalSpellCounter": 0,
+      "observedDarkBalanceBeforeAttack": 303462
+    }
+  },
+  "latestPackage": {
+    "version": "3.2.6",
+    "path": "build/script-examples/farm-walls-sm-s916b-3.2.6-cv19.zip",
+    "sha256": "46d5c4872cabb2cc63994542dfaae57df2af748cd668beed9d9502fc2b75c4a6"
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "data": "2026-11-14",
+  "aparelho": "SM_S916B",
+  "pacote": "farm-walls-sm-s916b",
+  "nome": "Farm parametrizado V2 — destruição e muros",
+  "revisao": "f6561331-ca6e-4933-aaa3-c17cfa40395d",
+  "resultado": "importado e disponível no topo da tela inicial",
+  "configuracao_inicial": {
+    "multivillage": true,
+    "improveWalls": false,
+    "maxBattles": 1
+  },
+  "testes_jvm": {
+    "total": 1824,
+    "falhas": 0,
+    "erros": 0,
+    "ignorados": 0
+  },
+  "build_fdroid_debug": "aprovado",
+  "conferencias_no_aparelho": [
+    "Cartão no topo da home em retrato e paisagem.",
+    "Botão Iniciar abre o formulário do pacote exibido.",
+    "Multivilas ligado; melhorar muros desligado e bloqueado.",
+    "Cancelar conserva o pacote e retorna sem iniciar automação.",
+    "Biblioteca com um único pacote principal.",
+    "69 revisões de desenvolvimento arquivadas; três cenários originais preservados."
+  ],
+  "arquivo_de_testes_no_app": "files/scripts/validation-archive-20261114/packages",
+  "evidencias": [
+    "../../assets/script-mode/farm-v2-home-sm-s916b.png",
+    "../../assets/script-mode/farm-v2-inicio-sm-s916b.png",
+    "../../assets/script-mode/farm-v2-home-paisagem-sm-s916b.png"
+  ]
+}

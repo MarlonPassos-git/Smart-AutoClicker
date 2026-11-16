@@ -1,0 +1,147 @@
+{
+  "date": "2026-11-14",
+  "device": "SM-S916B",
+  "resolution": [
+    2340,
+    1080
+  ],
+  "revision": "aceef9c2-0781-4135-a120-6fac301c58c5",
+  "result": "Rodada concluída nas duas vilas, com farm e troca automáticos.",
+  "parameters": {
+    "villages": [
+      "#GCY20PCPL",
+      "#82GRC2U8U"
+    ],
+    "finishMode": "destruição",
+    "targetDestruction": 50.0,
+    "improveWalls": false,
+    "wallTrigger": "qualquer depósito de ouro ou elixir cheio",
+    "stopFarm": "nunca",
+    "goldReserve": 0.0,
+    "elixirReserve": 0.0,
+    "resourcePriority": "ouro",
+    "maxWallBatch": 50.0,
+    "maxBattles": 1.0
+  },
+  "startupAttempt": {
+    "outcome": "Interrompido antes de qualquer ataque.",
+    "reason": "Error: Vila utilizável não confirmada em 45 segundos; rodada preservada.\n    at confirmVillage (villages.js:155:20)\n",
+    "attacksConfirmed": 0,
+    "manualPreparation": "O Clash permaneceu no carregamento. O jogo foi reiniciado e o aviso de boas-vindas foi fechado antes de continuar a mesma rodada."
+  },
+  "continuedAttempt": {
+    "elapsedSecondsObserved": 172.0,
+    "manualInterventionsAfterStarting": 0,
+    "sequence": [
+      "Identificou MarlonFull pela tag #GCY20PCPL e iniciou um ataque.",
+      "Confirmou o retorno à vila, registrou 1/1 ataque e concluiu MarlonFull.",
+      "Trocou automaticamente para MarlonPassoz e confirmou a tag #82GRC2U8U.",
+      "Iniciou e concluiu um ataque em MarlonPassoz.",
+      "Confirmou o retorno, registrou 1/1 ataque e encerrou a rodada sem repetir a fila."
+    ],
+    "wallsImproved": 0,
+    "configurationUnchanged": true
+  },
+  "finalCheckpoint": {
+    "formatVersion": 1,
+    "revision": "aceef9c2-0781-4135-a120-6fac301c58c5",
+    "answers": {
+      "villages": [
+        "#GCY20PCPL",
+        "#82GRC2U8U"
+      ],
+      "finishMode": "destruição",
+      "targetDestruction": 50.0,
+      "improveWalls": false,
+      "wallTrigger": "qualquer depósito de ouro ou elixir cheio",
+      "stopFarm": "nunca",
+      "goldReserve": 0.0,
+      "elixirReserve": 0.0,
+      "resourcePriority": "ouro",
+      "maxWallBatch": 50.0,
+      "maxBattles": 1.0
+    },
+    "state": {
+      "version": 1,
+      "id": "1794684008745",
+      "options": {
+        "villages": [
+          "#GCY20PCPL",
+          "#82GRC2U8U"
+        ],
+        "finishMode": "destruição",
+        "targetDestruction": 50,
+        "improveWalls": false,
+        "wallTrigger": "qualquer depósito de ouro ou elixir cheio",
+        "stopFarm": "nunca",
+        "goldReserve": 0,
+        "elixirReserve": 0,
+        "resourcePriority": "ouro",
+        "maxWallBatch": 50,
+        "maxBattles": 1,
+        "multivillage": true,
+        "goldMinimum": 0,
+        "elixirMinimum": 0
+      },
+      "villages": [
+        {
+          "id": "#GCY20PCPL",
+          "key": "MarlonFull",
+          "name": "MarlonFull",
+          "label": "MarlonFull",
+          "capacities": {
+            "goldCapacity": 25000000,
+            "elixirCapacity": 25000000,
+            "darkCapacity": 410000
+          },
+          "attacks": 1,
+          "status": "completed",
+          "reason": "Limite de 1 batalha(s) atingido. Muros confirmados: 0."
+        },
+        {
+          "id": "#82GRC2U8U",
+          "key": "MarlonPassoz",
+          "name": "MarlonPassoz",
+          "label": "MarlonPassoz",
+          "capacities": {
+            "goldCapacity": 31000000,
+            "elixirCapacity": 30500000,
+            "darkCapacity": 500000
+          },
+          "attacks": 1,
+          "status": "completed",
+          "reason": "Limite de 1 batalha(s) atingido. Muros confirmados: 0."
+        }
+      ],
+      "stage": "completed",
+      "pending": null,
+      "createdAt": "2026-11-14T19:20:08.745Z",
+      "updatedAt": "2026-11-14T19:27:09.119Z",
+      "details": [
+        "MarlonFull: 1 ataque(s), concluída — Limite de 1 batalha(s) atingido. Muros confirmados: 0.",
+        "MarlonPassoz: 1 ataque(s), concluída — Limite de 1 batalha(s) atingido. Muros confirmados: 0."
+      ],
+      "reason": "Todas as vilas da rodada foram concluídas.",
+      "current": "#82GRC2U8U",
+      "recovery": null
+    },
+    "completed": true,
+    "createdAt": "2026-11-14T19:20:08.746358Z",
+    "updatedAt": "2026-11-14T19:27:09.120109Z"
+  },
+  "scope": "Teste finito de uma batalha por vila. A condição por recursos foi desativada para exercitar ataques mesmo com os depósitos acima da capacidade por ofertas.",
+  "evidence": {
+    "farm-v3-vila1-ataque-sm-s916b.png": {
+      "path": "../../assets/script-mode/farm-v3-vila1-ataque-sm-s916b.png",
+      "sha256": "b157f8519a118ab572fd6c5d9648482cd848d549deef8dc159312ea9f98489f8"
+    },
+    "farm-v3-vila2-ataque-sm-s916b.png": {
+      "path": "../../assets/script-mode/farm-v3-vila2-ataque-sm-s916b.png",
+      "sha256": "78fa4d56241ab88b8045f240737ccab5115d86c764014be82f2ed29107e3edac"
+    },
+    "farm-v3-concluido-sm-s916b.png": {
+      "path": "../../assets/script-mode/farm-v3-concluido-sm-s916b.png",
+      "sha256": "a19e9e26a4b1686602ee80edf0c10363756a5474036dc1337f2572ca3d916e1d"
+    }
+  }
+}

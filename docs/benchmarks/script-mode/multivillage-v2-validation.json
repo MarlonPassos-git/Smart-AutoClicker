@@ -1,0 +1,85 @@
+{
+  "data": "2026-11-14",
+  "estado": "validação do escopo concluída",
+  "aparelho": {
+    "modelo": "SM_S916B",
+    "android_api": 36,
+    "resolucao": [
+      2340,
+      1080
+    ]
+  },
+  "testes": {
+    "jvm": {
+      "total": 1821,
+      "falhas": 0,
+      "comando": "./gradlew testFDroidDebugUnitTest assembleFDroidDebug"
+    },
+    "instrumentacao_runtime_emulador": {
+      "total": 28,
+      "falhas": 0
+    },
+    "instrumentacao_ocr_emulador": {
+      "total": 1,
+      "falhas": 0,
+      "recortes": [
+        "seletor",
+        "tag",
+        "título sem espaços",
+        "recompensa em duas caixas",
+        "capacidade com sobreposição"
+      ]
+    },
+    "instrumentacao_recursos_samsung": {
+      "total": 18,
+      "falhas": 0,
+      "classe": "NativeScriptResourcesIntegrationTest",
+      "inclui": [
+        "OCR livre das contas e tags",
+        "capacidades de 31 milhões, 30,5 milhões e 25 milhões",
+        "rejeição de frames antigos"
+      ]
+    }
+  },
+  "comprovado_no_aparelho": [
+    "Importação do ZIP produzido no computador, pela biblioteca do aplicativo.",
+    "Descoberta das duas contas por nome completo e tag confirmada em duas leituras.",
+    "Primeira vila: um ataque contado somente depois do retorno à vila; muros confirmados: zero.",
+    "Pausa e retomada durante a batalha, preservando vila e contagem.",
+    "Parada durante troca, reabertura do mesmo pacote e diálogo Continuar rodada com primeira vila concluída.",
+    "Continuação sem novas perguntas de parâmetros e sem repetir a primeira vila.",
+    "Rodada posterior com a correção: conta inicial fora do primeiro item do seletor, um ataque confirmado por conta, zero muros e encerramento final sem repetir a fila.",
+    "Capacidades ao vivo, sem ataques nem melhorias: MarlonFull com ouro e elixir de 25 milhões; MarlonPassoz com ouro de 31 milhões e elixir de 30,5 milhões. Cada valor exige consenso entre recortes em duas observações concordantes.",
+    "Cenário Smart de validação: executar → pausar → retomar → pausar → parar. Um único início de detecção; a pausa não recriou o processador. Parar durante pausa encerrou detecção e captura."
+  ],
+  "interrupcao_adicional": "A primeira revisão de validação conservou uma tentativa incerta após mudança de aplicativo/orientação. Seu registro foi preservado sem migração nem repetição automática. Uma rodada nova da revisão corrigida foi concluída nas duas contas.",
+  "pendente": [],
+  "evidencias_visuais": [
+    "../../assets/script-mode/multivilas-pausa-sm-s916b.png",
+    "../../assets/script-mode/multivilas-continuacao-sm-s916b.png"
+  ],
+  "limites": [
+    "O teste ao vivo Smart comprova controles e retenção da sessão; congelamento das esperas, contadores e revalidação são cobertos nos testes de motor/processador.",
+    "Os testes com adaptadores e recortes não substituem a validação da rodada completa no jogo.",
+    "Nenhum commit, push ou PR criado."
+  ],
+  "rodada_completa": {
+    "registro": "multivillage-v2-round-completed.json",
+    "ataques_por_vila": [
+      1,
+      1
+    ],
+    "muros_confirmados": 0,
+    "alvo_destruicao": 1,
+    "concluida": true
+  },
+  "capacidades_ao_vivo": {
+    "registro": "multivillage-v2-capacities-live.json",
+    "ataques": 0,
+    "melhorias_de_muros": 0
+  },
+  "pausa_smart": {
+    "registro": "smart-pause-sm-s916b.json",
+    "controle": "toques diretos com ADB, sem UiAutomation durante execução"
+  }
+}

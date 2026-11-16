@@ -1,0 +1,119 @@
+{
+  "date": "2026-11-16",
+  "device": "SM-S916B",
+  "androidSdk": 36,
+  "gameVersion": "19.32.4",
+  "resolution": [
+    2340,
+    1080
+  ],
+  "scriptVersion": "3.1.0",
+  "installedRevision": "a0b89120-03fb-4227-814f-4396c26002c1",
+  "scope": "Ajustes do farm em uma única vila. Troca de contas e muros não exercitados nesta versão.",
+  "failure": {
+    "stage": "oponente encontrado",
+    "cause": "O template Próxima começa em y=759. A região anterior começava em y=760 e não tinha margem.",
+    "correction": "Margem de 16 pixels na região, preservando imagem e limiar.",
+    "nativeRegression": "Falhou com o perfil anterior; passou com o recorte real nas posições y-8, y e y+8."
+  },
+  "validation": {
+    "unit": {
+      "tests": 1850,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "native": {
+      "tests": 21,
+      "failures": 0,
+      "skipped": 0,
+      "suite": "NativeScriptResourcesIntegrationTest",
+      "device": "SM-S916B/API36"
+    },
+    "build": "./gradlew testFDroidDebugUnitTest assembleFDroidDebug",
+    "nativeCommand": "./gradlew :core:script:android:connectedFDroidDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.buzbuz.smartautoclicker.core.script.android.NativeScriptResourcesIntegrationTest"
+  },
+  "runs": [
+    {
+      "runId": "d6eea36c-eb91-4987-ba5e-9f50bc49b335",
+      "revision": "b699beba-d795-4576-b6cf-4a4c623158a1",
+      "scriptVersion": "3.0.0",
+      "status": "STOPPED",
+      "reason": "Interrompido pelo usuário",
+      "startedAt": "2026-11-16T15:22:38.814950Z",
+      "endedAt": "2026-11-16T15:23:16.673580Z",
+      "droppedEvents": 0
+    },
+    {
+      "runId": "ee94d610-415d-42b0-bc83-76cf93703da5",
+      "revision": "5b1cd8c2-0ca3-48a8-8f67-7b5e4eb711d7",
+      "scriptVersion": "3.1.0",
+      "status": "STOPPED",
+      "reason": "Limite de 1 batalha(s) atingido. Muros confirmados: 0.",
+      "startedAt": "2026-11-16T15:26:39.949395Z",
+      "endedAt": "2026-11-16T15:27:12.716648Z",
+      "droppedEvents": 0
+    },
+    {
+      "runId": "8604885e-bedc-45e3-a1ff-a30f1cf1182e",
+      "revision": "30b30679-8dc7-4c43-b25a-49615e4ec597",
+      "scriptVersion": "3.1.0",
+      "status": "STOPPED",
+      "reason": "Limite de 1 batalha(s) atingido. Muros confirmados: 0.",
+      "startedAt": "2026-11-16T15:38:23.733439Z",
+      "endedAt": "2026-11-16T15:38:59.664886Z",
+      "droppedEvents": 0
+    }
+  ],
+  "battleParameters": {
+    "maxBattles": 1,
+    "improveWalls": false,
+    "stopFarm": "nunca",
+    "finishMode": "destruição",
+    "targetDestruction": 50
+  },
+  "observedChest": {
+    "manualCalibration": [
+      "Resgatar",
+      "Quatro toques no baú",
+      "Tela de recompensa com Continuar"
+    ],
+    "automaticLiveRecovery": {
+      "claims": 0,
+      "strikes": 0,
+      "confirmations": 1,
+      "followedByOneCompletedBattle": true
+    },
+    "fullAutomaticOpeningValidatedLive": false,
+    "automatedCoverage": [
+      "Resgate, quatro toques, confirmação e retorno à vila",
+      "Início com baú parcialmente aberto",
+      "Início com recompensa revelada",
+      "Baú sem progresso para antes de atacar",
+      "Reconhecimento nativo do bônus, tentativas restantes e recompensa nos recortes reais",
+      "Indicadores de tentativas já gastas não autorizam outro toque no baú"
+    ]
+  },
+  "preservedState": {
+    "files/scripts/execution-state/farm-walls-sm-s916b.json": {
+      "unchanged": true,
+      "sha256": "97849e721964747c6c30a14c2b89783d535177fef4017c06fa7f2473ee5a5398"
+    },
+    "files/scripts/execution-state/configuration/farm-walls-sm-s916b.json": {
+      "unchanged": true,
+      "sha256": "339c5b279f7188fa796b3086ad52a8018b6e73fbf55165397b0a8a20b5ec8d23"
+    }
+  },
+  "fixtures": "../../../core/script/android/src/androidTest/assets/farm_cv19/provenance.json",
+  "package": {
+    "path": "build/script-examples/farm-walls-sm-s916b-3.1.0-cv19.zip",
+    "sha256": "1a1f909ef6e4620d34b97b4e8a6b77de6388d9c0f42823ca8719d79b396ee1c9",
+    "phonePath": "/sdcard/Download/farm-walls-sm-s916b-3.1.0-cv19-20261116.zip"
+  },
+  "limitations": [
+    "Abertura automática completa aguarda outro bônus disponível para observação física.",
+    "Teste finito de duas batalhas: não comprova execução contínua.",
+    "Troca de vilas, novas capacidades do CV19 e melhorias de muros não foram validadas nesta sessão.",
+    "O perfil de muros nível 16 permanece na versão anterior."
+  ]
+}

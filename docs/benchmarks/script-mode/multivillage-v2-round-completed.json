@@ -1,0 +1,77 @@
+{
+  "formatVersion": 1,
+  "revision": "983cb635-548c-413c-9acf-45be52ebb016",
+  "answers": {
+    "multivillage": true,
+    "finishMode": "destruição",
+    "targetDestruction": 1.0,
+    "improveWalls": false,
+    "wallTrigger": "qualquer depósito cheio",
+    "stopFarm": "nunca",
+    "goldReserve": 0.0,
+    "elixirReserve": 0.0,
+    "goldMinimum": 0.0,
+    "elixirMinimum": 0.0,
+    "goldCapacity": 30500000.0,
+    "elixirCapacity": 29000000.0,
+    "resourcePriority": "ouro",
+    "maxWallBatch": 50.0,
+    "maxBattles": 1.0
+  },
+  "state": {
+    "version": 1,
+    "id": "1794674751170",
+    "options": {
+      "multivillage": true,
+      "finishMode": "destruição",
+      "targetDestruction": 1,
+      "improveWalls": false,
+      "wallTrigger": "qualquer depósito cheio",
+      "stopFarm": "nunca",
+      "goldReserve": 0,
+      "elixirReserve": 0,
+      "goldMinimum": 0,
+      "elixirMinimum": 0,
+      "goldCapacity": 30500000,
+      "elixirCapacity": 29000000,
+      "resourcePriority": "ouro",
+      "maxWallBatch": 50,
+      "maxBattles": 1
+    },
+    "villages": [
+      {
+        "id": "#GCY20PCPL",
+        "key": "MarlonFull",
+        "name": "MarlonFull",
+        "attacks": 1,
+        "status": "completed",
+        "reason": "Limite de 1 batalha(s) atingido. Muros confirmados: 0.",
+        "capacities": {}
+      },
+      {
+        "id": "#82GRC2U8U",
+        "key": "MarlonPassoz",
+        "name": "MarlonPassoz",
+        "attacks": 1,
+        "status": "completed",
+        "reason": "Limite de 1 batalha(s) atingido. Muros confirmados: 0.",
+        "capacities": {}
+      }
+    ],
+    "stage": "completed",
+    "pending": null,
+    "createdAt": "2026-11-14T16:45:51.170Z",
+    "updatedAt": "2026-11-14T16:48:34.478Z",
+    "details": [
+      "MarlonFull: 1 ataque(s), concluída — Limite de 1 batalha(s) atingido. Muros confirmados: 0.",
+      "MarlonPassoz: 1 ataque(s), concluída — Limite de 1 batalha(s) atingido. Muros confirmados: 0."
+    ],
+    "initialId": "#GCY20PCPL",
+    "current": "#82GRC2U8U",
+    "recovery": null,
+    "reason": "Todas as vilas da rodada foram concluídas."
+  },
+  "completed": true,
+  "createdAt": "2026-11-14T16:45:51.171019Z",
+  "updatedAt": "2026-11-14T16:48:34.479577Z"
+}

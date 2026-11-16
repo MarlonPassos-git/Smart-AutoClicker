@@ -1,0 +1,34 @@
+{
+  "data": "2026-11-14",
+  "cenario": "Validação — pausa real Smart",
+  "aparelho": "SM_S916B",
+  "resultado": "aprovado",
+  "transicoes": [
+    "INACTIVE",
+    "RECORDING",
+    "DETECTING",
+    "PAUSED",
+    "DETECTING",
+    "PAUSED",
+    "RECORDING",
+    "INACTIVE"
+  ],
+  "inicios_da_deteccao": 1,
+  "paradas_da_deteccao": 1,
+  "log": [
+    "11-14 14:48:28.773 10616 10662 D CrashBreadcrumb: Crash key detection_state = INACTIVE",
+    "11-14 14:49:07.747 10616 10616 I DetectorEngine: startScreenRecord",
+    "11-14 14:49:07.922 10616 10648 D CrashBreadcrumb: Crash key detection_state = RECORDING",
+    "11-14 14:49:33.386 10616 10616 I DetectorEngine: startDetection",
+    "11-14 14:49:33.408 10616 10649 I DetectorEngine: Process scenario at unlimited FPS (1000000ns per loop)",
+    "11-14 14:49:33.422 10616 10656 D CrashBreadcrumb: Crash key detection_state = DETECTING",
+    "11-14 14:49:35.336 10616 10650 D CrashBreadcrumb: Crash key detection_state = PAUSED",
+    "11-14 14:49:39.543 10616 10654 D CrashBreadcrumb: Crash key detection_state = DETECTING",
+    "11-14 14:49:43.714 10616 10663 D CrashBreadcrumb: Crash key detection_state = PAUSED",
+    "11-14 14:49:45.812 10616 10616 I DetectorEngine: stopScreenRecord",
+    "11-14 14:49:45.813 10616 10652 I DetectorEngine: stopDetection",
+    "11-14 14:49:45.832 10616 10654 D CrashBreadcrumb: Crash key detection_state = RECORDING",
+    "11-14 14:49:45.846 10616 10662 D CrashBreadcrumb: Crash key detection_state = INACTIVE"
+  ],
+  "limite": "Este teste ao vivo comprova os controles e a retenção da sessão. Congelamento das esperas, contadores e revalidação de tela são cobertos nos testes de motor/processador."
+}

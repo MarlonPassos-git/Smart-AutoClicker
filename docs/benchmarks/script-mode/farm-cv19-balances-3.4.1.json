@@ -1,0 +1,75 @@
+{
+  "date": "2026-11-16",
+  "scriptVersion": "3.4.1",
+  "engineUpdate": {
+    "format": "WHITE_INTEGER_LINE",
+    "behavior": "Formato optativo de inteiros não negativos em branco, com reconhecimento direto da linha. Aceita zero e separadores de milhares, sem aceitar sinal negativo. Não muda os formatos numéricos existentes.",
+    "deployedWithDataPreserved": true
+  },
+  "balanceStrategy": "Concordância entre recortes com o método normal; sem concordância, usa a linha direta e exige concordância entre pelo menos dois recortes desse método. Leituras ausentes e empates não viram zero.",
+  "regressions": {
+    "darkValues": [
+      276010,
+      337221,
+      368812
+    ],
+    "completeBars": [
+      {
+        "gold": 17212483,
+        "elixir": 20383010,
+        "dark": 337221
+      },
+      {
+        "gold": 19861435,
+        "elixir": 23353222,
+        "dark": 368812
+      }
+    ],
+    "zeroAndEmptyRegion": true,
+    "finiteLimitDoesNotReReadBalances": true
+  },
+  "checks": {
+    "unitTests": 1861,
+    "unitFailures": 0,
+    "nativeTests": 27,
+    "nativeFailures": 0,
+    "build": "./gradlew testFDroidDebugUnitTest assembleFDroidDebug"
+  },
+  "failedIntermediateRuns": [
+    {
+      "version": "3.3.0",
+      "runId": "412613a1-5945-43e5-9f12-29fb990b4a45",
+      "confirmedAttacks": 6,
+      "reason": "dark=368812 sem duas leituras concordantes."
+    },
+    {
+      "version": "3.4.0",
+      "runId": "889a8522-0e2f-4819-a00f-b55e7b40dcde",
+      "confirmedAttacks": 0,
+      "reason": "A leitura direta substituía os recortes normais e perdeu o ouro 19861435; 3.4.1 preserva ambos os métodos."
+    }
+  ],
+  "live": {
+    "runId": "0bdd4d38-4d2c-4bbd-8f55-b808022c28b5",
+    "status": "STOPPED",
+    "maxBattlesPerVillage": 8,
+    "stopFarm": "qualquer depósito cheio",
+    "improveWalls": false,
+    "confirmedAttacks": {
+      "MarlonFull": 5,
+      "MarlonPassoz": 3
+    },
+    "reason": "Busca de oponentes excedeu 60 segundos. Os oito ataques anteriores tiveram saldos confirmados; o ataque pendente terminou sem tropas lançadas após a interrupção.",
+    "balanceFailures": 0,
+    "resourceConditionTriggered": true,
+    "whiteLineFallbackObserved": {
+      "resource": "dark",
+      "value": 299292,
+      "matchingCrops": 16
+    }
+  },
+  "package": {
+    "path": "build/script-examples/farm-walls-sm-s916b-3.4.1-cv19.zip",
+    "sha256": "4c1cc02ebf62d339750087a1be09831dff8caaf63b8933b000f4ba9411df1fc5"
+  }
+}
