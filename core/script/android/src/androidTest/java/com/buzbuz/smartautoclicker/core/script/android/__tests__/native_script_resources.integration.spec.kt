@@ -29,6 +29,314 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class NativeScriptResourcesIntegrationTest {
     @Test(timeout = 60000)
+    fun farmReadsCountersOfDifferentSpellsAndASelectedCardWithoutPortraitMatching() = runBlocking {
+        withFrame("mixed_army", 80, 885, "quantity_calibration") { frame ->
+            verifyFarm(frame, """
+                import {snapshot, found} from './screen.js';
+                import {heroReferences} from './profile.js';
+                import {readSpellCards} from './spells.js';
+                import {read} from 'klickr';
+                const current = await snapshot(heroReferences);
+                const heroes = heroReferences.map(name=>current.results[name]).filter(found);
+                const left = Math.max(...heroes.map(hero=>hero.x+hero.width/2))/current.frame.width;
+                const cards = await readSpellCards(current,left);
+                if (cards.slice(0,3).map(card=>card.quantity).join(',') !== '4,1,1') throw new Error('Wrong mixed spell quantities: '+JSON.stringify(cards));
+                if (cards.some(card=>card.at.x < 1850)) throw new Error('Troops or heroes became spells');
+            """.trimIndent())
+        }
+        withFrame("selected_spell", 80, 885, "farm_cv19") { frame ->
+            verifyFarm(frame, """
+                import {snapshot} from './screen.js';
+                import {readSpellCards} from './spells.js';
+                import {read} from 'klickr';
+                const current = await snapshot(['battle']);
+                const cards = await readSpellCards(current,880/2340);
+                if (cards.length !== 1 || cards[0].quantity !== 9) throw new Error('Selected spell quantity lost: '+JSON.stringify(cards));
+                const one = await read(current.frame,{kind:'image',reference:'spellOne',region:{left:920,top:920,right:1040,bottom:970},threshold:12});
+                if (one.status === 'found') throw new Error('A nine was mistaken for one');
+            """.trimIndent())
+        }
+        withFrame("mixed_selected_spells", 500, 885, "farm_cv19") { frame ->
+            verifyFarm(frame, """
+                import {snapshot} from './screen.js';
+                import {readSpellCards} from './spells.js';
+                import {read} from 'klickr';
+                const current = await snapshot(['battle']);
+                for (const left of [859,867,875,887]) {
+                    const cards = await readSpellCards(current,left/2340,[{xRatio:984/2340},{xRatio:1097/2340}]);
+                    if (cards.map(card=>card.quantity).join(',') !== '0,3') throw new Error('Selected mixed spells lost: '+JSON.stringify({left,cards}));
+                }
+            """.trimIndent())
+        }
+        withFrame("selected_spell_one", 500, 885, "farm_cv19") { frame ->
+            verifyFarm(frame, """
+                import {snapshot} from './screen.js';
+                import {readSpellCards} from './spells.js';
+                import {read} from 'klickr';
+                const current = await snapshot(['battle']);
+                for (const left of [859,867,875,887]) {
+                    const cards = await readSpellCards(current,left/2340,[{xRatio:984/2340},{xRatio:1097/2340}]);
+                    if (cards.map(card=>card.quantity).join(',') !== '1,5') throw new Error('Selected one lost: '+JSON.stringify({left,cards}));
+                }
+                const one = await read(current.frame,{kind:'image',reference:'spellOne',region:{left:1037,top:920,right:1157,bottom:970},threshold:12});
+                if (one.status === 'found') throw new Error('A five was mistaken for one');
+                const eleven = await read(current.frame,{kind:'image',reference:'spellEleven',region:{left:920,top:920,right:1040,bottom:970},threshold:12});
+                if (eleven.status === 'found') throw new Error('A one was mistaken for eleven');
+            """.trimIndent())
+        }
+        withFrame("selected_freeze_one", 500, 885, "farm_cv19") { frame ->
+            verifyFarm(frame, """
+                import {snapshot} from './screen.js';
+                import {readSpellCards} from './spells.js';
+                import {read} from 'klickr';
+                const current = await snapshot(['battle']);
+                for (const left of [859,867,875,887]) {
+                    const cards = await readSpellCards(current,left/2340,[{xRatio:984/2340,quantity:0},{xRatio:1097/2340,quantity:3}]);
+                    if (cards.map(card=>card.quantity).join(',') !== '0,1') throw new Error('Selected freeze one lost: '+JSON.stringify({left,cards}));
+                }
+            """.trimIndent())
+        }
+        withFrame("initial_spells_eleven", 500, 885, "farm_cv19") { frame ->
+            verifyFarm(frame, """
+                import {snapshot} from './screen.js';
+                import {readSpellCards} from './spells.js';
+                import {readText} from 'klickr';
+                const current = await snapshot(['battle']);
+                for (const left of [1216,1224,1232]) {
+                    const cards = await readSpellCards(current,left/2340);
+                    if (cards.length !== 1 || cards[0].quantity !== 11) throw new Error('Initial eleven lost: '+JSON.stringify({left,cards}));
+                }
+            """.trimIndent())
+        }
+        withFrame("quantity_zero", 1700, 920, "quantity_calibration") { frame ->
+            verifyFarm(frame, """
+                import {snapshot} from './screen.js';
+                import {readSpellCards} from './spells.js';
+                import {read} from 'klickr';
+                const current = await snapshot(['battle']);
+                const cards = await readSpellCards(current,1700/2340,[{xRatio:1775/2340}]);
+                if (cards.length !== 1 || cards[0].quantity !== 0) throw new Error('Explicit zero spell counter lost: '+JSON.stringify(cards));
+            """.trimIndent())
+        }
+    }
+
+    @Test(timeout = 60000)
+    fun whiteIntegerLinesRecognizeZeroAndRejectEmptyRegions() = runBlocking {
+        val frame = Bitmap.createBitmap(2340,1080,Bitmap.Config.ARGB_8888)
+        frame.eraseColor(Color.BLACK)
+        Canvas(frame).drawText("0",2050f,215f,Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color=Color.WHITE
+            textSize=40f
+            typeface=android.graphics.Typeface.DEFAULT_BOLD
+        })
+        try {
+            verify(frame,mapOf(
+                "manifest.json" to """{"formatVersion":1,"apiVersion":1,"id":"integer-line-zero","name":"Saldo zero","scriptVersion":"1","entry":"entry.js","resources":{"balance":{"type":"number","format":"WHITE_INTEGER_LINE"}}}""".toByteArray(),
+                "entry.js" to """
+                    import {observe,read} from 'klickr';
+                    const frame=await observe();
+                    const zero=await read(frame,{kind:'number',reference:'balance',threshold:85,region:{left:1980,top:175,right:2180,bottom:235}});
+                    if(zero.status!=='found'||zero.number!==0) throw new Error('Zero integer line lost: '+JSON.stringify(zero));
+                    const empty=await read(frame,{kind:'number',reference:'balance',threshold:85,region:{left:1910,top:25,right:2180,bottom:90}});
+                    if(empty.status==='found') throw new Error('An empty region became a number');
+                """.trimIndent().toByteArray()
+            ))
+        } finally { frame.recycle() }
+    }
+
+    @Test(timeout = 60000)
+    fun farmReadsConcordantBalancesAfterSixAttacks() = runBlocking {
+        for ((asset,expected) in listOf("dark_balance_276010" to 276010,"dark_balance_337221" to 337221,"dark_balance_368812" to 368812)) {
+            withFrame(asset,1980,175,"farm_cv19") { frame ->
+                verifyFarm(frame,"""
+                    import {snapshot} from './screen.js';
+                    import {readResourceBalance} from './farm.js';
+                    const current=await snapshot(['darkBalance']);
+                    const amount=await readResourceBalance(current,'dark');
+                    if (amount!==$expected) throw new Error('No reliable balance for $asset: '+amount);
+                """.trimIndent())
+            }
+        }
+        for ((asset,gold,elixir,dark) in listOf(
+            listOf("balances_after_six",17212483,20383010,337221),
+            listOf("balances_after_twelve",19861435,23353222,368812))) withFrame(asset.toString(),1900,15,"farm_cv19") { frame ->
+            verifyFarm(frame,"""
+                import {snapshot} from './screen.js';
+                import {readResourceBalance} from './farm.js';
+                const current=await snapshot(['goldBalance','elixirBalance','darkBalance']);
+                for (const [resource,expected] of [['gold',$gold],['elixir',$elixir],['dark',$dark]]) {
+                    const amount=await readResourceBalance(current,resource);
+                    if (amount!==expected) throw new Error('Wrong '+resource+' balance: '+amount);
+                }
+            """.trimIndent())
+        }
+    }
+
+    @Test(timeout = 60000)
+    fun farmReadsTheDarkBalanceThatBlockedTheResourceStopRule() = runBlocking {
+        withFrame("dark_balance_276010", 1980, 175, "farm_cv19") { frame ->
+            verifyFarm(frame, """
+                import {snapshot} from './screen.js';
+                const current = await snapshot(['darkBalance']);
+                if (current.results.darkBalance.status !== 'found' || current.results.darkBalance.number !== 276010)
+                    throw new Error('Dark balance failed: '+JSON.stringify(current.results.darkBalance));
+            """.trimIndent())
+        }
+    }
+
+    @Test(timeout = 120000)
+    fun farmReadsCv19MaximumCapacitiesWithoutUsingProductionOrTreasuryAmounts() = runBlocking {
+        for ((asset, resource, expected) in listOf(
+            Triple("capacity_gold", "gold", 31000000), Triple("capacity_elixir", "elixir", 31000000),
+            Triple("capacity_dark", "dark", 500000))) {
+            val x = if (resource == "dark") 1700 else 1640
+            val y = when (resource) { "gold" -> 80; "elixir" -> 155; else -> 230 }
+            withFrame(asset, x, y, "farm_cv19") { frame ->
+                verifyFarm(frame, """
+                    import { observe, profile, readText } from 'klickr';
+                    import { readCapacity } from './villages.js';
+                    const frame = await observe();
+                    const geometry = await profile(frame);
+                    const result = await readText(frame,{region:geometry.regions['${resource}Capacity'],threshold:85});
+                    const amount = await readCapacity({frame,geometry,blocks:result.blocks},'$resource');
+                    if (amount !== $expected) throw new Error('Wrong CV19 maximum for $resource: '+amount);
+                """.trimIndent())
+            }
+        }
+    }
+
+    @Test(timeout = 60000)
+    fun farmRecognizesTheCv19SettingsTabBeforeIdentifyingAVillage() = runBlocking {
+        withFrame("account_tabs", 400, 0, "farm_cv19") { frame ->
+            verifyFarm(frame, """
+                import { readText } from 'klickr';
+                import { snapshot, found } from './screen.js';
+                const current = await snapshot(['accountSettingsTitle']);
+                const title = await readText(current.frame,{region:current.calibration.regions.accountSettingsTitle,threshold:80});
+                if (!found(current.results.accountSettingsTitle)) throw new Error('Settings tab not recognized: '+JSON.stringify(title));
+                const normalized = text => text.normalize('NFD').replace(/[\u0300-\u036f\s.:]/g,'').toLowerCase();
+                const names = new Set(['configuracoes','configuraces','configurares']);
+                if (!title.blocks.some(block => block.confidence >= 80 && names.has(normalized(block.text)))) throw new Error('Settings navigation rejected OCR: '+JSON.stringify(title));
+            """.trimIndent())
+        }
+    }
+
+    @Test(timeout = 60000)
+    fun farmReadsTheCv19StarBonusAndChestStagesFromRealCrops() = runBlocking {
+        withFrame("star_bonus", 650, 200, "farm_cv19") { frame ->
+            verifyFarm(frame, """
+                import { readText } from 'klickr';
+                import { snapshot, all } from './screen.js';
+                const current = await snapshot(['starBonusTitle','starBonusClaim']);
+                const title = await readText(current.frame,{region:current.calibration.regions.starBonusTitle,threshold:0});
+                if (!all(current,['starBonusTitle','starBonusClaim'])) throw new Error('Star bonus not recognized: '+JSON.stringify(current.results)+' OCR='+JSON.stringify(title));
+            """.trimIndent())
+        }
+        for (asset in listOf("chest_rolls_four", "chest_rolls_three", "chest_rolls_one")) {
+            withFrame(asset, 960, 885, "farm_cv19") { frame ->
+                verifyFarm(frame, """
+                    import { snapshot, found } from './screen.js';
+                    const current = await snapshot(['chestRoll']);
+                    if (!found(current.results.chestRoll)) throw new Error('Chest attempt missing in $asset');
+                """.trimIndent())
+            }
+        }
+        withFrame("chest_spent_rolls", 960, 885, "farm_cv19") { frame ->
+            verifyFarm(frame, """
+                import { snapshot, found } from './screen.js';
+                const current = await snapshot(['chestRoll']);
+                if (found(current.results.chestRoll)) throw new Error('Spent chest attempts authorized another tap');
+            """.trimIndent())
+        }
+        withFrame("chest_reward", 700, 805, "farm_cv19") { frame ->
+            verifyFarm(frame, """
+                import { snapshot, all, found } from './screen.js';
+                const current = await snapshot(['chestContinue','chestRewardNote','chestRoll']);
+                if (!all(current,['chestContinue','chestRewardNote']) || found(current.results.chestRoll)) throw new Error('Reward not recognized: '+JSON.stringify(current.results));
+            """.trimIndent())
+        }
+    }
+
+    @Test(timeout = 60000)
+    fun farmRecognizesTheCv19OpponentWithSmallVerticalLayoutChanges() = runBlocking {
+        for (offset in listOf(-8, 0, 8)) {
+            withFrame("opponent", 1930, 730 + offset, "farm_cv19") { frame ->
+                verifyFarm(frame, """
+                    import { snapshot, found } from './screen.js';
+                    const current = await snapshot(['opponent']);
+                    if (!found(current.results.opponent)) throw new Error('CV19 opponent not recognized at offset $offset');
+                """.trimIndent())
+            }
+        }
+    }
+
+    @Test(timeout = 120000)
+    fun freeTextApiReadsRealAccountRowsTagsAndCapacityAndRejectsOldFrames() = runBlocking {
+        withFrame("selector", 1140, 200, "multivillage") { frame ->
+            verifyFarm(frame, """
+                import { observe, profile, readText, log } from 'klickr';
+                import { selectorRows } from './villages.js';
+                const observation = await observe();
+                const geometry = await profile(observation);
+                const result = await readText(observation, {region:geometry.regions.accountList,threshold:85});
+                if (result.truncated) throw new Error('Account list truncated');
+                const rows = selectorRows(result.blocks, geometry.regions.accountList.top);
+                if (rows.length !== 2 || rows[0].key !== 'MarlonPassoz' || rows[1].key !== 'MarlonFull') throw new Error('Wrong real account rows: '+JSON.stringify(rows));
+                if (result.blocks.some(block => block.frame !== observation.frame || block.left < 1140)) throw new Error('Lost absolute bounds/frame');
+                await observe();
+                let rejected = false;
+                try { await readText(observation, {region:geometry.regions.accountList}); } catch (error) { rejected = error.code === 'stale_observation'; }
+                if (!rejected) throw new Error('Stale text accepted');
+            """.trimIndent())
+        }
+        withFrame("identity", 1050, 160, "multivillage") { frame ->
+            verifyFarm(frame, """
+                import { observe, profile, readText, saveState, loadState } from 'klickr';
+                import { stableTag } from './villages.js';
+                const frame = await observe();
+                const geometry = await profile(frame);
+                const result = await readText(frame, {region:geometry.regions.accountIdentity,threshold:85});
+                if (stableTag(result.blocks) !== '#GCY20PCPL') throw new Error('Wrong stable identity: '+JSON.stringify(result));
+                await saveState({version:1,confirmed:3});
+                if ((await loadState()).confirmed !== 3) throw new Error('Checkpoint lost');
+                await saveState({version:1,confirmed:3}, {completed:true});
+            """.trimIndent())
+        }
+        for ((asset, resource, expected) in listOf(
+            Triple("capacity", "gold", 31000000), Triple("capacity-elixir-current", "elixir", 30500000),
+            Triple("capacity-gold25-current", "gold", 25000000), Triple("setup-gold31", "gold", 31000000), Triple("setup-dark410", "dark", 410000), Triple("setup-elixir25", "elixir", 25000000), Triple("setup-gold25-overflow", "gold", 25000000))) {
+            withFrame(asset, 1730, when (resource) { "gold" -> 95; "dark" -> 245; else -> 170 }, "multivillage") { frame ->
+                verifyFarm(frame, """
+                    import { observe, profile, readText, log } from 'klickr';
+                    import { readCapacity } from './villages.js';
+                    const frame = await observe();
+                    const geometry = await profile(frame);
+                    const result = await readText(frame, {region:geometry.regions["${resource}Capacity"],threshold:85});
+                    const numeric = geometry.regions["${resource}CapacityNumber"];
+                    const diagnostic = await readText(frame,{region:numeric,threshold:0});
+                    const isolatedLabel = await readText(frame,{region:geometry.regions["${resource}CapacityLabel"],threshold:0});
+                    await log('$asset isolatedLabel='+JSON.stringify(isolatedLabel.blocks)+' label='+JSON.stringify(result.blocks)+' numeric='+JSON.stringify(diagnostic.blocks));
+                    let amount;
+                    try { amount = await readCapacity({frame,geometry,blocks:result.blocks}, "$resource"); }
+                    catch(error) { throw new Error('$asset: '+error.message); }
+                    if (amount !== $expected) throw new Error('Wrong real capacity: '+amount);
+                """.trimIndent())
+            }
+        }
+    }
+
+    @Test(timeout = 60000)
+    fun darkElixirBalanceIsReadFromTheCurrentSamsungResourceBar() = runBlocking {
+        withFrame("setup-dark-balance", 1980, 175, "multivillage") { frame ->
+            verifyFarm(frame, """
+                import {snapshot, number} from './screen.js';
+                const current = await snapshot(['darkBalance']);
+                if (number(current.results.darkBalance) !== 19547) throw new Error('Wrong dark elixir balance: '+JSON.stringify(current.results));
+            """.trimIndent())
+        }
+    }
+
+    @Test(timeout = 60000)
     fun templateDimensionsDescribeTheCropAndScaleWithTheReferenceScreen() = runBlocking {
         val frame = Bitmap.createBitmap(100, 200, Bitmap.Config.ARGB_8888)
         frame.eraseColor(Color.BLACK)
@@ -296,10 +604,13 @@ class NativeScriptResourcesIntegrationTest {
     }
 
     private suspend fun verifyFarm(frame: Bitmap, source: String, packageName: String = "farm-walls-sm-s916b") {
-        val manifestBytes = resource("manifest.json", packageName)
-        val manifest = Json.parseToJsonElement(manifestBytes.toString(Charsets.UTF_8)).jsonObject
+        val original = Json.parseToJsonElement(resource("manifest.json", packageName).toString(Charsets.UTF_8)).jsonObject
+        val manifest = JsonObject(original - setOf("parameters", "parameterRules", "setup"))
+        val manifestBytes = manifest.toString().toByteArray()
         val files = mutableMapOf("manifest.json" to manifestBytes, "entry.js" to source.toByteArray())
-        for (file in listOf("screen.js", "profile.js")) files[file] = resource(file, packageName)
+        val modules = listOf("screen.js", "profile.js", "villages.js", "policy.js") +
+            if (packageName == "farm-walls-sm-s916b") listOf("rewards.js", "spells.js", "farm.js", "battle.js", "walls.js") else emptyList()
+        for (file in modules) files[file] = resource(file, packageName)
         manifest.getValue("resources").jsonObject.values.forEach { value ->
             val definition = value.jsonObject
             if (definition.getValue("type").jsonPrimitive.content == "image") {
@@ -339,7 +650,7 @@ class NativeScriptResourcesIntegrationTest {
                     }, "com.buzbuz.smartautoclicker.core.script.android.test")
                 execution.run(stored.storageId, JsonObject(emptyMap()))
                 val status = execution.status.value
-                assertEquals(status.failure?.stackTraceToString(), ScriptSessionState.COMPLETED, status.state)
+                assertEquals(status.failure?.stackTraceToString() + "\n" + execution.diagnostics.jsonLines(), ScriptSessionState.COMPLETED, status.state)
                 assertFalse("The recorder frame is borrowed", frame.isRecycled)
             }
         } finally { root.deleteRecursively() }

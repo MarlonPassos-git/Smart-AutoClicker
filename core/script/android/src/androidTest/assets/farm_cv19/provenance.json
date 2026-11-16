@@ -1,0 +1,201 @@
+{
+  "capturedOn": "2026-11-16",
+  "device": "SM-S916B",
+  "gameVersion": "19.32.4",
+  "screen": {
+    "width": 2340,
+    "height": 1080
+  },
+  "images": {
+    "opponent.png": {
+      "crop": {
+        "left": 1930,
+        "top": 730,
+        "right": 2250,
+        "bottom": 890
+      },
+      "sha256": "09c392d7d514767fcb6a8c6d6a3332fe6db3521769c7b02dce58eb7f274b1bbe"
+    },
+    "star_bonus.png": {
+      "crop": {
+        "left": 650,
+        "top": 200,
+        "right": 1690,
+        "bottom": 1000
+      },
+      "sha256": "532ce6b0e5ff7c5d77aa5363cc1e88c573f183902a67964c5c825dffd1353f35"
+    },
+    "chest_rolls_four.png": {
+      "crop": {
+        "left": 960,
+        "top": 885,
+        "right": 1365,
+        "bottom": 995
+      },
+      "sha256": "c3764707b0ca38b758ecb95d14dd7176f40d3cbdc351e032770b34f82e03d550"
+    },
+    "chest_rolls_three.png": {
+      "crop": {
+        "left": 960,
+        "top": 885,
+        "right": 1365,
+        "bottom": 995
+      },
+      "sha256": "966f10c901d63acf3f7346b4ae24d21e586530313148020b5557ec06c50cffd1"
+    },
+    "chest_rolls_one.png": {
+      "crop": {
+        "left": 960,
+        "top": 885,
+        "right": 1365,
+        "bottom": 995
+      },
+      "sha256": "eaf8a9c896a4e2d03094b6227d35f87bd1d86c3f778427d17b6ac8dadd09cbab"
+    },
+    "chest_reward.png": {
+      "crop": {
+        "left": 700,
+        "top": 805,
+        "right": 1610,
+        "bottom": 1020
+      },
+      "sha256": "f10ae8f321fd00d56a4e70d1448957988700153c474f3d6e8735377e53db6edd"
+    },
+    "chest_spent_rolls.png": {
+      "crop": {
+        "left": 960,
+        "top": 885,
+        "right": 1245,
+        "bottom": 995
+      },
+      "sha256": "fb12818c52213c525ef796447607fbfaa3aa317fb69751a52754eedc272d4a1a"
+    },
+    "account_tabs.png": {
+      "crop": {
+        "left": 400,
+        "top": 0,
+        "right": 1920,
+        "bottom": 145
+      },
+      "sha256": "8b9b7c8bb008e1cc665d62b7244cde4062e4e7a8dcf0ba682a83d805f928f490"
+    },
+    "capacity_gold.png": {
+      "crop": {
+        "left": 1640,
+        "top": 80,
+        "right": 2240,
+        "bottom": 280
+      },
+      "sha256": "c1f9066dafe69a81d7dae19bd7d7a03b47a380cf227ff477a0f2abd91f6c17d1"
+    },
+    "capacity_elixir.png": {
+      "crop": {
+        "left": 1640,
+        "top": 155,
+        "right": 2240,
+        "bottom": 350
+      },
+      "sha256": "75d4d55da32ed721fb422c35a67413be9dba9c5de896436b715dd3f465a3ae96"
+    },
+    "capacity_dark.png": {
+      "crop": {
+        "left": 1700,
+        "top": 230,
+        "right": 2240,
+        "bottom": 415
+      },
+      "sha256": "e4cc321087db24f71fac0be4884b8326855d9c6aa3d9865b11a14ae193ca11cf"
+    },
+    "selected_spell.png": {
+      "crop": {
+        "left": 80,
+        "top": 885,
+        "right": 2260,
+        "bottom": 1080
+      },
+      "sha256": "3eb6edc31918fa92610eb020270479d2119eafb837157fb1714897796da8d30e"
+    },
+    "mixed_selected_spells.png": {
+      "crop": {
+        "left": 500,
+        "top": 885,
+        "right": 1200,
+        "bottom": 1080
+      },
+      "sha256": "73f7de30efb325c002443d8ef58033daccb924cba92b6208d736edd71f5e1722"
+    },
+    "selected_spell_one.png": {
+      "crop": {
+        "left": 500,
+        "top": 885,
+        "right": 1200,
+        "bottom": 1080
+      },
+      "sha256": "e942b3d18b9f2dc3771f6a489bbae96a07d9f0c378f6c36ba1d7e031efaecc6c"
+    },
+    "selected_freeze_one.png": {
+      "crop": {
+        "left": 500,
+        "top": 885,
+        "right": 1200,
+        "bottom": 1080
+      },
+      "sha256": "7d73b18f4f3b20492cecc2c41520a097342b9329cd337753595cb68e2363bf2e"
+    },
+    "initial_spells_eleven.png": {
+      "crop": {
+        "left": 500,
+        "top": 885,
+        "right": 1500,
+        "bottom": 1080
+      },
+      "sha256": "daf846f80e15f9cde248bc2e274c59e6940d3181de36de1a625eb6fabfb7a131"
+    },
+    "dark_balance_276010.png": {
+      "crop": {
+        "left": 1980,
+        "top": 175,
+        "right": 2180,
+        "bottom": 235
+      },
+      "sha256": "d9468c44a453a7ecb179bb5c3a021bcb2d8ea9713cd57a7cd5fc69bf5fde0c16"
+    },
+    "dark_balance_337221.png": {
+      "crop": {
+        "left": 1980,
+        "top": 175,
+        "right": 2180,
+        "bottom": 235
+      },
+      "sha256": "a5ddf2a88a74355a4fc972382909141a922676920ecfea7269cf65ffaf544938"
+    },
+    "balances_after_six.png": {
+      "crop": {
+        "left": 1900,
+        "top": 15,
+        "right": 2240,
+        "bottom": 245
+      },
+      "sha256": "2e94288386f63d1712c5121eb42db0b2a0153e6ee17080a5f6f6470b20fb8d19"
+    },
+    "dark_balance_368812.png": {
+      "crop": {
+        "left": 1980,
+        "top": 175,
+        "right": 2180,
+        "bottom": 235
+      },
+      "sha256": "9c7b22f2e3d2fc793c6d509e06fa0efa0111012b79716e9e28357d66540e5283"
+    },
+    "balances_after_twelve.png": {
+      "crop": {
+        "left": 1900,
+        "top": 15,
+        "right": 2240,
+        "bottom": 245
+      },
+      "sha256": "9b4684443aa75199992c5ce529d7bf4a1b759f550418e08c6739dc921f24a8d0"
+    }
+  },
+  "note": "Recorte sem retoque da tela do adversário. A referência Próxima começa em y=759, um pixel acima da antiga região exata; a regressão também desloca o recorte em oito pixels."
+}
