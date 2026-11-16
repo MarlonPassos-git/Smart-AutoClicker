@@ -1,0 +1,76 @@
+{
+  "formatVersion": 1,
+  "items": [
+    {
+      "asset": "setup-gold31.png",
+      "source": "ADB screencap, SM-S916B, 2340x1080, 2026-11-14",
+      "sourceSha256": "198f592f098d5ef41fdb390bd711c10cecbf5d284d87cdc91762b086f3ba224e",
+      "crop": [
+        1730,
+        95,
+        2260,
+        240
+      ],
+      "sha256": "125e4af0cc044e4c66473398b3cd5905826e5a4da13d98bd98f9f5a48b5d228b",
+      "expectedCapacity": 31000000,
+      "transform": "pixel crop only"
+    },
+    {
+      "asset": "setup-dark410.png",
+      "source": "ADB screencap, SM-S916B, 2340x1080, 2026-11-14",
+      "sourceSha256": "697d365adbceedafefa97b650bf46db409b71f2d3654e786ee27bed04790980d",
+      "crop": [
+        1730,
+        245,
+        2260,
+        390
+      ],
+      "sha256": "844c6f21c02ae03255e287223828f921af6e2a43a67cd8d304dab115f6dc35df",
+      "expectedCapacity": 410000,
+      "transform": "pixel crop only"
+    },
+    {
+      "asset": "setup-elixir25.png",
+      "source": "ADB screencap, SM-S916B, 2340x1080, 2026-11-14",
+      "sourceSha256": "d532ae073a03eaf786e61c388b4bb0f2f7e418c9028488f6e08f1bacfcd437da",
+      "crop": [
+        1730,
+        170,
+        2260,
+        315
+      ],
+      "sha256": "80a0889050fef000206532e29f3d78cacc77664004d2a735bac1502a9b4eae7f",
+      "expectedCapacity": 25000000,
+      "transform": "pixel crop only"
+    },
+    {
+      "asset": "setup-dark-balance.png",
+      "source": "ADB screencap, SM-S916B, 2340x1080, 2026-11-14",
+      "sourceSha256": "697d365adbceedafefa97b650bf46db409b71f2d3654e786ee27bed04790980d",
+      "crop": [
+        1980,
+        175,
+        2180,
+        235
+      ],
+      "sha256": "95d19d9827b1e08409edc16135eced7b7105211fcce0699329deacf81ba9af20",
+      "expectedBalance": 19547,
+      "transform": "pixel crop only"
+    },
+    {
+      "asset": "setup-gold25-overflow.png",
+      "source": "ADB screencap, SM-S916B, 2340x1080, 2026-11-14",
+      "sourceSha256": "714fa0639c193f91ab12409ac41ee8155f2456de27e8220ad2a18d312b7c3b46",
+      "crop": [
+        1730,
+        95,
+        2260,
+        240
+      ],
+      "sha256": "04468cbd28b20fda0e359fb409e687d34fd418f272cf0521f1f39d29a938d5e2",
+      "expectedCapacity": 25000000,
+      "transform": "pixel crop only",
+      "note": "Saldo superior à capacidade após oferta; rótulo Máx. em baixo contraste."
+    }
+  ]
+}
