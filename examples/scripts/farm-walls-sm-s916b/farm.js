@@ -23,9 +23,35 @@ export function balanceConsensus(values) {
     return ranked[0]?.[1] >= 2 && ranked[0][1] > (ranked[1]?.[1] || 0) ? ranked[0][0] : undefined;
 }
 
-/** Read one balance with agreement across calibrated crops; e.g. await readResourceBalance(current, "dark"). */
-export async function readResourceBalance(current, resource) {
+const validBalance = value => Number.isSafeInteger(value) && value >= 0 && value <= 999999999;
+const balanceContext = current => `${current.frame.width}:${current.frame.height}:${current.frame.resumeGeneration}`;
+
+async function confirmStableBalance(current, resource, samples, history) {
+    if (!history) return undefined;
+    const candidates = [...new Set(samples.map(sample => number(sample.result)).filter(validBalance))];
+    if (candidates.length !== 1) { history.delete(resource); return undefined; }
+    const value = candidates[0];
+    const previous = history.get(resource);
+    const context = balanceContext(current);
+    // A repeated call on the same observation is not independent evidence.
+    if (previous?.context === context && previous.frame === current.frame.frame) return undefined;
+    const consecutive = previous?.context === context && previous.value === value && previous.frame < current.frame.frame
+        ? previous.consecutive + 1 : 1;
+    const query = samples.find(sample => number(sample.result) === value).query;
+    history.set(resource, { value, consecutive, context, frame: current.frame.frame, query });
+    await log(JSON.stringify({ event: "balance_stability", resource, value, consecutive, required: 3,
+        frame: current.frame.frame, resumeGeneration: current.frame.resumeGeneration }));
+    if (consecutive < 3) return undefined;
+    history.delete(resource);
+    return value;
+}
+
+/** Confirm a balance across crops, or three fresh frames using a caller-owned, village-local history.
+ * Example: await readResourceBalance(current, "gold", history). Omit history to require same-frame agreement. */
+export async function readResourceBalance(current, resource, history) {
     const base = current.calibration.regions[`${resource}Balance`];
+    const accepted = value => { history?.delete(resource); return value; };
+    if (history?.get(resource)?.context !== balanceContext(current)) history?.delete(resource);
     const scale = current.frame.width / 2340;
     const queries = [];
     for (const inset of [0, 10, 20, 30]) for (const trim of [-5, -2, 0, 2]) {
@@ -41,23 +67,41 @@ export async function readResourceBalance(current, resource) {
     const first = await readAll(current.frame, [probe]);
     const readings = [number(current.results[`${resource}Balance`]), number(first[0])];
     const fast = balanceConsensus(readings);
-    if (fast !== undefined) return fast;
+    if (fast !== undefined) return accepted(fast);
+    const samples = [
+        { query: { kind: "number", reference: "decimal", region: base, threshold: 85 }, result: current.results[`${resource}Balance`] },
+        { query: probe, result: first[0] },
+    ];
+    const previous = history?.get(resource);
+    if (previous) {
+        const preferred = await readAll(current.frame, [previous.query]);
+        const focused = [...samples, { query: previous.query, result: preferred[0] }];
+        const candidates = focused.map(sample => number(sample.result)).filter(validBalance);
+        // Reuse only a readable, uncontradicted crop. Otherwise run the complete recovery again.
+        if (number(preferred[0]) === previous.value && candidates.every(value => value === previous.value)) {
+            return confirmStableBalance(current, resource, focused, history);
+        }
+        history.delete(resource);
+    }
     const alternatives = await readAll(current.frame, queries);
+    samples.push(...alternatives.map((result, index) => ({ query: queries[index], result })));
     const candidates = [...readings, ...alternatives.map(number)];
     const normal = balanceConsensus(candidates);
     if (normal !== undefined) {
         await log(JSON.stringify({ event: "balance_read", resource, value: normal, method: "text_blocks",
             candidates: candidates.filter(value => value !== undefined) }));
-        return normal;
+        return accepted(normal);
     }
     // Single-line recognition complements localization; it does not replace readable text blocks.
     const lines = await readAll(current.frame, whiteQueries);
+    samples.push(...lines.map((result, index) => ({ query: whiteQueries[index], result })));
     const lineCandidates = lines.map(number);
     const value = balanceConsensus(lineCandidates);
     await log(JSON.stringify({ event: "balance_read", resource, value: value ?? null, method: "white_integer_line",
         candidates: lineCandidates.filter(value => value !== undefined),
         blockCandidates: candidates.filter(value => value !== undefined) }));
-    return value;
+    if (value !== undefined) return accepted(value);
+    return confirmStableBalance(current, resource, samples, history);
 }
 
 async function villageBalances(options) {
@@ -66,6 +110,8 @@ async function villageBalances(options) {
     const deadline = await now() + 10000;
     let missing = resources;
     let homeSeen = false;
+    // Never carry balance evidence across resource decisions, villages, or executions.
+    const history = new Map();
     do {
         try {
             const current = await snapshot(["village", "villageText", ...resources.map(resource => `${resource}Balance`)]);
@@ -73,15 +119,16 @@ async function villageBalances(options) {
             homeSeen ||= home;
             if (home) {
                 const balances = {};
-                for (const resource of resources) balances[resource] = await readResourceBalance(current, resource);
+                for (const resource of resources) balances[resource] = await readResourceBalance(current, resource, history);
                 missing = resources.filter(resource => balances[resource] === undefined);
                 if (!missing.length) {
                     await guard(found(current.results.village) ? "village" : "villageText", current);
                     return balances;
                 }
-            }
+            } else history.clear();
         } catch (error) {
             if (error.code !== "stale_observation") throw error;
+            history.clear();
         }
         await sleep(200);
     } while (await now() < deadline);
