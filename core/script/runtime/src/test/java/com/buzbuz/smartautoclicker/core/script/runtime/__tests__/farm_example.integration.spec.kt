@@ -242,10 +242,16 @@ class FarmExampleIntegrationTest {
             if (battleFinished(options, 60, 0, undefined)) throw new Error('Missing loot became zero');
             if (!battleFinished(options, 60, 0, 0)) throw new Error('Two valid zero readings were ignored');
             if (canReserve(undefined, 10, 1) || !canReserve(11, 10, 1) || canReserve(10, 10, 1)) throw new Error('Reserve boundary is wrong');
-            const consume = amount => { const bursts = []; let attempted = 0;
-                while (amount > 0) { const count = nextBurst(amount, attempted); bursts.push(count); attempted += count; amount -= count; }
-                return bursts.join(','); };
-            if (consume(25) !== '16,8,1' || consume(29) !== '16,8,4,1' || nextBurst(1,600) !== 0) throw new Error('Troop budget is wrong');
+            for (const total of [1, 9, 25, 29, 599, 600]) {
+                let attempted = 0;
+                while (attempted < total) {
+                    const count = nextBurst(total-attempted, attempted);
+                    if (count < 1 || count > 16 || count > total-attempted) throw new Error('Invalid burst');
+                    attempted += count;
+                }
+                if (attempted !== total) throw new Error('Troop budget is wrong');
+            }
+            if (nextBurst(10,599) !== 1 || nextBurst(1,600) !== 0) throw new Error('Safety limit exceeded');
         """.trimIndent()))
         val runtime = QuickJsScriptRuntime(Dispatchers.Default)
         runtime.validate(program)
@@ -260,7 +266,7 @@ class FarmExampleIntegrationTest {
         assertTrue(status.reason!!.contains("Limite de 1 batalha"))
         assertEquals(25, backend.troopsDeployed)
         assertEquals(1, backend.heroAbilities)
-        assertEquals(2, backend.spellsDeployed)
+        assertEquals(0, backend.spellsDeployed)
         assertEquals(1, backend.exitRequests)
         assertEquals(1, backend.exitConfirmations)
         assertEquals("village", backend.screen)
@@ -287,6 +293,37 @@ class FarmExampleIntegrationTest {
         assertEquals("village", backend.screen)
     }
 
+    @Test(timeout = 20000)
+    fun troopsAndHeroesAreDeployedBeforeTheFirstSpell() = runBlocking {
+        val backend = BattleBackend("fim natural", heroCount = 6)
+        val status = execute(backend)
+        assertEquals(status.failure?.stackTraceToString(), ScriptSessionState.STOPPED, status.state)
+        assertEquals(25, backend.troopsDeployed)
+        assertEquals(6, backend.heroAbilities)
+        assertEquals(2, backend.spellsDeployed)
+        assertEquals(listOf("troops", "heroes", "spells"), backend.deploymentOrder.distinct())
+        assertTrue(backend.deploymentOrder.lastIndexOf("troops") < backend.deploymentOrder.indexOf("heroes"))
+        assertTrue(backend.deploymentOrder.lastIndexOf("heroes") < backend.deploymentOrder.indexOf("spells"))
+    }
+
+    private fun withSpellConflicts(count: Int, afterReadings: Int = 0): ScriptProgram {
+        val original = sources()
+        val source = original.sources.getValue("spells.js")
+            .replace("export async function readSpellCards(", "async function readActualSpellCards(") + """
+                let conflicts = $count;
+                let readings = 0;
+                export async function readSpellCards(...args) {
+                    if (readings++ >= $afterReadings && conflicts-- > 0) {
+                        const error = new Error('Contador de feitiço divergente: 71 e 7');
+                        error.code = 'conflicting_spell_counter';
+                        throw error;
+                    }
+                    return readActualSpellCards(...args);
+                }
+            """.trimIndent()
+        return original.copy(sources = original.sources + ("spells.js" to source))
+    }
+
     @Test(timeout = 15000)
     fun zeroBalanceTriggersTheConfiguredMinimumBeforeAnyGesture() = runBlocking {
         val backend = BattleBackend("destruição")
@@ -296,7 +333,7 @@ class FarmExampleIntegrationTest {
         assertEquals(emptyList<ScreenPoint>(), backend.taps)
     }
 
-    private suspend fun execute(backend: BattleBackend, overrides: JsonObject = JsonObject(emptyMap())): ScriptSessionStatus = coroutineScope {
+    private suspend fun execute(backend: BattleBackend, overrides: JsonObject = JsonObject(emptyMap()), program: ScriptProgram = sources()): ScriptSessionStatus = coroutineScope {
         val manifest = Json.parseToJsonElement(resource("manifest.json")).jsonObject
         val defaults = manifest.getValue("parameters").jsonObject.mapValues { it.value.jsonObject.getValue("default") }
         val options = JsonObject(defaults + mapOf("improveWalls" to JsonPrimitive(false), "stopFarm" to JsonPrimitive("nunca"),
@@ -304,7 +341,7 @@ class FarmExampleIntegrationTest {
         val host = ScreenAutomationHost(backend, { false }, backend.clock::get, options,
             referenceProfile = ScreenProfile.parse(manifest.getValue("screen")))
         val session = ScriptSession(QuickJsScriptRuntime(Dispatchers.Default), AutomationSessionCoordinator(Dispatchers.Default) {})
-        launch { session.run(sources(), host) }.join()
+        launch { session.run(program, host) }.join()
         session.status.value
     }
 
@@ -317,7 +354,7 @@ class FarmExampleIntegrationTest {
     private fun resource(path: String) = checkNotNull(javaClass.classLoader!!.getResourceAsStream("farm-walls-sm-s916b/$path"))
         .bufferedReader().use { it.readText() }
 
-    private class BattleBackend(val finishMode: String) : ScreenAutomationBackend {
+    private class BattleBackend(val finishMode: String, heroCount: Int = 1) : ScreenAutomationBackend {
         var ignoredOpeningTaps = 0
         var openingTaps = 0
         var screenAfterIgnoredOpening = "village"
@@ -327,9 +364,18 @@ class FarmExampleIntegrationTest {
         var matchmakingDelayMs = 0L
         var tapsDuringMatchmaking = 0
         private var matchmakingStartedAt = 0L
+        var initialTroops = 25
+        var wideCounterMissesTroops = false
+        var scopedCounterMissesTroops = false
+        var collapseElevenTroops = false
+        var ignoreTroopCasts = false
+        var lastTroopTarget: ScreenPoint? = null
+        var hideTroopCounter = false
+        var troopCastAttempts = 0
         var troopsDeployed = 0
         var heroAbilities = 0
         var spellsDeployed = 0
+        val deploymentOrder = mutableListOf<String>()
         var exitRequests = 0
         var exitConfirmations = 0
         var showStarBonusAfterBattle = false
@@ -346,11 +392,16 @@ class FarmExampleIntegrationTest {
         var naturalEndAfterCaptures: Int? = null
         var excessSpellTaps = 0
         var ignoreSpellCasts = false
+        var rejectedSpell: Int? = null
+        var spellCastAttempts = 0
         var hideSpellCountersAfterCasting = false
         private var naturalCaptures = 0
         private var selectedSpell = 0
         private var selected: String? = null
-        private var heroDeployed = false
+        private val heroPositions = List(heroCount) { ScreenPoint(1500 - (heroCount - it - 1) * 120, 990) }
+        private val deployedHeroes = mutableSetOf<Int>()
+        private var selectedHero = 0
+        private val heroDeployed get() = deployedHeroes.isNotEmpty()
         override suspend fun capture(): ScreenSize {
             clock.addAndGet(if (screen == "matchmaking") 10_000_000_000 else 200_000_000)
             if (screen == "matchmaking" && clock.get() - matchmakingStartedAt >= matchmakingDelayMs * 1_000_000) screen = "opponent"
@@ -361,7 +412,10 @@ class FarmExampleIntegrationTest {
             if (starBonusVisible && region.left == 650) listOf(
                 ScreenText("Bônus de estrela recebido", 99.0, ScreenRegion(810, 200, 1530, 245)),
                 ScreenText("Resgatar", 99.0, ScreenRegion(1100, 820, 1260, 870)),
-            ) else if (screen == "battle" && region.top == 920 && !(hideSpellCountersAfterCasting && spellsDeployed > 0)) spellAmounts.mapIndexedNotNull { index, amount ->
+            ) else if (screen == "battle" && region.top == 920 && region.right <= heroPositions.first().x) {
+                if (hideTroopCounter || 200 !in region.left until region.right) emptyList()
+                else listOf(ScreenText("x${initialTroops-troopsDeployed}", 99.0, ScreenRegion(180, 920, 220, 960)))
+            } else if (screen == "battle" && region.top == 920 && !(hideSpellCountersAfterCasting && spellsDeployed > 0)) spellAmounts.mapIndexedNotNull { index, amount ->
                 val x = 1800 + index * 120
                 if (x !in region.left until region.right) null
                 else ScreenText("x$amount", 99.0, ScreenRegion(x - 20, 920, x + 20, if (clippedSpellHeader) 924 else 960))
@@ -375,8 +429,12 @@ class FarmExampleIntegrationTest {
             if (query.kind == RecognitionKind.NUMBER) {
                 val spell = spellAmounts.indexOfFirst { it > 0 }
                 val value = when {
-                    query.reference == "quantity" && screen == "battle" && troopsDeployed < 25 -> (25 - troopsDeployed).toDouble()
-                    query.reference == "quantity" && screen == "battle" && spell >= 0 -> spellAmounts[spell].toDouble()
+                    query.reference == "quantity" && screen == "battle" && hideTroopCounter -> null
+                    query.reference == "quantity" && screen == "battle" && troopsDeployed < initialTroops &&
+                        !(wideCounterMissesTroops && query.region.right > heroPositions.first().x) && !scopedCounterMissesTroops ->
+                        if (collapseElevenTroops && initialTroops - troopsDeployed in 8..11) 1.0
+                        else (initialTroops - troopsDeployed).toDouble()
+                    query.reference == "quantity" && screen == "battle" && spell >= 0 && query.region.right > 1800 -> spellAmounts[spell].toDouble()
                     query.region == ScreenRegion(2140, 815, 2250, 880) && screen == "battle" ->
                         if (finishMode == "saque total" || heroDeployed) 60.0 else 20.0
                     query.region == ScreenRegion(170, 130, 410, 182) || query.region == ScreenRegion(170, 188, 410, 240) ->
@@ -386,7 +444,9 @@ class FarmExampleIntegrationTest {
                 }
                 return if (value == null) ScreenRecognition(RecognitionStatus.INVALID_READING, 0.0)
                     else ScreenRecognition(RecognitionStatus.FOUND, 100.0,
-                        if (query.reference == "quantity" && troopsDeployed >= 25) ScreenPoint(1800 + spell * 120, 945) else ScreenPoint(200, 945), value)
+                        if (query.reference == "quantity" && (troopsDeployed >= initialTroops ||
+                                wideCounterMissesTroops && query.region.right > heroPositions.first().x || scopedCounterMissesTroops))
+                            ScreenPoint(1800 + spell * 120, 945) else ScreenPoint(200, 945), value)
             }
             val recognized = when (query.reference) {
                 "village", "villageText" -> screen == "village"
@@ -396,7 +456,10 @@ class FarmExampleIntegrationTest {
                 "battle" -> screen == "battle" || screen == "opponent"
                 "exitConfirm" -> screen == "exitConfirm"
                 "result", "resultText" -> screen == "result"
-                "hero1" -> screen == "battle" && !heroDeployed
+                in heroPositions.indices.map { "hero${it + 1}" } -> screen == "battle" &&
+                    query.reference!!.removePrefix("hero").toInt() - 1 !in deployedHeroes
+                "troopEleven" -> screen == "battle" && initialTroops - troopsDeployed == 11 &&
+                    200 in query.region.left until query.region.right
                 "spell" -> screen == "battle" && heroDeployed && spellImageVisible
                 "starBonusTitle", "starBonusClaim" -> starBonusVisible
                 "chestRoll" -> screen == "chest"
@@ -404,7 +467,8 @@ class FarmExampleIntegrationTest {
                 else -> false
             }
             val position = when (query.reference) {
-                "hero1" -> ScreenPoint(1500, 990)
+                "troopEleven" -> ScreenPoint(200, 945)
+                in heroPositions.indices.map { "hero${it + 1}" } -> heroPositions[query.reference!!.removePrefix("hero").toInt() - 1]
                 "spell" -> ScreenPoint(1000, 1000)
                 "exitConfirm" -> ScreenPoint(1380, 700)
                 "starBonusClaim" -> ScreenPoint(1180, 845)
@@ -441,17 +505,26 @@ class FarmExampleIntegrationTest {
                 "result" -> { screen = "village"; starBonusVisible = showStarBonusAfterBattle }
                 "battle" -> when (position) {
                     ScreenPoint(210, 845) -> { screen = "exitConfirm"; exitRequests++ }
-                    ScreenPoint(200, 945) -> selected = "troops"
-                    ScreenPoint(1500, 990) -> if (heroDeployed) heroAbilities++ else selected = "hero"
+                    ScreenPoint(200, 945), ScreenPoint(200, 980) -> selected = "troops"
                     ScreenPoint(1000, 1000) -> selected = "spell"
-                    else -> if (position.y in 930..1065 && position.x >= 1800) {
+                    else -> if (position in heroPositions) {
+                        selectedHero = heroPositions.indexOf(position)
+                        if (selectedHero in deployedHeroes) heroAbilities++ else selected = "hero"
+                    } else if (position.y in 930..1065 && position.x >= 1800) {
                         selected = "spell"; selectedSpell = (position.x - 1800) / 120
                     } else when (selected) {
-                        "troops" -> troopsDeployed++
-                        "hero" -> heroDeployed = true
+                        "troops" -> {
+                            troopCastAttempts++
+                            if (!ignoreTroopCasts && troopsDeployed < initialTroops &&
+                                (initialTroops - troopsDeployed != 1 || lastTroopTarget == null || position == lastTroopTarget)) {
+                                troopsDeployed++; deploymentOrder += "troops"
+                            }
+                        }
+                        "hero" -> { deployedHeroes += selectedHero; deploymentOrder += "heroes" }
                         "spell" -> {
-                            if (ignoreSpellCasts) Unit
-                            else if (spellAmounts[selectedSpell] > 0) { spellsDeployed++; spellAmounts[selectedSpell]-- }
+                            spellCastAttempts++
+                            if (ignoreSpellCasts || selectedSpell == rejectedSpell) Unit
+                            else if (spellAmounts[selectedSpell] > 0) { spellsDeployed++; spellAmounts[selectedSpell]--; deploymentOrder += "spells" }
                             else excessSpellTaps++
                             if (finishMode == "fim natural" && spellAmounts.all { it == 0 }) screen = "result"
                         }
