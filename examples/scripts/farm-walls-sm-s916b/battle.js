@@ -1,9 +1,9 @@
-import { read, zoom, sleep, now, log, stop, stage } from "klickr";
+import { read, readText, zoom, sleep, now, log, stop, stage } from "klickr";
 import { heroReferences } from "./profile.js";
 import { found, number, snapshot, waitSnapshot, guard, position, tapStep, act, transition } from "./screen.js";
 import { battleFinished, nextBurst } from "./policy.js";
 import { confirmVillage } from "./villages.js";
-import { readSpellCards } from "./spells.js";
+import { readSpellCards, spellQuantity } from "./spells.js";
 
 const resultNames = ["result", "resultText"];
 const hasResult = current => resultNames.some(name => found(current.results[name]));
@@ -83,6 +83,36 @@ export async function verifiedTroopQuantity(current, quantity, boundary) {
     return verified;
 }
 
+/** Resolve troops only to the left of the heroes; a spell reading never proves troops are empty.
+ * Example: await readTroopCounter(current, firstHeroLeft). */
+export async function readTroopCounter(current, boundary) {
+    const broad = current.results.troops;
+    if (found(broad) && broad.x < boundary) return broad;
+    const row = current.calibration.regions.troops;
+    const region = { ...row, right: Math.min(row.right, Math.floor(boundary)) };
+    const quantity = await read(current.frame, { kind: "number", reference: "quantity", region, threshold: 80 });
+    if (found(quantity)) return quantity;
+    // The wide strip can omit a counter when a selected card changes segmentation.
+    // Read overlapping header windows, keeping zeros explicit rather than inferred from a spell.
+    const scale = current.frame.width / 2340;
+    const counters = [];
+    for (let left = region.left; left < region.right; left += Math.round(60 * scale)) {
+        const text = await readText(current.frame, { threshold: 80, region: { ...region,
+            left: Math.max(region.left, left - Math.round(40 * scale)),
+            right: Math.min(region.right, left + Math.round(100 * scale)),
+            bottom: row.bottom - Math.round(10 * scale) } });
+        if (text.truncated) return undefined;
+        for (const block of text.blocks) {
+            const amount = /^[xX×]/.test(block.text.trim()) ? spellQuantity(block.text) : undefined;
+            if (amount === undefined) continue;
+            counters.push({ status: "found", number: amount, x: Math.round((block.left + block.right) / 2),
+                y: Math.round((block.top + block.bottom) / 2), frame: current.frame.frame });
+        }
+    }
+    const positive = counters.filter(counter => counter.number > 0).sort((a, b) => a.x - b.x)[0];
+    return positive || counters.find(counter => counter.number === 0);
+}
+
 // A local deployment failure must not abandon an already-started battle. Keep
 // unreadable counters unknown, stop casting that unit, and let the result settle.
 async function deferDeployment(unit, reason, attempted, remaining) {
@@ -113,9 +143,15 @@ async function deployTroops(options, spellLayout) {
         }
         const boundary = Math.min(...boundaries);
         spellLayout.leftRatio = Math.max(...heroes.map(result => result.x + (result.width ?? 0) / 2)) / current.frame.width;
-        const quantity = current.results.troops;
+        const quantity = await readTroopCounter(current, boundary);
         let amount = number(quantity);
-        if (found(quantity) && quantity.x >= boundary) { spellLayout.expected = true; return false; }
+        await log(JSON.stringify({ event: "troop_counter_observed", quantity: amount ?? null,
+            x: quantity?.x ?? null, boundary, broadQuantity: number(current.results.troops) ?? null,
+            broadX: current.results.troops?.x ?? null, attempted }));
+        if (amount === 0) {
+            spellLayout.expected = found(current.results.troops) && current.results.troops.x >= boundary;
+            return false;
+        }
         if (!Number.isSafeInteger(amount) || amount <= 0) {
             unreadable++;
             if (unreadable >= 4) return defer("contador ilegível");
