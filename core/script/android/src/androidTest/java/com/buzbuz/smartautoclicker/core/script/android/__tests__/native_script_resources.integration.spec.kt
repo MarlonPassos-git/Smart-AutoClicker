@@ -29,6 +29,26 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class NativeScriptResourcesIntegrationTest {
     @Test(timeout = 60000)
+    fun remainingMinionsAreReadBeforeTheHeroBoundary() = runBlocking {
+        withFrame("undeployed_minions", 500, 885, "farm_cv19") { frame ->
+            verifyFarm(frame, """
+                import {snapshot, found, number} from './screen.js';
+                import {heroReferences} from './profile.js';
+                import {readTroopCounter} from './battle.js';
+                const current = await snapshot(['troops',...heroReferences]);
+                const heroes = heroReferences.map(name=>current.results[name]).filter(found);
+                const boundary = Math.min(...heroes.map(hero=>hero.x-hero.width/2));
+                if (!Number.isFinite(boundary) || number(current.results.troops)!==29 || current.results.troops.x>=boundary)
+                    throw new Error('Remaining minions were skipped: '+JSON.stringify({boundary,results:current.results}));
+                const recovered = await readTroopCounter({...current,results:{...current.results,
+                    troops:{status:'found',number:11,x:980,y:940}}},boundary);
+                if (number(recovered)!==29 || recovered.x>=boundary)
+                    throw new Error('A spell hid the remaining minions: '+JSON.stringify(recovered));
+            """.trimIndent())
+        }
+    }
+
+    @Test(timeout = 60000)
     fun selectedTroopElevenIsConfirmedWhenQuantityOcrCollapsesItToOne() = runBlocking {
         withFrame("troop_eleven", 510, 920, "farm_cv19") { frame ->
             verifyFarm(frame, """

@@ -13,6 +13,29 @@ import org.junit.Test
 
 class FarmExampleIntegrationTest {
     @Test(timeout = 20000)
+    fun aSpellReadFromTheWideStripDoesNotSkipRemainingTroops() = runBlocking {
+        val backend = BattleBackend("fim natural").apply { wideCounterMissesTroops = true }
+        val status = execute(backend)
+        assertEquals(status.failure?.stackTraceToString(), ScriptSessionState.STOPPED, status.state)
+        assertEquals(25, backend.troopsDeployed)
+        assertEquals("troops", backend.deploymentOrder.first())
+        assertEquals("village", backend.screen)
+    }
+
+    @Test(timeout = 20000)
+    fun smallHeaderWindowsRecoverTroopsWhenBothQuantityReadsMissThem() = runBlocking {
+        val backend = BattleBackend("fim natural").apply {
+            wideCounterMissesTroops = true
+            scopedCounterMissesTroops = true
+        }
+        val status = execute(backend)
+        assertEquals(status.failure?.stackTraceToString(), ScriptSessionState.STOPPED, status.state)
+        assertEquals(25, backend.troopsDeployed)
+        assertEquals(2, backend.spellsDeployed)
+        assertEquals("village", backend.screen)
+    }
+
+    @Test(timeout = 20000)
     fun matchmakingLongerThanOneMinuteStillCompletesTheBattle() = runBlocking {
         val backend = BattleBackend("fim natural").apply { matchmakingDelayMs = 70000 }
         val status = execute(backend)
