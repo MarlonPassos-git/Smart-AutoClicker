@@ -324,6 +324,34 @@ class FarmExampleIntegrationTest {
         return original.copy(sources = original.sources + ("spells.js" to source))
     }
 
+    @Test(timeout = 20000)
+    fun collapsedElevenTroopCounterIsVerifiedBeforeRetryBudgetRunsOut() = runBlocking {
+        val backend = BattleBackend("fim natural").apply {
+            initialTroops = 27
+            collapseElevenTroops = true
+        }
+        val status = execute(backend)
+        assertEquals(status.failure?.stackTraceToString(), ScriptSessionState.STOPPED, status.state)
+        assertTrue(status.reason!!.contains("Limite de 1 batalha"))
+        assertEquals(27, backend.troopsDeployed)
+        assertEquals(1, backend.heroAbilities)
+        assertEquals(2, backend.spellsDeployed)
+        assertEquals("village", backend.screen)
+    }
+
+    @Test(timeout = 20000)
+    fun aRealSingleTroopIsNotInflatedByAnElevenSpellCounter() = runBlocking {
+        val backend = BattleBackend("fim natural").apply {
+            initialTroops = 17
+            spellAmounts = mutableListOf(11)
+        }
+        val status = execute(backend)
+        assertTrue(status.reason!!.contains("Limite de 1 batalha"))
+        assertEquals(17, backend.troopsDeployed)
+        assertEquals(11, backend.spellsDeployed)
+        assertEquals("village", backend.screen)
+    }
+
     @Test(timeout = 15000)
     fun zeroBalanceTriggersTheConfiguredMinimumBeforeAnyGesture() = runBlocking {
         val backend = BattleBackend("destruição")

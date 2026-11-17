@@ -29,6 +29,21 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class NativeScriptResourcesIntegrationTest {
     @Test(timeout = 60000)
+    fun selectedTroopElevenIsConfirmedWhenQuantityOcrCollapsesItToOne() = runBlocking {
+        withFrame("troop_eleven", 510, 920, "farm_cv19") { frame ->
+            verifyFarm(frame, """
+                import {snapshot} from './screen.js';
+                import {verifiedTroopQuantity} from './battle.js';
+                const current = await snapshot(['battle']);
+                // Reproduce the deployed OCR's collapsed result over the original captured glyph.
+                const quantity = {status:'found',number:1,x:590,y:935};
+                const verified = await verifiedTroopQuantity(current, quantity, 768);
+                if (verified !== 11) throw new Error('Troop x11 remained '+verified+': '+JSON.stringify(quantity));
+            """.trimIndent())
+        }
+    }
+
+    @Test(timeout = 60000)
     fun farmReadsCountersOfDifferentSpellsAndASelectedCardWithoutPortraitMatching() = runBlocking {
         withFrame("mixed_army", 80, 885, "quantity_calibration") { frame ->
             verifyFarm(frame, """
