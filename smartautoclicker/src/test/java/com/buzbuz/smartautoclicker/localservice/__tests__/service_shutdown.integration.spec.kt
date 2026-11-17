@@ -28,6 +28,7 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.slot
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -51,6 +52,43 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [35], application = Application::class)
 class ServiceShutdownIntegrationTest {
+    @Test
+    fun retryStaysOverTheGameWithoutRestartingTheServiceOrOpeningAnActivity() = runTest {
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
+        val driver = mockk<ScriptServiceDriver>(relaxed = true)
+        every { driver.diagnostics } returns ScriptDiagnostics()
+        every { driver.status } returns MutableStateFlow(ScriptSessionStatus(ScriptSessionState.FAILED))
+        mockkConstructor(ServiceNotificationController::class)
+        every { anyConstructed<ServiceNotificationController>().createNotification(any(), any(), any(), any()) } returns Notification()
+        val fixture = Fixture(script = driver)
+        val overlay = slot<com.buzbuz.smartautoclicker.feature.script.config.ScriptRunOverlay>()
+        coEvery { fixture.overlays.navigateTo(any(), capture(overlay)) } returns Unit
+        every { driver.retry() } returns true
+        val application = ApplicationProvider.getApplicationContext<Application>()
+        val shadow = org.robolectric.Shadows.shadowOf(application)
+        try {
+            assertTrue(fixture.service.startScript(-1, Intent(), "failed-revision", "{}"))
+            runCurrent()
+            val retry = overlay.captured.javaClass.getDeclaredField("onRetryClicked").apply { isAccessible = true }
+                .get(overlay.captured) as () -> Boolean
+            assertTrue(retry())
+            runCurrent()
+            assertEquals(null, shadow.nextStartedActivity)
+            advanceUntilIdle()
+            assertEquals(null, shadow.nextStartedActivity)
+            assertTrue(fixture.service.isStarted)
+            coVerify(exactly = 0) { driver.stopAndJoin() }
+            io.mockk.verify(exactly = 1) { driver.retry() }
+            io.mockk.verify(exactly = 1) { driver.start(any(), any(), any(), any(), any(), any(), any()) }
+        } finally {
+            fixture.service.stopScenario()
+            advanceUntilIdle()
+            fixture.service.release()
+            unmockkConstructor(ServiceNotificationController::class)
+            Dispatchers.resetMain()
+        }
+    }
+
     @Test
     fun scriptReportExportsRetainedEventsWithoutEnablingTracingAndEndsWithItsSession() = runTest {
         Dispatchers.setMain(StandardTestDispatcher(testScheduler))

@@ -41,6 +41,75 @@ class ScriptDriverIntegrationTest {
     @get:Rule val temporary = TemporaryFolder()
 
     @Test(timeout = 20000)
+    fun retryUsesTheLiveProjectionAndOriginalCheckpointWithFreshExecutionResources() = runBlocking {
+        val context = mockk<Context>(relaxed = true)
+        every { context.filesDir } returns temporary.root
+        val bytes = ByteArrayOutputStream()
+        ZipOutputStream(bytes).use { zip ->
+            mapOf("manifest.json" to """{"formatVersion":1,"apiVersion":1,"id":"retry","name":"Retomada","scriptVersion":"1","entry":"entry.js","executionState":{"version":1}}""",
+                "entry.js" to "const example = true;").forEach { (path, source) ->
+                zip.putNextEntry(ZipEntry(path)); zip.write(source.toByteArray()); zip.closeEntry()
+            }
+        }
+        val stored = ScriptPackageRepository(File(temporary.root, "scripts/packages")).importPackage(ByteArrayInputStream(bytes.toByteArray()))
+        val recorder = mockk<DisplayRecorder>(relaxed = true)
+        val display = mockk<DisplayConfigManager>(relaxed = true)
+        every { display.displayConfig } returns DisplayConfig(Point(100, 200), 1, 0, emptyMap())
+        val detectors = mutableListOf<ImageDetector>()
+        var attempts = 0
+        var restored: JsonObject? = null
+        val runtime = object : ScriptRuntime {
+            override suspend fun validate(program: ScriptProgram) = Unit
+            override suspend fun execute(program: ScriptProgram, host: ScriptHost) {
+                if (++attempts == 1) {
+                    host.call("""{"apiVersion":1,"operation":"saveState","value":{"attacks":9,"pending":{"kind":"attack"}},"completed":false}""")
+                    throw IllegalStateException("Falha recuperável")
+                }
+                restored = Json.parseToJsonElement(host.call("""{"apiVersion":1,"operation":"loadState"}""")).jsonObject
+                if (attempts == 2) {
+                    host.call("""{"apiVersion":1,"operation":"saveState","value":{"attacks":9,"pending":{"kind":"attack"},"recovery":{"choices":[{"id":"count","label":"Contar ataque"},{"id":"discard","label":"Manter contagem"}]}},"completed":false}""")
+                    host.call("""{"apiVersion":1,"operation":"stop","message":"Resultado incerto"}""")
+                }
+            }
+        }
+        val driver = ScriptServiceDriver(context, recorder, display, mockk(relaxed = true), mockk(relaxed = true), "retry-test",
+            { mockk<ImageDetector>(relaxed = true).also { detectors += it } }, runtime)
+        val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+        try {
+            assertFalse(driver.retry())
+            driver.start(scope, -1, Intent(), stored.storageId, "{}", newRound = true)
+            withTimeout(10000) { driver.status.first { it.state == ScriptSessionState.FAILED } }
+            coVerify(exactly = 0) { recorder.stopProjection() }
+            assertTrue(driver.retry())
+            try { withTimeout(10000) { driver.status.first { it.state == ScriptSessionState.STOPPED } } }
+            catch (timeout: TimeoutCancellationException) {
+                throw AssertionError("Retry after $attempts attempt(s): ${driver.status.value}", driver.status.value.failure ?: timeout)
+            }
+            assertEquals(listOf("count", "discard"), driver.recoveryChoices().map { it.id })
+            assertFalse(driver.resolveRecovery("unknown"))
+            assertTrue(driver.resolveRecovery("count"))
+            withTimeout(10000) { driver.status.first { it.state == ScriptSessionState.COMPLETED } }
+            driver.stopAndJoin()
+            assertEquals(3, attempts)
+            val checkpoint = checkNotNull(restored).getValue("value").jsonObject
+            assertEquals(9, checkpoint.getValue("attacks").jsonPrimitive.int)
+            assertEquals("count", checkpoint.getValue("recovery").jsonObject.getValue("answer").jsonPrimitive.content)
+            assertEquals(3, detectors.size)
+            detectors.forEach { verify(exactly = 1) { it.close() } }
+            coVerify(exactly = 1) { recorder.startProjection(any(), any(), any()) }
+            coVerify(exactly = 1) { recorder.startScreenRecord(any()) }
+            coVerify(exactly = 1) { recorder.stopProjection() }
+            val summaries = File(temporary.root, "scripts/execution-logs").listFiles()!!.map {
+                Json.parseToJsonElement(it.resolve("summary.json").readText()).jsonObject
+            }
+            assertEquals(setOf("FAILED", "STOPPED", "COMPLETED"), summaries.map { it.getValue("status").jsonPrimitive.content }.toSet())
+            assertTrue(summaries.all { it.getValue("revision") == JsonPrimitive(stored.storageId) })
+            assertFalse(summaries.single { it.getValue("status") == JsonPrimitive("COMPLETED") }.getValue("newRound").jsonPrimitive.boolean)
+            assertFalse(driver.retry())
+        } finally { driver.stopAndJoin(); scope.cancel() }
+    }
+
+    @Test(timeout = 20000)
     fun preparationWaitsForTheCalibratedOrientationBeforeCreatingCaptureOrExecutingCode() = runBlocking {
         val context = mockk<Context>(relaxed = true)
         every { context.filesDir } returns temporary.root

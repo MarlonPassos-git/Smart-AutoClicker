@@ -266,7 +266,30 @@ class MultivillageIntegrationTest {
                 "multivillage" to JsonPrimitive(true), "improveWalls" to JsonPrimitive(false), "maxBattles" to JsonPrimitive(2)))
     }
 
-    private suspend fun execute(source: String, previous: JsonObject? = null, home: Boolean = false, homeAfterCaptures: Int = 0): Result = kotlinx.coroutines.coroutineScope {
+    @Test(timeout = 20000) fun retryOnTheBattleOrResultScreenConfirmsThePendingAttackExactlyOnce() = runBlocking {
+        for (screen in listOf("battle", "result")) {
+            val previous = buildJsonObject {
+                put("version", 1); put("options", options()); put("stage", "ready")
+                put("villages", Json.parseToJsonElement("""[{"id":"#CURRENT","key":"current","name":"Atual","attacks":1,"status":"running"}]"""))
+                put("pending", Json.parseToJsonElement("""{"kind":"attack","village":"#CURRENT","confirmedBefore":1}"""))
+            }
+            val result = execute("""
+                let recovered = 0;
+                await runRound(options, { currentIdentity: async () => '#CURRENT',
+                    runBattle: async () => { recovered++; },
+                    runVillage: async (_, callbacks) => {
+                        if (recovered !== 1 || callbacks.attacks !== 2) throw new Error('Pending attack not confirmed exactly once');
+                        return 'Limite atingido';
+                    } });
+            """, previous, recoveryScreen = screen)
+            assertEquals(result.status.failure?.stackTraceToString(), ScriptSessionState.COMPLETED, result.status.state)
+            assertEquals(2, result.state!!.getValue("villages").jsonArray.single().jsonObject.getValue("attacks").jsonPrimitive.int)
+            assertEquals(JsonNull, result.state.getValue("pending"))
+        }
+    }
+
+    private suspend fun execute(source: String, previous: JsonObject? = null, home: Boolean = false, homeAfterCaptures: Int = 0,
+        recoveryScreen: String? = null): Result = kotlinx.coroutines.coroutineScope {
         var checkpoint = previous
         val store = object : ScriptExecutionState {
             override suspend fun read() = checkpoint
@@ -281,7 +304,7 @@ class MultivillageIntegrationTest {
         val backend = object : ScreenAutomationBackend {
             override suspend fun capture(): ScreenSize { captures++; return ScreenSize(2340, 1080) }
             override suspend fun recognize(query: RecognitionQuery) = ScreenRecognition(
-                if (home && captures > homeAfterCaptures && query.reference == "village") RecognitionStatus.FOUND else RecognitionStatus.NOT_FOUND, 99.0)
+                if (query.reference == recoveryScreen || home && captures > homeAfterCaptures && query.reference == "village") RecognitionStatus.FOUND else RecognitionStatus.NOT_FOUND, 99.0)
             override suspend fun tap(position: ScreenPoint, durationMs: Long) { error("Unexpected gesture") }
             override suspend fun tapSequence(steps: List<ScreenTapStep>) { error("Unexpected gesture") }
             override suspend fun swipe(from: ScreenPoint, to: ScreenPoint, durationMs: Long) { error("Unexpected gesture") }
