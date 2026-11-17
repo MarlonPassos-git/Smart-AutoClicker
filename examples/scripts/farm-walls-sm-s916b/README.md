@@ -30,6 +30,8 @@ A versão 3.6.0 trata falhas locais de lançamento sem abandonar a batalha. Uma 
 
 A versão 3.6.1 não considera as tropas esgotadas apenas porque a leitura da barra encontrou um feitiço. Nesse caso, relê somente a área à esquerda dos heróis e usa recortes menores dos cabeçalhos se necessário. Zero precisa ser reconhecido explicitamente; uma leitura ausente continua ilegível. O evento `troop_counter_observed` registra quantidade, posição, limite dos heróis e leitura original da barra.
 
+A versão 3.6.2 também confirma um saldo quando o mesmo valor aparece sem divergência em três capturas consecutivas da vila. Durante essa conferência, prioriza o recorte que conseguiu ler. Leituras ausentes, conflitantes, uma pausa ou a perda da vila reiniciam a sequência. O histórico é descartado antes de outra decisão de recursos ou troca de vila.
+
 ## Uso
 
 Inicie com a vila visível, na resolução e no enquadramento do perfil. Confira os parâmetros antes de executar. A calibração reconhece muros de nível 18 e confirma o nível 19 após melhorar. Mudanças de idioma, interface, níveis, paisagem ou posições exigem novas referências.

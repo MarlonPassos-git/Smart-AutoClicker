@@ -1,0 +1,84 @@
+{
+  "date": "2026-11-17",
+  "scriptVersion": "3.6.2",
+  "device": "Samsung SM-S916B",
+  "revision": "fc51e613-d22d-49fc-a20b-519b2fbd41aa",
+  "runId": "daa967ea-a546-4c64-a3a4-5ca0c0efbf1e",
+  "status": "COMPLETED",
+  "problem": {
+    "runId": "5ff3582d-9b27-4f20-86d1-332fbba5bff3",
+    "gold": 7756688,
+    "repeatedFrames": 4,
+    "reason": "Um único recorte legível por captura era descartado mesmo quando o valor se repetia."
+  },
+  "correction": {
+    "sameFrameCropConsensusPreserved": true,
+    "consecutiveFramesRequired": 3,
+    "reuseReadableCrop": true,
+    "resetOn": [
+      "leitura ausente",
+      "valores conflitantes observados",
+      "mudança do saldo",
+      "pausa ou mudança da geometria",
+      "perda da vila",
+      "nova decisão de recursos ou vila"
+    ]
+  },
+  "checks": {
+    "command": "./gradlew testFDroidDebugUnitTest assembleFDroidDebug :core:script:android:assembleFDroidDebugAndroidTest",
+    "result": "BUILD SUCCESSFUL",
+    "tests": 1890,
+    "failures": 0,
+    "errors": 0,
+    "nativeTest": "theGoldBalanceThatStoppedTheFarmIsConfirmedAcrossFreshObservations",
+    "nativeResult": "OK (1 test)",
+    "controlledCases": [
+      "Um recorte legível em três capturas independentes.",
+      "Redução das leituras após encontrar o recorte legível.",
+      "Saldo mudando reinicia a confirmação.",
+      "Ausência ou conflito observado descarta o histórico.",
+      "Repetir a mesma captura não aumenta a contagem.",
+      "Pausa exige nova sequência.",
+      "Ausência não vira zero.",
+      "Chamada sem histórico mantém a exigência de consenso entre recortes.",
+      "Decisão de recursos usa o saldo estável antes de qualquer gesto."
+    ]
+  },
+  "deviceValidation": {
+    "maxBattles": 1,
+    "confirmedBattles": 1,
+    "destruction": 51,
+    "wallsEnabled": false,
+    "startingBalances": {
+      "gold": 6670753,
+      "elixir": 7219416,
+      "dark": 144001
+    }
+  },
+  "preservation": {
+    "backup": "~/.local/state/klickr-validation/balances-20261117",
+    "configurationUnchangedByteForByte": true,
+    "answersRestoredByteForByte": true,
+    "roundStateUnchanged": true,
+    "checkpointRevisionUpdatedTo": "fc51e613-d22d-49fc-a20b-519b2fbd41aa",
+    "confirmedAttacksRestored": [
+      34,
+      11
+    ],
+    "pendingAttack": null
+  },
+  "fixture": {
+    "path": "core/script/android/src/androidTest/assets/farm_cv19/gold_balance_7756688.png",
+    "source": "Captura do aparelho parado por falta de concordância às 10h38; recorte de 400×225 em (1900,15).",
+    "sha256": "35d8dff1767b7d2ef23d06ca16197bf299537b6d45f5d7e37062ec899e00a7d2"
+  },
+  "artifact": {
+    "path": "build/script-examples/farm-walls-sm-s916b-3.6.2.zip",
+    "sha256": "deeb5851df0d6968d9cd0d4110f8f0b53aaee6203a7215181e781f5220314985"
+  },
+  "limits": [
+    "Após recarregar o jogo, o saldo real do ataque limitado era diferente do valor da falha e foi confirmado por vários recortes. A recuperação temporal da falha exata foi comprovada no teste nativo com a captura preservada.",
+    "O ataque de validação ficou arquivado separadamente e não foi somado à rodada anterior.",
+    "A validação física não incluiu melhoria de muros nem troca de conta."
+  ]
+}
