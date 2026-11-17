@@ -49,6 +49,7 @@ async function requireHome(round) {
         { timeoutMs: 30000, intervalMs: 200, required: false });
     if (current && (found(current.results.village) || found(current.results.villageText))) return "home";
     if (current && (found(current.results.result) || found(current.results.resultText))) return "result";
+    if (current && found(current.results.battle)) return "battle";
     round.reason = "Batalha ou transição pendente. Finalize manualmente e volte à vila para conferir a identidade e resolver a contagem.";
     await checkpoint(round);
     await stop(round.reason);
@@ -59,7 +60,7 @@ async function recoverAttack(round, automation) {
     const village = round.villages.find(item => item.id === pending.village);
     if (!village || village.status === "completed" || pending.confirmedBefore !== village.attacks) throw new Error("Tentativa pendente sem vila em andamento; registro preservado.");
     const screen = await requireHome(round);
-    if (screen === "result") {
+    if (screen === "result" || screen === "battle") {
         await (automation.runBattle || runBattle)(round.options);
         const id = await automation.currentIdentity();
         if (id !== village.id) throw new Error(`Resultado pertence à conta ${id}, esperada ${village.id}; contagem não alterada.`);

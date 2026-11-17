@@ -7,6 +7,7 @@
     <string name="script_invalid_parameters">Confira os parâmetros: %1$s</string>
     <string name="script_pause">Pausar script</string>
     <string name="script_resume">Retomar script</string>
+    <string name="script_retry">Tentar novamente</string>
     <string name="script_stop">Parar e fechar</string>
     <string name="script_diagnostics">Diagnóstico detalhado</string>
     <string name="script_diagnostics_close">Fechar diagnóstico detalhado</string>

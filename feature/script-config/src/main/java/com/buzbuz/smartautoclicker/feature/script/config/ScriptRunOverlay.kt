@@ -22,16 +22,28 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 /** Reuses the existing movable overlay menu rather than creating a second window stack. */
-class ScriptRunOverlay(private val controller: ScriptRunController, private val onStopClicked: () -> Unit) : OverlayMenu(
+class ScriptRunOverlay(
+    private val controller: ScriptRunController,
+    private val onRetryClicked: (() -> Boolean)? = null,
+    private val onStopClicked: () -> Unit,
+) : OverlayMenu(
     theme = com.buzbuz.smartautoclicker.core.ui.R.style.AppTheme,
 ) {
     private lateinit var binding: OverlayScriptRunBinding
     private lateinit var historyAdapter: ScriptDiagnosticAdapter
     private val detailsVisible = MutableStateFlow(false)
     private var expandedControls = false
+    private var retryRequested = false
+    private var renderedChoices = emptyList<com.buzbuz.smartautoclicker.core.script.android.ScriptRecoveryChoice>()
 
     override fun onCreateMenu(layoutInflater: LayoutInflater): ViewGroup {
         binding = OverlayScriptRunBinding.inflate(layoutInflater)
+        binding.btnRetry.setOnClickListener {
+            if (!retryRequested && controller.status.value.state in setOf(ScriptSessionState.FAILED, ScriptSessionState.STOPPED)) {
+                retryRequested = onRetryClicked?.invoke() == true
+                binding.btnRetry.isEnabled = !retryRequested
+            }
+        }
         binding.state.addOnLayoutChangeListener { view, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom ->
             if (right - left != oldRight - oldLeft || bottom - top != oldBottom - oldTop) {
                 // Text changes do not run the buttons' LayoutTransition. Resize after the parent finishes laying out.
@@ -94,6 +106,10 @@ class ScriptRunOverlay(private val controller: ScriptRunController, private val 
     }
 
     private fun renderState(status: ScriptSessionStatus, event: ScriptDiagnostic?) {
+        if (status.state !in setOf(ScriptSessionState.FAILED, ScriptSessionState.STOPPED)) {
+            retryRequested = false
+            binding.btnRetry.isEnabled = true
+        }
         val viewContext = binding.root.context
         val label = viewContext.getString(when (status.state) {
             ScriptSessionState.PREPARING -> R.string.script_preparing
@@ -121,6 +137,32 @@ class ScriptRunOverlay(private val controller: ScriptRunController, private val 
         }
         binding.btnMove.isVisible = !compact
         binding.btnDiagnostics.isVisible = !compact
+        val showRetry = onRetryClicked != null &&
+            status.state in setOf(ScriptSessionState.FAILED, ScriptSessionState.STOPPED)
+        val choices = if (showRetry) controller.recoveryChoices() else emptyList()
+        if (choices != renderedChoices) {
+            renderedChoices = choices
+            binding.recoveryChoices.removeAllViews()
+            for (choice in choices) {
+                binding.recoveryChoices.addView(com.google.android.material.button.MaterialButton(viewContext).apply {
+                    text = choice.label
+                    setTextColor(binding.btnRetry.textColors)
+                    setOnClickListener {
+                        if (!retryRequested && controller.resolveRecovery(choice.id)) {
+                            retryRequested = true
+                            binding.btnRetry.isEnabled = false
+                            for (index in 0 until binding.recoveryChoices.childCount) binding.recoveryChoices.getChildAt(index).isEnabled = false
+                        }
+                    }
+                })
+            }
+            binding.recoveryChoices.isVisible = choices.isNotEmpty()
+            binding.root.post { forceWindowResize(forceContentMeasure = !binding.diagnosticScroll.isVisible) }
+        }
+        if (binding.btnRetry.isVisible != showRetry) {
+            binding.btnRetry.isVisible = showRetry
+            binding.root.post { forceWindowResize(forceContentMeasure = !binding.diagnosticScroll.isVisible) }
+        }
         binding.state.isClickable = canToggleControls
         // Leave room for target recognition and deployment while keeping recovery instructions readable when paused.
         binding.state.minLines = if (compact) 1 else 3

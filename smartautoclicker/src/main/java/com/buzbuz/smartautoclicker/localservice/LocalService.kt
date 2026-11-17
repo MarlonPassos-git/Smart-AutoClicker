@@ -244,7 +244,8 @@ class LocalService(
             }
             startJob = serviceScope.launch {
                 overlayManager.navigateTo(context,
-                    com.buzbuz.smartautoclicker.feature.script.config.ScriptRunOverlay(driver) { stopScenario() })
+                    com.buzbuz.smartautoclicker.feature.script.config.ScriptRunOverlay(driver,
+                        onRetryClicked = driver::retry) { stopScenario() })
                 driver.start(serviceScope, resultCode, data, storageId, answersJson, newRound, setup)
                 scriptStatusJob = driver.status.onEach { status ->
                     notificationController.updateNotification(context,
