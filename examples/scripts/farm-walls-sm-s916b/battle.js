@@ -83,38 +83,58 @@ export async function verifiedTroopQuantity(current, quantity, boundary) {
     return verified;
 }
 
+// A local deployment failure must not abandon an already-started battle. Keep
+// unreadable counters unknown, stop casting that unit, and let the result settle.
+async function deferDeployment(unit, reason, attempted, remaining) {
+    await log(JSON.stringify({ event: "deployment_deferred", unit, reason, attempted, remaining: remaining ?? null }));
+    await stage("Continuando o ataque", `Não confirmei o lançamento de ${unit}; seguindo com o restante do ataque.`);
+    return false;
+}
+
 async function deployTroops(options, spellLayout) {
     let attempted = 0;
     let cursor = 0;
     let previous = null;
     let noProgress = 0;
     let unreadable = 0;
-    const initialDeadline = await now() + 3000;
+    const defer = (reason, remaining) => {
+        spellLayout.troopsDeferred = true;
+        return deferDeployment("tropas", reason, attempted, remaining);
+    };
     while (true) {
         const checked = await checkpoint(options, ["troops", ...heroReferences]);
         if (checked.finished) return true;
         const current = checked.current;
-        const quantity = current.results.troops;
-        let amount = number(quantity);
         const heroes = heroReferences.map(name => current.results[name]).filter(found);
         const boundaries = heroes.map(result => result.x - (result.width ?? 0) / 2);
-        if (boundaries.length === 0) await stop("Não reconheci o limite entre tropas e heróis na barra calibrada.");
+        if (boundaries.length === 0) {
+            if (++unreadable >= 3) return defer("limite dos heróis ilegível");
+            continue;
+        }
         const boundary = Math.min(...boundaries);
         spellLayout.leftRatio = Math.max(...heroes.map(result => result.x + (result.width ?? 0) / 2)) / current.frame.width;
+        const quantity = current.results.troops;
+        let amount = number(quantity);
+        if (found(quantity) && quantity.x >= boundary) { spellLayout.expected = true; return false; }
         if (!Number.isSafeInteger(amount) || amount <= 0) {
             unreadable++;
-            if (attempted === 0 && await now() >= initialDeadline) await stop("Não consegui ler a barra inicial de tropas.");
-            if (attempted > 0 && unreadable >= 4) return false;
+            if (unreadable >= 4) return defer("contador ilegível");
             await sleep(200);
             continue;
         }
-        if (quantity.x >= boundary) { spellLayout.expected = true; return false; }
         amount = await verifiedTroopQuantity(current, quantity, boundary);
         unreadable = 0;
-        if (previous && quantity.x <= previous.x + 60 && amount >= previous.amount) noProgress++;
+        if (previous && previous.generation === current.frame.resumeGeneration &&
+            Math.abs(quantity.x - previous.x) <= 60 * current.frame.width / 2340 && amount >= previous.amount) noProgress++;
         else noProgress = 0;
-        if (noProgress >= 3) await stop("A quantidade de tropas não diminuiu após três tentativas de lançamento.");
-        previous = { x: quantity.x, amount };
+        // A single remaining troop used to try only three adjacent points. Probe
+        // the full calibrated ring, reselecting the card on each fresh frame.
+        if (noProgress >= 12) return defer("sem redução após percorrer o anel", amount);
+        if (noProgress > 0) {
+            cursor = (cursor + 4) % 12;
+            await log(JSON.stringify({ event: "troop_deployment_recovery", quantity: amount, noProgress, nextPoint: cursor + 1 }));
+        }
+        previous = { x: quantity.x, amount, generation: current.frame.resumeGeneration };
         let remaining = amount;
         let first = true;
         let actionFrame = current;
@@ -127,14 +147,17 @@ async function deployTroops(options, spellLayout) {
                 // A resumed script must re-read/reselect its card, not continue a remembered selection.
                 if (actionFrame.frame.resumeGeneration !== generation) { previous = null; break; }
             }
-            const count = nextBurst(remaining, attempted);
-            if (count === 0) await stop("Limite de 600 tentativas de lançamento de tropas atingido.");
-            const steps = first ? [tapStep(quantity, 20, 40)] : [];
+            const count = Math.min(nextBurst(remaining, attempted), noProgress > 0 ? 4 : 16);
+            if (count === 0) return defer("limite de 600 tentativas", amount);
+            // Select inside the card, rather than on the narrow OCR counter header.
+            const selection = { ...quantity, y: current.calibration.regions.troops.bottom + Math.round(10 * current.frame.width / 2340) };
+            const steps = first ? [tapStep(selection, 20, 40)] : [];
             for (let index = 0; index < count; index++) {
                 steps.push(tapStep(position(actionFrame, `deploy${(cursor + index) % 12 + 1}`), 20, 10));
             }
             if (!await act(actionFrame, steps)) { previous = null; break; }
             attempted += count; remaining -= count; cursor = (cursor + count) % 12; first = false;
+            if (noProgress > 0) break;
         }
     }
 }
@@ -165,7 +188,9 @@ async function deploySpells(options, layout) {
     let noProgress = 0;
     let previous = null;
     const slots = [];
+    const deferredSlots = [];
     const sameSlot = (a, b) => Math.abs(a.xRatio - b.xRatio) <= 60 / 2340;
+    if (!Number.isFinite(layout.leftRatio)) return deferDeployment("feitiços", "limite dos heróis ilegível", attempted);
     while (true) {
         const checked = await checkpoint(options);
         if (checked.finished) return true;
@@ -175,7 +200,7 @@ async function deploySpells(options, layout) {
         catch (error) {
             if (error.code === "conflicting_spell_counter") {
                 await log(JSON.stringify({ event: "spell_counter_conflict", attempt: ++conflicts, message: error.message }));
-                if (conflicts >= 3) await stop(error.message);
+                if (conflicts >= 3) return deferDeployment("feitiços", "contadores divergentes", attempted);
                 await stage("Conferindo feitiços", "Leituras divergentes; tentando novamente sem lançar feitiços.");
                 await sleep(200);
                 continue;
@@ -190,28 +215,36 @@ async function deploySpells(options, layout) {
             else slots.push({ xRatio: card.xRatio, quantity: card.quantity });
         }
         await log(JSON.stringify({ event: "spell_counters_observed", cards: cards.map(({quantity, xRatio}) => ({quantity, xRatio})), slots }));
-        const missing = slots.some(slot => slot.quantity > 0 && !cards.some(card => sameSlot(slot, card)));
+        const missing = slots.some(slot => slot.quantity > 0 && !deferredSlots.some(deferred => sameSlot(slot, deferred)) &&
+            !cards.some(card => sameSlot(slot, card)));
         if (missing || (cards.length === 0 && (layout.expected || attempted > 0))) {
-            if (++unreadable >= 3) await stop("Quantidade de feitiço ilegível em três observações; não foi considerada zero.");
+            if (++unreadable >= 3) return deferDeployment("feitiços", "contador ilegível", attempted);
             await sleep(200); continue;
         }
         if (previous && previous.generation === current.frame.resumeGeneration) {
             const updated = cards.find(card => sameSlot(card, previous));
             if (!updated) {
-                if (++unreadable >= 3) await stop("Não confirmei o contador do último feitiço; lançamento interrompido.");
+                if (++unreadable >= 3) return deferDeployment("feitiços", "último contador ilegível", attempted);
                 await sleep(200); continue;
             }
-            noProgress = updated.quantity >= previous.quantity ? noProgress + 1 : 0;
-            if (noProgress >= 3) await stop("A quantidade de feitiços não diminuiu após três tentativas; confira os alvos permitidos.");
+            noProgress = updated.quantity >= previous.quantity ? noProgress + previous.count : 0;
+            // Two casts per observation cover the twelve targets before giving
+            // up on this card. Other spell types can still be deployed.
+            if (noProgress >= 12) {
+                await deferDeployment("feitiços", "card sem redução após percorrer o anel", attempted, updated.quantity);
+                deferredSlots.push(updated);
+                previous = null; noProgress = 0;
+            }
         } else noProgress = 0;
         unreadable = 0;
-        const card = cards.find(card => card.quantity > 0);
+        const card = cards.find(card => card.quantity > 0 && !deferredSlots.some(deferred => sameSlot(card, deferred)));
         if (!card) {
-            await log(JSON.stringify({ event: "spell_deployment_completed", attempted, counters: cards.map(card => card.quantity) }));
+            await log(JSON.stringify({ event: deferredSlots.length ? "spell_deployment_partial" : "spell_deployment_completed",
+                attempted, counters: cards.map(card => card.quantity) }));
             return false;
         }
         const count = Math.min(card.quantity, 2, 600 - attempted);
-        if (count <= 0) await stop("Limite de 600 tentativas de lançamento de feitiços atingido.");
+        if (count <= 0) return deferDeployment("feitiços", "limite de 600 tentativas", attempted, card.quantity);
         await stage("lançar feitiços", `Card com ${card.quantity} feitiço(s); lançando ${count} e conferindo o contador.`);
         // Selection and casts use this observation; odd quantities never produce an extra cast.
         const selection = { ...card.at, y: current.calibration.regions.troops.bottom + Math.round(10 * current.frame.width / 2340) };
@@ -219,7 +252,7 @@ async function deploySpells(options, layout) {
         for (let offset = 0; offset < count; offset++) steps.push(tapStep(position(current, `spellDeploy${(attempted + offset) % 12 + 1}`), 100, 150));
         if (await act(current, steps)) {
             attempted += count;
-            previous = { ...card, generation: current.frame.resumeGeneration };
+            previous = { ...card, count, generation: current.frame.resumeGeneration };
             await log(JSON.stringify({ event: "spell_cast_attempt", quantityBefore: card.quantity, count, attempted }));
         } else { previous = null; noProgress = 0; }
     }
@@ -237,7 +270,8 @@ export async function runBattle(options) {
     }
     const heroesAt = await now();
     await log(JSON.stringify({ event: "army_deployment", troopsMs: troopsAt - startedAt,
-        heroesMs: heroesAt - troopsAt, elapsedMs: heroesAt - startedAt, completed: !finished, targetMs: 10000 }));
+        heroesMs: heroesAt - troopsAt, elapsedMs: heroesAt - startedAt, completed: !finished && !spellLayout.troopsDeferred,
+        troopsDeferred: Boolean(spellLayout.troopsDeferred), targetMs: 10000 }));
     if (!finished) {
         await stage("lançar feitiços", "Conferindo os contadores de feitiços.");
         finished = await deploySpells(options, spellLayout);
