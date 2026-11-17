@@ -32,6 +32,8 @@ python3 scripts/package_script_example.py examples/scripts/farm-walls-sm-s916b b
 
 Transfira o ZIP e use **Importar ZIP**. Modelos OCR precisam estar instalados. O pacote usa os módulos e imagens locais durante a execução.
 
+No APK atualizado, **Tentar novamente** mantém o jogo aberto e inicia uma nova execução da revisão original, com os mesmos parâmetros e progresso, usando a captura ainda ativa. A versão 3.6.0 reconhece batalha e resultado para continuar dali e só confirma a contagem após voltar à conta correta. Se já voltou à vila e o resultado ficou incerto, as escolhas de contagem aparecem no painel flutuante. Se a captura foi encerrada pelo sistema, é necessário parar e conceder uma nova autorização de captura. Uma rodada iniciada em outra revisão deve ser continuada nessa revisão antes de usar o pacote atualizado em uma nova rodada.
+
 ## Comportamento
 
 O encerramento da batalha pode usar a meta de destruição, duas leituras válidas de saque restante iguais a zero ou o fim natural. Saque ilegível não vira zero. O lançamento lê a quantidade positiva de cada card à esquerda dos heróis, distribui o orçamento em blocos de 16, 8, 4, 2 e 1 e confere o ataque entre blocos. O limite é de 600 tentativas de lançamento de tropas; três tentativas completas sem redução da quantidade encerram o fluxo.
