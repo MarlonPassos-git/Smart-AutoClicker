@@ -13,6 +13,10 @@ Use JDK 21 and the checked-in Gradle wrapper. `mise install` configures the decl
 - `./gradlew :feature:tutorial:testFDroidDebugUnitTest` tests one module while iterating.
 - `mise run install-emulator` builds and installs the x86_64 APK on an active emulator.
 
+## Atualização e teste no celular
+
+Após atualizar o APK ou um pacote de automação, se houver celular conectado por cabo e autorizado no ADB, instale o APK compatível, importe o pacote atualizado e teste no próprio aparelho automaticamente, sem pedir nova confirmação para essas etapas. Confira a tela e os registros da execução, preserve uma cópia do progresso e do cadastro existentes e use rodadas limitadas para validação. Informe o resultado e eventuais bloqueios; se o aparelho não estiver disponível, deixe os artefatos prontos para instalação.
+
 ## Coding Style & Naming Conventions
 
 Follow standard Kotlin and Android formatting with four-space indentation. Keep functions focused and short, favor early returns, and limit nesting. Give modules and functions one responsibility; use specific names rather than generic terms such as `data`, `handler`, or `Manager`. Kotlin types use `PascalCase`, functions and properties use `camelCase`, and Android resources use `snake_case`. Preserve intent comments; add comments for reasons or constraints, not obvious mechanics. Public functions require a short intent docstring and usage example. Inject dependencies through constructors or parameters, and wrap third-party APIs behind project-owned interfaces.
