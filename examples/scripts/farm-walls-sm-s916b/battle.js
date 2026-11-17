@@ -143,6 +143,7 @@ async function deployHeroes(options) {
 
 async function deploySpells(options, layout) {
     let attempted = 0;
+    let conflicts = 0;
     let unreadable = 0;
     let noProgress = 0;
     let previous = null;
@@ -155,9 +156,17 @@ async function deploySpells(options, layout) {
         let cards;
         try { cards = await readSpellCards(current, layout.leftRatio, slots); }
         catch (error) {
+            if (error.code === "conflicting_spell_counter") {
+                await log(JSON.stringify({ event: "spell_counter_conflict", attempt: ++conflicts, message: error.message }));
+                if (conflicts >= 3) await stop(error.message);
+                await stage("Conferindo feitiços", "Leituras divergentes; tentando novamente sem lançar feitiços.");
+                await sleep(200);
+                continue;
+            }
             if (error.code !== "stale_observation") throw error;
             previous = null; noProgress = 0; continue;
         }
+        conflicts = 0;
         for (const card of cards) {
             const slot = slots.find(slot => sameSlot(slot, card));
             if (slot) slot.quantity = card.quantity;

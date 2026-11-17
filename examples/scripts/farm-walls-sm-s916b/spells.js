@@ -22,6 +22,7 @@ export async function readSpellCards(current, leftRatio, knownSlots = []) {
     const coreWidth = Math.round(60 * scale);
     const context = Math.round(40 * scale);
     const cards = [];
+    const conflicts = new Map();
     // Small OCR windows preserve narrow xN glyphs; each core owns its labels, including at a window edge.
     for (let core = left; core < row.right; core += coreWidth) {
         const end = Math.min(row.right, core + coreWidth);
@@ -34,7 +35,7 @@ export async function readSpellCards(current, leftRatio, knownSlots = []) {
             if (x < core || x >= end || quantity === undefined) continue;
             const duplicate = cards.find(card => Math.abs(card.at.x - x) <= 40 * scale);
             if (duplicate) {
-                if (duplicate.quantity !== quantity) throw new Error(`Contador de feitiço divergente: ${duplicate.quantity} e ${quantity}; nenhum próximo lançamento autorizado.`);
+                if (duplicate.quantity !== quantity) conflicts.set(duplicate, [duplicate.quantity, quantity]);
                 continue;
             }
             cards.push({ quantity, xRatio: x / current.frame.width,
@@ -52,10 +53,39 @@ export async function readSpellCards(current, leftRatio, knownSlots = []) {
                 duplicate.quantity = 11;
                 duplicate.xRatio = eleven.x / current.frame.width;
                 duplicate.at = { x: eleven.x, y: eleven.y, frame: current.frame.frame };
+                conflicts.delete(duplicate);
             }
             else cards.push({ quantity: 11, xRatio: eleven.x / current.frame.width,
                 at: { x: eleven.x, y: eleven.y, frame: current.frame.frame } });
         }
+    }
+    // Overlapping OCR crops can read the same x7 as both x71 and x7. Require
+    // agreement from two focused crops; never choose the smaller value by guesswork.
+    for (const [card, quantities] of conflicts) {
+        const known = knownSlots.find(slot => Math.abs(card.xRatio - slot.xRatio) <= 60 / 2340);
+        const center = (known?.xRatio ?? card.xRatio) * current.frame.width;
+        const readings = [];
+        for (const width of [100, 60, 110]) {
+            const region = { ...row, left: Math.max(left, Math.floor(center - width / 2 * scale)),
+                right: Math.min(row.right, Math.ceil(center + width / 2 * scale)) };
+            const text = await readText(current.frame, { region, threshold: 80 });
+            if (text.truncated) continue;
+            const candidates = text.blocks.map(block => ({ block, quantity: spellQuantity(block.text) }))
+                .filter(value => /^[xX×]/.test(value.block.text.trim()) && value.quantity !== undefined &&
+                    Math.abs((value.block.left + value.block.right) / 2 - center) <= 40 * scale &&
+                    (!known || value.quantity <= known.quantity));
+            if (candidates.length === 1) readings.push(candidates[0]);
+        }
+        const agreed = readings.find(value => readings.filter(other => other.quantity === value.quantity).length >= 2);
+        if (!agreed) {
+            const error = new Error(`Contador de feitiço divergente: ${quantities.join(" e ")}; aguardando nova leitura.`);
+            error.code = "conflicting_spell_counter";
+            throw error;
+        }
+        card.quantity = agreed.quantity;
+        card.at = { x: Math.round((agreed.block.left + agreed.block.right) / 2),
+            y: Math.round((agreed.block.top + agreed.block.bottom) / 2), frame: current.frame.frame };
+        card.xRatio = card.at.x / current.frame.width;
     }
     // Re-read a missing known header with its own window: selected borders change OCR segmentation.
     // A missing positive reading alone never means zero. The x1/x0 glyphs have no spell portrait.
