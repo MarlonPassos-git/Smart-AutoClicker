@@ -20,6 +20,8 @@ A versão 3.4.1 mantém a leitura normal dos saldos e, quando falta concordânci
 
 A versão 3.4.2 espera até três minutos pela busca de oponentes, que ultrapassou um minuto no aparelho. Durante a espera não envia gestos nem confirma um ataque; só prossegue após reconhecer o adversário.
 
+A versão 3.5.0 lança tropas, depois heróis e por último feitiços. Reduz os intervalos entre toques e as esperas dos heróis, preservando as quatro posições de tentativa e a ativação de habilidade. A meta de batalha permanece prioritária. O evento `army_deployment` registra os tempos de tropas, heróis e total antes dos feitiços; 10 segundos é a meta de medição no aparelho, não um prazo que descarte unidades. A [medição no Samsung](../../../docs/benchmarks/script-mode/farm-deployment-3.5.0-sm-s916b.json) concluiu dois ataques em vilas diferentes com 7,93 s e 9,14 s para tropas e heróis, antes dos feitiços. As amostras tinham quatro e dois heróis reconhecidos; seis heróis foram cobertos nos testes determinísticos.
+
 ## Uso
 
 Inicie com a vila visível, na resolução e no enquadramento do perfil. Confira os parâmetros antes de executar. A calibração reconhece muros de nível 18 e confirma o nível 19 após melhorar. Mudanças de idioma, interface, níveis, paisagem ou posições exigem novas referências.

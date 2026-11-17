@@ -1,0 +1,76 @@
+{
+  "date": "2026-11-16",
+  "scriptVersion": "3.5.0",
+  "device": "Samsung SM-S916B",
+  "androidSdk": 36,
+  "deploymentOrder": [
+    "tropas",
+    "heróis",
+    "feitiços"
+  ],
+  "timing": {
+    "start": "Antes da primeira conferência de tropas, depois do zoom da batalha.",
+    "end": "Depois da etapa de heróis, incluindo habilidades e a conferência seguinte.",
+    "includesScreenRecognition": true,
+    "targetMs": 10000
+  },
+  "live": {
+    "runId": "a2a92675-af42-4d97-8b4a-0f2f0e374ffd",
+    "status": "COMPLETED",
+    "attacks": 2,
+    "maxBattlesPerVillage": 1,
+    "stopFarm": "nunca",
+    "improveWalls": false,
+    "samples": [
+      {
+        "village": 1,
+        "recognizedHeroes": 4,
+        "event": "army_deployment",
+        "troopsMs": 2596.5942179858685,
+        "heroesMs": 5336.386144012213,
+        "elapsedMs": 7932.980361998081,
+        "completed": true,
+        "targetMs": 10000
+      },
+      {
+        "village": 2,
+        "recognizedHeroes": 2,
+        "event": "army_deployment",
+        "troopsMs": 5237.035571008921,
+        "heroesMs": 3899.091456979513,
+        "elapsedMs": 9136.127027988434,
+        "completed": true,
+        "targetMs": 10000
+      }
+    ],
+    "spellCasts": 22,
+    "droppedEvents": 0
+  },
+  "checks": {
+    "command": "mise exec -- ./gradlew testFDroidDebugUnitTest assembleFDroidDebug",
+    "result": "BUILD SUCCESSFUL",
+    "unitTests": 1864,
+    "failures": 0,
+    "errors": 0,
+    "sixHeroOrderRegression": true
+  },
+  "limits": [
+    "Duas amostras no aparelho; não garante tempo inferior a 10 segundos para qualquer exército ou carga do sistema.",
+    "Os seis heróis foram cobertos com telas determinísticas; as amostras físicas tinham quatro e dois heróis reconhecidos.",
+    "A meta de batalha continua prioritária e pode encerrar o lançamento antes dos feitiços."
+  ],
+  "deviceInstallation": {
+    "revision": "da1e23b0-797e-4de3-9e55-1a8de99de2f4",
+    "originalCheckpointPreserved": true,
+    "validationPackageRemoved": true
+  },
+  "sourceSha256": {
+    "battle.js": "36f7bafe7d58351ed1a8fdeb34f0474b8a5103f8369daac0db112c60c0c9d7b6",
+    "policy.js": "b3b007b30473b07741562af5b0cb6921a36c8096c5986ce19b43f000774a0238",
+    "manifest.json": "33de0dbe3076abc8b96ffec120709f7dddbdde53d416c5294d7bf2faaf014b53"
+  },
+  "package": {
+    "path": "build/script-examples/farm-walls-sm-s916b-3.5.0-validado.zip",
+    "sha256": "c640903ba77968a5496e69e747d9aad123f611d9a0d8968b7e1ea78fc0dae58a"
+  }
+}
