@@ -28,6 +28,8 @@ A versão 3.5.2 verifica visualmente o glifo `x11` quando o OCR das tropas infor
 
 A versão 3.6.0 trata falhas locais de lançamento sem abandonar a batalha. Uma quantidade de tropas que não diminui aciona nova seleção dentro do card e tentativas em pontos distribuídos pelo anel. Se a leitura ou o lançamento continuar falhando dentro do limite, registra a pendência e segue com heróis, feitiços e a confirmação do resultado. Feitiços incompatíveis com os alvos do anel são deixados de lado após percorrer os doze pontos, permitindo usar outros tipos. A recuperação só ocorre com a interface de batalha reconhecida; telas desconhecidas continuam interrompendo os gestos. O caminho normal mantém os intervalos anteriores.
 
+A versão 3.6.1 não considera as tropas esgotadas apenas porque a leitura da barra encontrou um feitiço. Nesse caso, relê somente a área à esquerda dos heróis e usa recortes menores dos cabeçalhos se necessário. Zero precisa ser reconhecido explicitamente; uma leitura ausente continua ilegível. O evento `troop_counter_observed` registra quantidade, posição, limite dos heróis e leitura original da barra.
+
 ## Uso
 
 Inicie com a vila visível, na resolução e no enquadramento do perfil. Confira os parâmetros antes de executar. A calibração reconhece muros de nível 18 e confirma o nível 19 após melhorar. Mudanças de idioma, interface, níveis, paisagem ou posições exigem novas referências.

@@ -1,0 +1,123 @@
+{
+  "date": "2026-11-17",
+  "scriptVersion": "3.6.1",
+  "device": "Samsung SM-S916B",
+  "revision": "4c14f110-d227-443d-887c-16393ddb15ee",
+  "runId": "25ed2e41-cb93-4176-9021-73318160b440",
+  "status": "COMPLETED",
+  "correction": "Uma leitura de feitiço não confirma o esgotamento das tropas. A recuperação relê somente a região anterior aos heróis e tenta cabeçalhos menores.",
+  "checks": {
+    "command": "./gradlew testFDroidDebugUnitTest assembleFDroidDebug :core:script:android:assembleFDroidDebugAndroidTest",
+    "result": "BUILD SUCCESSFUL",
+    "tests": 1883,
+    "failures": 0,
+    "errors": 0,
+    "nativeTest": "remainingMinionsAreReadBeforeTheHeroBoundary",
+    "nativeResult": "OK (1 test)"
+  },
+  "deviceValidation": {
+    "maxBattles": 1,
+    "confirmedBattles": 1,
+    "troopsInitiallyVisible": 29,
+    "troopCardDepletedInCapture": true,
+    "spellsUsed": 11,
+    "events": [
+      {
+        "event": "troop_counter_observed",
+        "quantity": 29,
+        "x": 591,
+        "boundary": 666,
+        "broadQuantity": 29,
+        "broadX": 591,
+        "attempted": 0
+      },
+      {
+        "event": "troop_counter_observed",
+        "quantity": 2,
+        "x": 597,
+        "boundary": 666,
+        "broadQuantity": 2,
+        "broadX": 597,
+        "attempted": 29
+      },
+      {
+        "event": "troop_counter_observed",
+        "quantity": null,
+        "x": null,
+        "boundary": 666,
+        "broadQuantity": 1,
+        "broadX": 977,
+        "attempted": 31
+      },
+      {
+        "event": "troop_counter_observed",
+        "quantity": null,
+        "x": null,
+        "boundary": 666,
+        "broadQuantity": 1,
+        "broadX": 977,
+        "attempted": 31
+      },
+      {
+        "event": "troop_counter_observed",
+        "quantity": null,
+        "x": null,
+        "boundary": 666,
+        "broadQuantity": 1,
+        "broadX": 977,
+        "attempted": 31
+      },
+      {
+        "event": "troop_counter_observed",
+        "quantity": null,
+        "x": null,
+        "boundary": 666,
+        "broadQuantity": 1,
+        "broadX": 977,
+        "attempted": 31
+      },
+      {
+        "event": "deployment_deferred",
+        "unit": "tropas",
+        "reason": "contador ilegível",
+        "attempted": 31,
+        "remaining": null
+      },
+      {
+        "event": "army_deployment",
+        "troopsMs": 9200.857183992863,
+        "heroesMs": 3178.72416600585,
+        "elapsedMs": 12379.581349998713,
+        "completed": false,
+        "troopsDeferred": true,
+        "targetMs": 10000
+      },
+      {
+        "event": "spell_deployment_completed",
+        "attempted": 11,
+        "counters": [
+          0
+        ]
+      }
+    ]
+  },
+  "preservation": {
+    "backup": "~/.local/state/klickr-validation/servos-20261117",
+    "configurationUnchanged": true,
+    "answersRestoredByteForByte": true,
+    "roundStateUnchanged": true,
+    "checkpointRevisionUpdatedTo": "4c14f110-d227-443d-887c-16393ddb15ee",
+    "confirmedAttacksRestored": 31,
+    "pendingAttackPreserved": true
+  },
+  "artifact": {
+    "path": "build/script-examples/farm-walls-sm-s916b-3.6.1.zip",
+    "sha256": "b0c4e20ddb9022e19fad9fb7e0b1f9bedfd667b99bcb6761370005e54d0824d1"
+  },
+  "limits": [
+    "O ataque físico usou os 29 servos, mas não reproduziu a omissão inicial da leitura. Essa recuperação foi verificada nos testes controlados e no teste nativo com uma captura do aparelho.",
+    "Após 31 tentativas de toque, o card estava visualmente esgotado, mas o zero não foi reconhecido. O script registrou contador ilegível, seguiu com heróis e 11 feitiços e concluiu a batalha.",
+    "Uma primeira preparação da rodada de validação tinha multivillage incompatível com a seleção única. Foi corrigida antes de qualquer ataque dessa execução.",
+    "O progresso original mantém a batalha pendente para resolução da contagem ao continuar. O ataque de validação foi arquivado separadamente."
+  ]
+}
