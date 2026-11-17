@@ -3,7 +3,7 @@
   "apiVersion": 1,
   "id": "farm-walls-sm-s916b",
   "name": "Farm — vilas e muros",
-  "scriptVersion": "3.5.1",
+  "scriptVersion": "3.5.2",
   "entry": "entry.js",
   "targetPackage": "com.supercell.clashofclans",
   "parameters": {
@@ -506,6 +506,12 @@
     "spellEleven": {
       "type": "image",
       "path": "images/spell-eleven.png",
+      "width": 48,
+      "height": 29
+    },
+    "troopEleven": {
+      "type": "image",
+      "path": "images/troop-eleven.png",
       "width": 48,
       "height": 29
     },

@@ -1,4 +1,4 @@
-import { zoom, sleep, now, log, stop, stage } from "klickr";
+import { read, zoom, sleep, now, log, stop, stage } from "klickr";
 import { heroReferences } from "./profile.js";
 import { found, number, snapshot, waitSnapshot, guard, position, tapStep, act, transition } from "./screen.js";
 import { battleFinished, nextBurst } from "./policy.js";
@@ -67,6 +67,22 @@ async function checkpoint(options, extra = []) {
     return { current, finished: false };
 }
 
+/** Confirm an ambiguous troop counter on its own card before budgeting taps.
+ * Example: await verifiedTroopQuantity(current, current.results.troops, firstHeroLeft). */
+export async function verifiedTroopQuantity(current, quantity, boundary) {
+    const amount = number(quantity);
+    if (amount !== 1) return amount;
+    const scale = current.frame.width / 2340;
+    const row = current.calibration.regions.troops;
+    const eleven = await read(current.frame, { kind: "image", reference: "troopEleven",
+        region: { ...row, left: Math.max(row.left, Math.floor(quantity.x - 60 * scale)),
+            right: Math.min(row.right, Math.ceil(boundary), Math.ceil(quantity.x + 60 * scale)) }, threshold: 12 });
+    const verified = found(eleven) ? 11 : amount;
+    await log(JSON.stringify({ event: "troop_counter_verified", ocr: amount, quantity: verified,
+        confirmedEleven: found(eleven), x: quantity.x }));
+    return verified;
+}
+
 async function deployTroops(options, spellLayout) {
     let attempted = 0;
     let cursor = 0;
@@ -79,7 +95,7 @@ async function deployTroops(options, spellLayout) {
         if (checked.finished) return true;
         const current = checked.current;
         const quantity = current.results.troops;
-        const amount = number(quantity);
+        let amount = number(quantity);
         const heroes = heroReferences.map(name => current.results[name]).filter(found);
         const boundaries = heroes.map(result => result.x - (result.width ?? 0) / 2);
         if (boundaries.length === 0) await stop("Não reconheci o limite entre tropas e heróis na barra calibrada.");
@@ -93,6 +109,7 @@ async function deployTroops(options, spellLayout) {
             continue;
         }
         if (quantity.x >= boundary) { spellLayout.expected = true; return false; }
+        amount = await verifiedTroopQuantity(current, quantity, boundary);
         unreadable = 0;
         if (previous && quantity.x <= previous.x + 60 && amount >= previous.amount) noProgress++;
         else noProgress = 0;

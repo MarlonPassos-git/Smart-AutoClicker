@@ -146,6 +146,10 @@
     "images/spell-eleven.png": {
       "sha256": "0858ce18036876206f8427bc61b4e8662865815eda445617bfe558caa3935d41",
       "source": "SM-S916B, Clash 19.32.4, 16/11/2026; recorte sem retoque (1314,927)-(1362,956) do contador x11; somente glifos, sem retrato"
+    },
+    "images/troop-eleven.png": {
+      "sha256": "9d5696a40f63a0648fc295248e4b6b08f355c758d629df4e8e2a73ad2579140d",
+      "source": "SM-S916B, Clash 19.32.4, 16/11/2026; captura ADB da falha f3929634-2911-4c59-9c7f-07ba29e17514, SHA-256 cfba9dd0a522b4b9965c622ef4772582da134c1ef0d184240e9d551f2944d2cf; recorte sem retoque (565,920)-(613,949) do contador x11 de tropas selecionadas; somente glifos, sem retrato"
     }
   }
 }
