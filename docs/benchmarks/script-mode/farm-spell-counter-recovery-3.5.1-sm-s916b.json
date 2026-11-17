@@ -1,0 +1,80 @@
+{
+  "date": "2026-11-16",
+  "scriptVersion": "3.5.1",
+  "device": "Samsung SM-S916B",
+  "androidSdk": 36,
+  "revision": "9690ad53-97f6-483e-b5d3-853794f4e1a0",
+  "settings": {
+    "maxBattlesPerVillage": 1,
+    "finishMode": "fim natural",
+    "stopFarm": "nunca",
+    "improveWalls": false,
+    "villages": 2
+  },
+  "firstAttempt": {
+    "runId": "abf9c3f4-ff5b-4bc5-b2cf-4b17d9e90ed6",
+    "status": "FAILED",
+    "error": "O perfil não abriu após três tentativas confirmadas na vila.",
+    "observedPopup": "Aviso de item entregue visível após a troca de conta; a relação causal com a falha de abertura do perfil não foi isolada."
+  },
+  "continuation": {
+    "runId": "238f355b-79e5-4d46-9100-70cf4e9604d8",
+    "status": "COMPLETED",
+    "newRound": false,
+    "confirmedAttacksBefore": [
+      1,
+      0
+    ],
+    "confirmedAttacksAfter": [
+      1,
+      1
+    ],
+    "repeatedCompletedVillage": false
+  },
+  "spells": {
+    "observedAttemptsPerBattle": [
+      11,
+      11
+    ],
+    "observedReadingsPerBattle": [
+      [
+        11,
+        9,
+        7,
+        5,
+        3,
+        1,
+        0
+      ],
+      [
+        11,
+        9,
+        7,
+        5,
+        3,
+        1,
+        0
+      ]
+    ],
+    "source": "Eventos spell_cast_attempt e spell_deployment_completed acompanhados ao vivo por ADB. Os eventos iniciais da continuação já tinham sido rotacionados para fora da retenção ao coletar os arquivos finais."
+  },
+  "installation": {
+    "apkSha256": "e442864d44fec37ba503991ed67bd3da2ee30d452495997618c0bb729d28d46f",
+    "zipSha256": "12fe9c51c158860a3d3a8c73490653170c6ed8c219e1fd59d6870015c307de33",
+    "verifiedPackageFiles": 51,
+    "configurationPreserved": true,
+    "previousRoundBackedUp": true
+  },
+  "checks": {
+    "command": "mise exec -- ./gradlew testFDroidDebugUnitTest assembleFDroidDebug",
+    "result": "BUILD SUCCESSFUL",
+    "unitTests": 1872,
+    "failures": 0,
+    "errors": 0
+  },
+  "limits": [
+    "Uma batalha por vila; não estabelece uma taxa de falhas de OCR.",
+    "A divergência 71 × 7 foi coberta nos testes determinísticos; os dois ataques físicos completaram o lançamento dos feitiços sem interrupção pelo contador.",
+    "A rodada precisou de continuação após a falha de abertura do perfil."
+  ]
+}
