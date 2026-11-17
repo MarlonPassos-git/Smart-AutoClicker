@@ -113,14 +113,16 @@ class FarmExampleIntegrationTest {
     }
 
     @Test(timeout = 20000)
-    fun aSpellCounterThatDoesNotDecreaseStopsInsteadOfRepeatedlyCasting() = runBlocking {
-        val backend = BattleBackend("fim natural").apply { ignoreSpellCasts = true }
+    fun aSpellCounterThatDoesNotDecreaseFinishesTheBattleWithoutUnboundedCasting() = runBlocking {
+        val backend = BattleBackend("fim natural").apply { ignoreSpellCasts = true; naturalEndAfterCaptures = 40 }
         val status = execute(backend)
         assertEquals(ScriptSessionState.STOPPED, status.state)
-        assertTrue(status.reason!!.contains("não diminuiu"))
+        assertTrue(status.reason!!.contains("Limite de 1 batalha"))
         assertEquals(0, backend.spellsDeployed)
-        assertEquals(0, backend.heroAbilities)
+        assertEquals(12, backend.spellCastAttempts)
+        assertEquals(1, backend.heroAbilities)
         assertEquals(1, backend.openingTaps)
+        assertEquals("village", backend.screen)
     }
 
     @Test(timeout = 20000)
@@ -128,13 +130,15 @@ class FarmExampleIntegrationTest {
         val backend = BattleBackend("fim natural").apply {
             spellAmounts = mutableListOf(5)
             hideSpellCountersAfterCasting = true
+            naturalEndAfterCaptures = 40
         }
         val status = execute(backend)
         assertEquals(ScriptSessionState.STOPPED, status.state)
-        assertTrue(status.reason!!.contains("ilegível"))
+        assertTrue(status.reason!!.contains("Limite de 1 batalha"))
         assertEquals(2, backend.spellsDeployed)
         assertEquals(listOf(3), backend.spellAmounts)
         assertEquals(1, backend.openingTaps)
+        assertEquals("village", backend.screen)
     }
 
     @Test(timeout = 20000)
@@ -306,24 +310,6 @@ class FarmExampleIntegrationTest {
         assertTrue(backend.deploymentOrder.lastIndexOf("heroes") < backend.deploymentOrder.indexOf("spells"))
     }
 
-    private fun withSpellConflicts(count: Int, afterReadings: Int = 0): ScriptProgram {
-        val original = sources()
-        val source = original.sources.getValue("spells.js")
-            .replace("export async function readSpellCards(", "async function readActualSpellCards(") + """
-                let conflicts = $count;
-                let readings = 0;
-                export async function readSpellCards(...args) {
-                    if (readings++ >= $afterReadings && conflicts-- > 0) {
-                        const error = new Error('Contador de feitiço divergente: 71 e 7');
-                        error.code = 'conflicting_spell_counter';
-                        throw error;
-                    }
-                    return readActualSpellCards(...args);
-                }
-            """.trimIndent()
-        return original.copy(sources = original.sources + ("spells.js" to source))
-    }
-
     @Test(timeout = 20000)
     fun collapsedElevenTroopCounterIsVerifiedBeforeRetryBudgetRunsOut() = runBlocking {
         val backend = BattleBackend("fim natural").apply {
@@ -350,6 +336,108 @@ class FarmExampleIntegrationTest {
         assertEquals(17, backend.troopsDeployed)
         assertEquals(11, backend.spellsDeployed)
         assertEquals("village", backend.screen)
+    }
+
+    @Test(timeout = 20000)
+    fun persistentTroopFailureStillDeploysHeroesAndSpellsAndConfirmsTheBattle() = runBlocking {
+        val backend = BattleBackend("fim natural").apply {
+            initialTroops = 11
+            collapseElevenTroops = true
+            ignoreTroopCasts = true
+        }
+        val status = execute(backend)
+        assertTrue(status.reason!!.contains("Limite de 1 batalha"))
+        assertEquals(0, backend.troopsDeployed)
+        assertTrue(backend.troopCastAttempts in 12..60)
+        assertEquals(1, backend.heroAbilities)
+        assertEquals(2, backend.spellsDeployed)
+        assertEquals("village", backend.screen)
+    }
+
+    @Test(timeout = 90000)
+    fun theLastTroopCanRecoverOnAnyOfTheTwelveCalibratedPoints() = runBlocking {
+        val positions = Json.parseToJsonElement(resource("manifest.json")).jsonObject
+            .getValue("screen").jsonObject.getValue("positions").jsonObject
+        for (index in 1..12) {
+            val point = positions.getValue("deploy$index").jsonObject
+            val backend = BattleBackend("fim natural").apply {
+                initialTroops = 29
+                lastTroopTarget = ScreenPoint(point.getValue("x").jsonPrimitive.int, point.getValue("y").jsonPrimitive.int)
+            }
+            val status = execute(backend)
+            assertEquals("Point $index: ${status.reason}", "village", backend.screen)
+            assertEquals(29, backend.troopsDeployed)
+            assertEquals(1, backend.heroAbilities)
+            assertEquals(2, backend.spellsDeployed)
+            assertTrue(backend.troopCastAttempts <= 60)
+        }
+    }
+
+    @Test(timeout = 20000)
+    fun unreadableTroopsAreNotBlindlyCastAndDoNotAbandonTheBattle() = runBlocking {
+        val backend = BattleBackend("fim natural").apply { hideTroopCounter = true }
+        val status = execute(backend)
+        assertTrue(status.reason!!.contains("Limite de 1 batalha"))
+        assertEquals(0, backend.troopCastAttempts)
+        assertEquals(1, backend.heroAbilities)
+        assertEquals(2, backend.spellsDeployed)
+        assertEquals("village", backend.screen)
+    }
+
+    @Test(timeout = 20000)
+    fun aStalledSpellCardDoesNotPreventUsingOtherSpellTypes() = runBlocking {
+        val backend = BattleBackend("fim natural").apply {
+            spellAmounts = mutableListOf(1, 3)
+            rejectedSpell = 0
+            naturalEndAfterCaptures = 60
+        }
+        val status = execute(backend)
+        assertTrue(status.reason!!.contains("Limite de 1 batalha"))
+        assertEquals(listOf(1, 0), backend.spellAmounts)
+        assertEquals(15, backend.spellCastAttempts)
+        assertEquals("village", backend.screen)
+    }
+
+    @Test(timeout = 20000)
+    fun aTransientSpellConflictRetriesWithoutRepeatingAnArmyDeployment() = runBlocking {
+        val backend = BattleBackend("fim natural").apply { spellAmounts = mutableListOf(11) }
+        val status = execute(backend, program = withSpellConflicts(2, afterReadings = 2))
+        assertEquals(status.failure?.stackTraceToString(), ScriptSessionState.STOPPED, status.state)
+        assertTrue(status.reason!!.contains("Limite de 1 batalha"))
+        assertEquals(25, backend.troopsDeployed)
+        assertEquals(1, backend.heroAbilities)
+        assertEquals(11, backend.spellsDeployed)
+        assertEquals(0, backend.excessSpellTaps)
+        assertEquals("village", backend.screen)
+    }
+
+    @Test(timeout = 20000)
+    fun persistentSpellConflictsLetTheBattleFinishWithoutGuessingTheCounter() = runBlocking {
+        val backend = BattleBackend("fim natural").apply { naturalEndAfterCaptures = 40 }
+        val status = execute(backend, program = withSpellConflicts(100))
+        assertEquals(ScriptSessionState.STOPPED, status.state)
+        assertTrue(status.reason!!.contains("Limite de 1 batalha"))
+        assertEquals(0, backend.spellsDeployed)
+        assertEquals(1, backend.openingTaps)
+        assertEquals("village", backend.screen)
+    }
+
+    private fun withSpellConflicts(count: Int, afterReadings: Int = 0): ScriptProgram {
+        val original = sources()
+        val source = original.sources.getValue("spells.js")
+            .replace("export async function readSpellCards(", "async function readActualSpellCards(") + """
+                let conflicts = $count;
+                let readings = 0;
+                export async function readSpellCards(...args) {
+                    if (readings++ >= $afterReadings && conflicts-- > 0) {
+                        const error = new Error('Contador de feitiço divergente: 71 e 7');
+                        error.code = 'conflicting_spell_counter';
+                        throw error;
+                    }
+                    return readActualSpellCards(...args);
+                }
+            """.trimIndent()
+        return original.copy(sources = original.sources + ("spells.js" to source))
     }
 
     @Test(timeout = 15000)
