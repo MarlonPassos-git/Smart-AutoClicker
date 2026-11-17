@@ -29,6 +29,23 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class NativeScriptResourcesIntegrationTest {
     @Test(timeout = 60000)
+    fun theGoldBalanceThatStoppedTheFarmIsConfirmedAcrossFreshObservations() = runBlocking {
+        withFrame("gold_balance_7756688", 1900, 15, "farm_cv19") { frame ->
+            verifyFarm(frame, """
+                import {snapshot} from './screen.js';
+                import {readResourceBalance} from './farm.js';
+                const history=new Map();
+                for (let index=0;index<3;index++) {
+                    const current=await snapshot(['goldBalance']);
+                    const value=await readResourceBalance(current,'gold',history);
+                    if (value !== (index===2 ? 7756688 : undefined))
+                        throw new Error('Captured gold balance was not confirmed safely: '+JSON.stringify({index,value}));
+                }
+            """.trimIndent())
+        }
+    }
+
+    @Test(timeout = 60000)
     fun remainingMinionsAreReadBeforeTheHeroBoundary() = runBlocking {
         withFrame("undeployed_minions", 500, 885, "farm_cv19") { frame ->
             verifyFarm(frame, """
