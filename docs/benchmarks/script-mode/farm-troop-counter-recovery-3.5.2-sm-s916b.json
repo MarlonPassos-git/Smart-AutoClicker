@@ -1,0 +1,48 @@
+{
+  "date": "2026-11-16",
+  "scriptVersion": "3.5.2",
+  "device": "Samsung SM-S916B",
+  "revision": "e7abd9d3-634b-4aaf-9b53-bb7adc9c884d",
+  "runId": "ce6b3b12-027d-4c52-a15c-84c5ab3d5e03",
+  "status": "COMPLETED",
+  "settings": {
+    "villages": 1,
+    "maxBattlesPerVillage": 1,
+    "finishMode": "destruição",
+    "targetDestruction": 50,
+    "improveWalls": false
+  },
+  "armyDeployment": {
+    "event": "army_deployment",
+    "troopsMs": 4387.494738012552,
+    "heroesMs": 5826.505517989397,
+    "elapsedMs": 10214.00025600195,
+    "completed": true,
+    "targetMs": 10000
+  },
+  "troopCounterVerifications": [],
+  "spellAttempts": 10,
+  "checks": {
+    "command": "./gradlew testFDroidDebugUnitTest assembleFDroidDebug",
+    "result": "BUILD SUCCESSFUL",
+    "unitTests": 1875,
+    "failures": 0,
+    "errors": 0,
+    "nativeTest": "NativeScriptResourcesIntegrationTest#selectedTroopElevenIsConfirmedWhenQuantityOcrCollapsesItToOne",
+    "nativeTestResult": "BUILD SUCCESSFUL no Samsung"
+  },
+  "installation": {
+    "verifiedFiles": 52,
+    "zipSha256": "3dc86bd2370e865baabab6a3c251d1e70f154040487cb48cf9205ad35fd49ac9",
+    "apkChanged": false,
+    "configurationPreserved": true,
+    "previousRoundRestoredByteForByte": true,
+    "previousAnswersRestoredByteForByte": true,
+    "deviceBackup": "files/scripts/validation-archive-20261116/troops-352"
+  },
+  "limits": [
+    "O ataque físico final não reproduziu a leitura x11 como x1; a correção foi validada com o detector nativo sobre um recorte da captura original e com a regressão determinística de lançamento.",
+    "A meta de 50% encerrou o ataque após dez tentativas de feitiço; o último feitiço não precisava ser lançado.",
+    "A rodada anterior pertence à revisão 3.5.1 e mantém oito ataques confirmados e um pendente; não foi migrada silenciosamente."
+  ]
+}

@@ -24,6 +24,8 @@ A versão 3.5.0 lança tropas, depois heróis e por último feitiços. Reduz os 
 
 A versão 3.5.1 confere contadores de feitiços divergentes com três recortes focados e exige concordância em pelo menos dois. Sem concordância, tenta até três observações novas sem lançar feitiços. Se a divergência persistir, interrompe e preserva a rodada.
 
+A versão 3.5.2 verifica visualmente o glifo `x11` quando o OCR das tropas informa `1`, antes de calcular o lote e contar uma tentativa sem progresso. A conferência usa o mesmo frame e apenas a região do card à esquerda dos heróis, sem confundir contadores de feitiços. O evento `troop_counter_verified` registra a leitura original e a quantidade conferida. As três tentativas e o limite total continuam ativos para falhas reais de lançamento.
+
 ## Uso
 
 Inicie com a vila visível, na resolução e no enquadramento do perfil. Confira os parâmetros antes de executar. A calibração reconhece muros de nível 18 e confirma o nível 19 após melhorar. Mudanças de idioma, interface, níveis, paisagem ou posições exigem novas referências.
