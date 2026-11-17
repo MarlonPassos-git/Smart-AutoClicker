@@ -3,7 +3,7 @@
   "apiVersion": 1,
   "id": "farm-walls-sm-s916b",
   "name": "Farm — vilas e muros",
-  "scriptVersion": "3.4.2",
+  "scriptVersion": "3.5.0",
   "entry": "entry.js",
   "targetPackage": "com.supercell.clashofclans",
   "parameters": {

@@ -53,7 +53,7 @@ export function nextBurst(remaining, attempted) {
     if (!Number.isSafeInteger(remaining) || remaining <= 0) throw new Error(`Quantidade de tropas inválida: ${remaining}.`);
     const available = 600 - attempted;
     if (available <= 0) return 0;
-    return [16, 8, 4, 2, 1].find(count => count <= remaining && count <= available);
+    return Math.min(16, remaining, available);
 }
 
 export function canReserve(balance, total, reserve) {

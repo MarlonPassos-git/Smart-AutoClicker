@@ -114,7 +114,7 @@ async function deployTroops(options, spellLayout) {
             if (count === 0) await stop("Limite de 600 tentativas de lançamento de tropas atingido.");
             const steps = first ? [tapStep(quantity, 20, 40)] : [];
             for (let index = 0; index < count; index++) {
-                steps.push(tapStep(position(actionFrame, `deploy${(cursor + index) % 12 + 1}`), 20, 20));
+                steps.push(tapStep(position(actionFrame, `deploy${(cursor + index) % 12 + 1}`), 20, 10));
             }
             if (!await act(actionFrame, steps)) { previous = null; break; }
             attempted += count; remaining -= count; cursor = (cursor + count) % 12; first = false;
@@ -131,11 +131,11 @@ async function deployHeroes(options) {
         const hero = heroReferences.map(name => current.results[name]).find(result =>
             found(result) && !used.some(x => Math.abs(x - result.x) <= 60));
         if (!hero) return false;
-        const steps = [tapStep(hero, 65, 60)];
+        const steps = [tapStep(hero, 40, 40)];
         for (let index = 1; index <= 4; index++) {
-            steps.push(tapStep(position(current, `heroDeploy${index}`), 40, index === 4 ? 180 : 60));
+            steps.push(tapStep(position(current, `heroDeploy${index}`), 30, index === 4 ? 60 : 30));
         }
-        steps.push(tapStep(hero, 65, 150));
+        steps.push(tapStep(hero, 40, 60));
         if (await act(current, steps)) used.push(hero.x);
     }
     return false;
@@ -201,8 +201,23 @@ async function deploySpells(options, layout) {
 
 export async function runBattle(options) {
     const spellLayout = {};
-    // Spells follow troops before heroes, so their counters are consumed earlier while the battle goal remains authoritative.
-    if (!await deployTroops(options, spellLayout) && !await deploySpells(options, spellLayout) && !await deployHeroes(options)) {
+    const startedAt = await now();
+    await stage("lançar tropas", "Tropas primeiro; depois heróis e feitiços.");
+    let finished = await deployTroops(options, spellLayout);
+    const troopsAt = await now();
+    if (!finished) {
+        await stage("lançar heróis", "Posicionando os heróis e ativando habilidades.");
+        finished = await deployHeroes(options);
+    }
+    const heroesAt = await now();
+    await log(JSON.stringify({ event: "army_deployment", troopsMs: troopsAt - startedAt,
+        heroesMs: heroesAt - troopsAt, elapsedMs: heroesAt - startedAt, completed: !finished, targetMs: 10000 }));
+    if (!finished) {
+        await stage("lançar feitiços", "Conferindo os contadores de feitiços.");
+        finished = await deploySpells(options, spellLayout);
+    }
+    // A result or the configured battle goal still takes priority at every deployment checkpoint.
+    if (!finished) {
         const deadline = await now() + 240000;
         while (await now() < deadline) {
             if ((await checkpoint(options)).finished) break;
