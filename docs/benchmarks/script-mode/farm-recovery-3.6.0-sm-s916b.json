@@ -1,0 +1,93 @@
+{
+  "date": "2026-11-16",
+  "scriptVersion": "3.6.0",
+  "device": "Samsung SM-S916B",
+  "revision": "aa7f278a-baac-4a2d-b28e-322a038530f5",
+  "runId": "a0299bab-2d11-4710-a17c-d6981323861e",
+  "status": "COMPLETED",
+  "settings": {
+    "villages": 1,
+    "maxBattlesPerVillage": 1,
+    "finishMode": "destruição",
+    "targetDestruction": 50,
+    "improveWalls": false
+  },
+  "recovery": {
+    "troops": [
+      {
+        "event": "deployment_deferred",
+        "unit": "tropas",
+        "reason": "contador ilegível",
+        "attempted": 31,
+        "remaining": null
+      }
+    ],
+    "armyDeployment": {
+      "event": "army_deployment",
+      "troopsMs": 9468.796819001436,
+      "heroesMs": 6451.734476983547,
+      "elapsedMs": 15920.531295984983,
+      "completed": false,
+      "troopsDeferred": true,
+      "targetMs": 10000
+    },
+    "spellDeployment": {
+      "event": "spell_deployment_completed",
+      "attempted": 11,
+      "counters": [
+        0
+      ]
+    },
+    "battleConfirmed": true
+  },
+  "floatingRetry": {
+    "revision": "dca8979e-ab9c-43de-981d-d09d07a14fcf",
+    "runs": [
+      "b2f3050e-5f95-4132-9f3e-45091ab5bba3",
+      "886069bc-f88b-431d-a4f9-60db0b77134d",
+      "e41d66d1-1297-4312-a7b5-8f90df0c927a"
+    ],
+    "outcomes": [
+      "STOPPED",
+      "STOPPED",
+      "COMPLETED"
+    ],
+    "targetRemainedForeground": "com.supercell.clashofclans",
+    "sameLiveProjection": true,
+    "confirmedAttacksPreserved": 9,
+    "recoveryChoice": "count",
+    "freshCaptureConsentOnRetry": false
+  },
+  "checks": {
+    "command": "./gradlew testFDroidDebugUnitTest assembleFDroidDebug",
+    "result": "BUILD SUCCESSFUL",
+    "tests": 1881,
+    "failures": 0,
+    "errors": 0,
+    "controlledCases": [
+      "Última tropa aceita em cada um dos doze pontos calibrados.",
+      "Lançamento persistentemente bloqueado segue para heróis, feitiços e confirmação da batalha.",
+      "Contador ilegível não autoriza lançamentos cegos nem abandona a batalha.",
+      "Feitiço bloqueado não impede o uso de outros tipos.",
+      "Retomada durante batalha ou resultado confirma a pendência exatamente uma vez.",
+      "Nova execução reutiliza a captura ativa, fecha os recursos da tentativa anterior e preserva o checkpoint.",
+      "Escolhas de contagem são respondidas no painel, com proteção contra clique duplicado."
+    ]
+  },
+  "installation": {
+    "apk": "arm64-v8a FDroid Debug",
+    "zipSha256": "fe2379e5fe50799e8e21ca100cc727bde6d49ea0bcecc5312e5a1b6757358170",
+    "configurationPreservedByteForByte": true,
+    "previousRoundRestoredByteForByte": true,
+    "previousAnswersRestoredByteForByte": true,
+    "backup": "~/.local/state/klickr-validation/recovery-20261116",
+    "deviceBackup": "files/scripts/validation-archive-20261116/recovery-360-before.tar"
+  },
+  "limits": [
+    "O ataque físico não reproduziu o bloqueio persistente da última tropa; esse caso passou nos testes controlados para todos os doze pontos.",
+    "O registro físico não confirmou a quantidade positiva de tropas após 31 tentativas. Seguiu com heróis e 11 feitiços e confirmou um ataque, sem tratar o contador ilegível como zero.",
+    "A rodada anterior pertence à revisão 3.5.2 e foi restaurada sem migração automática: nove ataques confirmados e um pendente. O ataque limitado foi registrado separadamente.",
+    "Uma primeira inspeção com UIAutomator suprimiu o serviço de acessibilidade e encerrou a captura. A validação final usou ADB screencap e leitura de logs, sem UIAutomator durante a execução.",
+    "Se a captura for encerrada pelo sistema ou pelo usuário, a retomada requer uma nova autorização de captura."
+  ]
+}

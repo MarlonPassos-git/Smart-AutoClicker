@@ -26,6 +26,8 @@ A versão 3.5.1 confere contadores de feitiços divergentes com três recortes f
 
 A versão 3.5.2 verifica visualmente o glifo `x11` quando o OCR das tropas informa `1`, antes de calcular o lote e contar uma tentativa sem progresso. A conferência usa o mesmo frame e apenas a região do card à esquerda dos heróis, sem confundir contadores de feitiços. O evento `troop_counter_verified` registra a leitura original e a quantidade conferida. As três tentativas e o limite total continuam ativos para falhas reais de lançamento.
 
+A versão 3.6.0 trata falhas locais de lançamento sem abandonar a batalha. Uma quantidade de tropas que não diminui aciona nova seleção dentro do card e tentativas em pontos distribuídos pelo anel. Se a leitura ou o lançamento continuar falhando dentro do limite, registra a pendência e segue com heróis, feitiços e a confirmação do resultado. Feitiços incompatíveis com os alvos do anel são deixados de lado após percorrer os doze pontos, permitindo usar outros tipos. A recuperação só ocorre com a interface de batalha reconhecida; telas desconhecidas continuam interrompendo os gestos. O caminho normal mantém os intervalos anteriores.
+
 ## Uso
 
 Inicie com a vila visível, na resolução e no enquadramento do perfil. Confira os parâmetros antes de executar. A calibração reconhece muros de nível 18 e confirma o nível 19 após melhorar. Mudanças de idioma, interface, níveis, paisagem ou posições exigem novas referências.
@@ -42,9 +44,9 @@ No APK atualizado, **Tentar novamente** mantém o jogo aberto e inicia uma nova 
 
 ## Comportamento
 
-O encerramento da batalha pode usar a meta de destruição, duas leituras válidas de saque restante iguais a zero ou o fim natural. Saque ilegível não vira zero. O lançamento lê a quantidade positiva de cada card à esquerda dos heróis, distribui o orçamento em blocos de 16, 8, 4, 2 e 1 e confere o ataque entre blocos. O limite é de 600 tentativas de lançamento de tropas; três tentativas completas sem redução da quantidade encerram o fluxo.
+O encerramento da batalha pode usar a meta de destruição, duas leituras válidas de saque restante iguais a zero ou o fim natural. Saque ilegível não vira zero. O lançamento lê a quantidade positiva de cada card à esquerda dos heróis, distribui o orçamento em blocos de até 16, usando o restante exato no último bloco e confere o ataque entre blocos. O limite é de 600 tentativas de lançamento de tropas. Quando o contador não diminui, novas observações conferem o card e distribuem as tentativas pelos doze pontos calibrados. Se a falha persistir, o restante das tropas fica pendente e a batalha continua; contador ilegível não vira zero.
 
-O lançamento segue tropas, feitiços e heróis. Feitiços usam as posições do anel; tipos que exigem alvos específicos interrompem o fluxo se o contador não diminuir em três tentativas. Heróis usam referências alternativas, quatro posições de lançamento e ativação da habilidade. A pausa conserva o andamento; uma mudança de `resumeGeneration` exige nova leitura/seleção do card. Depois de retornar do resultado, o script espera três segundos para os saldos da vila assentarem.
+O lançamento segue tropas, heróis e feitiços. Feitiços usam as posições do anel; um tipo que não diminui após doze tentativas é deixado de lado para permitir os demais. Leituras persistentemente ilegíveis ou divergentes suspendem os lançamentos, mantendo a espera pelo resultado da batalha. Heróis usam referências alternativas, quatro posições de lançamento e ativação da habilidade. A pausa conserva o andamento; uma mudança de `resumeGeneration` exige nova leitura/seleção do card. Depois de retornar do resultado, o script espera três segundos para os saldos da vila assentarem.
 
 Os muros são tentados antes da parada por depósitos cheios. O script procura em quatro setores, exige construtor disponível e reconhece os dois preços do muro selecionado. Custos divergentes encerram o fluxo. A preferência de moeda é aplicada primeiro; a alternativa é tentada quando preço ou reserva impedem o recurso preferido.
 
