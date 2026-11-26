@@ -36,7 +36,7 @@ versão.
 
 ## Instalação
 
-[Baixe uma versão compatível com seu celular](https://github.com/MarlonPassos-git/Smart-AutoClicker/releases/tag/4.0.0-beta06).
+[Baixe uma versão compatível com seu celular](https://github.com/MarlonPassos-git/Smart-AutoClicker/releases/tag/4.0.0-beta07).
 Se precisar de ajuda, consulte [Qual APK devo instalar?](docs/QUAL-APK-DEVO-INSTALAR.md)
 e depois siga o [guia de instalação](docs/INSTALACAO-E-CONFIGURACAO.md).
 
@@ -72,7 +72,7 @@ versões oficiais para lojas estão em
 
 ## Links
 
-- [Baixar o aplicativo](https://github.com/MarlonPassos-git/Smart-AutoClicker/releases/tag/4.0.0-beta06)
+- [Baixar o aplicativo](https://github.com/MarlonPassos-git/Smart-AutoClicker/releases/tag/4.0.0-beta07)
 - [Escolher o APK compatível](docs/QUAL-APK-DEVO-INSTALAR.md)
 - [Instalar e configurar o aplicativo](docs/INSTALACAO-E-CONFIGURACAO.md)
 - [Relatar um problema](https://github.com/MarlonPassos-git/Smart-AutoClicker/issues/new?template=bug_report.yml)

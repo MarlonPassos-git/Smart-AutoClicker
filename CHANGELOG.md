@@ -6,7 +6,7 @@ e as versões seguem o [Versionamento Semântico](https://semver.org/lang/pt-BR/
 
 ## [Não lançado]
 
-## [4.0.0-beta06] - 2026-11-25
+## [4.0.0-beta07] - 2026-11-25
 
 ### Adicionado
 
@@ -51,6 +51,6 @@ As telas abaixo foram registradas no emulador com a versão desta release.
   <img src="https://raw.githubusercontent.com/MarlonPassos-git/Smart-AutoClicker/master/docs/assets/releases/4.0.0-beta05/zoom-action.png" width="260" alt="Ação de zoom configurada">
 </p>
 
-[Não lançado]: https://github.com/MarlonPassos-git/Smart-AutoClicker/compare/4.0.0-beta06...HEAD
-[4.0.0-beta06]: https://github.com/MarlonPassos-git/Smart-AutoClicker/compare/4.0.0-beta05...4.0.0-beta06
+[Não lançado]: https://github.com/MarlonPassos-git/Smart-AutoClicker/compare/4.0.0-beta07...HEAD
+[4.0.0-beta07]: https://github.com/MarlonPassos-git/Smart-AutoClicker/compare/4.0.0-beta05...4.0.0-beta07
 [4.0.0-beta05]: https://github.com/MarlonPassos-git/Smart-AutoClicker/compare/45545d23...4.0.0-beta05

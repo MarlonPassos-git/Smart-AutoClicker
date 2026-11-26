@@ -1,6 +1,6 @@
 # Qual APK devo instalar?
 
-[Abrir a página de download](https://github.com/MarlonPassos-git/Smart-AutoClicker/releases/tag/4.0.0-beta06)
+[Abrir a página de download](https://github.com/MarlonPassos-git/Smart-AutoClicker/releases/tag/4.0.0-beta07)
 
 Escolha o arquivo indicado para seu aparelho:
 

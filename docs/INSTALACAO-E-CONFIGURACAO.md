@@ -5,7 +5,7 @@ instalação e algumas permissões. Siga as etapas abaixo na ordem.
 
 ## 1. Baixar o aplicativo
 
-[Baixar o Klick'r pela página da versão](https://github.com/MarlonPassos-git/Smart-AutoClicker/releases/tag/4.0.0-beta06)
+[Baixar o Klick'r pela página da versão](https://github.com/MarlonPassos-git/Smart-AutoClicker/releases/tag/4.0.0-beta07)
 
 Baixe a versão compatível com seu celular. Se não souber qual escolher,
 consulte [Qual APK devo instalar?](QUAL-APK-DEVO-INSTALAR.md).
