@@ -10,6 +10,19 @@ extensions.configure<com.android.build.api.dsl.LibraryExtension> {
     buildFeatures.viewBinding = true
 }
 
+val farmPackage = rootProject.layout.projectDirectory.dir("examples/scripts/farm-walls-sm-s916b")
+extensions.configure<com.android.build.api.variant.LibraryAndroidComponentsExtension> {
+    onVariants { variant ->
+        val packageFarm = tasks.register<Zip>("package${variant.name.replaceFirstChar { it.uppercaseChar() }}BundledFarm") {
+            from(farmPackage)
+            archiveFileName.set("farm-walls-sm-s916b.zip")
+            isPreserveFileTimestamps = false
+            isReproducibleFileOrder = true
+        }
+        variant.sources.assets?.addGeneratedSourceDirectory(packageFarm, Zip::getDestinationDirectory)
+    }
+}
+
 // Editor validation tests use host JNI; device builds keep the Android artifact.
 configurations.matching { it.name.contains("UnitTest") }.configureEach {
     resolutionStrategy.dependencySubstitution {

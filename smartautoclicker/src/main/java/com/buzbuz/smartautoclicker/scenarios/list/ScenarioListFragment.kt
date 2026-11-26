@@ -50,9 +50,9 @@ import com.buzbuz.smartautoclicker.scenarios.migration.ConditionsMigrationFragme
 import com.buzbuz.smartautoclicker.scenarios.creation.ScenarioCreationDialog
 import com.buzbuz.smartautoclicker.scenarios.list.adapter.ScenarioAdapter
 import com.buzbuz.smartautoclicker.feature.script.config.ScriptHomeAdapter
-import com.buzbuz.smartautoclicker.core.script.packages.ScriptPackageRepository
 import com.buzbuz.smartautoclicker.core.script.packages.StoredScriptPackage
 import com.buzbuz.smartautoclicker.feature.script.config.ScriptLibraryActivity
+import com.buzbuz.smartautoclicker.feature.script.config.ScriptLibraryStorage
 import com.buzbuz.smartautoclicker.scenarios.list.copy.ScenarioCopyDialog
 import com.buzbuz.smartautoclicker.scenarios.list.copy.ScenarioCopyDialog.Companion.FRAGMENT_TAG_COPY_DIALOG
 import com.buzbuz.smartautoclicker.scenarios.list.model.ScenarioListUiState
@@ -67,7 +67,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.io.File
 
 /**
  * Fragment displaying the list of click scenario and the creation dialog.
@@ -162,9 +161,11 @@ class ScenarioListFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        val packageRoot = File(requireContext().filesDir, "scripts/packages")
+        val context = requireContext().applicationContext
         viewLifecycleOwner.lifecycleScope.launch {
-            val result = withContext(Dispatchers.IO) { runCatching { ScriptPackageRepository(packageRoot).listLatestPackages() } }
+            val result = withContext(Dispatchers.IO) {
+                runCatching { ScriptLibraryStorage.listPackages(context) }
+            }
             result.onSuccess { homeScripts = it }
                 .onFailure { android.widget.Toast.makeText(requireContext(), it.message, android.widget.Toast.LENGTH_LONG).show() }
             updateUiState(scenarioListViewModel.uiState.value)

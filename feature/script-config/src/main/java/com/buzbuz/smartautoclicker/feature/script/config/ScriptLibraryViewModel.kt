@@ -9,12 +9,10 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.buzbuz.smartautoclicker.core.script.android.ScriptRunLogs
-import com.buzbuz.smartautoclicker.core.script.packages.ScriptPackageRepository
 import com.buzbuz.smartautoclicker.core.script.packages.StoredScriptPackage
 import com.buzbuz.smartautoclicker.core.script.runtime.QuickJsScriptRuntime
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
-import java.io.File
 import java.util.UUID
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
@@ -47,7 +45,7 @@ data class ScriptCalibrationRequest(val storageId: String, val name: String, val
 
 /** Retains an editor draft across rotation; every save publishes a separate immutable revision. */
 class ScriptLibraryViewModel(application: Application, private val savedState: SavedStateHandle) : AndroidViewModel(application) {
-    private val repository by lazy { ScriptPackageRepository(File(application.filesDir, "scripts/packages")) }
+    private val repository by lazy { ScriptLibraryStorage.repository(application) }
     private val recentValues by lazy { application.getSharedPreferences("script-start-answers", Context.MODE_PRIVATE) }
     private val mutableState = MutableStateFlow(ScriptLibraryState())
     val state = mutableState.asStateFlow()
@@ -75,7 +73,7 @@ class ScriptLibraryViewModel(application: Application, private val savedState: S
 
     /** Refreshes the script library, e.g. after returning from an import. */
     fun refresh() = work {
-        val packages = io { repository.listLatestPackages() }
+        val packages = io { ScriptLibraryStorage.listPackages(getApplication()) }
         mutableState.update { it.copy(packages = packages) }
         val selectedId = savedState.get<String>("selected") ?: return@work
         val selected = packages.find { it.storageId == selectedId }
