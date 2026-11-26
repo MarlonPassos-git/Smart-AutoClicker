@@ -29,13 +29,14 @@ adicionar recursos desenvolvidos para cenários mais complexos.
 - **Toque em área:** define uma região poligonal e escolhe um ponto válido dentro dela durante a execução.
 - **Zoom configurável:** executa gestos de aproximar ou afastar nos modos inteligente e regular.
 - **Automação avançada:** combina imagens, textos, temporizadores, contadores, intents e controle de fluxo.
+- **Modo Script:** executa automações em JavaScript e já inclui **Farm — vilas e muros** na tela inicial.
 
 Consulte o [histórico de mudanças](CHANGELOG.md) para ver detalhes de cada
 versão.
 
 ## Instalação
 
-[Baixe uma versão compatível com seu celular](https://github.com/MarlonPassos-git/Smart-AutoClicker/releases/tag/4.0.0-beta05).
+[Baixe uma versão compatível com seu celular](https://github.com/MarlonPassos-git/Smart-AutoClicker/releases/tag/4.0.0-beta06).
 Se precisar de ajuda, consulte [Qual APK devo instalar?](docs/QUAL-APK-DEVO-INSTALAR.md)
 e depois siga o [guia de instalação](docs/INSTALACAO-E-CONFIGURACAO.md).
 
@@ -71,7 +72,7 @@ versões oficiais para lojas estão em
 
 ## Links
 
-- [Baixar o aplicativo](https://github.com/MarlonPassos-git/Smart-AutoClicker/releases/tag/4.0.0-beta05)
+- [Baixar o aplicativo](https://github.com/MarlonPassos-git/Smart-AutoClicker/releases/tag/4.0.0-beta06)
 - [Escolher o APK compatível](docs/QUAL-APK-DEVO-INSTALAR.md)
 - [Instalar e configurar o aplicativo](docs/INSTALACAO-E-CONFIGURACAO.md)
 - [Relatar um problema](https://github.com/MarlonPassos-git/Smart-AutoClicker/issues/new?template=bug_report.yml)

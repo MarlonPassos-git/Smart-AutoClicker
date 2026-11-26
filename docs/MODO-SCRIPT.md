@@ -1,6 +1,12 @@
 # Modo Script
 
-O modo Script executa JavaScript no próprio Android e mantém seus pacotes separados dos cenários por imagem e das sequências simples. A interface está disponível nos builds deste checkout. A validação do farm completo em aparelho arm64 e a comparação final de latência ainda estão pendentes; este documento não anuncia uma versão publicada.
+O modo Script executa JavaScript no próprio Android e mantém seus pacotes separados dos cenários por imagem e das sequências simples.
+
+## Farm — vilas e muros
+
+A partir da versão 4.0.0-beta06, o farm vem no APK e aparece na tela inicial ao abrir o Klick'r. Toque em **Configurar vilas** para fazer o cadastro. Em **Iniciar**, selecione as vilas e revise o limite de batalhas e as opções de muros antes de confirmar.
+
+O pacote inclui o [perfil de referência do Samsung SM-S916B](../examples/scripts/farm-walls-sm-s916b/README.md), calibrado em português, na paisagem Clássica, a 2340 × 1080. Mudanças de layout, idioma ou enquadramento podem exigir recalibração. Se você já importou esse pacote, o Klick'r mantém a sua revisão e seus dados.
 
 ## Criar, importar e executar
 

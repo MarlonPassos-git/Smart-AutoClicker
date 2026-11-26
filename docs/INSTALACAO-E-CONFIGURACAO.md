@@ -5,7 +5,7 @@ instalação e algumas permissões. Siga as etapas abaixo na ordem.
 
 ## 1. Baixar o aplicativo
 
-[Baixar o Klick'r pela página da versão](https://github.com/MarlonPassos-git/Smart-AutoClicker/releases/tag/4.0.0-beta05)
+[Baixar o Klick'r pela página da versão](https://github.com/MarlonPassos-git/Smart-AutoClicker/releases/tag/4.0.0-beta06)
 
 Baixe a versão compatível com seu celular. Se não souber qual escolher,
 consulte [Qual APK devo instalar?](QUAL-APK-DEVO-INSTALAR.md).
@@ -81,4 +81,7 @@ A tela de notificações pode mudar conforme a versão do Android.
 
 ![Passo a passo para ativar o serviço de acessibilidade do Klick'r](images/instalacao/ativar-acessibilidade.gif)
 
-Pronto. Abra o Klick'r e comece a criar seus cenários.
+Ao abrir o Klick'r, o cartão **Farm — vilas e muros** aparece na tela inicial.
+Use **Configurar vilas** para cadastrar as contas e **Iniciar** para revisar os
+parâmetros. Consulte o [guia do modo Script](MODO-SCRIPT.md) para ver os requisitos
+do farm e importar outros pacotes.
