@@ -2,6 +2,10 @@ package com.buzbuz.smartautoclicker.feature.script.config
 
 import android.app.Application
 import androidx.test.core.app.ApplicationProvider
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
+import java.util.zip.ZipEntry
+import java.util.zip.ZipOutputStream
 import kotlinx.serialization.json.*
 import androidx.lifecycle.SavedStateHandle
 import io.mockk.every
@@ -29,14 +33,71 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [35])
 class ScriptLibraryIntegrationTest {
+    private val farmId = "farm-walls-sm-s916b"
     @get:Rule val temporary = TemporaryFolder()
     @Before fun mainDispatcher() { Dispatchers.setMain(UnconfinedTestDispatcher()) }
     @After fun resetDispatcher() { Dispatchers.resetMain() }
 
     @Test(timeout = 15000)
+    fun firstLibraryOpenInstallsTheBundledFarmOnce() = runBlocking {
+        val application = testApplication()
+        val model = ScriptLibraryViewModel(application, SavedStateHandle())
+        idle(model)
+
+        val farm = model.state.value.packages.single()
+        assertEquals(farmId, farm.manifest.id)
+        assertEquals("Farm — vilas e muros", farm.manifest.name)
+        assertTrue(farm.manifest.setup != null)
+        assertTrue("maxBattles" in farm.manifest.parameters)
+        assertEquals(null, model.state.value.selected)
+        assertEquals(farm, ScriptLibraryStorage.listPackages(application).single())
+        assertEquals(farm, ScriptLibraryStorage.repository(application).listPackages().single())
+    }
+
+    @Test(timeout = 15000)
+    fun previouslyImportedFarmKeepsItsRevisionAndSavedRound() = runBlocking {
+        val application = testApplication()
+        val repository = ScriptLibraryStorage.repository(application)
+        val archive = ByteArrayOutputStream()
+        ZipOutputStream(archive).use { zip ->
+            zip.putNextEntry(ZipEntry("manifest.json"))
+            zip.write(
+                """
+                {"formatVersion":1,"apiVersion":1,"id":"$farmId","name":"Meu farm","scriptVersion":"3.5.0","entry":"entry.js"}
+                """.trimIndent().toByteArray(),
+            )
+            zip.closeEntry()
+            zip.putNextEntry(ZipEntry("entry.js"))
+            zip.write("// Personalizado".toByteArray())
+            zip.closeEntry()
+        }
+        val previous = repository.importPackage(ByteArrayInputStream(archive.toByteArray()))
+        val progress = buildJsonObject {
+            put("formatVersion", 1)
+            put("revision", previous.storageId)
+            put("completed", false)
+            putJsonObject("answers") { put("maxBattles", 2) }
+            putJsonObject("state") { put("battles", 1) }
+        }
+        val configuration = buildJsonObject { putJsonArray("villages") { add("Minha vila") } }
+        val states = repository.executionStates()
+        states.acquire(farmId).use {
+            it.writeConfiguration(configuration)
+            it.write(progress)
+        }
+
+        val model = ScriptLibraryViewModel(application, SavedStateHandle())
+        idle(model)
+
+        assertEquals(previous, model.state.value.packages.single())
+        assertEquals(previous, repository.listPackages().single())
+        assertEquals(progress, states.read(farmId))
+        assertEquals(configuration, states.readConfiguration(farmId))
+    }
+
+    @Test(timeout = 15000)
     fun failedStartupCanBeExportedWithoutStartingTheService() = runBlocking {
-        val application = mockk<Application>(relaxed = true)
-        every { application.filesDir } returns temporary.root
+        val application = testApplication()
         val resolver = mockk<android.content.ContentResolver>()
         every { application.contentResolver } returns resolver
         val uri = android.net.Uri.parse("content://documents/history.zip")
@@ -63,8 +124,7 @@ class ScriptLibraryIntegrationTest {
 
     @Test(timeout = 15000)
     fun syntaxValidationReportsTheSourceFileAndLineWhileKeepingTheDraft() = runBlocking {
-        val application = mockk<Application>(relaxed = true)
-        every { application.filesDir } returns temporary.root
+        val application = testApplication()
         val model = ScriptLibraryViewModel(application, SavedStateHandle())
         idle(model)
         model.create("Erro localizado")
@@ -81,8 +141,7 @@ class ScriptLibraryIntegrationTest {
 
     @Test(timeout = 15000)
     fun projectionConsentKeepsTheReviewedRevisionAfterLibrarySelectionChanges() = runBlocking {
-        val application = mockk<Application>(relaxed = true)
-        every { application.filesDir } returns temporary.root
+        val application = testApplication()
         val saved = SavedStateHandle()
         val model = ScriptLibraryViewModel(application, saved)
         idle(model)
@@ -101,11 +160,10 @@ class ScriptLibraryIntegrationTest {
 
     @Test(timeout = 15000)
     fun recentAnswersSurviveReopeningWithoutChangingDefaultsAndIgnoreIncompatibleDefinitions() = runBlocking {
-        val application = mockk<Application>(relaxed = true)
+        val application = testApplication()
         val preferences = ApplicationProvider.getApplicationContext<Application>()
             .getSharedPreferences("recent-answers-test", android.content.Context.MODE_PRIVATE)
         preferences.edit().clear().commit()
-        every { application.filesDir } returns temporary.root
         every { application.getSharedPreferences(any(), any()) } returns preferences
         val model = ScriptLibraryViewModel(application, SavedStateHandle())
         idle(model)
@@ -135,8 +193,7 @@ class ScriptLibraryIntegrationTest {
 
     @Test(timeout = 15000)
     fun restoredEditorKeepsTheDraftAndOriginalPackageSeparate() = runBlocking {
-        val application = mockk<Application>(relaxed = true)
-        every { application.filesDir } returns temporary.root
+        val application = testApplication()
         val saved = SavedStateHandle()
         val model = ScriptLibraryViewModel(application, saved)
         idle(model)
@@ -153,8 +210,7 @@ class ScriptLibraryIntegrationTest {
 
     @Test(timeout = 15000)
     fun savingManifestEditsPublishesANewRevision() = runBlocking {
-        val application = mockk<Application>(relaxed = true)
-        every { application.filesDir } returns temporary.root
+        val application = testApplication()
         val model = ScriptLibraryViewModel(application, SavedStateHandle())
         idle(model)
         model.create("Original")
@@ -167,12 +223,23 @@ class ScriptLibraryIntegrationTest {
         idle(model)
         assertEquals("Editado", model.state.value.selected!!.manifest.name)
         assertTrue(previousId != model.state.value.selected!!.storageId)
-        assertEquals(listOf(model.state.value.selected!!.storageId), model.state.value.packages.map { it.storageId })
+        assertEquals(
+            model.state.value.selected!!.storageId,
+            model.state.value.packages.single { it.manifest.id != farmId }.storageId,
+        )
         val original = ScriptLibraryViewModel(application, SavedStateHandle(mapOf("selected" to previousId)))
         idle(original)
         assertEquals("Original", original.state.value.selected!!.manifest.name)
-        assertEquals("Editado", original.state.value.packages.single().manifest.name)
+        assertEquals("Editado", original.state.value.packages.single { it.manifest.id != farmId }.manifest.name)
         assertTrue(!model.state.value.dirty)
+    }
+
+    private fun testApplication(): Application {
+        val assets = ApplicationProvider.getApplicationContext<Application>().assets
+        return mockk<Application>(relaxed = true) {
+            every { filesDir } returns temporary.root
+            every { this@mockk.assets } returns assets
+        }
     }
 
     private suspend fun idle(model: ScriptLibraryViewModel) {
