@@ -20,6 +20,8 @@ extensions.configure<com.android.build.api.variant.LibraryAndroidComponentsExten
             isReproducibleFileOrder = true
         }
         variant.sources.assets?.addGeneratedSourceDirectory(packageFarm, Zip::getDestinationDirectory)
+        // AGP's library asset merge can run without the generated asset task in its graph.
+        variant.lifecycleTasks.registerPreBuild(packageFarm)
     }
 }
 
