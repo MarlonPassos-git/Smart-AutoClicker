@@ -6,7 +6,7 @@ e as versões seguem o [Versionamento Semântico](https://semver.org/lang/pt-BR/
 
 ## [Não lançado]
 
-## [4.0.0-beta07] - 2026-11-25
+## [4.0.0-beta07] - 2026-11-26
 
 ### Adicionado
 
@@ -22,6 +22,10 @@ e as versões seguem o [Versionamento Semântico](https://semver.org/lang/pt-BR/
 
 - O farm reconfirma saldos e contadores de tropas e feitiços antes de decidir. Quando esgota as tentativas de lançar uma unidade, segue para as fases restantes da batalha.
 - O menu flutuante mantém os controles utilizáveis após redimensionamento. Pausar um cenário inteligente conserva seu progresso.
+
+### Atualização da beta05
+
+Os APKs desta beta têm uma assinatura de desenvolvimento diferente da beta05 publicada neste repositório. O Android bloqueia a atualização direta entre essas versões. O cadastro e o progresso do farm ficam no armazenamento local da instalação. O ZIP exportado pela biblioteca Scripts contém os arquivos do pacote.
 
 ## [4.0.0-beta05] - 2026-07-24
 
